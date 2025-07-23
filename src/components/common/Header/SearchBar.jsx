@@ -127,7 +127,7 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
             className="search-field__button"
             onClick={() => setActiveField(activeField === 'location' ? null : 'location')}
           >
-            <div className="search-field__label">¿A dónde?</div>
+          
             <div className="search-field__value">
               {searchData.location || 'Buscar destinos'}
             </div>
@@ -170,7 +170,7 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
                   <div className="no-suggestions">No se encontraron ubicaciones</div>
                 ) : (
                   <div className="popular-destinations">
-                    <div className="suggestions-title">Destinos populares</div>
+                   
                     {popularLocations.slice(0, 4).map((location, index) => (
                       <button
                         key={index}
@@ -204,7 +204,6 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
           >
             <div className="search-field__content">
               <div className="date-section">
-                <div className="search-field__label">Llegada</div>
                 <div className="search-field__value">
                   {searchData.checkIn ? format(searchData.checkIn, 'dd MMM', { locale: es }) : 'Agregar fechas'}
                 </div>
@@ -377,7 +376,7 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
               fill="currentColor"
             />
           </svg>
-          <span className="search-button__text">Buscar</span>
+          
         </button>
       </div>
     </div>
