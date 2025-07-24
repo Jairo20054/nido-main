@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
-import SearchBar from './SearchBar';
 import Navigation from './Navigation';
 import UserMenu from './UserMenu';
 import { 
@@ -41,7 +40,6 @@ function throttle(func, limit) {
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [hasNewNotifications, setHasNewNotifications] = useState(false);
   
@@ -92,7 +90,6 @@ const Header = () => {
   // Reset al cambiar de ruta
   useEffect(() => {
     setIsMobileMenuOpen(false);
-    setIsSearchExpanded(false);
   }, [location.pathname]);
 
   // Control de tecla Escape y overflow
@@ -100,11 +97,10 @@ const Header = () => {
     const handleEscape = (e) => {
       if (e.key === 'Escape') {
         setIsMobileMenuOpen(false);
-        setIsSearchExpanded(false);
       }
     };
 
-    if (isMobileMenuOpen || isSearchExpanded) {
+    if (isMobileMenuOpen) {
       document.addEventListener('keydown', handleEscape);
       document.body.style.overflow = 'hidden';
     } else {
@@ -115,7 +111,7 @@ const Header = () => {
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = '';
     };
-  }, [isMobileMenuOpen, isSearchExpanded]);
+  }, [isMobileMenuOpen]);
 
   // Notificaciones simuladas
   useEffect(() => {
@@ -135,10 +131,6 @@ const Header = () => {
 
   const toggleMobileMenu = useCallback(() => {
     setIsMobileMenuOpen(prev => !prev);
-  }, []);
-
-  const toggleSearch = useCallback(() => {
-    setIsSearchExpanded(prev => !prev);
   }, []);
 
   const closeMobileMenu = useCallback(() => {
@@ -202,15 +194,6 @@ const Header = () => {
             items={navigationItems}
             activePathMatcher={(item) => isActiveNavItem(item.path)}
             className="header__navigation"
-          />
-        </div>
-
-        {/* Barra de búsqueda */}
-        <div className={`header__search ${isSearchExpanded ? 'header__search--expanded' : ''}`}>
-          <SearchBar 
-            isExpanded={isSearchExpanded}
-            onToggle={toggleSearch}
-            onClose={() => setIsSearchExpanded(false)}
           />
         </div>
 
