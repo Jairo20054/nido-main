@@ -15,32 +15,38 @@ const Navigation = ({
   const navRef = useRef(null);
   const activeItemRef = useRef(null);
 
-  const navigationItems = [
-    {
-      id: 'short-stays',
-      path: '/short-stays',
-      label: 'Estadías Cortas',
-      shortLabel: 'Cortos',
-      icon: FaHome,
-      description: 'Reservas de corta duración'
-    },
-    {
-      id: 'long-stays',
-      path: '/long-stays',
-      label: 'Estadías Largas',
-      shortLabel: 'Largos',
-      icon: FaClock,
-      description: 'Reservas de larga duración'
-    },
-    {
-      id: 'services',
-      path: '/services',
-      label: 'Servicios Adicionales',
-      shortLabel: 'Servicios',
-      icon: FaServicestack,
-      description: 'Servicios complementarios'
-    }
-  ];
+  const  navigationItems  = [
+  {
+    id: 'short-stays',
+    path: '/short-stays',
+    label: 'Estadías Cortas',
+    shortLabel: 'Cortos',
+    icon: FaHome,
+    description: 'Reservas de corta duración',
+    color: 'red',
+    className: 'nav-item nav-item-blue' // Clases añadidas
+  },
+  {
+    id: 'long-stays',
+    path: '/long-stays',
+    label: 'Estadías Largas',
+    shortLabel: 'Largos',
+    icon: FaClock,
+    description: 'Reservas de larga duración',
+    color: 'green',
+    className: 'nav-item nav-item-green' // Clases añadidas
+  },
+  {
+    id: 'services',
+    path: '/services',
+    label: 'Servicios ADICIONALES',
+    shortLabel: 'Servicios',
+    icon: FaServicestack,
+    description: 'Servicios complementarios',
+    color: 'purple',
+    className: 'nav-item nav-item-purple' // Clases añadidas
+  }
+];
 
   // Actualizar posición del indicador activo
   useEffect(() => {
@@ -132,7 +138,7 @@ const Navigation = ({
                   ref={isActive ? activeItemRef : null}
                   to={item.path}
                   className={({ isActive: linkIsActive }) => 
-                    `nav-link ${linkIsActive ? 'active' : ''}`
+                    `nav-link ${linkIsActive ? 'active' : ''} nav-link--${item.color}`
                   }
                   onClick={() => handleItemClick(item)}
                   role="menuitem"
