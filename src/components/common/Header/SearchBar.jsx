@@ -317,26 +317,9 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
 
                 <div className="guest-type">
                   <div className="guest-info">
-                    <div className="guest-title">Bebés</div>
-                    <div className="guest-subtitle">Menores de 2 años</div>
                   </div>
                   <div className="guest-controls">
-                    <button
-                      type="button"
-                      className="guest-btn"
-                      onClick={() => updateGuests('babies', 'decrement')}
-                      disabled={searchData.guests.babies <= 0}
-                    >
-                      −
-                    </button>
-                    <span className="guest-count">{searchData.guests.babies}</span>
-                    <button
-                      type="button"
-                      className="guest-btn"
-                      onClick={() => updateGuests('babies', 'increment')}
-                    >
-                      +
-                    </button>
+                    
                   </div>
                 </div>
 
@@ -365,19 +348,7 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
         </div>
 
         {/* Botón de búsqueda */}
-        <button
-          className="search-button"
-          onClick={handleSearch}
-          disabled={isLoading}
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path
-              d="M7 14A7 7 0 1 0 7 0a7 7 0 0 0 0 14ZM7 2a5 5 0 1 1 0 10A5 5 0 0 1 7 2Zm4.93 7.75L15 12.58l-.92.92-3.5-3.5a.5.5 0 0 1 .35-.25Z"
-              fill="currentColor"
-            />
-          </svg>
-          
-        </button>
+       
       </div>
     </div>
   );
