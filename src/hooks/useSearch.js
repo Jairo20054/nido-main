@@ -1,5 +1,5 @@
 import { useState, useContext, useCallback, useRef } from 'react';
-import { SearchContext } from '../context/SearchContext'; // Importación CORREGIDA
+import { SearchContext } from '../context/BookingContext';
 import { api } from '../utils/api';
 
 export const useSearch = () => {

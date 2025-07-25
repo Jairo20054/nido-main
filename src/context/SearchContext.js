@@ -1,66 +1,36 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
-export const SearchContext = createContext();
+const SearchContext = createContext();
 
 export const SearchProvider = ({ children }) => {
-  // 1. Mejor inicialización de fechas para evitar undefined
   const [location, setLocation] = useState('');
-  const [dates, setDatesState] = useState({ 
-    checkIn: null, 
-    checkOut: null 
-  });
-  
+  const [dates, setDatesState] = useState({ checkIn: null, checkOut: null });
   const [guests, setGuests] = useState(1);
-  
-  // 2. Inicializar results como array vacío para prevenir undefined en operaciones de array
   const [results, setResults] = useState([]);
-  
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const updateDates = (checkIn, checkOut) => {
-    // 3. Validación mejorada de fechas
-    if (checkIn && checkOut) {
-      const checkInDate = new Date(checkIn);
-      const checkOutDate = new Date(checkOut);
-      
-      if (checkOutDate <= checkInDate) {
-        setError('La fecha de salida debe ser posterior a la de entrada');
-        return;
-      }
+    if (new Date(checkOut) <= new Date(checkIn)) {
+      setError('La fecha de salida debe ser posterior a la de entrada');
+      return;
     }
     setDatesState({ checkIn, checkOut });
     setError(null);
   };
 
   useEffect(() => {
-    // 4. Manejo seguro del localStorage con try/catch
-    try {
-      const saved = localStorage.getItem('searchParams');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        
-        // 5. Validar estructura antes de usar los datos
-        if (parsed.loc && parsed.dates && parsed.guests) {
-          setLocation(parsed.loc);
-          setDatesState(parsed.dates);
-          setGuests(parsed.guests);
-        }
-      }
-    } catch (e) {
-      console.error("Error al recuperar búsquedas guardadas", e);
+    const saved = localStorage.getItem('searchParams');
+    if (saved) {
+      const { loc, dates, guests: g } = JSON.parse(saved);
+      setLocation(loc);
+      setDatesState(dates);
+      setGuests(g);
     }
   }, []);
 
   useEffect(() => {
-    // 6. Guardar solo si los datos son válidos
-    if (location || dates.checkIn || dates.checkOut) {
-      localStorage.setItem('searchParams', JSON.stringify({ 
-        loc: location, 
-        dates, 
-        guests 
-      }));
-    }
+    localStorage.setItem('searchParams', JSON.stringify({ loc: location, dates, guests }));
   }, [location, dates, guests]);
 
   return (
@@ -83,8 +53,8 @@ export const SearchProvider = ({ children }) => {
   );
 };
 
-export const useSearchContext = () => {
+export const useSearch = () => {
   const ctx = useContext(SearchContext);
-  if (!ctx) throw new Error('useSearchContext debe usarse dentro de SearchProvider');
+  if (!ctx) throw new Error('useSearch debe usarse dentro de SearchProvider');
   return ctx;
 };

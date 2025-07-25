@@ -21,14 +21,6 @@
   --nav-transition-slow: 300ms ease-in-out;
   --nav-z-index-dropdown: 50;
   --nav-z-index-modal: 100;
-  
-  /* Colores específicos para categorías */
-  --nav-blue: #3b82f6;
-  --nav-blue-hover: #2563eb;
-  --nav-green: #10b981;
-  --nav-green-hover: #059669;
-  --nav-purple: #8b5cf6;
-  --nav-purple-hover: #7c3aed;
 }
 
 /* Botón menú móvil */
@@ -130,6 +122,8 @@
 
 /* Estados del enlace */
 .nav-link:hover {
+  color: var(--nav-primary-color);
+  background-color: var(--nav-bg-gray-50);
   transform: translateY(-1px);
 }
 
@@ -141,46 +135,17 @@
 .nav-link:focus {
   outline: 2px solid var(--nav-primary-color);
   outline-offset: 2px;
+  color: var(--nav-primary-color);
 }
 
 .nav-link.active {
+  color: var(--nav-primary-color);
   font-weight: 600;
   background-color: var(--nav-bg-gray-50);
 }
 
 .navigation.horizontal .nav-link.active {
   background-color: transparent;
-}
-
-/* Colores específicos para cada categoría */
-.nav-link--blue:hover,
-.nav-link--blue.active {
-  color: var(--nav-blue);
-}
-
-.nav-link--green:hover,
-.nav-link--green.active {
-  color: var(--nav-green);
-}
-
-.nav-link--purple:hover,
-.nav-link--purple.active {
-  color: var(--nav-purple);
-}
-
-.nav-link--blue:hover .nav-icon,
-.nav-link--blue.active .nav-icon {
-  color: var(--nav-blue);
-}
-
-.nav-link--green:hover .nav-icon,
-.nav-link--green.active .nav-icon {
-  color: var(--nav-green);
-}
-
-.nav-link--purple:hover .nav-icon,
-.nav-link--purple.active .nav-icon {
-  color: var(--nav-purple);
 }
 
 /* Iconos de navegación */
@@ -216,6 +181,7 @@
   left: 50%;
   width: 0;
   height: 3px;
+  background: linear-gradient(90deg, var(--nav-primary-color), var(--nav-primary-hover));
   border-radius: 2px;
   transform: translateX(-50%);
   transition: width var(--nav-transition-normal);
@@ -229,25 +195,12 @@
   width: 80%;
 }
 
-/* Colores para subrayado */
-.nav-link--blue .nav-underline {
-  background: linear-gradient(90deg, var(--nav-blue), var(--nav-blue-hover));
-}
-
-.nav-link--green .nav-underline {
-  background: linear-gradient(90deg, var(--nav-green), var(--nav-green-hover));
-}
-
-.nav-link--purple .nav-underline {
-  background: linear-gradient(90deg, var(--nav-purple), var(--nav-purple-hover));
-}
-
 /* Indicador activo dinámico */
 .active-indicator {
   position: absolute;
   bottom: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--nav-blue), var(--nav-blue-hover));
+  background: linear-gradient(90deg, var(--nav-primary-color), var(--nav-primary-hover));
   border-radius: 2px;
   transition: all var(--nav-transition-normal);
   opacity: 0;

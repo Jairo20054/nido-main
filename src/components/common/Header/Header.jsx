@@ -42,49 +42,55 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [hasNewNotifications, setHasNewNotifications] = useState(false);
-  
+
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const navigationItems = useMemo(() => [
-    {
-      id: 'short-stays',
-      label: 'Estadías Cortas',
-      shortLabel: 'Cortas',
-      path: '/search?type=short',
-      icon: HomeIcon,
-      description: 'Hasta 30 días',
-      color: 'blue'
-    },
-    {
-      id: 'long-stays',
-      label: 'Estadías Largas',
-      shortLabel: 'Largas',
-      path: '/search?type=long',
-      icon: CalendarDaysIcon,
-      description: 'Más de 30 días',
-      color: 'green'
-    },
-    {
-      id: 'services',
-      label: 'Servicios',
-      shortLabel: 'Servicios',
-      path: '/services',
-      icon: WrenchScrewdriverIcon,
-      description: 'Limpieza, tours, más',
-      color: 'purple'
-    }
-  ], []);
+  const navigationItems = useMemo(
+    () => [
+      {
+        id: "short-stays",
+        label: "Estadías Cortas",
+        shortLabel: "Cortas",
+        path: "/search?type=short",
+        icon: HomeIcon,
+        description: "Hasta 30 días",
+        color: "blue",
+      },
+      {
+        id: "long-stays",
+        label: "Estadías Largas",
+        shortLabel: "Largas",
+        path: "/search?type=long",
+        icon: CalendarDaysIcon,
+        description: "Más de 30 días",
+        color: "green",
+      },
+      {
+        id: "services",
+        label: "Servicios",
+        shortLabel: "Servicios",
+        path: "/services",
+        icon: WrenchScrewdriverIcon,
+        description: "Limpieza, tours, más",
+        color: "purple",
+      },
+    ],
+    []
+  );
 
   // Manejo del scroll optimizado
-  const handleScroll = useCallback(throttle(() => {
-    setIsScrolled(window.scrollY > 10);
-  }, 100), []);
+  const handleScroll = useCallback(
+    throttle(() => {
+      setIsScrolled(window.scrollY > 10);
+    }, 100),
+    []
+  );
 
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
   // Reset al cambiar de ruta
@@ -95,21 +101,21 @@ const Header = () => {
   // Control de tecla Escape y overflow
   useEffect(() => {
     const handleEscape = (e) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         setIsMobileMenuOpen(false);
       }
     };
 
     if (isMobileMenuOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = '';
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "";
     };
   }, [isMobileMenuOpen]);
 
@@ -117,20 +123,20 @@ const Header = () => {
   useEffect(() => {
     if (isAuthenticated) {
       const mockNotifications = [
-        { id: 1, message: 'Nueva reserva confirmada', unread: true },
-        { id: 2, message: 'Mensaje del anfitrión', unread: true }
+        { id: 1, message: "Nueva reserva confirmada", unread: true },
+        { id: 2, message: "Mensaje del anfitrión", unread: true },
       ];
       setNotifications(mockNotifications);
-      setHasNewNotifications(mockNotifications.some(n => n.unread));
+      setHasNewNotifications(mockNotifications.some((n) => n.unread));
     }
   }, [isAuthenticated]);
 
   const handleAuthAction = useCallback(() => {
-    navigate(isAuthenticated ? '/dashboard' : '/login');
+    navigate(isAuthenticated ? "/dashboard" : "/login");
   }, [isAuthenticated, navigate]);
 
   const toggleMobileMenu = useCallback(() => {
-    setIsMobileMenuOpen(prev => !prev);
+    setIsMobileMenuOpen((prev) => !prev);
   }, []);
 
   const closeMobileMenu = useCallback(() => {
@@ -138,33 +144,58 @@ const Header = () => {
   }, []);
 
   const handleNotificationClick = useCallback(() => {
-    navigate('/notifications');
+    navigate("/notifications");
     setHasNewNotifications(false);
   }, [navigate]);
 
   // Verificar ruta activa
-  const isActiveNavItem = useCallback((itemPath) => {
-    if (itemPath.includes('?')) {
-      const [path, query] = itemPath.split('?');
-      return location.pathname === path && location.search.includes(query.split('=')[1]);
-    }
-    return location.pathname === itemPath;
-  }, [location]);
+  const isActiveNavItem = useCallback(
+    (itemPath) => {
+      if (itemPath.includes("?")) {
+        const [path, query] = itemPath.split("?");
+        return (
+          location.pathname === path &&
+          location.search.includes(query.split("=")[1])
+        );
+      }
+      return location.pathname === itemPath;
+    },
+    [location]
+  );
+
+  // Funciones para navegación del UserMenu
+  const onProfileClick = useCallback(() => {
+    navigate("/profile");
+  }, [navigate]);
+
+  const onReservationsClick = useCallback(() => {
+    navigate("/my-bookings");
+  }, [navigate]);
+
+  const onPropertiesClick = useCallback(() => {
+    navigate("/host/properties");
+  }, [navigate]);
+
+  const onSettingsClick = useCallback(() => {
+    navigate("/profile");
+  }, [navigate]);
+
+  const onLogoutClick = useCallback(() => {
+    // Aquí puedes agregar lógica para cerrar sesión si es necesario
+    navigate("/login");
+  }, [navigate]);
 
   return (
-    <header 
-      className={`header ${isScrolled ? 'header--scrolled' : ''}`}
-      role="banner"
-    >
+    <header className={`header ${isScrolled ? "header--scrolled" : ""}`} role="banner">
       <div className="header__container">
         {/* Logo */}
-        <Link 
-          to="/" 
-          className="header__logo"
-          aria-label="Nido - Inicio"
-        >
+        <Link to="/" className="header__logo" aria-label="Nido - Inicio">
           <div className="header__logo-icon">
-            <svg viewBox="0 0 32 32" className="header__logo-svg" aria-hidden="true">
+            <svg
+              viewBox="0 0 32 32"
+              className="header__logo-svg"
+              aria-hidden="true"
+            >
               <defs>
                 <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#10B981" />
@@ -188,7 +219,7 @@ const Header = () => {
 
         {/* Navegación desktop */}
         <div className="header__nav-container hide-mobile">
-          <Navigation 
+          <Navigation
             variant="horizontal"
             showIcons={true}
             items={navigationItems}
@@ -201,8 +232,8 @@ const Header = () => {
         <div className="header__actions">
           {/* Favoritos */}
           {isAuthenticated && (
-            <Link 
-              to="/favorites" 
+            <Link
+              to="/favorites"
               className="header__action-btn hide-mobile"
               aria-label="Mis favoritos"
               title="Mis favoritos"
@@ -216,44 +247,56 @@ const Header = () => {
             <button
               onClick={handleNotificationClick}
               className="header__action-btn header__notifications hide-mobile"
-              aria-label={`Notificaciones${hasNewNotifications ? ' (nuevas)' : ''}`}
+              aria-label={`Notificaciones${hasNewNotifications ? " (nuevas)" : ""}`}
               title="Notificaciones"
             >
               <BellIcon className="header__action-icon" />
               {hasNewNotifications && (
                 <span className="header__notification-badge" aria-hidden="true">
-                  {notifications.filter(n => n.unread).length}
+                  {notifications.filter((n) => n.unread).length}
                 </span>
               )}
             </button>
           )}
 
           {/* Convertirse en anfitrión */}
-          <Link 
-            to="/become-host" 
+          <Link
+            to="/become-host"
             className="header__host-link hide-mobile"
             aria-label="Ofrece tu espacio como anfitrión"
           >
             <span>Ofrece tu espacio</span>
-            <svg className="header__host-icon" viewBox="0 0 16 16" aria-hidden="true">
-              <path d="M8 0L10.5 5L16 5.5L11.5 9L13 16L8 13L3 16L4.5 9L0 5.5L5.5 5L8 0Z" fill="#10B981" />
+            <svg
+              className="header__host-icon"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+            >
+              <path
+                d="M8 0L10.5 5L16 5.5L11.5 9L13 16L8 13L3 16L4.5 9L0 5.5L5.5 5L8 0Z"
+                fill="#10B981"
+              />
             </svg>
           </Link>
 
           {/* Menú de usuario */}
-          <UserMenu 
+          <UserMenu
             user={user}
             isAuthenticated={isAuthenticated}
             onAuthAction={handleAuthAction}
             notifications={notifications}
             hasNewNotifications={hasNewNotifications}
+            onProfileClick={onProfileClick}
+            onReservationsClick={onReservationsClick}
+            onPropertiesClick={onPropertiesClick}
+            onSettingsClick={onSettingsClick}
+            onLogoutClick={onLogoutClick}
           />
 
           {/* Toggle para menú móvil */}
           <button
             className="header__mobile-toggle hide-desktop"
             onClick={toggleMobileMenu}
-            aria-label={isMobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+            aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-menu"
           >
@@ -268,7 +311,7 @@ const Header = () => {
 
       {/* Menú móvil */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           id="mobile-menu"
           className="header__mobile-menu"
           role="navigation"
@@ -278,19 +321,23 @@ const Header = () => {
             {navigationItems.map((item) => {
               const Icon = item.icon;
               const isActive = isActiveNavItem(item.path);
-              
+
               return (
                 <Link
                   key={item.id}
                   to={item.path}
-                  className={`header__mobile-nav-item ${isActive ? 'header__mobile-nav-item--active' : ''}`}
+                  className={`header__mobile-nav-item ${
+                    isActive ? "header__mobile-nav-item--active" : ""
+                  }`}
                   onClick={closeMobileMenu}
-                  aria-current={isActive ? 'page' : undefined}
+                  aria-current={isActive ? "page" : undefined}
                 >
                   <Icon className="header__mobile-nav-icon" aria-hidden="true" />
                   <div>
                     <div className="header__mobile-nav-label">{item.label}</div>
-                    <div className="header__mobile-nav-description">{item.description}</div>
+                    <div className="header__mobile-nav-description">
+                      {item.description}
+                    </div>
                   </div>
                 </Link>
               );
@@ -304,10 +351,15 @@ const Header = () => {
                   className="header__mobile-nav-item"
                   onClick={closeMobileMenu}
                 >
-                  <HeartIcon className="header__mobile-nav-icon" aria-hidden="true" />
+                  <HeartIcon
+                    className="header__mobile-nav-icon"
+                    aria-hidden="true"
+                  />
                   <div>
                     <div className="header__mobile-nav-label">Mis Favoritos</div>
-                    <div className="header__mobile-nav-description">Lugares guardados</div>
+                    <div className="header__mobile-nav-description">
+                      Lugares guardados
+                    </div>
                   </div>
                 </Link>
 
@@ -316,18 +368,23 @@ const Header = () => {
                   className="header__mobile-nav-item"
                   onClick={closeMobileMenu}
                 >
-                  <BellIcon className="header__mobile-nav-icon" aria-hidden="true" />
+                  <BellIcon
+                    className="header__mobile-nav-icon"
+                    aria-hidden="true"
+                  />
                   <div>
                     <div className="header__mobile-nav-label">
                       Notificaciones
                       {hasNewNotifications && (
                         <span className="header__mobile-badge">
-                          {notifications.filter(n => n.unread).length}
+                          {notifications.filter((n) => n.unread).length}
                         </span>
                       )}
                     </div>
                     <div className="header__mobile-nav-description">
-                      {hasNewNotifications ? 'Tienes notificaciones nuevas' : 'Sin notificaciones nuevas'}
+                      {hasNewNotifications
+                        ? "Tienes notificaciones nuevas"
+                        : "Sin notificaciones nuevas"}
                     </div>
                   </div>
                 </Link>
@@ -340,12 +397,21 @@ const Header = () => {
               className="header__mobile-nav-item header__mobile-nav-item--highlight"
               onClick={closeMobileMenu}
             >
-              <svg className="header__mobile-nav-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L15.5 8.5L22 9L17 14L18.5 22L12 18.5L5.5 22L7 14L2 9L8.5 8.5L12 2Z" fill="#10B981" />
+              <svg
+                className="header__mobile-nav-icon"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M12 2L15.5 8.5L22 9L17 14L18.5 22L12 18.5L5.5 22L7 14L2 9L8.5 8.5L12 2Z"
+                  fill="#10B981"
+                />
               </svg>
               <div>
                 <div className="header__mobile-nav-label">Ofrece tu espacio</div>
-                <div className="header__mobile-nav-description">Gana dinero extra siendo anfitrión</div>
+                <div className="header__mobile-nav-description">
+                  Gana dinero extra siendo anfitrión
+                </div>
               </div>
             </Link>
           </div>
@@ -354,7 +420,7 @@ const Header = () => {
 
       {/* Fondo difuminado para menú móvil */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="header__mobile-backdrop"
           onClick={closeMobileMenu}
           aria-hidden="true"
