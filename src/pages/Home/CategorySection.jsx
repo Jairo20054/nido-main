@@ -160,19 +160,30 @@ const CategorySection = () => {
             </svg>
           </button>
           
-          <div 
-           className="category-grid"
-            ref={containerRef}
-            onMouseEnter={() => setIsPaused(true)}
-            onMouseLeave={() => setIsPaused(false)}
-            onMouseDown={startDrag}
-            onMouseMove={duringDrag}
-            onMouseUp={endDrag}
-            onMouseLeave={endDrag}
-            onTouchStart={(e) => startDrag(e.touches[0])}
-            onTouchMove={(e) => duringDrag(e.touches[0])}
-            onTouchEnd={endDrag}
-          >
+         <div 
+  className="category-grid"
+  ref={containerRef}
+  onMouseEnter={() => setIsPaused(true)}
+  onMouseLeave={() => {
+    setIsPaused(false);
+    endDrag(); // Asegura que se limpie el estado de arrastre al salir
+  }}
+  onMouseDown={startDrag}
+  onMouseMove={duringDrag}
+  onMouseUp={endDrag}
+  onTouchStart={(e) => {
+    setIsPaused(true);
+    startDrag(e.touches[0]);
+  }}
+  onTouchMove={(e) => {
+    if (isDragging) duringDrag(e.touches[0]);
+  }}
+  onTouchEnd={() => {
+    setIsPaused(false);
+    endDrag();
+  }}
+  style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+>
             {categories.map((category, index) => (
               <div 
                 key={category.id} 
