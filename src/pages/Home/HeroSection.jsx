@@ -175,12 +175,6 @@ const HeroSection = ({ onSearch }) => {
             </div>
           </form>
           
-          <div className="hero-tags">
-            <span className="tag">Económico</span>
-            <span className="tag">Accesible</span>
-            <span className="tag">Familiar</span>
-            <span className="tag">Seguro</span>
-          </div>
         </div>
       </div>
     </section>
