@@ -175,6 +175,7 @@ const HeroSection = ({ onSearch }) => {
             </div>
           </form>
           
+          
         </div>
       </div>
     </section>
