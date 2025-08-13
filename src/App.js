@@ -68,3 +68,7 @@ function operacionAsincrona(exito) {
 
 operacionAsincrona(true).then(console.log);  // Salida: 'Éxito'
 operacionAsincrona(false).then(console.log).catch(console.error);  // Salida: Error: Fallo
+
+// tercer ejercicio
+
+function 
