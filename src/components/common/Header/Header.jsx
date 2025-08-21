@@ -1,7 +1,7 @@
-// src/components/Header/Header.jsx
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../../hooks/useAuth';
+// Cambiamos la importación para usar la exportación por defecto
+import useAuth from '../../../hooks/useAuth';
 import Navigation from './Navigation';
 import UserMenu from './UserMenu';
 import { 
@@ -43,6 +43,7 @@ const Header = () => {
   const [notifications, setNotifications] = useState([]);
   const [hasNewNotifications, setHasNewNotifications] = useState(false);
 
+  // Ahora useAuth es la exportación por defecto
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();

@@ -19,6 +19,7 @@ import './assets/styles/global.css';
 import './assets/styles/variables.css';
 import './assets/styles/utilities.css';
 import './assets/styles/animations.css';
+import './assets/styles/responsive-fixes.css';
 import './App.css';
 
 // Helper function for lazy loading with error handling
