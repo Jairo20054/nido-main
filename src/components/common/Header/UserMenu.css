@@ -153,21 +153,6 @@
   transform: translateY(-8px) scale(0.95);
 }
 
-.dropdown-header {
-  padding: var(--space-4);
-  background: linear-gradient(135deg, var(--primary-light) 0%, var(--bg-gray-50) 100%);
-  border-bottom: 1px solid var(--border-light);
-}
-
-.dropdown-header h3 {
-  margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  line-height: 1.4;
-}
-
 .user-info {
   display: flex;
   flex-direction: column;
@@ -235,6 +220,7 @@
 .dropdown-item.logout {
   color: var(--danger-color);
   margin-top: var(--space-2);
+  font-weight: 600;
 }
 
 .dropdown-item.logout:hover,
@@ -294,10 +280,6 @@
     --bg-gray-100: #374151;
     --primary-light: #9ca6c0;
   }
-  
-  .dropdown-header {
-    background: linear-gradient(135deg, var(--primary-light) 0%, var(--bg-gray-50) 100%);
-  }
 }
 
 /* ===== ANIMACIONES MEJORADAS ===== */
@@ -324,35 +306,6 @@
 .dropdown-item:nth-child(4) { animation-delay: 0.12s; }
 .dropdown-item:nth-child(5) { animation-delay: 0.15s; }
 .dropdown-item:nth-child(6) { animation-delay: 0.18s; }
-
-/* ===== ESTILOS ADICIONALES PARA ICONOS ===== */
-.dropdown-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.dropdown-icon svg {
-  width: 100%;
-  height: 100%;
-}
-
-/* ===== EFECTO DE CARGA MEJORADO ===== */
-@keyframes shimmer {
-  0% { background-position: -200px 0; }
-  100% { background-position: calc(200px + 100%) 0; }
-}
-
-.loading-shimmer {
-  animation: shimmer 1.5s infinite linear;
-  background: linear-gradient(
-    to right,
-    var(--bg-gray-100) 0%,
-    var(--bg-gray-200) 50%,
-    var(--bg-gray-100) 100%
-  );
-  background-size: 200px 100%;
-}
 
 /* ===== MEJORAS DE ACCESIBILIDAD ===== */
 @media (prefers-reduced-motion: reduce) {
