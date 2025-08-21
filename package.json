@@ -2,6 +2,7 @@
   "name": "nido",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:5000",
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
@@ -16,13 +17,14 @@
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
-    "express": "^4.18.2",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
     "framer-motion": "^12.20.1",
-    "jsonwebtoken": "^9.0.0",
+    "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.525.0",
-    "mongoose": "^7.0.3",
+    "mongoose": "^7.8.7",
+    "multer": "^2.0.2",
     "react": "^19.1.0",
     "react-datepicker": "^8.4.0",
     "react-dom": "^19.1.0",
@@ -32,6 +34,7 @@
     "react-router-dom": "^7.6.3",
     "react-scripts": "5.0.1",
     "react-toastify": "^11.0.5",
+    "socket.io": "^4.8.1",
     "web-vitals": "^2.1.4",
     "zustand": "^5.0.6"
   },
@@ -40,7 +43,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "dev:backend": "nodemon server.js"
+    "start:backend": "node backend/src/server.js",
+    "dev:backend": "nodemon backend/src/server.js",
+    "dev": "concurrently \"npm start\" \"npm run dev:backend\""
   },
   "eslintConfig": {
     "extends": [
@@ -63,6 +68,7 @@
   "devDependencies": {
     "@testing-library/react": "^16.3.0",
     "jest": "^27.5.1",
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "concurrently": "^8.2.2"
   }
 }
