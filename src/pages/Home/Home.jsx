@@ -1,4 +1,3 @@
-// src/pages/Home/Home.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HeroSection from './HeroSection';
@@ -11,13 +10,16 @@ const Home = () => {
   const [featuredProperties, setFeaturedProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentImageIndexes, setCurrentImageIndexes] = useState({});
+  const [likedPosts, setLikedPosts] = useState({});
+  const [savedPosts, setSavedPosts] = useState({});
   const navigate = useNavigate();
 
-  // Datos mock para propiedades destacadas (agregamos múltiples imágenes a algunas para demostrar el carrusel)
+  // Datos mock para propiedades destacadas
   const mockFeaturedProperties = [
     {
       id: 1,
-      title: "Apartamento Moderno en Zona Rosa",
+      title: "Acabo de renovar mi apartamento en Zona Rosa! 📍",
       location: "Zona Rosa, Bogotá",
       price: 150000,
       rating: 4.8,
@@ -35,11 +37,14 @@ const Home = () => {
       },
       likes: 245,
       comments: 32,
-      shares: 12
+      shares: 12,
+      description: "Después de meses de trabajo, finalmente terminé la renovación de mi apartamento. ¡Estoy encantado con los resultados! Tiene todas las comodidades para una estancia perfecta. #interiordesign #apartamento #bogota",
+      timestamp: "2 horas ago",
+      isFollowing: false
     },
     {
       id: 2,
-      title: "Casa Familiar en Chapinero",
+      title: "Mi casa familiar ahora disponible para estancias cortas",
       location: "Chapinero, Bogotá",
       price: 280000,
       rating: 4.9,
@@ -56,11 +61,14 @@ const Home = () => {
       },
       likes: 312,
       comments: 45,
-      shares: 21
+      shares: 21,
+      description: "Debido a que estaré de viaje los próximos meses, decidí abrir mi casa familiar para quienes busquen una estancia cómoda y acogedora en Chapinero. Tiene un jardín precioso y está cerca de todo. #casa #viajes #bogota",
+      timestamp: "5 horas ago",
+      isFollowing: true
     },
     {
       id: 3,
-      title: "Loft Contemporáneo La Candelaria",
+      title: "Loft con vista panorámica en el centro histórico",
       location: "La Candelaria, Bogotá",
       price: 120000,
       rating: 4.7,
@@ -74,11 +82,14 @@ const Home = () => {
       },
       likes: 198,
       comments: 28,
-      shares: 7
+      shares: 7,
+      description: "Este loft tiene una de las mejores vistas de La Candelaria. Perfecto para artistas, escritores o cualquier persona que busque inspiración. #loft #vista #candelaria",
+      timestamp: "1 día ago",
+      isFollowing: false
     },
     {
       id: 4,
-      title: "Apartamento con Vista al Parque",
+      title: "Apartamento premium con vista al parque",
       location: "Usaquén, Bogotá",
       price: 180000,
       rating: 4.6,
@@ -95,16 +106,19 @@ const Home = () => {
       },
       likes: 276,
       comments: 41,
-      shares: 15
+      shares: 15,
+      description: "Vista espectacular al parque desde este apartamento completamente equipado. Ideal para quienes buscan comodidad y tranquilidad. #apartamento #usaquen #vista",
+      timestamp: "1 día ago",
+      isFollowing: false
     },
     {
       id: 5,
-      title: "Casa Campestre en las Afueras",
+      title: "Casa campestre a solo 30 min de Bogotá",
       location: "La Calera, Bogotá",
       price: 350000,
       rating: 4.9,
       images: [
-        "https://images.unsplash.com/photo-1575517111839-3a3843ee7f5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGhvdXNlfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
+        "https://images.unsplash.com/photo-1575517111839-3a3843ee7f5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8GhoustfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
         "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YXBhcnRtZW50fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"
       ],
       amenities: ["WiFi", "Jardín", "Chimenea", "Parking", "Accesible"],
@@ -116,11 +130,14 @@ const Home = () => {
       },
       likes: 421,
       comments: 67,
-      shares: 34
+      shares: 34,
+      description: "Escápate de la ciudad sin ir demasiado lejos. Esta casa campestre ofrece tranquilidad y naturaleza con todas las comodidades. #campestre #naturaleza #escapada",
+      timestamp: "2 días ago",
+      isFollowing: true
     },
     {
       id: 6,
-      title: "Estudio en El Chicó",
+      title: "Estudio céntrico para estudiantes o viajeros",
       location: "El Chicó, Bogotá",
       price: 95000,
       rating: 4.5,
@@ -137,7 +154,10 @@ const Home = () => {
       },
       likes: 154,
       comments: 19,
-      shares: 5
+      shares: 5,
+      description: "Estudio perfecto para estudiantes o viajeros que buscan una ubicación céntrica a un precio accesible. ¡Totalmente equipado! #estudio #económico #chico",
+      timestamp: "3 días ago",
+      isFollowing: false
     }
   ];
 
@@ -148,6 +168,13 @@ const Home = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       setFeaturedProperties(mockFeaturedProperties);
+      
+      // Inicializar índices de imágenes
+      const initialIndexes = {};
+      mockFeaturedProperties.forEach(property => {
+        initialIndexes[property.id] = 0;
+      });
+      setCurrentImageIndexes(initialIndexes);
     } catch (err) {
       console.error("Error fetching featured properties:", err);
       setError("No pudimos cargar las propiedades destacadas. Intenta de nuevo más tarde.");
@@ -172,6 +199,53 @@ const Home = () => {
     navigate(`/property/${propertyId}`);
   }, [navigate]);
 
+  const handleLike = useCallback((propertyId, e) => {
+    e.stopPropagation();
+    setLikedPosts(prev => ({
+      ...prev,
+      [propertyId]: !prev[propertyId]
+    }));
+  }, []);
+
+  const handleSave = useCallback((propertyId, e) => {
+    e.stopPropagation();
+    setSavedPosts(prev => ({
+      ...prev,
+      [propertyId]: !prev[propertyId]
+    }));
+  }, []);
+
+  const handleFollow = useCallback((propertyId, e) => {
+    e.stopPropagation();
+    setFeaturedProperties(prev => 
+      prev.map(property => 
+        property.id === propertyId 
+          ? { ...property, isFollowing: !property.isFollowing } 
+          : property
+      )
+    );
+  }, []);
+
+  const handleImageChange = useCallback((propertyId, direction) => {
+    setCurrentImageIndexes(prevIndexes => {
+      const currentIndex = prevIndexes[propertyId];
+      const property = featuredProperties.find(p => p.id === propertyId);
+      if (!property) return prevIndexes;
+      
+      let newIndex;
+      if (direction === 'next') {
+        newIndex = (currentIndex + 1) % property.images.length;
+      } else {
+        newIndex = (currentIndex - 1 + property.images.length) % property.images.length;
+      }
+      
+      return {
+        ...prevIndexes,
+        [propertyId]: newIndex
+      };
+    });
+  }, [featuredProperties]);
+
   if (error) {
     return (
       <div className="home-page">
@@ -191,12 +265,14 @@ const Home = () => {
       
       <main className="social-feed">
         <div className="feed-container">
+
+
           {/* Feed de propiedades */}
           <div className="posts-grid">
             {loading ? (
               <div className="loading-container">
                 <LoadingSpinner />
-                <p className="loading-text">Cargando propiedades...</p>
+                <p className="loading-text">Cargando publicaciones...</p>
               </div>
             ) : (
               featuredProperties.map((property) => (
@@ -204,6 +280,13 @@ const Home = () => {
                   key={property.id} 
                   property={property} 
                   onClick={handleCardClick}
+                  onLike={handleLike}
+                  onSave={handleSave}
+                  onFollow={handleFollow}
+                  currentImageIndex={currentImageIndexes[property.id] || 0}
+                  onImageChange={handleImageChange}
+                  isLiked={likedPosts[property.id]}
+                  isSaved={savedPosts[property.id]}
                 />
               ))
             )}
@@ -211,29 +294,7 @@ const Home = () => {
         </div>
 
         {/* Sidebar (solo en desktop) */}
-        <aside className="sidebar">
-          <div className="suggestions-section">
-            <div className="suggestions-header">
-              {/* Contenido de sugerencias */}
-            </div>
-            
-            {mockFeaturedProperties.slice(0, 5).map((property) => (
-              <div key={`suggestion-${property.id}`} className="suggestion">
-                <div className="suggestion-user">
-                  {/* Sugerencia de usuario */}
-                </div>
-                <button className="follow-button">Seguir</button>
-              </div>
-            ))}
-          </div>
-
-          <div className="sidebar-footer">
-            <div className="footer-links">
-              <a href="#">Información</a> • <a href="#">Ayuda</a> • <a href="#">Prensa</a> • <a href="#">API</a> • <a href="#">Empleo</a> • <a href="#">Privacidad</a> • <a href="#">Condiciones</a> • <a href="#">Ubicaciones</a> • <a href="#">Idioma</a> • <a href="#">Meta Verified</a>
-            </div>
-            <div className="copyright">© 2023 HOUSEPLA</div>
-          </div>
-        </aside>
+        {/* Removed sidebar with user profile and footer links */}
       </main>
 
       {/* Barra de navegación inferior para móviles */}
@@ -272,21 +333,27 @@ const Home = () => {
   );
 };
 
-// Componente separado para PostCard con carrusel de imágenes
-const PostCard = ({ property, onClick }) => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  const nextImage = useCallback((e) => {
-    e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev + 1) % property.images.length);
-  }, [property.images.length]);
-
-  const prevImage = useCallback((e) => {
-    e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev - 1 + property.images.length) % property.images.length);
-  }, [property.images.length]);
-
+// Componente PostCard con diseño de red social
+const PostCard = ({ 
+  property, 
+  onClick, 
+  onLike, 
+  onSave, 
+  onFollow,
+  currentImageIndex,
+  onImageChange,
+  isLiked,
+  isSaved
+}) => {
   const hasMultipleImages = property.images.length > 1;
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0
+    }).format(price);
+  };
 
   return (
     <div className="post-card">
@@ -304,21 +371,33 @@ const PostCard = ({ property, onClick }) => {
       </div>
 
       {/* Carrusel de imágenes */}
-      <div className="post-image" onClick={() => onClick(property.id)}>
+      <div className="post-image">
         <img 
           src={property.images[currentImageIndex]} 
           alt={`${property.title} - Imagen ${currentImageIndex + 1}`} 
         />
         {hasMultipleImages && (
           <>
-            <button className="carousel-button prev" onClick={prevImage}>
-              <svg viewBox="0 0 24 24" width="24" height="24">
-                <path d="M15 19l-7-7 7-7" fill="none" stroke="white" strokeWidth="2" />
+            <button 
+              className="carousel-button prev" 
+              onClick={(e) => {
+                e.stopPropagation();
+                onImageChange(property.id, 'prev');
+              }}
+            >
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
+                <path d="M15 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" fill="none"/>
               </svg>
             </button>
-            <button className="carousel-button next" onClick={nextImage}>
-              <svg viewBox="0 0 24 24" width="24" height="24">
-                <path d="M9 5l7 7-7 7" fill="none" stroke="white" strokeWidth="2" />
+            <button 
+              className="carousel-button next" 
+              onClick={(e) => {
+                e.stopPropagation();
+                onImageChange(property.id, 'next');
+              }}
+            >
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
+                <path d="M9 5l7 7-7 7" stroke="currentColor" strokeWidth="2" fill="none"/>
               </svg>
             </button>
             <div className="carousel-dots">
@@ -331,19 +410,21 @@ const PostCard = ({ property, onClick }) => {
             </div>
           </>
         )}
-        <button className="like-button">
-          <svg aria-label="Me gusta" fill="#ffffff" height="24" viewBox="0 0 48 48" width="24">
-            <path d="M34.6 6.1c5.7 0 10.4 5.2 10.4 11.5 0 6.8-5.9 11-11.5 16S25 41.3 24 41.9c-1.1-.7-4.7-4-9.5-8.3-5.7-5-11.5-9.2-11.5-16C3 11.3 7.7 6.1 13.4 6.1c4.2 0 6.5 2 8.1 4.3 1.9 2.6 2.2 3.9 2.5 3.9.3 0 .6-1.3 2.5-3.9 1.6-2.3 3.9-4.3 8.1-4.3z"></path>
-          </svg>
-        </button>
       </div>
 
-      {/* Acciones y estadísticas */}
+      {/* Acciones del post */}
       <div className="post-actions">
         <div className="action-buttons">
-          <button className="action-button">
-            <svg aria-label="Me gusta" fill="#262626" height="24" viewBox="0 0 48 48" width="24">
-              <path d="M34.6 6.1c5.7 0 10.4 5.2 10.4 11.5 0 6.8-5.9 11-11.5 16S25 41.3 24 41.9c-1.1-.7-4.7-4-9.5-8.3-5.7-5-11.5-9.2-11.5-16C3 11.3 7.7 6.1 13.4 6.1c4.2 0 6.5 2 8.1 4.3 1.9 2.6 2.2 3.9 2.5 3.9.3 0 .6-1.3 2.5-3.9 1.6-2.3 3.9-4.3 8.1-4.3z"></path>
+          <button 
+            className={`action-button ${isLiked ? 'liked' : ''}`}
+            onClick={(e) => onLike(property.id, e)}
+          >
+            <svg aria-label="Me gusta" height="24" viewBox="0 0 48 48" width="24">
+              <path d="M34.6 6.1c5.7 0 10.4 5.2 10.4 11.5 0 6.8-5.9 11-11.5 16S25 41.3 24 41.9c-1.1-.7-4.7-4-9.5-8.3-5.7-5-11.5-9.2-11.5-16C3 11.3 7.7 6.1 13.4 6.1c4.2 0 6.5 2 8.1 4.3 1.9 2.6 2.2 3.9 2.5 3.9.3 0 .6-1.3 2.5-3.9 1.6-2.3 3.9-4.3 8.1-4.3z" 
+                fill={isLiked ? "#ed4956" : "none"} 
+                stroke={isLiked ? "none" : "#262626"} 
+                strokeWidth="2"
+              />
             </svg>
           </button>
           <button className="action-button">
@@ -357,24 +438,36 @@ const PostCard = ({ property, onClick }) => {
             </svg>
           </button>
         </div>
-        <button className="save-button">
-          <svg aria-label="Guardar" fill="#262626" height="24" viewBox="0 0 48 48" width="24">
-            <path d="M43.5 48c-.4 0-.8-.2-1.1-.4L24 29 5.6 47.6c-.4.4-1.1.6-1.6.3-.6-.2-1-.8-1-1.4v-45C3 .7 3.7 0 4.5 0h39c.8 0 1.5.7 1.5 1.5v45c0 .6-.4 1.2-.9 1.4-.2.1-.4.1-.6.1zM24 26c.8 0 1.6.3 2.2.9l15.8 16V3H6v39.9l15.8-16c.6-.6 1.4-.9 2.2-.9z"></path>
+        <button 
+          className={`save-button ${isSaved ? 'saved' : ''}`}
+          onClick={(e) => onSave(property.id, e)}
+        >
+          <svg aria-label="Guardar" height="24" viewBox="0 0 48 48" width="24">
+            <path d="M43.5 48c-.4 0-.8-.2-1.1-.4L24 29 5.6 47.6c-.4.4-1.1.6-1.6.3-.6-.2-1-.8-1-1.4v-45C3 .7 3.7 0 4.5 0h39c.8 0 1.5.7 1.5 1.5v45c0 .6-.4 1.2-.9 1.4-.2.1-.4.1-.6.1zM24 26c.8 0 1.6.3 2.2.9l15.8 16V3H6v39.9l15.8-16c.6-.6 1.4-.9 2.2-.9z" 
+              fill={isSaved ? "#262626" : "none"} 
+              stroke={isSaved ? "none" : "#262626"} 
+              strokeWidth="2"
+            />
           </svg>
         </button>
       </div>
 
+      {/* Estadísticas del post */}
       <div className="post-stats">
-        <span className="likes-count">{property.likes} me gusta</span>
+        <span className="likes-count">{property.likes + (isLiked ? 1 : 0)} me gusta</span>
         <div className="post-caption">
           <span className="username">{property.user.name}</span>
-          <span className="caption">{property.title}</span>
+          <span className="caption">{property.description}</span>
         </div>
         <button className="view-comments">Ver los {property.comments} comentarios</button>
-        <span className="post-time">Hace 2 horas</span>
+        <div className="price-tag">
+          <span className="price">{formatPrice(property.price)}</span>
+          <span className="night">/noche</span>
+        </div>
+        <span className="post-time">{property.timestamp}</span>
       </div>
 
-      {/* Comentar */}
+      {/* Añadir comentario */}
       <div className="add-comment">
         <input type="text" placeholder="Añade un comentario..." />
         <button className="post-comment-button">Publicar</button>
