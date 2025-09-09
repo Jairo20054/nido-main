@@ -5,18 +5,6 @@ import { es } from "date-fns/locale";
 import "react-datepicker/dist/react-datepicker.css";
 import "./SearchBar.css";
 
-/**
- * Mejoras clave:
- * - Eliminación de duplicados del componente.
- * - Botón de búsqueda visible y accesible (type="button" y aria-labels).
- * - Atributos ARIA y semántica: combobox para ubicación, aria-expanded/controls/haspopup en toggles.
- * - Cierre con ESC y click afuera para dropdowns.
- * - Responsivo real (stack en mobile, dropdowns como panel fullscreen en <768px).
- * - Evitamos alert() intrusivo: usamos setError y aria-live para anunciar errores.
- * - Prevenimos selecciones inválidas: auto-ajuste de checkout.
- * - Estados de foco/hover consistentes y sin “layout shifts”.
- */
-
 const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
   const [activeField, setActiveField] = useState(null);
   const [error, setError] = useState("");
@@ -38,7 +26,7 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
 
   const [suggestions, setSuggestions] = useState([]);
 
-  // Sugerencias estáticas (podrías conectar a API después)
+  // Sugerencias estáticas
   const popularLocations = [
     { name: "Centro, Bogotá", type: "Barrio", country: "Colombia" },
     { name: "Zona Rosa, Bogotá", type: "Barrio", country: "Colombia" },
@@ -174,7 +162,7 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
             aria-haspopup="listbox"
             onClick={() => setActiveField(activeField === "location" ? null : "location")}
           >
-            <span className="search-field__label">Ubicación</span>
+            <span className="search-field__label">¿Dónde?</span>
             <span className="search-field__value">
               {searchData.location || "Buscar destinos"}
             </span>
@@ -271,7 +259,7 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
             aria-haspopup="dialog"
             onClick={() => setActiveField(activeField === "dates" ? null : "dates")}
           >
-            <div className="search-field__label">Fechas</div>
+            <div className="search-field__label">Cuándo</div>
             <div className="search-field__content">
               <div className="date-section">
                 <div className="search-field__value">

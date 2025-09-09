@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import useSearch from '../../hooks/useSearch'; // Cambiado a importación por defecto
+import useSearch from '../../hooks/useSearch';
 import SearchFilters from '../../components/Search/SearchFilters';
 import PropertyGrid from '../../components/property/PropertyGrid/PropertyGrid';
 import MapView from '../../components/Search/MapView/MapView';
@@ -10,6 +10,7 @@ import EmptyState from '../../components/common/EmptyState/EmptyState';
 import ErrorMessage from '../../components/common/ErrorMessage/ErrorMessage';
 import SortDropdown from '../../components/Search/SortDropdown/SortDropdown';
 import ResultsCounter from '../../components/Search/ResultsCounter/ResultsCounter';
+import SearchBar from '../../components/Search/SearchBar/SearchBar'; // Nuevo componente
 import './Search.css';
 
 const Search = () => {
@@ -27,6 +28,7 @@ const Search = () => {
   });
   const [sortBy, setSortBy] = useState('relevance');
   const [filtersVisible, setFiltersVisible] = useState(false);
+  const [searchBarExpanded, setSearchBarExpanded] = useState(false); // Nuevo estado para barra de búsqueda
   
   // Usar el hook useSearch correctamente
   const { results, isLoading, searchProperties } = useSearch();
@@ -234,6 +236,15 @@ const Search = () => {
         ))}
       </nav>
 
+      {/* Barra de búsqueda estilo Airbnb */}
+      <SearchBar
+        searchParams={searchParams}
+        onFilterChange={handleFilterChange}
+        expanded={searchBarExpanded}
+        onExpand={() => setSearchBarExpanded(true)}
+        onCollapse={() => setSearchBarExpanded(false)}
+      />
+
       {/* Header */}
       <header className="search-header">
         <div className="header-content">
@@ -270,28 +281,30 @@ const Search = () => {
 
       {/* Layout principal */}
       <div className="search-layout">
-        {/* Filtros */}
-        <aside 
-          className={`filters-container ${filtersVisible ? 'visible' : ''}`}
-          aria-label="Filtros de búsqueda"
-        >
-          <div className="filters-header">
-            <h2>Filtros</h2>
-            <button 
-              className="clear-filters"
-              onClick={handleClearFilters}
+        {/* Filtros (ahora ocultos por defecto, accesibles desde la barra de búsqueda) */}
+        {filtersVisible && (
+          <aside 
+            className="filters-container"
+            aria-label="Filtros de búsqueda"
+          >
+            <div className="filters-header">
+              <h2>Filtros</h2>
+              <button 
+                className="clear-filters"
+                onClick={handleClearFilters}
+                disabled={loading}
+              >
+                Limpiar
+              </button>
+            </div>
+            
+            <SearchFilters 
+              filters={searchParams} 
+              onFilterChange={handleFilterChange}
               disabled={loading}
-            >
-              Limpiar
-            </button>
-          </div>
-          
-          <SearchFilters 
-            filters={searchParams} 
-            onFilterChange={handleFilterChange}
-            disabled={loading}
-          />
-        </aside>
+            />
+          </aside>
+        )}
 
         {/* Resultados */}
         <main className="results-container" role="main">
