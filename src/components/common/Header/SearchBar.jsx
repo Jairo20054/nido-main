@@ -1,8 +1,5 @@
+// No se usan librerías externas salvo aviso. Fecha de llegada y fecha de salida: inputs tipo `date` con validación. Autocompletado de ejemplo (estático): ["Bogotá","Medellín","Cali","Cartagena","Barranquilla"]. Soporte selección por teclado (flechas arriba/abajo + Enter).
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import DatePicker from "react-datepicker";
-import { format, addDays } from "date-fns";
-import { es } from "date-fns/locale";
-import "react-datepicker/dist/react-datepicker.css";
 import "./SearchBar.css";
 
 const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
@@ -25,17 +22,15 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
   });
 
   const [suggestions, setSuggestions] = useState([]);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
 
   // Sugerencias estáticas
   const popularLocations = [
-    { name: "Centro, Bogotá", type: "Barrio", country: "Colombia" },
-    { name: "Zona Rosa, Bogotá", type: "Barrio", country: "Colombia" },
-    { name: "Chapinero, Bogotá", type: "Barrio", country: "Colombia" },
-    { name: "La Candelaria, Bogotá", type: "Barrio", country: "Colombia" },
+    { name: "Bogotá", type: "Ciudad", country: "Colombia" },
     { name: "Medellín", type: "Ciudad", country: "Colombia" },
-    { name: "Cartagena", type: "Ciudad", country: "Colombia" },
     { name: "Cali", type: "Ciudad", country: "Colombia" },
-    { name: "Santa Marta", type: "Ciudad", country: "Colombia" },
+    { name: "Cartagena", type: "Ciudad", country: "Colombia" },
+    { name: "Barranquilla", type: "Ciudad", country: "Colombia" },
   ];
 
   // Cerrar dropdown al click afuera
@@ -76,23 +71,26 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
     } else {
       setSuggestions([]);
     }
+    setSelectedSuggestionIndex(-1);
   };
 
   const selectSuggestion = (suggestion) => {
     setSearchData((prev) => ({ ...prev, location: suggestion.name }));
     setSuggestions([]);
     setActiveField(null);
+    setSelectedSuggestionIndex(-1);
   };
 
-  const handleDateChange = (date, type) => {
+  const handleDateChange = (dateString, type) => {
     setError("");
+    const date = new Date(dateString);
     setSearchData((prev) => {
       const next = { ...prev, [type]: date };
       if (type === "checkIn" && prev.checkOut && date >= prev.checkOut) {
-        next.checkOut = addDays(date, 1);
+        next.checkOut = new Date(date.getTime() + 24 * 60 * 60 * 1000); // add 1 day
       }
       if (type === "checkOut" && prev.checkIn && date <= prev.checkIn) {
-        next.checkOut = addDays(prev.checkIn, 1);
+        next.checkOut = new Date(prev.checkIn.getTime() + 24 * 60 * 60 * 1000);
       }
       return next;
     });
@@ -102,7 +100,7 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
     setError("");
     setSearchData((prev) => {
       const current = prev.guests[type];
-      const value = op === "increment" ? current + 1 : Math.max(0, current - 1);
+      const value = op === "increment" ? Math.min(10, current + 1) : Math.max(0, current - 1);
       // Regla: al menos 1 adulto
       const nextAdults =
         type === "adults" ? Math.max(1, value) : Math.max(1, prev.guests.adults);
@@ -142,7 +140,29 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") handleSearch();
+    if (activeField === "location" && suggestions.length > 0) {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev =>
+          prev < suggestions.length - 1 ? prev + 1 : 0
+        );
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev =>
+          prev > 0 ? prev - 1 : suggestions.length - 1
+        );
+      } else if (e.key === "Enter" && selectedSuggestionIndex >= 0) {
+        e.preventDefault();
+        selectSuggestion(suggestions[selectedSuggestionIndex]);
+      } else if (e.key === "Enter") {
+        handleSearch();
+      } else if (e.key === "Escape") {
+        setActiveField(null);
+        setSelectedSuggestionIndex(-1);
+      }
+    } else if (e.key === "Enter") {
+      handleSearch();
+    }
   };
 
   return (
@@ -196,7 +216,7 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
                   suggestions.map((s, idx) => (
                     <button
                       key={`${s.name}-${idx}`}
-                      className="suggestion-item"
+                      className={`suggestion-item ${selectedSuggestionIndex === idx ? 'suggestion-item--selected' : ''}`}
                       role="option"
                       onClick={() => selectSuggestion(s)}
                     >
@@ -223,7 +243,7 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
                     {popularLocations.slice(0, 4).map((l, index) => (
                       <button
                         key={`${l.name}-${index}`}
-                        className="suggestion-item"
+                        className={`suggestion-item ${selectedSuggestionIndex === index ? 'suggestion-item--selected' : ''}`}
                         role="option"
                         onClick={() => selectSuggestion(l)}
                       >
@@ -263,12 +283,12 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
             <div className="search-field__content">
               <div className="date-section">
                 <div className="search-field__value">
-                  {searchData.checkIn ? format(searchData.checkIn, "dd MMM", { locale: es }) : "Entrada"}
+                  {searchData.checkIn ? searchData.checkIn.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : "Entrada"}
                 </div>
               </div>
               <div className="date-section">
                 <div className="search-field__value">
-                  {searchData.checkOut ? format(searchData.checkOut, "dd MMM", { locale: es }) : "Salida"}
+                  {searchData.checkOut ? searchData.checkOut.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : "Salida"}
                 </div>
               </div>
             </div>
@@ -277,28 +297,26 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
           {activeField === "dates" && (
             <div id="dates-dropdown" className="search-dropdown search-dropdown--dates" role="dialog" aria-label="Selector de fechas">
               <div className="date-picker-container">
-                <DatePicker
-                  selected={searchData.checkIn}
-                  onChange={(date) => handleDateChange(date, "checkIn")}
-                  startDate={searchData.checkIn}
-                  endDate={searchData.checkOut}
-                  selectsStart
-                  minDate={new Date()}
-                  monthsShown={2}
-                  inline
-                  locale={es}
-                />
-                <DatePicker
-                  selected={searchData.checkOut}
-                  onChange={(date) => handleDateChange(date, "checkOut")}
-                  startDate={searchData.checkIn}
-                  endDate={searchData.checkOut}
-                  selectsEnd
-                  minDate={searchData.checkIn || new Date()}
-                  monthsShown={2}
-                  inline
-                  locale={es}
-                />
+                <div className="date-input-group">
+                  <label htmlFor="checkIn-date">Fecha de llegada</label>
+                  <input
+                    type="date"
+                    id="checkIn-date"
+                    value={searchData.checkIn ? searchData.checkIn.toISOString().split('T')[0] : ''}
+                    onChange={(e) => handleDateChange(e.target.value, "checkIn")}
+                    min={new Date().toISOString().split('T')[0]}
+                  />
+                </div>
+                <div className="date-input-group">
+                  <label htmlFor="checkOut-date">Fecha de salida</label>
+                  <input
+                    type="date"
+                    id="checkOut-date"
+                    value={searchData.checkOut ? searchData.checkOut.toISOString().split('T')[0] : ''}
+                    onChange={(e) => handleDateChange(e.target.value, "checkOut")}
+                    min={searchData.checkIn ? searchData.checkIn.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
+                  />
+                </div>
               </div>
             </div>
           )}

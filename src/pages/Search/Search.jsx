@@ -10,7 +10,7 @@ import EmptyState from '../../components/common/EmptyState/EmptyState';
 import ErrorMessage from '../../components/common/ErrorMessage/ErrorMessage';
 import SortDropdown from '../../components/Search/SortDropdown/SortDropdown';
 import ResultsCounter from '../../components/Search/ResultsCounter/ResultsCounter';
-import SearchBar from '../../components/Search/SearchBar/SearchBar'; // Nuevo componente
+import SearchBar from '../../components/common/Header/SearchBar'; // Componente existente
 import './Search.css';
 
 const Search = () => {
@@ -28,7 +28,6 @@ const Search = () => {
   });
   const [sortBy, setSortBy] = useState('relevance');
   const [filtersVisible, setFiltersVisible] = useState(false);
-  const [searchBarExpanded, setSearchBarExpanded] = useState(false); // Nuevo estado para barra de búsqueda
   
   // Usar el hook useSearch correctamente
   const { results, isLoading, searchProperties } = useSearch();
@@ -238,11 +237,8 @@ const Search = () => {
 
       {/* Barra de búsqueda estilo Airbnb */}
       <SearchBar
-        searchParams={searchParams}
-        onFilterChange={handleFilterChange}
-        expanded={searchBarExpanded}
-        onExpand={() => setSearchBarExpanded(true)}
-        onCollapse={() => setSearchBarExpanded(false)}
+        initialData={searchParams}
+        onSearch={handleFilterChange}
       />
 
       {/* Header */}

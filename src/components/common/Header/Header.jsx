@@ -15,6 +15,9 @@ import {
   HomeModernIcon,
   SparklesIcon
 } from '@heroicons/react/24/outline';
+import HeroSection from '../../../pages/Home/HeroSection';
+import SearchBar from './SearchBar';
+
 import './Header.css';
 
 // Función throttle optimizada
@@ -217,6 +220,9 @@ const Header = () => {
           </div>
           <span className="header__logo-text">Nido</span>
         </Link>
+
+        {/* SearchBar inserted here */}
+        <SearchBar onSearch={(params) => console.log(params)} />
 
         {/* Navegación desktop */}
         <div className="header__nav-container hide-mobile">

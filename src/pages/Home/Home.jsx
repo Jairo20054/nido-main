@@ -261,7 +261,6 @@ const Home = () => {
 
   return (
     <div className="home-page">
-      <HeroSection onSearch={handleSearch} />
       
       <main className="social-feed">
         <div className="feed-container">
@@ -292,9 +291,6 @@ const Home = () => {
             )}
           </div>
         </div>
-
-        {/* Sidebar (solo en desktop) */}
-        {/* Removed sidebar with user profile and footer links */}
       </main>
 
       {/* Barra de navegación inferior para móviles */}
