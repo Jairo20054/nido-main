@@ -16,7 +16,11 @@ database.connect();
 app.use(requestLogger);
 
 // Configuración de CORS
-app.use(cors(config.cors));
+// Fix CORS to allow the origin from config and allow credentials
+app.use(cors({
+  origin: config.cors.origin,
+  credentials: true,
+}));
 
 // Middleware para parsear JSON en el body
 app.use(express.json({ limit: '10mb' }));

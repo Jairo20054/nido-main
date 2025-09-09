@@ -1,26 +1,16 @@
 /* src/components/Home/HeroSection/HeroSection.css */
 
-/* Contenedor principal de la sección hero */
+/* Contenedor principal de la sección hero - Sin imagen de fondo, más compacto */
 .hero-section {
   position: relative;
-  height: 80vh;
-  min-height: 700px;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80');
-  background-size: cover;
-  background-position: center;
+  height: auto; /* Reducido para que sea más pequeño */
+  min-height: 300px; /* Altura mínima ajustada */
+  background-color: #f8f9fa; /* Fondo neutro en lugar de imagen */
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* Alineado más arriba */
   justify-content: center;
-  color: #FFFFFF;
-  padding: 0 20px;
-}
-
-/* Contenedor para centrar todo el contenido */
-.hero-content-container {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  max-width: 1200px;
+  color: #1f2937; /* Color de texto oscuro para contraste */
+  padding: 40px 20px 20px; /* Padding superior reducido para posicionar más arriba */
 }
 
 /* Contenedor del contenido principal */
@@ -34,55 +24,64 @@
 
 /* Estilos para el título principal */
 .hero-title {
-  font-size: 2.8rem;
+  font-size: 2.5rem; /* Tamaño ajustado para ser más compacto */
   font-weight: 800;
   line-height: 1.2;
-  margin-bottom: 1.2rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  color: white;
+  margin-bottom: 1rem;
+  color: #1f2937;
   text-align: center;
 }
 
 /* Estilos para el subtítulo */
 .hero-subtitle {
-  font-size: 1.4rem;
-  margin-bottom: 2.5rem;
+  font-size: 1.2rem; /* Más pequeño */
+  margin-bottom: 1.5rem;
   max-width: 600px;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  color: white;
+  color: #4b5563;
   text-align: center;
 }
 
-/* Formulario de búsqueda - CENTRADO */
+/* Formulario de búsqueda - Más pequeño y como Airbnb (barra horizontal compacta) */
 .search-form {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
-  padding: 25px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  background: #ffffff;
+  border-radius: 50px; /* Bordes redondeados como Airbnb */
+  padding: 8px; /* Padding reducido para hacerlo más pequeño */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 1000px;
+  max-width: 800px; /* Ancho máximo reducido */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #e5e7eb;
 }
 
-/* Fila del formulario */
+/* Fila del formulario - Horizontal como Airbnb */
 .form-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 15px;
+  align-items: center;
+  width: 100%;
+  gap: 0; /* Sin gaps grandes, campos pegados con separadores */
 }
 
-/* Grupo de campos del formulario */
+/* Grupo de campos del formulario - Compactos */
 .form-group {
   flex: 1;
-  min-width: 200px;
+  min-width: 120px; /* Ancho mínimo ajustado */
+  position: relative;
+  border-right: 1px solid #e5e7eb; /* Separadores como Airbnb */
+  padding: 0 12px;
 }
 
-/* Etiqueta del formulario */
+.form-group:last-child {
+  border-right: none;
+}
+
+/* Etiqueta del formulario - Más pequeña */
 .form-label {
   display: block;
-  font-size: 0.9rem;
+  font-size: 0.75rem; /* Tamaño reducido */
   color: #374151;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   font-weight: 600;
 }
 
@@ -91,61 +90,54 @@
   position: relative;
 }
 
-/* Estilos para el icono */
+/* Estilos para el icono - Más pequeños */
 .input-with-icon .icon {
   position: absolute;
-  left: 12px;
+  left: 8px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: #6B7280;
 }
 
-/* Estilos para los inputs */
+/* Estilos para los inputs - Compactos */
 .form-input {
   width: 100%;
-  padding: 14px 16px 14px 42px;
-  border: 1px solid #E5E7EB;
-  border-radius: 8px;
-  font-size: 1rem;
+  padding: 8px 12px 8px 32px; /* Padding reducido */
+  border: none;
+  font-size: 0.9rem;
   color: #374151;
-  background: #FFFFFF;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  background: transparent;
+  outline: none;
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #10B981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
 }
 
-/* Botón de búsqueda */
+/* Botón de búsqueda - Integrado en la barra como Airbnb */
 .search-button {
   background: #10B981;
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 14px 28px;
-  font-size: 1.1rem;
+  border-radius: 50px;
+  padding: 12px 24px;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
-  align-self: flex-end;
-  min-height: 50px;
-  box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+  transition: background-color 0.2s;
+  margin-left: 8px;
 }
 
 .search-button:hover {
   background: #059669;
 }
 
-.search-button:active {
-  transform: translateY(1px);
-}
-
-/* Sección expandible (Más opciones) */
+/* Sección expandible (Más opciones) - Compacta */
 .form-expandable {
-  margin-top: 15px;
+  margin-top: 12px; /* Espacio reducido */
+  width: 100%;
+  max-width: 800px;
 }
 
 /* Botón para expandir/contraer */
@@ -154,7 +146,7 @@
   border: none;
   color: #10B981;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -163,97 +155,67 @@
   transition: all 0.3s ease;
 }
 
-.expand-toggle:hover {
-  color: #059669;
-}
-
-.expand-icon {
-  transition: transform 0.3s;
-  font-size: 0.8rem;
-}
-
-.expand-icon.expanded {
-  transform: rotate(180deg);
-}
-
-/* Filtros avanzados - MEJORADOS */
+/* Filtros avanzados - Grid compacto */
 .advanced-filters {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #E5E7EB;
+  margin-top: 12px;
+  padding: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
 }
 
-/* Grupo de filtros */
+/* Grupo de filtros - Compacto */
 .filter-group {
-  margin-bottom: 20px;
-  background: #f9fafb;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 0; /* Sin margen inferior extra */
 }
 
 /* Título del filtro */
 .filter-title {
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #1f2937;
-  margin-bottom: 15px;
+  margin-bottom: 8px;
   font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.filter-title::before {
-  content: "";
-  display: inline-block;
-  width: 4px;
-  height: 16px;
-  background: #10B981;
-  border-radius: 2px;
 }
 
 /* Rango de precios */
 .price-range {
-  padding: 0 10px;
+  padding: 0;
 }
 
 .price-label {
   display: flex;
   justify-content: space-between;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: #6B7280;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .price-slider {
   width: 100%;
-  height: 6px;
-  border-radius: 3px;
+  height: 4px;
+  border-radius: 2px;
   background: #e5e7eb;
-  outline: none;
   -webkit-appearance: none;
   appearance: none;
 }
 
 .price-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: #10B981;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
   border: 2px solid white;
 }
 
 /* Opciones de filtro */
 .filter-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 /* Opción individual de filtro */
@@ -261,33 +223,18 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: #4B5563;
   cursor: pointer;
-  transition: all 0.2s;
-  padding: 8px;
-  border-radius: 6px;
-}
-
-.filter-option:hover {
-  background-color: #f0fdf4;
 }
 
 /* Casilla de verificación personalizada */
 .checkmark {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   border: 2px solid #D1D5DB;
-  border-radius: 5px;
+  border-radius: 4px;
   position: relative;
-  transition: all 0.2s;
-}
-
-.filter-option input[type="checkbox"] {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
 }
 
 .filter-option input[type="checkbox"]:checked + .checkmark {
@@ -298,146 +245,72 @@
 .filter-option input[type="checkbox"]:checked + .checkmark::after {
   content: "";
   position: absolute;
-  left: 6px;
-  top: 2px;
-  width: 5px;
-  height: 10px;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
   border: solid white;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
 
-/* Etiquetas/tags */
-.hero-tags {
-  display: flex;
-  gap: 15px;
-  margin-top: 30px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.tag {
-  background: rgba(16, 185, 129, 0.15);
-  color: #10B981;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.2s;
-  cursor: pointer;
-}
-
-.tag:hover {
-  background: rgba(16, 185, 129, 0.25);
-  transform: translateY(-2px);
-}
-
-/* Media queries para diseño responsive */
-
-/* Pantallas hasta 992px */
+/* Media queries para responsive - Optimizadas */
 @media (max-width: 992px) {
   .hero-section {
-    height: auto;
-    min-height: auto;
-    padding: 60px 20px;
+    padding: 30px 15px 15px;
   }
   
   .hero-title {
-    font-size: 2.4rem;
+    font-size: 2rem;
   }
   
   .hero-subtitle {
-    font-size: 1.3rem;
-  }
-  
-  .advanced-filters {
-    grid-template-columns: 1fr;
+    font-size: 1.1rem;
   }
 }
 
-/* Pantallas hasta 768px */
 @media (max-width: 768px) {
-  .hero-title {
-    font-size: 2.2rem;
-  }
-  
-  .hero-subtitle {
-    font-size: 1.2rem;
+  .search-form {
+    flex-direction: column;
+    border-radius: 12px;
+    padding: 16px;
   }
   
   .form-row {
     flex-direction: column;
   }
   
+  .form-group {
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 12px 0;
+  }
+  
+  .form-group:last-child {
+    border-bottom: none;
+  }
+  
   .search-button {
     width: 100%;
-    margin-top: 10px;
-  }
-  
-  .form-group {
-    min-width: 100%;
-  }
-  
-  .filter-options {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    margin: 12px 0 0;
+    border-radius: 8px;
   }
 }
 
-/* Pantallas hasta 480px */
 @media (max-width: 480px) {
   .hero-title {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
   }
   
   .hero-subtitle {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
   
-  .search-form {
-    padding: 20px 15px;
+  .form-label {
+    font-size: 0.7rem;
   }
   
   .form-input {
-    padding: 12px 12px 12px 38px;
-  }
-  
-  .filter-title {
-    font-size: 1rem;
-  }
-  
-  .filter-option {
-    font-size: 0.9rem;
-  }
-  
-  .price-label span {
-    font-size: 0.8rem;
-  }
-  
-  .filter-group {
-    padding: 15px;
-  }
-}
-
-/* Pantallas muy pequeñas */
-@media (max-width: 360px) {
-  .input-with-icon .icon {
-    left: 8px;
-    font-size: 1rem;
-  }
-  
-  .form-input {
-    padding-left: 35px;
-    font-size: 0.9rem;
-  }
-  
-  .search-button {
-    font-size: 1rem;
-    padding: 12px 20px;
-  }
-  
-  .filter-options {
-    grid-template-columns: 1fr;
+    font-size: 0.85rem;
   }
 }

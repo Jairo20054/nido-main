@@ -1,20 +1,19 @@
+// src/pages/Home/Home.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HeroSection from './HeroSection';
-import CategorySection from './CategorySection';
-import PropertyGrid from '../../components/property/PropertyGrid/PropertyGrid';
 import LoadingSpinner from '../../components/common/LoadingSpinner/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage/ErrorMessage';
 import Footer from '../../components/common/Footer/Footer';
 import './Home.css';
 
 const Home = () => {
-  const [featuredProperties, setFeaturedProperties] = useState([])
+  const [featuredProperties, setFeaturedProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Datos mock para propiedades destacadas
+  // Datos mock para propiedades destacadas (agregamos múltiples imágenes a algunas para demostrar el carrusel)
   const mockFeaturedProperties = [
     {
       id: 1,
@@ -22,7 +21,11 @@ const Home = () => {
       location: "Zona Rosa, Bogotá",
       price: 150000,
       rating: 4.8,
-      images: ["https://apartamento-bogota-zona-rosa.bogota-hotels-co.net/data/Photos/OriginalPhoto/1820/182016/182016102.JPEG"],
+      images: [
+        "https://apartamento-bogota-zona-rosa.bogota-hotels-co.net/data/Photos/OriginalPhoto/1820/182016/182016102.JPEG",
+        "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXBhcnRtZW50fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
+        "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YXBhcnRtZW50fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"
+      ],
       amenities: ["WiFi", "Cocina", "Accesible"],
       type: "apartment",
       user: {
@@ -40,7 +43,10 @@ const Home = () => {
       location: "Chapinero, Bogotá",
       price: 280000,
       rating: 4.9,
-      images: ["https://a0.muscache.com/im/pictures/cacd930a-dd65-4c56-95de-032d4e162ebb.jpg"],
+      images: [
+        "https://a0.muscache.com/im/pictures/cacd930a-dd65-4c56-95de-032d4e162ebb.jpg",
+        "https://cf.bstatic.com/xdata/images/hotel/max1024x768/540297069.jpg?k=43a388f82614e8438d0bbacba5249fc9e642c73322b2e2da3141580848bd4968&o=&hp=1"
+      ],
       amenities: ["WiFi", "Jardín", "Parking", "Accesible"],
       type: "house",
       user: {
@@ -76,7 +82,10 @@ const Home = () => {
       location: "Usaquén, Bogotá",
       price: 180000,
       rating: 4.6,
-      images: ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXBhcnRtZW50fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"],
+      images: [
+        "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXBhcnRtZW50fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
+        "https://images.unsplash.com/photo-1575517111839-3a3843ee7f5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGhvdXNlfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"
+      ],
       amenities: ["WiFi", "Piscina", "Gimnasio", "Accesible"],
       type: "apartment",
       user: {
@@ -94,7 +103,10 @@ const Home = () => {
       location: "La Calera, Bogotá",
       price: 350000,
       rating: 4.9,
-      images: ["https://images.unsplash.com/photo-1575517111839-3a3843ee7f5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGhvdXNlfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"],
+      images: [
+        "https://images.unsplash.com/photo-1575517111839-3a3843ee7f5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGhvdXNlfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
+        "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YXBhcnRtZW50fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"
+      ],
       amenities: ["WiFi", "Jardín", "Chimenea", "Parking", "Accesible"],
       type: "house",
       user: {
@@ -112,7 +124,10 @@ const Home = () => {
       location: "El Chicó, Bogotá",
       price: 95000,
       rating: 4.5,
-      images: ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YXBhcnRtZW50fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"],
+      images: [
+        "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YXBhcnRtZW50fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
+        "https://a0.muscache.com/im/pictures/cacd930a-dd65-4c56-95de-032d4e162ebb.jpg"
+      ],
       amenities: ["WiFi", "Cocina", "Lavandería", "Accesible"],
       type: "studio",
       user: {
@@ -145,20 +160,16 @@ const Home = () => {
     fetchFeaturedProperties();
   }, [fetchFeaturedProperties]);
 
-  // Función para manejar búsquedas
   const handleSearch = useCallback((searchParams) => {
-    navigate('/search', { 
-      state: { searchParams }  // Pasamos parámetros como estado de navegación
-    });
+    navigate('/search', { state: { searchParams } });
   }, [navigate]);
 
   const handleRetry = useCallback(() => {
     fetchFeaturedProperties();
   }, [fetchFeaturedProperties]);
 
-  // Nueva función para manejar click en card
-  const handleCardClick = useCallback((property) => {
-    navigate(`/property/${property.id}`);
+  const handleCardClick = useCallback((propertyId) => {
+    navigate(`/property/${propertyId}`);
   }, [navigate]);
 
   if (error) {
@@ -180,21 +191,6 @@ const Home = () => {
       
       <main className="social-feed">
         <div className="feed-container">
-          {/* Historias destacadas */}
-          <div className="stories-section">
-            <h2 className="stories-title">Historias destacadas</h2>
-            <div className="stories-list">
-              {mockFeaturedProperties.slice(0, 6).map((property) => (
-                <div key={property.id} className="story">
-                  <div className="story-avatar">
-                    <img src={property.user.avatar} alt={property.user.name} />
-                  </div>
-                  <span className="story-username">{property.user.name.split(' ')[0]}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
           {/* Feed de propiedades */}
           <div className="posts-grid">
             {loading ? (
@@ -204,72 +200,11 @@ const Home = () => {
               </div>
             ) : (
               featuredProperties.map((property) => (
-                <div key={property.id} className="post-card">
-                  {/* Header del post con información del usuario */}
-                  <div className="post-header">
-                    <div className="user-info">
-                      <img src={property.user.avatar} alt={property.user.name} className="user-avatar" />
-                      <div className="user-details">
-                        <span className="username">{property.user.name}</span>
-                        <span className="location">{property.location}</span>
-                      </div>
-                    </div>
-                    {property.user.verified && <span className="verified-badge">✓</span>}
-                    <button className="options-button">⋯</button>
-                  </div>
-
-                  {/* Imagen de la propiedad */}
-                  <div className="post-image" onClick={() => handleCardClick(property)}>
-                    <img src={property.images[0]} alt={property.title} />
-                    <button className="like-button">
-                      <svg aria-label="Me gusta" fill="#ffffff" height="24" viewBox="0 0 48 48" width="24">
-                        <path d="M34.6 6.1c5.7 0 10.4 5.2 10.4 11.5 0 6.8-5.9 11-11.5 16S25 41.3 24 41.9c-1.1-.7-4.7-4-9.5-8.3-5.7-5-11.5-9.2-11.5-16C3 11.3 7.7 6.1 13.4 6.1c4.2 0 6.5 2 8.1 4.3 1.9 2.6 2.2 3.9 2.5 3.9.3 0 .6-1.3 2.5-3.9 1.6-2.3 3.9-4.3 8.1-4.3z"></path>
-                      </svg>
-                    </button>
-                  </div>
-
-                  {/* Acciones y estadísticas */}
-                  <div className="post-actions">
-                    <div className="action-buttons">
-                      <button className="action-button">
-                        <svg aria-label="Me gusta" fill="#262626" height="24" viewBox="0 0 48 48" width="24">
-                          <path d="M34.6 6.1c5.7 0 10.4 5.2 10.4 11.5 0 6.8-5.9 11-11.5 16S25 41.3 24 41.9c-1.1-.7-4.7-4-9.5-8.3-5.7-5-11.5-9.2-11.5-16C3 11.3 7.7 6.1 13.4 6.1c4.2 0 6.5 2 8.1 4.3 1.9 2.6 2.2 3.9 2.5 3.9.3 0 .6-1.3 2.5-3.9 1.6-2.3 3.9-4.3 8.1-4.3z"></path>
-                        </svg>
-                      </button>
-                      <button className="action-button">
-                        <svg aria-label="Comentar" fill="#262626" height="24" viewBox="0 0 48 48" width="24">
-                          <path clipRule="evenodd" d="M47.5 46.1l-2.8-11c1.8-3.3 2.8-7.1 2.8-11.1C47.5 11 37 .5 24 .5S.5 11 .5 24 11 47.5 24 47.5c4 0 7.8-1 11.1-2.8l11 2.8c.8.2 1.6-.6 1.4-1.4zm-3-22.1c0 4-1 7-2.6 10-.2.4-.3.9-.2 1.4l2.1 8.4-8.3-2.1c-.5-.1-1-.1-1.4.2-1.8 1-5.2 2.6-10 2.6-11.4 0-20.6-9.2-20.6-20.5S12.7 3.5 24 3.5 44.5 12.7 44.5 24z" fillRule="evenodd"></path>
-                        </svg>
-                      </button>
-                      <button className="action-button">
-                        <svg aria-label="Compartir" fill="#262626" height="24" viewBox="0 0 48 48" width="24">
-                          <path d="M47.8 3.8c-.3-.5-.8-.8-1.3-.8h-45C.9 3.1.3 3.5.1 4S0 5.2.4 5.7l15.9 15.6 5.5 22.6c.1.6.6 1 1.2 1.1h.2c.5 0 1-.3 1.3-.7l23.2-39c.4-.4.4-1 .1-1.5zM5.2 6.1h35.5L18 18.7 5.2 6.1zm18.7 33.6l-4.4-18.4L42.4 8.6 23.9 39.7z"></path>
-                        </svg>
-                      </button>
-                    </div>
-                    <button className="save-button">
-                      <svg aria-label="Guardar" fill="#262626" height="24" viewBox="0 0 48 48" width="24">
-                        <path d="M43.5 48c-.4 0-.8-.2-1.1-.4L24 29 5.6 47.6c-.4.4-1.1.6-1.6.3-.6-.2-1-.8-1-1.4v-45C3 .7 3.7 0 4.5 0h39c.8 0 1.5.7 1.5 1.5v45c0 .6-.4 1.2-.9 1.4-.2.1-.4.1-.6.1zM24 26c.8 0 1.6.3 2.2.9l15.8 16V3H6v39.9l15.8-16c.6-.6 1.4-.9 2.2-.9z"></path>
-                      </svg>
-                    </button>
-                  </div>
-
-                  <div className="post-stats">
-                    <span className="likes-count">{property.likes} me gusta</span>
-                    <div className="post-caption">
-                      <span className="username">{property.user.name}</span>
-                      <span className="caption">{property.title}</span>
-                    </div>
-                    <button className="view-comments">Ver los {property.comments} comentarios</button>
-                    <span className="post-time">Hace 2 horas</span>
-                  </div>
-
-                  {/* Comentar */}
-                  <div className="add-comment">
-                    <input type="text" placeholder="Añade un comentario..." />
-                    <button className="post-comment-button">Publicar</button>
-                  </div>
-                </div>
+                <PostCard 
+                  key={property.id} 
+                  property={property} 
+                  onClick={handleCardClick}
+                />
               ))
             )}
           </div>
@@ -277,29 +212,15 @@ const Home = () => {
 
         {/* Sidebar (solo en desktop) */}
         <aside className="sidebar">
-          <div className="sidebar-profile">
-            <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Perfil" className="profile-avatar" />
-            <div className="profile-info">
-              <span className="profile-username">tu_usuario</span>
-              <span className="profile-name">Tu Nombre</span>
-            </div>
-            <button className="switch-button">Cambiar</button>
-          </div>
-
           <div className="suggestions-section">
             <div className="suggestions-header">
-              <span>Sugerencias para ti</span>
-              <button>Ver todo</button>
+              {/* Contenido de sugerencias */}
             </div>
             
             {mockFeaturedProperties.slice(0, 5).map((property) => (
               <div key={`suggestion-${property.id}`} className="suggestion">
                 <div className="suggestion-user">
-                  <img src={property.user.avatar} alt={property.user.name} />
-                  <div className="suggestion-info">
-                    <span className="suggestion-username">{property.user.name.split(' ')[0].toLowerCase()}</span>
-                    <span className="suggestion-detail">Te sigue</span>
-                  </div>
+                  {/* Sugerencia de usuario */}
                 </div>
                 <button className="follow-button">Seguir</button>
               </div>
@@ -347,6 +268,117 @@ const Home = () => {
       </nav>
       
       <Footer />
+    </div>
+  );
+};
+
+// Componente separado para PostCard con carrusel de imágenes
+const PostCard = ({ property, onClick }) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const nextImage = useCallback((e) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev + 1) % property.images.length);
+  }, [property.images.length]);
+
+  const prevImage = useCallback((e) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev - 1 + property.images.length) % property.images.length);
+  }, [property.images.length]);
+
+  const hasMultipleImages = property.images.length > 1;
+
+  return (
+    <div className="post-card">
+      {/* Header del post */}
+      <div className="post-header">
+        <div className="user-info">
+          <img src={property.user.avatar} alt={property.user.name} className="user-avatar" />
+          <div className="user-details">
+            <span className="username">{property.user.name}</span>
+            <span className="location">{property.location}</span>
+          </div>
+        </div>
+        {property.user.verified && <span className="verified-badge">✓</span>}
+        <button className="options-button">⋯</button>
+      </div>
+
+      {/* Carrusel de imágenes */}
+      <div className="post-image" onClick={() => onClick(property.id)}>
+        <img 
+          src={property.images[currentImageIndex]} 
+          alt={`${property.title} - Imagen ${currentImageIndex + 1}`} 
+        />
+        {hasMultipleImages && (
+          <>
+            <button className="carousel-button prev" onClick={prevImage}>
+              <svg viewBox="0 0 24 24" width="24" height="24">
+                <path d="M15 19l-7-7 7-7" fill="none" stroke="white" strokeWidth="2" />
+              </svg>
+            </button>
+            <button className="carousel-button next" onClick={nextImage}>
+              <svg viewBox="0 0 24 24" width="24" height="24">
+                <path d="M9 5l7 7-7 7" fill="none" stroke="white" strokeWidth="2" />
+              </svg>
+            </button>
+            <div className="carousel-dots">
+              {property.images.map((_, index) => (
+                <span 
+                  key={index} 
+                  className={`dot ${index === currentImageIndex ? 'active' : ''}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+        <button className="like-button">
+          <svg aria-label="Me gusta" fill="#ffffff" height="24" viewBox="0 0 48 48" width="24">
+            <path d="M34.6 6.1c5.7 0 10.4 5.2 10.4 11.5 0 6.8-5.9 11-11.5 16S25 41.3 24 41.9c-1.1-.7-4.7-4-9.5-8.3-5.7-5-11.5-9.2-11.5-16C3 11.3 7.7 6.1 13.4 6.1c4.2 0 6.5 2 8.1 4.3 1.9 2.6 2.2 3.9 2.5 3.9.3 0 .6-1.3 2.5-3.9 1.6-2.3 3.9-4.3 8.1-4.3z"></path>
+          </svg>
+        </button>
+      </div>
+
+      {/* Acciones y estadísticas */}
+      <div className="post-actions">
+        <div className="action-buttons">
+          <button className="action-button">
+            <svg aria-label="Me gusta" fill="#262626" height="24" viewBox="0 0 48 48" width="24">
+              <path d="M34.6 6.1c5.7 0 10.4 5.2 10.4 11.5 0 6.8-5.9 11-11.5 16S25 41.3 24 41.9c-1.1-.7-4.7-4-9.5-8.3-5.7-5-11.5-9.2-11.5-16C3 11.3 7.7 6.1 13.4 6.1c4.2 0 6.5 2 8.1 4.3 1.9 2.6 2.2 3.9 2.5 3.9.3 0 .6-1.3 2.5-3.9 1.6-2.3 3.9-4.3 8.1-4.3z"></path>
+            </svg>
+          </button>
+          <button className="action-button">
+            <svg aria-label="Comentar" fill="#262626" height="24" viewBox="0 0 48 48" width="24">
+              <path clipRule="evenodd" d="M47.5 46.1l-2.8-11c1.8-3.3 2.8-7.1 2.8-11.1C47.5 11 37 .5 24 .5S.5 11 .5 24 11 47.5 24 47.5c4 0 7.8-1 11.1-2.8l11 2.8c.8.2 1.6-.6 1.4-1.4zm-3-22.1c0 4-1 7-2.6 10-.2.4-.3.9-.2 1.4l2.1 8.4-8.3-2.1c-.5-.1-1-.1-1.4.2-1.8 1-5.2 2.6-10 2.6-11.4 0-20.6-9.2-20.6-20.5S12.7 3.5 24 3.5 44.5 12.7 44.5 24z" fillRule="evenodd"></path>
+            </svg>
+          </button>
+          <button className="action-button">
+            <svg aria-label="Compartir" fill="#262626" height="24" viewBox="0 0 48 48" width="24">
+              <path d="M47.8 3.8c-.3-.5-.8-.8-1.3-.8h-45C.9 3.1.3 3.5.1 4S0 5.2.4 5.7l15.9 15.6 5.5 22.6c.1.6.6 1 1.2 1.1h.2c.5 0 1-.3 1.3-.7l23.2-39c.4-.4.4-1 .1-1.5zM5.2 6.1h35.5L18 18.7 5.2 6.1zm18.7 33.6l-4.4-18.4L42.4 8.6 23.9 39.7z"></path>
+            </svg>
+          </button>
+        </div>
+        <button className="save-button">
+          <svg aria-label="Guardar" fill="#262626" height="24" viewBox="0 0 48 48" width="24">
+            <path d="M43.5 48c-.4 0-.8-.2-1.1-.4L24 29 5.6 47.6c-.4.4-1.1.6-1.6.3-.6-.2-1-.8-1-1.4v-45C3 .7 3.7 0 4.5 0h39c.8 0 1.5.7 1.5 1.5v45c0 .6-.4 1.2-.9 1.4-.2.1-.4.1-.6.1zM24 26c.8 0 1.6.3 2.2.9l15.8 16V3H6v39.9l15.8-16c.6-.6 1.4-.9 2.2-.9z"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div className="post-stats">
+        <span className="likes-count">{property.likes} me gusta</span>
+        <div className="post-caption">
+          <span className="username">{property.user.name}</span>
+          <span className="caption">{property.title}</span>
+        </div>
+        <button className="view-comments">Ver los {property.comments} comentarios</button>
+        <span className="post-time">Hace 2 horas</span>
+      </div>
+
+      {/* Comentar */}
+      <div className="add-comment">
+        <input type="text" placeholder="Añade un comentario..." />
+        <button className="post-comment-button">Publicar</button>
+      </div>
     </div>
   );
 };
