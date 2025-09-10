@@ -1,316 +1,346 @@
 /* src/components/Home/HeroSection/HeroSection.css */
+/* Mejoras: Estilo más limpio, responsive mejorado, colores Airbnb-like, transiciones suaves, accesibilidad (aria, focus states) */
 
-/* Contenedor principal de la sección hero - Sin imagen de fondo, más compacto */
 .hero-section {
-  position: relative;
-  height: auto; /* Reducido para que sea más pequeño */
-  min-height: 300px; /* Altura mínima ajustada */
-  background-color: #f8f9fa; /* Fondo neutro en lugar de imagen */
-  display: flex;
-  align-items: flex-start; /* Alineado más arriba */
-  justify-content: center;
-  color: #1f2937; /* Color de texto oscuro para contraste */
-  padding: 40px 20px 20px; /* Padding superior reducido para posicionar más arriba */
+  background-color: #f7f7f7; /* Fondo suave similar a Airbnb */
+  min-height: 60vh; /* Reducido para no dominar la página */
+  padding: 40px 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Contenedor del contenido principal */
-.hero-content {
-  max-width: 100%;
-  width: 100%;
+.hero-container {
+  max-width: 1128px;
+  margin: 0 auto;
+  display: flex;
+  gap: 32px; /* Aumentado para mejor separación */
+  padding: 0 24px;
+}
+
+.main-content {
+  flex: 7;
+}
+
+.sidebar {
+  flex: 3;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 24px; /* Más espacio entre secciones */
+  position: sticky;
+  top: 80px; /* Pegado al top para scroll */
+  align-self: flex-start;
 }
 
-/* Estilos para el título principal */
+.hero-content {
+  background: #fff;
+  border-radius: 12px; /* Bordes más suaves */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Sombra ligera */
+  padding: 32px;
+  transition: box-shadow 0.3s ease;
+}
+
+.hero-content:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
 .hero-title {
-  font-size: 2.5rem; /* Tamaño ajustado para ser más compacto */
-  font-weight: 800;
-  line-height: 1.2;
-  margin-bottom: 1rem;
-  color: #1f2937;
-  text-align: center;
+  font-size: 36px; /* Ligeramente más grande para impacto */
+  font-weight: 300;
+  color: #222;
+  margin: 0 0 12px 0;
 }
 
-/* Estilos para el subtítulo */
 .hero-subtitle {
-  font-size: 1.2rem; /* Más pequeño */
-  margin-bottom: 1.5rem;
-  max-width: 600px;
-  color: #4b5563;
-  text-align: center;
+  font-size: 18px;
+  color: #717171;
+  margin: 0 0 32px 0;
 }
 
-/* Formulario de búsqueda - Más pequeño y como Airbnb (barra horizontal compacta) */
-.search-form {
-  background: #ffffff;
-  border-radius: 50px; /* Bordes redondeados como Airbnb */
-  padding: 8px; /* Padding reducido para hacerlo más pequeño */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 800px; /* Ancho máximo reducido */
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border: 1px solid #e5e7eb;
+.preparation-section {
+  border-top: 1px solid #ebebeb;
+  padding-top: 24px;
 }
 
-/* Fila del formulario - Horizontal como Airbnb */
-.form-row {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  gap: 0; /* Sin gaps grandes, campos pegados con separadores */
-}
-
-/* Grupo de campos del formulario - Compactos */
-.form-group {
-  flex: 1;
-  min-width: 120px; /* Ancho mínimo ajustado */
-  position: relative;
-  border-right: 1px solid #e5e7eb; /* Separadores como Airbnb */
-  padding: 0 12px;
-}
-
-.form-group:last-child {
-  border-right: none;
-}
-
-/* Etiqueta del formulario - Más pequeña */
-.form-label {
-  display: block;
-  font-size: 0.75rem; /* Tamaño reducido */
-  color: #374151;
-  margin-bottom: 4px;
+.preparation-section h3 {
+  font-size: 20px;
   font-weight: 600;
+  margin: 0 0 16px 0;
+  color: #222;
 }
 
-/* Contenedor para inputs con icono */
-.input-with-icon {
-  position: relative;
+.progress-container {
+  margin-bottom: 16px;
 }
 
-/* Estilos para el icono - Más pequeños */
-.input-with-icon .icon {
-  position: absolute;
-  left: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1rem;
-  color: #6B7280;
+.progress-bar {
+  height: 6px; /* Más grueso para visibilidad */
+  background-color: #ebebeb;
+  border-radius: 3px;
+  margin-bottom: 8px;
 }
 
-/* Estilos para los inputs - Compactos */
-.form-input {
-  width: 100%;
-  padding: 8px 12px 8px 32px; /* Padding reducido */
-  border: none;
-  font-size: 0.9rem;
-  color: #374151;
-  background: transparent;
-  outline: none;
+.progress-fill {
+  height: 100%;
+  background-color: #ff385c; /* Color Airbnb */
+  border-radius: 3px;
+  transition: width 0.4s ease-in-out;
 }
 
-.form-input:focus {
-  outline: none;
+.progress-text {
+  font-size: 14px;
+  color: #717171;
 }
 
-/* Botón de búsqueda - Integrado en la barra como Airbnb */
-.search-button {
-  background: #10B981;
+.preparation-section p {
+  font-size: 14px;
+  color: #222;
+  margin: 0 0 20px 0;
+}
+
+.primary-button {
+  background-color: #ff385c;
   color: white;
   border: none;
-  border-radius: 50px;
+  border-radius: 8px;
   padding: 12px 24px;
-  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
-  margin-left: 8px;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
-.search-button:hover {
-  background: #059669;
+.primary-button:hover {
+  background-color: #e31c5f;
+  transform: translateY(-2px);
 }
 
-/* Sección expandible (Más opciones) - Compacta */
-.form-expandable {
-  margin-top: 12px; /* Espacio reducido */
-  width: 100%;
-  max-width: 800px;
+.primary-button:focus {
+  outline: 2px solid #ff385c;
+  outline-offset: 2px;
 }
 
-/* Botón para expandir/contraer */
-.expand-toggle {
-  background: transparent;
-  border: none;
-  color: #10B981;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 8px 0;
-  transition: all 0.3s ease;
+/* Sidebar Styles - SearchBar integrado arriba */
+.search-container {
+  margin-bottom: 24px; /* Espacio antes de profile-card */
 }
 
-/* Filtros avanzados - Grid compacto */
-.advanced-filters {
-  margin-top: 12px;
-  padding: 16px;
-  background: white;
+.profile-card {
+  background: #fff;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  transition: box-shadow 0.3s ease;
 }
 
-/* Grupo de filtros - Compacto */
-.filter-group {
-  margin-bottom: 0; /* Sin margen inferior extra */
+.profile-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
-/* Título del filtro */
-.filter-title {
-  font-size: 1rem;
-  color: #1f2937;
-  margin-bottom: 8px;
-  font-weight: 700;
+.profile-header {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20px;
 }
 
-/* Rango de precios */
-.price-range {
-  padding: 0;
+.avatar {
+  width: 64px; /* Ligeramente más grande */
+  height: 64px;
+  background-color: #ebebeb;
+  border-radius: 50%;
+  margin-right: 16px;
 }
 
-.price-label {
+.profile-info h4 {
+  margin: 0 0 6px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #222;
+}
+
+.profile-info p {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  color: #717171;
+}
+
+.profile-stats {
+  border-top: 1px solid #ebebeb;
+  border-bottom: 1px solid #ebebeb;
+  padding: 16px 0;
+  margin-bottom: 16px;
+}
+
+.stat {
   display: flex;
   justify-content: space-between;
-  font-size: 0.8rem;
-  color: #6B7280;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
-.price-slider {
+.stat:last-child {
+  margin-bottom: 0;
+}
+
+.stat span {
+  font-size: 14px;
+  color: #717171;
+}
+
+.stat strong {
+  font-size: 14px;
+  color: #ff385c; /* Color Airbnb */
+  font-weight: 600;
+}
+
+.premium-section {
+  margin-top: 16px;
+}
+
+.premium-section p {
+  font-size: 14px;
+  color: #222;
+  margin: 0 0 12px 0;
+}
+
+.premium-button {
   width: 100%;
-  height: 4px;
-  border-radius: 2px;
-  background: #e5e7eb;
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-.price-slider::-webkit-slider-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #10B981;
+  background-color: transparent;
+  color: #222;
+  border: 1px solid #717171;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  border: 2px solid white;
+  transition: background-color 0.3s;
 }
 
-/* Opciones de filtro */
-.filter-options {
+.premium-button:hover {
+  background-color: #f7f7f7;
+}
+
+.sidebar-section {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  transition: box-shadow 0.3s ease;
+}
+
+.sidebar-section:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.sidebar-section h5 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #222;
+  margin: 0 0 16px 0;
+}
+
+.sidebar-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-list li {
+  padding: 12px 0;
+  font-size: 14px;
+  color: #717171;
+  border-bottom: 1px solid #ebebeb;
+  cursor: pointer;
+  transition: color 0.3s, background-color 0.3s;
+}
+
+.sidebar-list li:last-child {
+  border-bottom: none;
+}
+
+.sidebar-list li:hover {
+  color: #ff385c;
+  background-color: #fff7f8;
+}
+
+.games-container {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
 }
 
-/* Opción individual de filtro */
-.filter-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.9rem;
-  color: #4B5563;
-  cursor: pointer;
+.game-item {
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  transition: background-color 0.3s;
 }
 
-/* Casilla de verificación personalizada */
-.checkmark {
-  width: 16px;
-  height: 16px;
-  border: 2px solid #D1D5DB;
-  border-radius: 4px;
-  position: relative;
+.game-item:hover {
+  background-color: #f0f0f0;
 }
 
-.filter-option input[type="checkbox"]:checked + .checkmark {
-  background-color: #10B981;
-  border-color: #10B981;
+.game-item h6 {
+  margin: 0 0 6px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #222;
 }
 
-.filter-option input[type="checkbox"]:checked + .checkmark::after {
-  content: "";
-  position: absolute;
-  left: 4px;
-  top: 1px;
-  width: 4px;
-  height: 8px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
+.game-item p {
+  margin: 0;
+  font-size: 12px;
+  color: #717171;
 }
 
-/* Media queries para responsive - Optimizadas */
+/* Responsive Design - Ajustes para no desacomodar en mobile */
 @media (max-width: 992px) {
-  .hero-section {
-    padding: 30px 15px 15px;
+  .hero-container {
+    flex-direction: column;
   }
   
-  .hero-title {
-    font-size: 2rem;
+  .sidebar {
+    order: -1; /* Sidebar arriba en mobile */
+    position: static; /* No sticky en mobile */
+    margin-bottom: 32px;
   }
-  
-  .hero-subtitle {
-    font-size: 1.1rem;
+
+  .search-container {
+    margin-bottom: 0; /* Ajuste para flujo natural */
   }
 }
 
 @media (max-width: 768px) {
-  .search-form {
+  .hero-title {
+    font-size: 28px;
+  }
+  
+  .hero-subtitle {
+    font-size: 16px;
+  }
+  
+  .profile-header {
     flex-direction: column;
-    border-radius: 12px;
-    padding: 16px;
+    align-items: center;
+    text-align: center;
   }
   
-  .form-row {
-    flex-direction: column;
-  }
-  
-  .form-group {
-    border-right: none;
-    border-bottom: 1px solid #e5e7eb;
-    padding: 12px 0;
-  }
-  
-  .form-group:last-child {
-    border-bottom: none;
-  }
-  
-  .search-button {
-    width: 100%;
-    margin: 12px 0 0;
-    border-radius: 8px;
+  .avatar {
+    margin-right: 0;
+    margin-bottom: 16px;
   }
 }
 
 @media (max-width: 480px) {
+  .hero-content {
+    padding: 24px;
+  }
+  
   .hero-title {
-    font-size: 1.6rem;
+    font-size: 24px;
   }
   
-  .hero-subtitle {
-    font-size: 1rem;
+  .hero-container {
+    padding: 0 16px;
   }
-  
-  .form-label {
-    font-size: 0.7rem;
-  }
-  
-  .form-input {
-    font-size: 0.85rem;
+
+  .primary-button {
+    width: 100%;
   }
 }
