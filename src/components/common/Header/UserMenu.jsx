@@ -1,5 +1,19 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { FaUserCircle, FaBell, FaEnvelope, FaUser, FaHome, FaCog, FaSignOutAlt, FaHeart, FaBookmark, FaKey, FaComments } from 'react-icons/fa';
+import { 
+  FaUserCircle, 
+  FaBell, 
+  FaEnvelope, 
+  FaUser, 
+  FaHome, 
+  FaCog, 
+  FaSignOutAlt, 
+  FaHeart, 
+  FaBookmark, 
+  FaKey, 
+  FaComments,
+  FaChevronDown,
+  FaChevronUp
+} from 'react-icons/fa';
 import './UserMenu.css';
 
 const UserMenu = ({ 
@@ -12,7 +26,8 @@ const UserMenu = ({
   onSettingsClick = () => {},
   onLogoutClick = () => {},
   onMessagesClick = () => {},
-  onFavoritesClick = () => {}
+  onFavoritesClick = () => {},
+  variant = 'default' // 'default' o 'sidebar'
 }) => {
   const safeUser = user || {
     name: 'Usuario',
@@ -50,6 +65,12 @@ const UserMenu = ({
 
   const menuItems = [
     {
+      id: 'profile',
+      label: 'Mi perfil',
+      icon: FaUser,
+      onClick: onProfileClick
+    },
+    {
       id: 'messages',
       label: 'Mensajes',
       icon: FaComments,
@@ -82,12 +103,6 @@ const UserMenu = ({
       label: 'Mis propiedades',
       icon: FaHome,
       onClick: onPropertiesClick
-    },
-    {
-      id: 'profile',
-      label: 'Mi perfil',
-      icon: FaUser,
-      onClick: onProfileClick
     }
   ];
 
@@ -102,12 +117,13 @@ const UserMenu = ({
       id: 'logout',
       label: 'Cerrar sesión',
       icon: FaSignOutAlt,
-      onClick: onLogoutClick
+      onClick: onLogoutClick,
+      isDestructive: true
     }
   ];
 
   return (
-    <div className="user-menu-airbnb" ref={dropdownRef}>
+    <div className={`user-menu ${variant}`} ref={dropdownRef}>
       <div className="user-menu-trigger" onClick={toggleMenu}>
         <div className="user-avatar">
           {safeUser.avatar ? (
@@ -116,60 +132,81 @@ const UserMenu = ({
             <FaUserCircle size={32} />
           )}
         </div>
-        {isOpen && (
-          <div className="user-menu-dropdown">
-            <div className="dropdown-header">
-              <div className="user-info">
+        <div className="user-info-trigger">
+          <span className="user-name-trigger">{safeUser.name}</span>
+          {variant === 'sidebar' && (
+            <span className="user-email-trigger">{safeUser.email}</span>
+          )}
+        </div>
+        <div className="dropdown-arrow">
+          {isOpen ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
+        </div>
+      </div>
+      
+      {isOpen && (
+        <div className="user-menu-dropdown">
+          <div className="dropdown-header">
+            <div className="user-info">
+              <div className="user-avatar-large">
+                {safeUser.avatar ? (
+                  <img src={safeUser.avatar} alt={safeUser.name} />
+                ) : (
+                  <FaUserCircle size={48} />
+                )}
+              </div>
+              <div className="user-details">
                 <div className="user-name">{safeUser.name}</div>
                 <div className="user-email">{safeUser.email}</div>
               </div>
             </div>
-            
-            <div className="dropdown-section">
+          </div>
+          
+          <div className="dropdown-content">
+            <div className="menu-section">
               {menuItems.map((item) => {
                 const IconComponent = item.icon;
                 return (
-                  <div 
-                    key={item.id} 
+                  <button
+                    key={item.id}
                     className="menu-item"
                     onClick={() => handleMenuItemClick(item.onClick)}
                   >
                     <div className="menu-item-content">
                       <IconComponent className="menu-icon" />
-                      <span>{item.label}</span>
+                      <span className="menu-label">{item.label}</span>
                     </div>
                     {item.showBadge && item.badgeCount > 0 && (
                       <div className="menu-badge">
                         {item.badgeCount > 99 ? '99+' : item.badgeCount}
                       </div>
                     )}
-                  </div>
+                  </button>
                 );
               })}
             </div>
             
-            <div className="dropdown-divider"></div>
+            <div className="menu-divider"></div>
             
-            <div className="dropdown-section">
+            <div className="menu-section">
               {footerItems.map((item) => {
                 const IconComponent = item.icon;
                 return (
-                  <div 
-                    key={item.id} 
-                    className="menu-item"
+                  <button
+                    key={item.id}
+                    className={`menu-item ${item.isDestructive ? 'destructive' : ''}`}
                     onClick={() => handleMenuItemClick(item.onClick)}
                   >
                     <div className="menu-item-content">
                       <IconComponent className="menu-icon" />
-                      <span>{item.label}</span>
+                      <span className="menu-label">{item.label}</span>
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
