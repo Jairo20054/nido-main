@@ -12,8 +12,8 @@
   display: flex;
   justify-content: center; /* Centrar horizontalmente */
   max-width: 935px;
-  margin: 32px auto 0; /* Espaciado superior para separar del header */
-  padding: 0 20px;
+  margin: 28px auto 0; /* Espaciado superior para separar del header */
+  padding: 0 40px;
   gap: 28px;
 }
 

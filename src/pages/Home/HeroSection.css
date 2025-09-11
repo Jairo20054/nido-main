@@ -1,346 +1,315 @@
 /* src/components/Home/HeroSection/HeroSection.css */
-/* Mejoras: Estilo más limpio, responsive mejorado, colores Airbnb-like, transiciones suaves, accesibilidad (aria, focus states) */
-
-.hero-section {
-  background-color: #f7f7f7; /* Fondo suave similar a Airbnb */
-  min-height: 60vh; /* Reducido para no dominar la página */
-  padding: 40px 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+.linkedin-hero {
+  background-color: #f3f2ef;
+  min-height: 100vh;
+  padding: 20px 0;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-.hero-container {
+.linkedin-container {
   max-width: 1128px;
   margin: 0 auto;
   display: flex;
-  gap: 32px; /* Aumentado para mejor separación */
-  padding: 0 24px;
+  gap: 24px;
+  padding: 0 16px;
 }
 
-.main-content {
+.linkedin-main-content {
   flex: 7;
 }
 
-.sidebar {
+.linkedin-sidebar {
   flex: 3;
-  display: flex;
-  flex-direction: column;
-  gap: 24px; /* Más espacio entre secciones */
-  position: sticky;
-  top: 80px; /* Pegado al top para scroll */
-  align-self: flex-start;
-}
-
-.hero-content {
-  background: #fff;
-  border-radius: 12px; /* Bordes más suaves */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Sombra ligera */
-  padding: 32px;
-  transition: box-shadow 0.3s ease;
-}
-
-.hero-content:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
-
-.hero-title {
-  font-size: 36px; /* Ligeramente más grande para impacto */
-  font-weight: 300;
-  color: #222;
-  margin: 0 0 12px 0;
-}
-
-.hero-subtitle {
-  font-size: 18px;
-  color: #717171;
-  margin: 0 0 32px 0;
-}
-
-.preparation-section {
-  border-top: 1px solid #ebebeb;
-  padding-top: 24px;
-}
-
-.preparation-section h3 {
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0 0 16px 0;
-  color: #222;
-}
-
-.progress-container {
-  margin-bottom: 16px;
-}
-
-.progress-bar {
-  height: 6px; /* Más grueso para visibilidad */
-  background-color: #ebebeb;
-  border-radius: 3px;
-  margin-bottom: 8px;
-}
-
-.progress-fill {
-  height: 100%;
-  background-color: #ff385c; /* Color Airbnb */
-  border-radius: 3px;
-  transition: width 0.4s ease-in-out;
-}
-
-.progress-text {
-  font-size: 14px;
-  color: #717171;
-}
-
-.preparation-section p {
-  font-size: 14px;
-  color: #222;
-  margin: 0 0 20px 0;
-}
-
-.primary-button {
-  background-color: #ff385c;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
-}
-
-.primary-button:hover {
-  background-color: #e31c5f;
-  transform: translateY(-2px);
-}
-
-.primary-button:focus {
-  outline: 2px solid #ff385c;
-  outline-offset: 2px;
-}
-
-/* Sidebar Styles - SearchBar integrado arriba */
-.search-container {
-  margin-bottom: 24px; /* Espacio antes de profile-card */
-}
-
-.profile-card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  padding: 20px;
-  transition: box-shadow 0.3s ease;
-}
-
-.profile-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
-
-.profile-header {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 20px;
-}
-
-.avatar {
-  width: 64px; /* Ligeramente más grande */
-  height: 64px;
-  background-color: #ebebeb;
-  border-radius: 50%;
-  margin-right: 16px;
-}
-
-.profile-info h4 {
-  margin: 0 0 6px 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #222;
-}
-
-.profile-info p {
-  margin: 0 0 4px 0;
-  font-size: 14px;
-  color: #717171;
-}
-
-.profile-stats {
-  border-top: 1px solid #ebebeb;
-  border-bottom: 1px solid #ebebeb;
-  padding: 16px 0;
-  margin-bottom: 16px;
-}
-
-.stat {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.stat:last-child {
-  margin-bottom: 0;
-}
-
-.stat span {
-  font-size: 14px;
-  color: #717171;
-}
-
-.stat strong {
-  font-size: 14px;
-  color: #ff385c; /* Color Airbnb */
-  font-weight: 600;
-}
-
-.premium-section {
-  margin-top: 16px;
-}
-
-.premium-section p {
-  font-size: 14px;
-  color: #222;
-  margin: 0 0 12px 0;
-}
-
-.premium-button {
-  width: 100%;
-  background-color: transparent;
-  color: #222;
-  border: 1px solid #717171;
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.premium-button:hover {
-  background-color: #f7f7f7;
-}
-
-.sidebar-section {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  padding: 20px;
-  transition: box-shadow 0.3s ease;
-}
-
-.sidebar-section:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
-
-.sidebar-section h5 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #222;
-  margin: 0 0 16px 0;
-}
-
-.sidebar-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.sidebar-list li {
-  padding: 12px 0;
-  font-size: 14px;
-  color: #717171;
-  border-bottom: 1px solid #ebebeb;
-  cursor: pointer;
-  transition: color 0.3s, background-color 0.3s;
-}
-
-.sidebar-list li:last-child {
-  border-bottom: none;
-}
-
-.sidebar-list li:hover {
-  color: #ff385c;
-  background-color: #fff7f8;
-}
-
-.games-container {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.game-item {
-  padding: 16px;
-  background-color: #f9f9f9;
+.linkedin-search-sidebar {
+  background: #fff;
   border-radius: 8px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.linkedin-hero-content {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+
+.linkedin-hero-title {
+  font-size: 32px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.9);
+  margin: 0 0 8px 0;
+}
+
+.linkedin-hero-subtitle {
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.6);
+  margin: 0 0 24px 0;
+}
+
+.linkedin-job-search-section {
+  border-top: 1px solid #e0e0e0;
+  padding-top: 24px;
+}
+
+.linkedin-job-search-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+  color: rgba(0, 0, 0, 0.9);
+}
+
+.linkedin-progress {
+  margin-bottom: 16px;
+}
+
+.linkedin-progress-bar {
+  height: 4px;
+  background-color: #e0e0e0;
+  border-radius: 2px;
+  margin-bottom: 8px;
+}
+
+.linkedin-progress-fill {
+  height: 100%;
+  background-color: #0a66c2;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.linkedin-progress-text {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.linkedin-job-search-section p {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.9);
+  margin: 0 0 16px 0;
+}
+
+.linkedin-primary-btn {
+  background-color: #0a66c2;
+  color: white;
+  border: none;
+  border-radius: 24px;
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
   transition: background-color 0.3s;
 }
 
-.game-item:hover {
-  background-color: #f0f0f0;
+.linkedin-primary-btn:hover {
+  background-color: #004182;
 }
 
-.game-item h6 {
-  margin: 0 0 6px 0;
+/* Sidebar Styles */
+.linkedin-profile-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.linkedin-profile-header {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.linkedin-avatar {
+  width: 56px;
+  height: 56px;
+  background-color: #e0e0e0;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.linkedin-profile-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.9);
+}
+
+.linkedin-profile-info p {
+  margin: 0 0 2px 0;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.linkedin-profile-stats {
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 12px 0;
+  margin-bottom: 12px;
+}
+
+.linkedin-stat {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.linkedin-stat:last-child {
+  margin-bottom: 0;
+}
+
+.linkedin-stat span {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.linkedin-stat strong {
+  font-size: 14px;
+  color: #0a66c2;
+  font-weight: 600;
+}
+
+.linkedin-premium {
+  margin-top: 12px;
+}
+
+.linkedin-premium p {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.9);
+  margin: 0 0 12px 0;
+}
+
+.linkedin-premium-btn {
+  width: 100%;
+  background-color: transparent;
+  color: rgba(0, 0, 0, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.6);
+  border-radius: 16px;
+  padding: 4px 12px;
   font-size: 14px;
   font-weight: 600;
-  color: #222;
+  cursor: pointer;
 }
 
-.game-item p {
+.linkedin-premium-btn:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.linkedin-sidebar-section {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  padding: 16px;
+}
+
+.linkedin-sidebar-section h5 {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.9);
+  margin: 0 0 12px 0;
+}
+
+.linkedin-sidebar-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.linkedin-sidebar-list li {
+  padding: 8px 0;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+}
+
+.linkedin-sidebar-list li:last-child {
+  border-bottom: none;
+}
+
+.linkedin-sidebar-list li:hover {
+  color: #0a66c2;
+  background-color: #f8f8f8;
+}
+
+.linkedin-games {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.linkedin-game {
+  padding: 12px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+.linkedin-game h6 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.9);
+}
+
+.linkedin-game p {
   margin: 0;
   font-size: 12px;
-  color: #717171;
+  color: rgba(0, 0, 0, 0.6);
 }
 
-/* Responsive Design - Ajustes para no desacomodar en mobile */
+/* Responsive Design */
 @media (max-width: 992px) {
-  .hero-container {
+  .linkedin-container {
     flex-direction: column;
   }
   
-  .sidebar {
-    order: -1; /* Sidebar arriba en mobile */
-    position: static; /* No sticky en mobile */
-    margin-bottom: 32px;
-  }
-
-  .search-container {
-    margin-bottom: 0; /* Ajuste para flujo natural */
+  .linkedin-sidebar {
+    order: -1;
+    margin-bottom: 24px;
   }
 }
 
 @media (max-width: 768px) {
-  .hero-title {
-    font-size: 28px;
+  .linkedin-hero-title {
+    font-size: 24px;
   }
   
-  .hero-subtitle {
-    font-size: 16px;
+  .linkedin-hero-subtitle {
+    font-size: 14px;
   }
   
-  .profile-header {
+  .linkedin-profile-header {
     flex-direction: column;
     align-items: center;
     text-align: center;
   }
   
-  .avatar {
+  .linkedin-avatar {
     margin-right: 0;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
+  }
+  
+  /* Ajustes para el SearchBar en móviles */
+  .linkedin-search-sidebar {
+    padding: 12px;
   }
 }
 
 @media (max-width: 480px) {
-  .hero-content {
-    padding: 24px;
+  .linkedin-hero-content {
+    padding: 16px;
   }
   
-  .hero-title {
-    font-size: 24px;
+  .linkedin-hero-title {
+    font-size: 20px;
   }
   
-  .hero-container {
-    padding: 0 16px;
-  }
-
-  .primary-button {
-    width: 100%;
+  .linkedin-container {
+    padding: 0 8px;
   }
 }
