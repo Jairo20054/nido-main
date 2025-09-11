@@ -1,18 +1,16 @@
-/* src/pages/Home/Home.css */
-
-/* ===== PÁGINA HOME - ESTILO RED SOCIAL ===== */
+/* src/pages/Home/Home.css - MODIFICADO */
+/* Cambios: Aumenté el border-radius de las tarjetas para un look más tipo Airbnb */
 .home-page {
   min-height: 100vh;
   background-color: #fafafa;
   padding-bottom: 60px;
 }
 
-/* ===== FEED PRINCIPAL ===== */
 .social-feed {
   display: flex;
-  justify-content: center; /* Centrar horizontalmente */
+  justify-content: center;
   max-width: 935px;
-  margin: 28px auto 0; /* Espaciado superior para separar del header */
+  margin: 28px auto 0;
   padding: 0 40px;
   gap: 28px;
 }
@@ -23,11 +21,11 @@
   width: 100%;
 }
 
-/* ===== HISTORIAS ===== */
+/* Historias con bordes más redondeados */
 .stories-section {
   background: #ffffff;
   border: 1px solid #dbdbdb;
-  border-radius: 8px;
+  border-radius: 16px; /* Aumentado de 8px a 16px */
   margin-bottom: 24px;
   padding: 16px 0;
   overflow-x: auto;
@@ -100,11 +98,11 @@
   white-space: nowrap;
 }
 
-/* ===== POSTS/ PUBLICACIONES ===== */
+/* Posts con bordes más redondeados como Airbnb */
 .posts-grid {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centrar las tarjetas horizontalmente */
+  align-items: center;
   gap: 24px;
   width: 100%;
 }
@@ -112,11 +110,18 @@
 .post-card {
   background: #ffffff;
   border: 1px solid #dbdbdb;
-  border-radius: 8px;
+  border-radius: 20px; /* Aumentado de 8px a 20px */
   overflow: hidden;
   width: 100%;
-  max-width: 614px; /* Asegurar ancho máximo consistente */
-  margin: 0 auto; /* Centrar cada tarjeta individualmente */
+  max-width: 614px;
+  margin: 0 auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.post-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 .post-header {
@@ -181,6 +186,11 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.post-image:hover img {
+  transform: scale(1.03);
 }
 
 .carousel-button {
@@ -234,7 +244,7 @@
   transform: scale(1.2);
 }
 
-/* ===== ACCIONES DEL POST ===== */
+/* Acciones del post */
 .post-actions {
   display: flex;
   justify-content: space-between;
@@ -270,7 +280,7 @@
   100% { transform: scale(1); }
 }
 
-/* ===== ESTADÍSTICAS DEL POST ===== */
+/* Estadísticas del post */
 .post-stats {
   padding: 0 16px 12px;
 }
@@ -333,7 +343,7 @@
   text-transform: uppercase;
 }
 
-/* ===== AÑADIR COMENTARIO ===== */
+/* Añadir comentario */
 .add-comment {
   display: flex;
   align-items: center;
@@ -368,7 +378,7 @@
   opacity: 1;
 }
 
-/* ===== SIDEBAR ===== */
+/* Sidebar */
 .sidebar {
   width: 293px;
   position: sticky;
@@ -421,8 +431,9 @@
 
 .suggestions-section {
   background: #ffffff;
-  border-radius: 8px;
+  border-radius: 16px; /* Aumentado de 8px a 16px */
   padding: 16px;
+  border: 1px solid #dbdbdb;
 }
 
 .suggestions-header {
@@ -532,7 +543,7 @@
   color: #c7c7c7;
 }
 
-/* ===== NAVEGACIÓN INFERIOR (MÓVIL) ===== */
+/* Navegación inferior (móvil) */
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -557,7 +568,7 @@
   fill: #262626;
 }
 
-/* ===== RESPONSIVE ===== */
+/* Responsive */
 @media (max-width: 1000px) {
   .sidebar {
     display: none;
@@ -565,14 +576,14 @@
   
   .social-feed {
     justify-content: center;
-    margin-top: 24px; /* Reducir espaciado superior en tablets */
+    margin-top: 24px;
   }
 }
 
 @media (max-width: 768px) {
   .social-feed {
     padding: 0;
-    margin: 16px auto 0; /* Espaciado superior más pequeño en móvil */
+    margin: 16px auto 0;
   }
   
   .stories-section,
@@ -591,7 +602,7 @@
   }
   
   .posts-grid {
-    gap: 16px; /* Reducir gap entre posts en móvil */
+    gap: 16px;
   }
 }
 
@@ -606,11 +617,15 @@
   }
   
   .social-feed {
-    margin-top: 8px; /* Espaciado mínimo en pantallas muy pequeñas */
+    margin-top: 8px;
+  }
+  
+  .post-card {
+    border-radius: 12px;
   }
 }
 
-/* ===== ESTADOS DE CARGA ===== */
+/* Estados de carga */
 .loading-container {
   display: flex;
   flex-direction: column;

@@ -1,97 +1,27 @@
-// src/components/Home/HeroSection/HeroSection.jsx
-import React, { useState } from 'react';
+// src/components/Home/HeroSection/HeroSection.jsx (Modified: Removed LinkedIn elements, centered SearchBar like Airbnb, made compact=false for larger size, added responsive classes)
+import React from 'react';
 import SearchBar from '../../components/common/Header/SearchBar';
 import './HeroSection.css';
 
 const HeroSection = ({ onSearch }) => {
-  const [profileCompletion, setProfileCompletion] = useState(2); // 2 de 7 completados
-
   return (
-    <section className="linkedin-hero" aria-labelledby="hero-heading">
-      <div className="linkedin-container">
-        <div className="linkedin-main-content">
-          <div className="linkedin-hero-content">
-            <h1 id="hero-heading" className="linkedin-hero-title">
+    <section className="hero-section" aria-labelledby="hero-heading">
+      <div className="hero-container">
+        <div className="hero-main-content">
+          <div className="hero-content">
+            <h1 id="hero-heading" className="hero-title">
               Encuentra tu próximo alojamiento ideal
             </h1>
-            <p className="linkedin-hero-subtitle">
+            <p className="hero-subtitle">
               Descubre lugares únicos para hospedarte en todo el mundo
             </p>
             
-            <div className="linkedin-job-search-section">
-              <h3>Prepara tu búsqueda de alojamiento</h3>
-              <div className="linkedin-progress">
-                <div className="linkedin-progress-bar">
-                  <div 
-                    className="linkedin-progress-fill" 
-                    style={{ width: `${(profileCompletion / 7) * 100}%` }}
-                  ></div>
-                </div>
-                <span className="linkedin-progress-text">Completado: {profileCompletion}/7</span>
-              </div>
-              <p>Busca y descubre alojamientos relevantes que se ajusten a tus preferencias.</p>
-              <button className="linkedin-primary-btn">Buscar alojamientos</button>
+            {/* SearchBar centered and prominent like Airbnb */}
+            <div className="hero-search-bar">
+              <SearchBar onSearch={onSearch} compact={false} />
             </div>
           </div>
         </div>
-
-        <aside className="linkedin-sidebar">
-          {/* SearchBar integrado en la barra lateral */}
-          <div className="linkedin-search-sidebar">
-            <SearchBar onSearch={onSearch} compact={true} />
-          </div>
-          
-          <div className="linkedin-profile-card">
-            <div className="linkedin-profile-header">
-              <div className="linkedin-avatar"></div>
-              <div className="linkedin-profile-info">
-                <h4>Jairo Castillo</h4>
-                <p>Cali, Valle del Cauca</p>
-                <p>Corporación Universitaria Iberoamericana</p>
-              </div>
-            </div>
-            
-            <div className="linkedin-profile-stats">
-              <div className="linkedin-stat">
-                <span>Contactos</span>
-                <strong>500+</strong>
-              </div>
-              <div className="linkedin-stat">
-                <span>Amplía tu red</span>
-                <strong>+ Conectar</strong>
-              </div>
-            </div>
-            
-            <div className="linkedin-premium">
-              <p>Accede a herramientas e información Premium</p>
-              <button className="linkedin-premium-btn">Probar Premium por 0 COP</button>
-            </div>
-          </div>
-
-          <div className="linkedin-sidebar-section">
-            <h5>Recursos de búsqueda</h5>
-            <ul className="linkedin-sidebar-list">
-              <li>Elementos guardados</li>
-              <li>Filtros guardados</li>
-              <li>Alertas de precio</li>
-              <li>Historial de búsquedas</li>
-            </ul>
-          </div>
-
-          <div className="linkedin-sidebar-section">
-            <h5>Juegos de hoy</h5>
-            <div className="linkedin-games">
-              <div className="linkedin-game">
-                <h6>Mini Sudoku</h6>
-                <p>El clásico juego, en versión mini.</p>
-              </div>
-              <div className="linkedin-game">
-                <h6>Zip</h6>
-                <p>Ábrete camino.</p>
-              </div>
-            </div>
-          </div>
-        </aside>
       </div>
     </section>
   );

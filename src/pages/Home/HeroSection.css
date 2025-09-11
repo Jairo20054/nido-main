@@ -1,315 +1,93 @@
 /* src/components/Home/HeroSection/HeroSection.css */
-.linkedin-hero {
-  background-color: #f3f2ef;
-  min-height: 100vh;
-  padding: 20px 0;
-  font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+/* Modified to Airbnb style: Removed LinkedIn elements, added hero background, centered search bar */
+.hero-section {
+  position: relative;
+  min-height: 400px;
+  background: url('https://example.com/airbnb-hero-bg.jpg') center/cover no-repeat; /* Replace with actual image URL or remove */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: white;
+  text-align: center;
 }
 
-.linkedin-container {
+.hero-container {
   max-width: 1128px;
   margin: 0 auto;
-  display: flex;
-  gap: 24px;
   padding: 0 16px;
-}
-
-.linkedin-main-content {
-  flex: 7;
-}
-
-.linkedin-sidebar {
-  flex: 3;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.linkedin-search-sidebar {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
-  padding: 16px;
-  margin-bottom: 16px;
-}
-
-.linkedin-hero-content {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
-  padding: 24px;
-  margin-bottom: 16px;
-}
-
-.linkedin-hero-title {
-  font-size: 32px;
-  font-weight: 400;
-  color: rgba(0, 0, 0, 0.9);
-  margin: 0 0 8px 0;
-}
-
-.linkedin-hero-subtitle {
-  font-size: 16px;
-  color: rgba(0, 0, 0, 0.6);
-  margin: 0 0 24px 0;
-}
-
-.linkedin-job-search-section {
-  border-top: 1px solid #e0e0e0;
-  padding-top: 24px;
-}
-
-.linkedin-job-search-section h3 {
-  font-size: 18px;
-  font-weight: 600;
-  margin: 0 0 16px 0;
-  color: rgba(0, 0, 0, 0.9);
-}
-
-.linkedin-progress {
-  margin-bottom: 16px;
-}
-
-.linkedin-progress-bar {
-  height: 4px;
-  background-color: #e0e0e0;
-  border-radius: 2px;
-  margin-bottom: 8px;
-}
-
-.linkedin-progress-fill {
-  height: 100%;
-  background-color: #0a66c2;
-  border-radius: 2px;
-  transition: width 0.3s ease;
-}
-
-.linkedin-progress-text {
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.6);
-}
-
-.linkedin-job-search-section p {
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.9);
-  margin: 0 0 16px 0;
-}
-
-.linkedin-primary-btn {
-  background-color: #0a66c2;
-  color: white;
-  border: none;
-  border-radius: 24px;
-  padding: 8px 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.linkedin-primary-btn:hover {
-  background-color: #004182;
-}
-
-/* Sidebar Styles */
-.linkedin-profile-card {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
-  padding: 16px;
-  margin-bottom: 16px;
-}
-
-.linkedin-profile-header {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 16px;
-}
-
-.linkedin-avatar {
-  width: 56px;
-  height: 56px;
-  background-color: #e0e0e0;
-  border-radius: 50%;
-  margin-right: 12px;
-}
-
-.linkedin-profile-info h4 {
-  margin: 0 0 4px 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: rgba(0, 0, 0, 0.9);
-}
-
-.linkedin-profile-info p {
-  margin: 0 0 2px 0;
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.6);
-}
-
-.linkedin-profile-stats {
-  border-top: 1px solid #e0e0e0;
-  border-bottom: 1px solid #e0e0e0;
-  padding: 12px 0;
-  margin-bottom: 12px;
-}
-
-.linkedin-stat {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.linkedin-stat:last-child {
-  margin-bottom: 0;
-}
-
-.linkedin-stat span {
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.6);
-}
-
-.linkedin-stat strong {
-  font-size: 14px;
-  color: #0a66c2;
-  font-weight: 600;
-}
-
-.linkedin-premium {
-  margin-top: 12px;
-}
-
-.linkedin-premium p {
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.9);
-  margin: 0 0 12px 0;
-}
-
-.linkedin-premium-btn {
   width: 100%;
-  background-color: transparent;
-  color: rgba(0, 0, 0, 0.9);
-  border: 1px solid rgba(0, 0, 0, 0.6);
-  border-radius: 16px;
-  padding: 4px 12px;
-  font-size: 14px;
+}
+
+.hero-main-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero-content {
+  margin-bottom: 32px;
+}
+
+.hero-title {
+  font-size: 48px;
   font-weight: 600;
-  cursor: pointer;
+  margin: 0 0 16px 0;
+  line-height: 1.1;
 }
 
-.linkedin-premium-btn:hover {
-  background-color: rgba(0, 0, 0, 0.04);
+.hero-subtitle {
+  font-size: 24px;
+  font-weight: 400;
+  margin: 0 0 32px 0;
+  opacity: 0.9;
 }
 
-.linkedin-sidebar-section {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
-  padding: 16px;
-}
-
-.linkedin-sidebar-section h5 {
-  font-size: 16px;
-  font-weight: 600;
-  color: rgba(0, 0, 0, 0.9);
-  margin: 0 0 12px 0;
-}
-
-.linkedin-sidebar-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.linkedin-sidebar-list li {
-  padding: 8px 0;
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.6);
-  border-bottom: 1px solid #f0f0f0;
-  cursor: pointer;
-}
-
-.linkedin-sidebar-list li:last-child {
-  border-bottom: none;
-}
-
-.linkedin-sidebar-list li:hover {
-  color: #0a66c2;
-  background-color: #f8f8f8;
-}
-
-.linkedin-games {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.linkedin-game {
-  padding: 12px;
-  background-color: #f9f9f9;
-  border-radius: 4px;
-}
-
-.linkedin-game h6 {
-  margin: 0 0 4px 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: rgba(0, 0, 0, 0.9);
-}
-
-.linkedin-game p {
-  margin: 0;
-  font-size: 12px;
-  color: rgba(0, 0, 0, 0.6);
+.hero-search-bar {
+  max-width: 850px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 /* Responsive Design */
 @media (max-width: 992px) {
-  .linkedin-container {
-    flex-direction: column;
+  .hero-section {
+    min-height: 300px;
+    padding: 40px 16px;
   }
   
-  .linkedin-sidebar {
-    order: -1;
-    margin-bottom: 24px;
+  .hero-title {
+    font-size: 36px;
+  }
+  
+  .hero-subtitle {
+    font-size: 20px;
   }
 }
 
 @media (max-width: 768px) {
-  .linkedin-hero-title {
-    font-size: 24px;
+  .hero-section {
+    padding: 30px 12px;
   }
   
-  .linkedin-hero-subtitle {
-    font-size: 14px;
+  .hero-title {
+    font-size: 28px;
   }
   
-  .linkedin-profile-header {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-  
-  .linkedin-avatar {
-    margin-right: 0;
-    margin-bottom: 12px;
-  }
-  
-  /* Ajustes para el SearchBar en móviles */
-  .linkedin-search-sidebar {
-    padding: 12px;
+  .hero-subtitle {
+    font-size: 18px;
   }
 }
 
 @media (max-width: 480px) {
-  .linkedin-hero-content {
-    padding: 16px;
+  .hero-section {
+    padding: 20px 8px;
   }
   
-  .linkedin-hero-title {
-    font-size: 20px;
+  .hero-title {
+    font-size: 24px;
   }
   
-  .linkedin-container {
-    padding: 0 8px;
+  .hero-subtitle {
+    font-size: 16px;
   }
 }

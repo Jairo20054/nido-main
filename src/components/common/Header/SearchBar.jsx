@@ -1,4 +1,4 @@
-// src/components/common/Header/SearchBar.jsx
+// src/components/common/Header/SearchBar.jsx (Modified: Changed trigger to multi-section like Airbnb, removed single input, added sections for location, checkIn, checkOut, guests, and search button. Adjusted placeholders and labels in Spanish. Removed clear button from trigger.)
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import "./SearchBar.css";
 
@@ -212,39 +212,50 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
     setActiveField(null);
   };
 
+  const checkInDisplay = searchData.checkIn ? formatDate(searchData.checkIn) : "Agrega fech...";
+  const checkOutDisplay = searchData.checkOut ? formatDate(searchData.checkOut) : "Agrega fech...";
+  const guestsDisplay = totalGuests > 0 ? `${totalGuests} huésped${totalGuests > 1 ? 'es' : ''}` : "¿Cuántos?";
+
   return (
     <div className={`search-bar ${compact ? "search-bar--compact" : ""}`} ref={searchRef}>
-      <div 
-        className="search-bar__trigger"
-        onClick={() => setActiveField(activeField ? null : "location")}
-      >
-        <div className="search-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-            <circle cx="11" cy="11" r="6" stroke="currentColor" strokeWidth="2" fill="none"/>
+      <div className="search-bar__trigger">
+        <div 
+          className={`trigger-section ${activeField === "location" ? "active" : ""}`} 
+          onClick={() => setActiveField("location")}
+        >
+          <label>Dónde</label>
+          <span>{searchData.location || "Explora destinos"}</span>
+        </div>
+        <div className="trigger-divider" />
+        <div 
+          className={`trigger-section ${activeField === "checkIn" ? "active" : ""}`} 
+          onClick={() => setActiveField("checkIn")}
+        >
+          <label>Check-in</label>
+          <span>{checkInDisplay}</span>
+        </div>
+        <div className="trigger-divider" />
+        <div 
+          className={`trigger-section ${activeField === "checkOut" ? "active" : ""}`} 
+          onClick={() => setActiveField("checkOut")}
+        >
+          <label>Check-out</label>
+          <span>{checkOutDisplay}</span>
+        </div>
+        <div className="trigger-divider" />
+        <div 
+          className={`trigger-section ${activeField === "guests" ? "active" : ""}`} 
+          onClick={() => setActiveField("guests")}
+        >
+          <label>Quién</label>
+          <span>{guestsDisplay}</span>
+        </div>
+        <button className="trigger-search-btn" onClick={handleSearch} aria-label="Buscar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+            <path d="M21 21l-4.35-4.35" />
+            <circle cx="11" cy="11" r="6" />
           </svg>
-        </div>
-        
-        <div className="search-input-container">
-          <input
-            ref={inputRef}
-            className="search-input"
-            placeholder="¿A dónde vas?"
-            value={searchData.location}
-            onChange={(e) => handleLocationSearch(e.target.value)}
-            onKeyDown={handleKeyDown}
-            aria-label="Buscar destino"
-            onFocus={() => setActiveField("location")}
-          />
-        </div>
-        
-        {searchData.location && (
-          <button className="clear-button" onClick={clearSearch} aria-label="Limpiar búsqueda">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </button>
-        )}
+        </button>
       </div>
 
       {/* Dropdown / panel */}
@@ -371,7 +382,7 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
                     <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
                     <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                   </svg>
-                  <span>{totalGuests} huésped{totalGuests !== 1 ? 'es' : ''}</span>
+                  <span>{guestsDisplay}</span>
                   {searchData.guests.pets && <span className="pets-indicator">· Mascotas</span>}
                 </div>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

@@ -1,3 +1,4 @@
+// src/pages/Home/Home.jsx (Modified: Added HeroSection to normal return, ensured responsive feed)
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HeroSection from './HeroSection';
@@ -261,11 +262,10 @@ const Home = () => {
 
   return (
     <div className="home-page">
+      <HeroSection onSearch={handleSearch} />
       
       <main className="social-feed">
         <div className="feed-container">
-
-
           {/* Feed de propiedades */}
           <div className="posts-grid">
             {loading ? (
@@ -292,44 +292,13 @@ const Home = () => {
           </div>
         </div>
       </main>
-
-      {/* Barra de navegación inferior para móviles */}
-      <nav className="bottom-nav">
-        <button className="nav-button active">
-          <svg aria-label="Inicio" fill="#262626" height="24" viewBox="0 0 48 48" width="24">
-            <path d="M45.5 48H30.1c-.8 0-1.5-.7-1.5-1.5V34.2c0-2.6-2.1-4.6-4.6-4.6s-4.6 2.1-4.6 4.6v12.3c0 .8-.7 1.5-1.5 1.5H2.5c-.8 0-1.5-.7-1.5-1.5V23c0-.4.2-.8.4-1.1L22.9.4c.6-.6 1.6-.6 2.1 0l21.5 21.5c.3.3.4.7.4 1.1v23.5c.1.8-.6 1.5-1.4 1.5z"></path>
-          </svg>
-        </button>
-        <button className="nav-button">
-          <svg aria-label="Buscar" fill="#262626" height="24" viewBox="0 0 48 48" width="24">
-            <path d="M20 40C9 40 0 31 0 20S9 0 20 0s20 9 20 20-9 20-20 20zm0-37C10.6 3 3 10.6 3 20s7.6 17 17 17 17-7.6 17-17S29.4 3 20 3z"></path>
-            <path d="M46.6 48.1c-.4 0-.8-.1-1.1-.4L32 34.2c-.6-.6-.6-1.5 0-2.1s1.5-.6 2.1 0l13.5 13.5c.6.6.6 1.5 0 2.1-.3.3-.7.4-1 .4z"></path>
-          </svg>
-        </button>
-        <button className="nav-button">
-          <svg aria-label="Explorar" fill="#262626" height="24" viewBox="0 0 48 48" width="24">
-            <path d="M47.9 23.9c0-13.3-10.8-24.1-24.1-24.1S-.1 10.6-.1 23.9c0 13.3 10.8 24.1 24.1 24.1 13.3.1 24.1-10.7 24.1-24.1zm-44.2 0c0-11.1 9-20.1 20.1-20.1s20.1 9 20.1 20.1-9 20.1-20.1 20.1-20.1-9-20.1-20.1z"></path>
-            <path d="M25.6 32.2l-9.7-5.3c-.4-.2-.6-.6-.6-1.1s.2-.9.6-1.1l9.7-5.3c.4-.2.9-.2 1.3 0 .4.2.6.6.6 1.1v10.5c0 .5-.2.9-.6 1.1-.2.1-.4.2-.7.2s-.5-.1-.6-.2z"></path>
-          </svg>
-        </button>
-        <button className="nav-button">
-          <svg aria-label="Reels" fill="#262626" height="24" viewBox="0 0 48 48" width="24">
-            <path d="M39.2 12.5H8.8c-1.5 0-2.8 1.2-2.8 2.8v20.3c0 1.5 1.2 2.8 2.8 2.8h30.3c1.5 0 2.8-1.2 2.8-2.8V15.3c.1-1.6-1.2-2.8-2.7-2.8zm-4.2 16.3l-12.7 7.5c-.6.4-1.4-.1-1.4-.8V20.3c0-.7.8-1.2 1.4-.8l12.7 7.5c.6.3.6 1.2 0 1.5z"></path>
-          </svg>
-        </button>
-        <button className="nav-button">
-          <svg aria-label="Perfil" fill="#262626" height="24" viewBox="0 0 48 48" width="24">
-            <path d="M24 27.3c6.9 0 12.4-5.6 12.4-12.4S30.9 2.5 24 2.5 11.6 8.1 11.6 14.9s5.6 12.4 12.4 12.4zm0-21.9c5.2 0 9.5 4.2 9.5 9.5s-4.2 9.5-9.5 9.5-9.5-4.2-9.5-9.5 4.3-9.5 9.5-9.5zM42.9 45.5H5.1c-1.5 0-2.8-1.2-2.8-2.8 0-8.6 7-15.6 15.6-15.6h13.1c8.6 0 15.6 7 15.6 15.6 0 1.6-1.2 2.8-2.7 2.8zM17.9 30.2c-6.9 0-12.5 5.6-12.5 12.5 0 .2.2.4.4.4h37.3c.2 0 .4-.2.4-.4.1-6.9-5.5-12.5-12.4-12.5H17.9z"></path>
-          </svg>
-        </button>
-      </nav>
       
       <Footer />
     </div>
   );
 };
 
-// Componente PostCard con diseño de red social
+// Componente PostCard con diseño de red social (unchanged)
 const PostCard = ({ 
   property, 
   onClick, 

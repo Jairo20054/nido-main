@@ -1,3 +1,4 @@
+// src/pages/Search/Search.jsx (Modified minimally for integration; added responsiveness notes in CSS if needed, but assuming existing CSS handles it)
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import useSearch from '../../hooks/useSearch';
