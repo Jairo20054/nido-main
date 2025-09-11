@@ -1,4 +1,3 @@
-// src/components/common/Header/SearchBar.jsx (Modified: Changed trigger to multi-section like Airbnb, removed single input, added sections for location, checkIn, checkOut, guests, and search button. Adjusted placeholders and labels in Spanish. Removed clear button from trigger.)
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import "./SearchBar.css";
 
@@ -13,24 +12,22 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
     checkIn: initialData.checkIn || null,
     checkOut: initialData.checkOut || null,
     guests: initialData.guests || {
-      adults: 1,
-      children: 0,
-      babies: 0,
-      pets: false,
+      adultos: 0,
+      niños: 0,
+      bebés: 0,
+      mascotas: 0,
     },
   });
 
   const popularLocations = [
-    { name: "Bogotá", icon: "🏙️" },
-    { name: "Medellín", icon: "🌸" },
-    { name: "Cali", icon: "💃" },
-    { name: "Cartagena", icon: "🏰" },
-    { name: "Barranquilla", icon: "🌊" },
-    { name: "Santa Marta", icon: "⛰️" },
-    { name: "San Andrés", icon: "🏝️" },
+    { name: "Cerca", description: "Descubre qué hay a tu alrededor", icon: "📍" },
+    { name: "Palmira, Valle del Cauca", description: "Cerca de ti", icon: "🏠" },
+    { name: "Bogotá, Bogotá", description: "Por lugares emblemáticos como este: Plaza de Bolívar", icon: "🏙️" },
+    { name: "Cartagena, Bolívar", description: "Una destinación de playa popular", icon: "🏖️" },
+    { name: "Jamundi, Valle del Cauca", description: "Cerca de ti", icon: "📍" },
   ];
 
-  const [suggestions, setSuggestions] = useState([]);
+  const [suggestions, setSuggestions] = useState(popularLocations);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const [dropdownStyle, setDropdownStyle] = useState({});
 
@@ -70,13 +67,16 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
         top: "auto",
         bottom: 0,
         width: "100%",
+        borderRadius: "24px 24px 0 0",
+        maxHeight: "80vh",
       });
     } else {
       setDropdownStyle({
         position: "absolute",
         left: 0,
-        top: rect.height + 8 + "px",
+        top: rect.height + 4 + "px",
         width: rect.width + "px",
+        borderRadius: "24px",
       });
     }
   }, []);
@@ -94,6 +94,8 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
       if (activeField === "location" && inputRef.current) {
         inputRef.current.focus();
       }
+    } else {
+      setSuggestions(popularLocations);
     }
   }, [activeField, updateDropdownPosition]);
 
@@ -105,17 +107,21 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
       const filtered = popularLocations.filter((l) =>
         l.name.toLowerCase().includes(value.toLowerCase())
       );
-      setSuggestions(filtered);
+      setSuggestions(filtered.length > 0 ? filtered : popularLocations);
     } else {
-      setSuggestions([]);
+      setSuggestions(popularLocations);
     }
     
     setSelectedSuggestionIndex(-1);
   };
 
   const selectSuggestion = (s) => {
-    setSearchData((p) => ({ ...p, location: s.name }));
-    setSuggestions([]);
+    if (s.name === "Cerca") {
+      setSearchData((p) => ({ ...p, location: "Cerca de ti" }));
+    } else {
+      setSearchData((p) => ({ ...p, location: s.name }));
+    }
+    setSuggestions(popularLocations);
     setActiveField(null);
     setSelectedSuggestionIndex(-1);
   };
@@ -143,19 +149,19 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
     setSearchData((prev) => {
       const current = prev.guests[type];
       const nextValue = op === "increment" ? Math.min(10, current + 1) : Math.max(0, current - 1);
-      const nextAdults = type === "adults" ? Math.max(1, nextValue) : Math.max(1, prev.guests.adults);
+      const nextAdults = type === "adultos" ? Math.max(0, nextValue) : prev.guests.adultos;
       
       return {
         ...prev,
         guests: {
           ...prev.guests,
-          [type]: type === "adults" ? nextAdults : nextValue,
+          [type]: nextValue,
         },
       };
     });
   };
 
-  const totalGuests = searchData.guests.adults + searchData.guests.children + searchData.guests.babies;
+  const totalGuests = searchData.guests.adultos + searchData.guests.niños + searchData.guests.bebés + searchData.guests.mascotas;
 
   const validate = useCallback(() => {
     if (!searchData.location.trim()) return "Por favor ingresa un destino.";
@@ -193,11 +199,10 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
   };
 
   const formatDate = (date) => {
-    if (!date) return "";
+    if (!date) return "Agrega fecha";
     return new Intl.DateTimeFormat('es-ES', {
       day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
+      month: 'short',
     }).format(date);
   };
 
@@ -206,14 +211,14 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
       location: "",
       checkIn: null,
       checkOut: null,
-      guests: { adults: 1, children: 0, babies: 0, pets: false }
+      guests: { adultos: 0, niños: 0, bebés: 0, mascotas: 0 }
     });
     setError("");
     setActiveField(null);
   };
 
-  const checkInDisplay = searchData.checkIn ? formatDate(searchData.checkIn) : "Agrega fech...";
-  const checkOutDisplay = searchData.checkOut ? formatDate(searchData.checkOut) : "Agrega fech...";
+  const checkInDisplay = searchData.checkIn ? formatDate(searchData.checkIn) : "Agrega fecha";
+  const checkOutDisplay = searchData.checkOut ? formatDate(searchData.checkOut) : "Agrega fecha";
   const guestsDisplay = totalGuests > 0 ? `${totalGuests} huésped${totalGuests > 1 ? 'es' : ''}` : "¿Cuántos?";
 
   return (
@@ -231,7 +236,7 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
           className={`trigger-section ${activeField === "checkIn" ? "active" : ""}`} 
           onClick={() => setActiveField("checkIn")}
         >
-          <label>Check-in</label>
+          <label>Llegada</label>
           <span>{checkInDisplay}</span>
         </div>
         <div className="trigger-divider" />
@@ -239,7 +244,7 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
           className={`trigger-section ${activeField === "checkOut" ? "active" : ""}`} 
           onClick={() => setActiveField("checkOut")}
         >
-          <label>Check-out</label>
+          <label>Salida</label>
           <span>{checkOutDisplay}</span>
         </div>
         <div className="trigger-divider" />
@@ -247,7 +252,7 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
           className={`trigger-section ${activeField === "guests" ? "active" : ""}`} 
           onClick={() => setActiveField("guests")}
         >
-          <label>Quién</label>
+          <label>Huéspedes</label>
           <span>{guestsDisplay}</span>
         </div>
         <button className="trigger-search-btn" onClick={handleSearch} aria-label="Buscar">
@@ -258,41 +263,31 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
         </button>
       </div>
 
-      {/* Dropdown / panel */}
+      {/* Field-specific dropdown */}
       {activeField && (
-        <div className="search-dropdown" style={dropdownStyle} role="dialog" aria-label="Filtros de búsqueda">
-          <div className="dropdown-header">
-            <h3>Buscar alojamiento</h3>
-            <button className="close-button" onClick={() => setActiveField(null)} aria-label="Cerrar búsqueda">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          
-          <div className="dropdown-content">
-            {/* Destino */}
-            <div className="search-section">
-              <label className="section-label">Destino</label>
-              <div className="input-with-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
-                <input
-                  ref={inputRef}
-                  className="text-input"
-                  type="text"
-                  value={searchData.location}
-                  onChange={(e) => handleLocationSearch(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Ciudad o barrio"
-                  aria-autocomplete="list"
-                />
-              </div>
-              
-              <div className="suggestions-container">
-                {suggestions.length > 0 ? (
+        <div className="search-dropdown" style={dropdownStyle} role="dialog" aria-label="Filtro seleccionado">
+          {activeField === "location" && (
+            <div className="dropdown-content location-content">
+              <div className="search-section">
+                <div className="input-with-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  <input
+                    ref={inputRef}
+                    className="text-input"
+                    type="text"
+                    value={searchData.location}
+                    onChange={(e) => handleLocationSearch(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="¿A dónde vas?"
+                    aria-autocomplete="list"
+                  />
+                </div>
+                
+                <div className="suggestions-container">
+                  <p className="suggestion-title">Destinaciones sugeridas</p>
                   <div className="suggestions-list">
                     {suggestions.map((s, i) => (
                       <button
@@ -301,114 +296,87 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
                         onClick={() => selectSuggestion(s)}
                       >
                         <span className="suggestion-icon">{s.icon}</span>
-                        <span className="suggestion-text">{s.name}</span>
+                        <div className="suggestion-details">
+                          <span className="suggestion-name">{s.name}</span>
+                          <span className="suggestion-description">{s.description}</span>
+                        </div>
                       </button>
                     ))}
                   </div>
-                ) : (
-                  <div className="popular-suggestions">
-                    <p className="suggestion-title">Destinos populares</p>
-                    <div className="suggestions-grid">
-                      {popularLocations.map((l) => (
-                        <button key={l.name} className="suggestion-chip" onClick={() => selectSuggestion(l)}>
-                          <span className="chip-icon">{l.icon}</span>
-                          <span className="chip-text">{l.name}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Fechas */}
-            <div className="search-section">
-              <label className="section-label">Fechas</label>
-              <div className="dates-container">
-                <div className="date-input-group">
-                  <label className="input-label">Entrada</label>
-                  <div className="input-with-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                      <line x1="16" y1="2" x2="16" y2="6" />
-                      <line x1="8" y1="2" x2="8" y2="6" />
-                      <line x1="3" y1="10" x2="21" y2="10" />
-                    </svg>
-                    <input
-                      className="text-input"
-                      type="date"
-                      value={searchData.checkIn ? searchData.checkIn.toISOString().slice(0, 10) : ""}
-                      onChange={(e) => handleDateChange(e.target.value, "checkIn")}
-                      min={new Date().toISOString().slice(0, 10)}
-                    />
-                    {searchData.checkIn && (
-                      <span className="date-display">{formatDate(searchData.checkIn)}</span>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="date-input-group">
-                  <label className="input-label">Salida</label>
-                  <div className="input-with-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                      <line x1="16" y1="2" x2="16" y2="6" />
-                      <line x1="8" y1="2" x2="8" y2="6" />
-                      <line x1="3" y1="10" x2="21" y2="10" />
-                    </svg>
-                    <input
-                      className="text-input"
-                      type="date"
-                      value={searchData.checkOut ? searchData.checkOut.toISOString().slice(0, 10) : ""}
-                      onChange={(e) => handleDateChange(e.target.value, "checkOut")}
-                      min={searchData.checkIn ? searchData.checkIn.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)}
-                    />
-                    {searchData.checkOut && (
-                      <span className="date-display">{formatDate(searchData.checkOut)}</span>
-                    )}
-                  </div>
                 </div>
               </div>
             </div>
+          )}
 
-            {/* Huéspedes */}
-            <div className="search-section">
-              <label className="section-label">Huéspedes</label>
-              <div className="guests-summary" onClick={() => setActiveField("guests")}>
-                <div className="guests-info">
+          {activeField === "checkIn" && (
+            <div className="dropdown-content date-content">
+              <div className="search-section">
+                <label className="section-label">Llegada</label>
+                <div className="input-with-icon">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
                   </svg>
-                  <span>{guestsDisplay}</span>
-                  {searchData.guests.pets && <span className="pets-indicator">· Mascotas</span>}
+                  <input
+                    className="text-input"
+                    type="date"
+                    value={searchData.checkIn ? searchData.checkIn.toISOString().slice(0, 10) : ""}
+                    onChange={(e) => handleDateChange(e.target.value, "checkIn")}
+                    min={new Date().toISOString().slice(0, 10)}
+                    autoFocus
+                  />
                 </div>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 5l7 7-7 7" />
-                </svg>
               </div>
-              
-              {activeField === "guests" && (
+            </div>
+          )}
+
+          {activeField === "checkOut" && (
+            <div className="dropdown-content date-content">
+              <div className="search-section">
+                <label className="section-label">Salida</label>
+                <div className="input-with-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                  <input
+                    className="text-input"
+                    type="date"
+                    value={searchData.checkOut ? searchData.checkOut.toISOString().slice(0, 10) : ""}
+                    onChange={(e) => handleDateChange(e.target.value, "checkOut")}
+                    min={searchData.checkIn ? searchData.checkIn.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)}
+                    autoFocus
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeField === "guests" && (
+            <div className="dropdown-content guests-content">
+              <div className="search-section">
                 <div className="guests-selector">
                   <div className="guest-type">
                     <div className="guest-info">
                       <span className="guest-label">Adultos</span>
-                      <span className="guest-age">13+ años</span>
+                      <span className="guest-age">Edad: 13 años o más</span>
                     </div>
                     <div className="guest-controls">
                       <button 
-                        onClick={() => updateGuests("adults", "decrement")} 
-                        disabled={searchData.guests.adults <= 1}
+                        onClick={() => updateGuests("adultos", "decrement")} 
+                        disabled={searchData.guests.adultos <= 0}
                         aria-label="Disminuir adultos"
                       >
                         −
                       </button>
-                      <span>{searchData.guests.adults}</span>
+                      <span>{searchData.guests.adultos}</span>
                       <button 
-                        onClick={() => updateGuests("adults", "increment")} 
-                        disabled={searchData.guests.adults >= 10}
+                        onClick={() => updateGuests("adultos", "increment")} 
+                        disabled={searchData.guests.adultos >= 10}
                         aria-label="Aumentar adultos"
                       >
                         +
@@ -419,20 +387,20 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
                   <div className="guest-type">
                     <div className="guest-info">
                       <span className="guest-label">Niños</span>
-                      <span className="guest-age">2-12 años</span>
+                      <span className="guest-age">Edades 2 – 12</span>
                     </div>
                     <div className="guest-controls">
                       <button 
-                        onClick={() => updateGuests("children", "decrement")} 
-                        disabled={searchData.guests.children <= 0}
+                        onClick={() => updateGuests("niños", "decrement")} 
+                        disabled={searchData.guests.niños <= 0}
                         aria-label="Disminuir niños"
                       >
                         −
                       </button>
-                      <span>{searchData.guests.children}</span>
+                      <span>{searchData.guests.niños}</span>
                       <button 
-                        onClick={() => updateGuests("children", "increment")} 
-                        disabled={searchData.guests.children >= 10}
+                        onClick={() => updateGuests("niños", "increment")} 
+                        disabled={searchData.guests.niños >= 10}
                         aria-label="Aumentar niños"
                       >
                         +
@@ -447,16 +415,16 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
                     </div>
                     <div className="guest-controls">
                       <button 
-                        onClick={() => updateGuests("babies", "decrement")} 
-                        disabled={searchData.guests.babies <= 0}
+                        onClick={() => updateGuests("bebés", "decrement")} 
+                        disabled={searchData.guests.bebés <= 0}
                         aria-label="Disminuir bebés"
                       >
                         −
                       </button>
-                      <span>{searchData.guests.babies}</span>
+                      <span>{searchData.guests.bebés}</span>
                       <button 
-                        onClick={() => updateGuests("babies", "increment")} 
-                        disabled={searchData.guests.babies >= 10}
+                        onClick={() => updateGuests("bebés", "increment")} 
+                        disabled={searchData.guests.bebés >= 10}
                         aria-label="Aumentar bebés"
                       >
                         +
@@ -464,44 +432,43 @@ const SearchBar = ({ onSearch, compact = false, initialData = {} }) => {
                     </div>
                   </div>
                   
-                  <div className="guest-type pets">
+                  <div className="guest-type">
                     <div className="guest-info">
                       <span className="guest-label">Mascotas</span>
-                      <span className="guest-age">¿Traes tu animal de servicio?</span>
+                      <span className="guest-age">¿Traes a un animal de servicio?</span>
                     </div>
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={searchData.guests.pets}
-                        onChange={(e) => setSearchData((p) => ({ 
-                          ...p, 
-                          guests: { ...p.guests, pets: e.target.checked } 
-                        }))}
-                      />
-                      <span className="slider"></span>
-                    </label>
+                    <div className="guest-controls">
+                      <button 
+                        onClick={() => updateGuests("mascotas", "decrement")} 
+                        disabled={searchData.guests.mascotas <= 0}
+                        aria-label="Disminuir mascotas"
+                      >
+                        −
+                      </button>
+                      <span>{searchData.guests.mascotas}</span>
+                      <button 
+                        onClick={() => updateGuests("mascotas", "increment")} 
+                        disabled={searchData.guests.mascotas >= 5}
+                        aria-label="Aumentar mascotas"
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
                 </div>
-              )}
-            </div>
-
-            {/* Error y acciones */}
-            <div className="search-actions">
-              {error && <div className="error-message" aria-live="polite">{error}</div>}
-              <div className="action-buttons">
+              </div>
+              <div className="search-actions guests-actions">
                 <button className="clear-btn" onClick={clearSearch}>
                   Limpiar
                 </button>
                 <button className="search-btn" onClick={handleSearch}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 21l-4.35-4.35" />
-                    <circle cx="11" cy="11" r="6" />
-                  </svg>
                   Buscar
                 </button>
               </div>
             </div>
-          </div>
+          )}
+          
+          {error && <div className="error-message" aria-live="polite">{error}</div>}
         </div>
       )}
     </div>
