@@ -1,22 +1,19 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
-import Navigation from './Navigation';
 import UserMenu from './UserMenu';
 import { 
   HomeIcon, 
-  CalendarDaysIcon, 
-  WrenchScrewdriverIcon,
-  Bars3Icon,
-  XMarkIcon,
+  CalendarDaysIcon,
   HeartIcon,
   BellIcon,
   ClockIcon,
   HomeModernIcon,
   SparklesIcon,
-  MagnifyingGlassIcon
+  MagnifyingGlassIcon,
+  Bars3Icon,
+  XMarkIcon
 } from '@heroicons/react/24/outline';
-import HeroSection from '../../../pages/Home/HeroSection';
 import SearchBar from './SearchBar';
 import './Header.css';
 
@@ -48,6 +45,9 @@ const Header = () => {
   const [notifications, setNotifications] = useState([]);
   const [hasNewNotifications, setHasNewNotifications] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [showMobileHeader, setShowMobileHeader] = useState(true);
+  const headerRef = useRef(null);
 
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -104,12 +104,26 @@ const Header = () => {
     []
   );
 
-  // Manejo del scroll optimizado
+  // Manejo del scroll para ocultar/mostrar header móvil y efecto de reducción
   const handleScroll = useCallback(
     throttle(() => {
-      setIsScrolled(window.scrollY > 10);
+      const currentScrollY = window.scrollY;
+
+      // Efecto de reducción (isScrolled)
+      setIsScrolled(currentScrollY > 10);
+
+      // Comportamiento de ocultar/mostrar header móvil
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scroll hacia abajo: ocultar header
+        setShowMobileHeader(false);
+      } else {
+        // Scroll hacia arriba: mostrar header
+        setShowMobileHeader(true);
+      }
+
+      setLastScrollY(currentScrollY);
     }, 100),
-    []
+    [lastScrollY]
   );
 
   useEffect(() => {
@@ -341,7 +355,11 @@ const Header = () => {
       </aside>
 
       {/* Header superior para móviles */}
-      <header className={`header hide-desktop ${isScrolled ? "header--scrolled" : ""}`} role="banner">
+      <header 
+        ref={headerRef}
+        className={`header hide-desktop ${isScrolled ? "header--scrolled" : ""} ${showMobileHeader ? "" : "header--hidden"}`} 
+        role="banner"
+      >
         <div className="header__container">
           {/* Logo */}
           <Link to="/" className="header__logo" aria-label="Nido - Inicio">
@@ -544,14 +562,14 @@ const Header = () => {
                 </>
               ) : (
                 <button 
-                  className="header__mobile-nav-item"
-                  onClick={() => {
-                    closeMobileMenu();
-                    handleAuthAction();
-                  }}
-                >
-                  <div className="header__mobile-nav-label">Iniciar Sesión</div>
-                </button>
+                    className="header__mobile-nav-item"
+                    onClick={() => {
+                      closeMobileMenu();
+                      handleAuthAction();
+                    }}
+                  >
+                    <div className="header__mobile-nav-label">Iniciar Sesión</div>
+                  </button>
               )}
             </div>
           </div>

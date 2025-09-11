@@ -1,4 +1,4 @@
-/* ===== HEADER LATERAL VERTICAL - CSS ===== */
+/* Header.css - Actualizado */
 :root {
   /* Dimensiones */
   --sidebar-width: 16rem;          /* 256px */
@@ -258,17 +258,22 @@
   left: 0;
   right: 0;
   height: var(--header-height-mobile);
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   z-index: 50;
   box-shadow: var(--shadow-light);
-  transition: height var(--transition-normal), box-shadow var(--transition-normal);
+  transition: transform 0.3s ease, height 0.3s ease, box-shadow 0.3s ease;
+  transform: translateY(0);
 }
 
 .header--scrolled {
   height: var(--header-height-scrolled);
   box-shadow: var(--shadow-medium);
+}
+
+.header--hidden {
+  transform: translateY(-100%);
 }
 
 .header__container {
