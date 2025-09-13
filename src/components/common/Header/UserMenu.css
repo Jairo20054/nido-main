@@ -1,4 +1,4 @@
-/* UserMenu.css - Estilos mejorados */
+/* src/components/common/UserMenu/UserMenu.css - MODIFICADO: Added 'grok' variant styles for centered, organized menu like the image */
 :root {
   /* Colores principales */
   --primary-color: #2563eb;
@@ -49,7 +49,7 @@
   --space-12: 3rem;
 }
 
-/* ===== ESTILOS PRINCIPALES ===== */
+/* ===== ESTILOS PRINCIPALES (unchanged for default/sidebar) ===== */
 .user-menu {
   position: relative;
   width: 100%;
@@ -306,44 +306,223 @@
   color: var(--danger-hover);
 }
 
+/* ===== GROK VARIANT STYLES (Centered, organized like the image) ===== */
+.user-menu.grok .user-menu-trigger.grok-trigger {
+  width: auto;
+  padding: var(--space-2);
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+}
+
+.user-menu.grok .grok-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--bg-gray-100);
+}
+
+.user-menu.grok .grok-dropdown {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  width: 300px;
+  min-width: auto;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  animation: slideDown 0.2s ease-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content */
+  padding: 0;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.grok-user-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center user info */
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-white);
+}
+
+.grok-user-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.grok-avatar-large {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--bg-gray-100);
+}
+
+.grok-user-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  text-align: center; /* Center text */
+}
+
+.grok-user-details .user-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.grok-user-details .user-email {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.grok-menu-items {
+  width: 100%;
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center menu items */
+  gap: var(--space-2);
+}
+
+.grok-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center icon and label */
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: center;
+  border-radius: var(--radius-md);
+  position: relative;
+}
+
+.grok-menu-label-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  text-align: left;
+}
+
+.grok-menu-sub-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.grok-menu-value {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  margin-left: auto;
+}
+
+.grok-menu-item.promo {
+  background: linear-gradient(90deg, #fef3c7 0%, #fef9c3 100%);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: var(--space-1);
+}
+
+.grok-menu-item.promo .grok-menu-label {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--primary-color);
+}
+
+.grok-menu-item.promo .grok-menu-sub-label {
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-top: 0;
+}
+
+.grok-menu-item.promo:hover {
+  background: linear-gradient(90deg, #fef08a 0%, #fef3c7 100%);
+}
+
+.grok-menu-item:hover {
+  background-color: var(--bg-gray-50);
+}
+
+.grok-menu-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.grok-menu-item:hover .grok-menu-icon {
+  color: var(--text-primary);
+}
+
+.grok-menu-label {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  flex: 1;
+  text-align: center;
+}
+
+.grok-menu-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: var(--space-3) 0;
+  width: 80%; /* Slightly narrower for centering */
+}
+
+.grok-menu-item.destructive .grok-menu-label,
+.grok-menu-item.destructive .grok-menu-icon {
+  color: var(--danger-color);
+}
+
+.grok-menu-item.destructive:hover {
+  background-color: rgba(220, 38, 38, 0.05);
+}
+
 /* ===== MEJORAS RESPONSIVAS ===== */
 @media (max-width: 768px) {
-  .user-menu-dropdown {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    top: auto;
-    width: 100%;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    margin-bottom: 0;
-    max-height: 80vh;
-    overflow-y: auto;
+  .user-menu.grok .grok-dropdown {
+    right: 16px;
+    top: 60px;
+    width: 280px;
   }
   
-  .user-menu.sidebar .user-menu-dropdown {
-    position: absolute;
-    bottom: 100%;
-    top: auto;
-    border-radius: var(--radius-lg);
-    max-height: 60vh;
+  .user-menu.grok .grok-trigger {
+    padding: var(--space-1);
   }
   
-  .user-menu-trigger {
-    padding: var(--space-2);
-  }
-  
-  .user-avatar {
+  .grok-avatar {
     width: 36px;
     height: 36px;
-  }
-  
-  .user-name-trigger {
-    font-size: 0.9rem;
-  }
-  
-  .user-email-trigger {
-    font-size: 0.75rem;
   }
 }
 
@@ -359,6 +538,20 @@
     --bg-gray-50: #111827;
     --bg-gray-100: #374151;
   }
+
+  .user-menu.grok .grok-dropdown {
+    background: rgba(31, 41, 55, 0.95);
+    border-color: var(--border-light);
+  }
+
+  .grok-user-header {
+    background: var(--bg-white);
+    border-color: var(--border-light);
+  }
+
+  .grok-menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
 }
 
 /* ===== ANIMACIONES ===== */
@@ -373,7 +566,7 @@
   }
 }
 
-.user-menu-dropdown {
+.user-menu-dropdown:not(.grok-dropdown) {
   animation: slideIn 0.2s ease-out;
 }
 
@@ -383,7 +576,7 @@
   outline-offset: 2px;
 }
 
-.menu-item:focus {
+.menu-item:focus, .grok-menu-item:focus {
   outline: 2px solid var(--primary-color);
   outline-offset: -2px;
 }
@@ -391,6 +584,7 @@
 @media (prefers-reduced-motion: reduce) {
   .user-menu-trigger,
   .menu-item,
+  .grok-menu-item,
   .user-menu-dropdown {
     transition: none;
   }

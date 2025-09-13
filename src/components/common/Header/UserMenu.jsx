@@ -1,14 +1,13 @@
+// src/components/common/UserMenu/UserMenu.jsx (Modified: Added 'grok' variant for centered, organized menu like the image)
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { 
   FaUserCircle, 
   FaBell, 
-  FaEnvelope, 
   FaUser, 
   FaHome, 
   FaCog, 
   FaSignOutAlt, 
   FaHeart, 
-  FaBookmark, 
   FaKey, 
   FaComments,
   FaChevronDown,
@@ -27,11 +26,12 @@ const UserMenu = ({
   onLogoutClick = () => {},
   onMessagesClick = () => {},
   onFavoritesClick = () => {},
-  variant = 'default' // 'default' o 'sidebar'
+  menuItems = [], // Additional items like Grok
+  variant = 'default' // 'default', 'sidebar', 'grok', 'copilot'
 }) => {
   const safeUser = user || {
-    name: 'Usuario',
-    email: 'usuario@example.com',
+    name: 'EL',
+    email: 'elcastillojairo2001@gmail.com',
     avatar: null
   };
 
@@ -63,7 +63,8 @@ const UserMenu = ({
     };
   }, [isOpen]);
 
-  const menuItems = [
+  // Default menu items for non-grok variants
+  const defaultMenuItems = [
     {
       id: 'profile',
       label: 'Mi perfil',
@@ -122,6 +123,77 @@ const UserMenu = ({
     }
   ];
 
+  if (variant === 'grok') {
+    return (
+      <div className={`user-menu ${variant}`} ref={dropdownRef}>
+        <div className="user-menu-trigger grok-trigger" onClick={toggleMenu}>
+          <div className="user-avatar grok-avatar">
+            {safeUser.avatar ? (
+              <img src={safeUser.avatar} alt={safeUser.name} />
+            ) : (
+              <FaUserCircle size={32} />
+            )}
+          </div>
+        </div>
+        
+        {isOpen && (
+          <div className="user-menu-dropdown grok-dropdown">
+            {/* Centered user info like Grok */}
+            <div className="grok-user-header">
+              <div className="grok-user-info">
+                <div className="user-avatar grok-avatar-large">
+                  {safeUser.avatar ? (
+                    <img src={safeUser.avatar} alt={safeUser.name} />
+                  ) : (
+                    <FaUserCircle size={48} />
+                  )}
+                </div>
+                <div className="grok-user-details">
+                  <div className="user-name">{safeUser.name}</div>
+                  <div className="user-email">{safeUser.email}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Organized menu items - Centered, icon-left like image */}
+            <div className="grok-menu-items">
+              {menuItems.map((item) => {
+                const IconComponent = item.icon || FaUser; // Fallback icon
+                return (
+                  <button
+                    key={item.id}
+                    className={`grok-menu-item ${item.isPromo ? 'promo' : ''}`}
+                    onClick={() => handleMenuItemClick(item.onClick)}
+                  >
+                    <IconComponent className="grok-menu-icon" />
+                    <div className="grok-menu-label-container">
+                      <span className="grok-menu-label">{item.label}</span>
+                      {item.subLabel && (
+                        <span className="grok-menu-sub-label">{item.subLabel}</span>
+                      )}
+                    </div>
+                    {item.value && (
+                      <span className="grok-menu-value">{item.value}</span>
+                    )}
+                  </button>
+                );
+              })}
+              <div className="grok-menu-divider" />
+              <button 
+                className="grok-menu-item destructive"
+                onClick={onLogoutClick}
+              >
+                <FaSignOutAlt className="grok-menu-icon" />
+                <span className="grok-menu-label">Cerrar sesión</span>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Fallback to original for other variants
   return (
     <div className={`user-menu ${variant}`} ref={dropdownRef}>
       <div className="user-menu-trigger" onClick={toggleMenu}>
@@ -163,7 +235,7 @@ const UserMenu = ({
           
           <div className="dropdown-content">
             <div className="menu-section">
-              {menuItems.map((item) => {
+              {(menuItems.length > 0 ? menuItems : defaultMenuItems).map((item) => {
                 const IconComponent = item.icon;
                 return (
                   <button
