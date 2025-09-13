@@ -344,6 +344,23 @@ const Header = () => {
               <GlobeAltIcon className="desktop-header__language-icon" />
             </button>
 
+            {/* UserMenu para desktop */}
+            {isAuthenticated && (
+              <UserMenu
+                user={user}
+                notificationCount={notifications.length}
+                messageCount={0}
+                onProfileClick={() => navigate('/profile')}
+                onReservationsClick={() => navigate('/my-bookings')}
+                onPropertiesClick={() => navigate('/host/properties')}
+                onSettingsClick={() => navigate('/settings')}
+                onLogoutClick={onLogoutClick}
+                onMessagesClick={() => navigate('/messages')}
+                onFavoritesClick={() => navigate('/favorites')}
+                variant="default"
+              />
+            )}
+
             {/* Botón menú hamburguesa */}
             <button
               className="desktop-header__menu-toggle"
@@ -460,156 +477,41 @@ const Header = () => {
             role="navigation"
             aria-label="Menú móvil"
           >
-            <div className="mobile-header__nav">
-              {isAuthenticated ? (
-                <>
-                  <div className="mobile-header__user-info">
-                    <div className="mobile-header__user-avatar">
-                      {user?.avatar ? (
-                        <img src={user.avatar} alt={user.name} />
-                      ) : (
-                        <div className="mobile-header__avatar-placeholder">
-                          {user?.name?.charAt(0) || 'U'}
-                        </div>
-                      )}
-                    </div>
-                    <div className="mobile-header__user-details">
-                      <div className="mobile-header__user-name">{user?.name || 'Usuario'}</div>
-                      <div className="mobile-header__user-email">{user?.email || 'usuario@ejemplo.com'}</div>
-                    </div>
-                  </div>
-                  
-                  <div className="mobile-header__divider" />
-                </>
-              ) : (
-                <div className="mobile-header__auth-buttons">
-                  <button 
-                    className="mobile-header__login-btn"
-                    onClick={() => {
-                      closeMobileMenu();
-                      handleAuthAction();
-                    }}
-                  >
-                    Iniciar sesión
-                  </button>
-                  <button 
-                    className="mobile-header__signup-btn"
-                    onClick={() => {
-                      closeMobileMenu();
-                      navigate('/register');
-                    }}
-                  >
-                    Registrarse
-                  </button>
-                </div>
-              )}
-
-              {navigationItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = isActiveNavItem(item.path);
-
-                return (
-                  <Link
-                    key={item.id}
-                    to={item.path}
-                    className={`mobile-header__nav-item ${
-                      isActive ? "mobile-header__nav-item--active" : ""
-                    }`}
-                    onClick={closeMobileMenu}
-                    aria-current={isActive ? "page" : undefined}
-                  >
-                    <div className="mobile-header__nav-icon-wrapper">
-                      <Icon className="mobile-header__nav-icon" aria-hidden="true" />
-                      {item.hasNovedad && <span className="mobile-header__novedad-badge">NOVEDAD</span>}
-                    </div>
-                    <span className="mobile-header__nav-label">{item.label}</span>
-                  </Link>
-                );
-              })}
-
-              {isAuthenticated && (
-                <>
-                  <div className="mobile-header__divider" />
-                  
-                  <Link
-                    to="/favorites"
-                    className="mobile-header__nav-item"
-                    onClick={closeMobileMenu}
-                  >
-                    <HeartIcon className="mobile-header__nav-icon" aria-hidden="true" />
-                    <span className="mobile-header__nav-label">Favoritos</span>
-                  </Link>
-
-                  <Link
-                    to="/my-bookings"
-                    className="mobile-header__nav-item"
-                    onClick={closeMobileMenu}
-                  >
-                    <CalendarDaysIcon className="mobile-header__nav-icon" aria-hidden="true" />
-                    <span className="mobile-header__nav-label">Reservas</span>
-                  </Link>
-
-                  <Link
-                    to="/notifications"
-                    className="mobile-header__nav-item"
-                    onClick={closeMobileMenu}
-                  >
-                    <BellIcon className="mobile-header__nav-icon" aria-hidden="true" />
-                    <span className="mobile-header__nav-label">
-                      Notificaciones
-                      {hasNewNotifications && (
-                        <span className="mobile-header__badge">
-                          {notifications.filter((n) => n.unread).length}
-                        </span>
-                      )}
-                    </span>
-                  </Link>
-                </>
-              )}
-
-              <div className="mobile-header__divider" />
-              
-              <Link
-                to="/become-host"
-                className="mobile-header__nav-item mobile-header__nav-item--highlight"
-                onClick={closeMobileMenu}
-              >
-                <svg className="mobile-header__nav-icon" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2L15.5 8.5L22 9L17 14L18.5 22L12 18.5L5.5 22L7 14L2 9L8.5 8.5L12 2Z" fill="#FF385C" />
-                </svg>
-                <span className="mobile-header__nav-label">Conviértete en anfitrión</span>
-              </Link>
-
-              <div className="mobile-header__divider" />
-              
-              <button className="mobile-header__nav-item">
-                <GlobeAltIcon className="mobile-header__nav-icon" />
-                <span className="mobile-header__nav-label">Idioma y región</span>
-              </button>
-
-              <button className="mobile-header__nav-item">
-                <svg className="mobile-header__nav-icon" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" />
-                </svg>
-                <span className="mobile-header__nav-label">Ayuda</span>
-              </button>
-
-              {/* Opciones de autenticación en móvil */}
-              {isAuthenticated && (
-                <>
-                  <div className="mobile-header__divider" />
-                  <button 
-                    className="mobile-header__nav-item"
-                    onClick={() => {
-                      closeMobileMenu();
-                      onLogoutClick();
-                    }}
-                  >
-                    <span className="mobile-header__nav-label">Cerrar sesión</span>
-                  </button>
-                </>
-              )}
-            </div>
+            <UserMenu
+              user={user}
+              notificationCount={notifications.length}
+              messageCount={0}
+              onProfileClick={() => {
+                closeMobileMenu();
+                navigate('/profile');
+              }}
+              onReservationsClick={() => {
+                closeMobileMenu();
+                navigate('/my-bookings');
+              }}
+              onPropertiesClick={() => {
+                closeMobileMenu();
+                navigate('/host/properties');
+              }}
+              onSettingsClick={() => {
+                closeMobileMenu();
+                navigate('/settings');
+              }}
+              onLogoutClick={() => {
+                closeMobileMenu();
+                onLogoutClick();
+              }}
+              onMessagesClick={() => {
+                closeMobileMenu();
+                navigate('/messages');
+              }}
+              onFavoritesClick={() => {
+                closeMobileMenu();
+                navigate('/favorites');
+              }}
+              menuItems={grokMenuItems}
+              variant="grok"
+            />
           </div>
         )}
 

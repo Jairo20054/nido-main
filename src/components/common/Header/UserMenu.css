@@ -316,6 +316,9 @@
   border: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: var(--shadow-md);
   cursor: pointer;
+  z-index: 1100; /* Ensure trigger is above mobile menu */
+  position: relative;
+  pointer-events: auto;
 }
 
 .user-menu.grok .grok-avatar {

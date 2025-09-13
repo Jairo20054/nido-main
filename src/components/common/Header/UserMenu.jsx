@@ -39,8 +39,9 @@ const UserMenu = ({
   const dropdownRef = useRef(null);
 
   const toggleMenu = useCallback(() => {
+    console.log('UserMenu toggleMenu clicked, current isOpen:', isOpen);
     setIsOpen(prev => !prev);
-  }, []);
+  }, [isOpen]);
 
   const handleMenuItemClick = useCallback((action) => {
     setIsOpen(false);
