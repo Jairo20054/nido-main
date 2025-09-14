@@ -1,0 +1,270 @@
+/* src/components/PostCard/PostCard.css */
+.post-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  gap: 12px;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.username {
+  font-weight: 600;
+  font-size: 14px;
+  color: #262626;
+}
+
+.location {
+  font-size: 12px;
+  color: #8e8e8e;
+}
+
+.verified-badge {
+  background: #0095f6;
+  color: white;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+}
+
+.follow-button {
+  background: #efefef;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #262626;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.follow-button.following {
+  background: #efefef;
+  color: #262626;
+}
+
+.follow-button:hover {
+  background: #dbdbdb;
+}
+
+.post-image {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+}
+
+.post-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.3);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.carousel-button.prev {
+  left: 12px;
+}
+
+.carousel-button.next {
+  right: 12px;
+}
+
+.carousel-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transition: all 0.3s;
+}
+
+.dot.active {
+  background: white;
+  width: 12px;
+  border-radius: 3px;
+}
+
+.post-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 16px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 16px;
+}
+
+.action-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.action-button.liked svg {
+  color: #ed4956;
+}
+
+.save-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.save-button.saved svg {
+  color: #262626;
+  fill: #262626;
+}
+
+.post-stats {
+  padding: 0 16px 12px;
+}
+
+.likes-count {
+  font-weight: 600;
+  font-size: 14px;
+  color: #262626;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.post-caption {
+  margin-bottom: 8px;
+}
+
+.post-caption .username {
+  margin-right: 4px;
+}
+
+.caption {
+  font-size: 14px;
+  color: #262626;
+}
+
+.view-comments {
+  background: none;
+  border: none;
+  color: #8e8e8e;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 8px;
+}
+
+.view-comments:hover {
+  text-decoration: underline;
+}
+
+.price-tag {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.price {
+  font-weight: 600;
+  font-size: 16px;
+  color: #262626;
+}
+
+.night {
+  font-size: 14px;
+  color: #8e8e8e;
+}
+
+.post-time {
+  font-size: 10px;
+  color: #8e8e8e;
+  text-transform: uppercase;
+}
+
+.add-comment {
+  display: flex;
+  border-top: 1px solid #efefef;
+  padding: 12px 16px;
+}
+
+.add-comment input {
+  flex: 1;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 14px;
+}
+
+.post-comment-button {
+  background: none;
+  border: none;
+  color: #0095f6;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.post-comment-button:hover {
+  color: #0080d4;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .post-image {
+    height: 300px;
+  }
+  
+  .post-header,
+  .post-actions,
+  .post-stats,
+  .add-comment {
+    padding: 12px;
+  }
+}
