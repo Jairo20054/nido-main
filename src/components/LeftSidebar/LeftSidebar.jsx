@@ -26,9 +26,6 @@ const LeftSidebar = () => {
 
   return (
     <div className="left-sidebar">
-      <div className="sidebar-header">
-        <h2>ViviendaSocial</h2>
-      </div>
       
       <div className="sidebar-menu">
         {menuItems.map(item => (

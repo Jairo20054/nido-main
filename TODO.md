@@ -1,26 +1,25 @@
-# TODO: Organize HeroSection and SearchBar Code
+# TODO: Actualizar Historias y Barra de Búsqueda
 
-## HeroSection Refactoring
-- [ ] Create HeroContent.jsx subcomponent
-- [ ] Create ProgressSection.jsx subcomponent
-- [ ] Create ProfileCard.jsx subcomponent
-- [ ] Create ResourcesSection.jsx subcomponent
-- [ ] Create GamesSection.jsx subcomponent
-- [ ] Create HeroSidebar.jsx subcomponent
-- [ ] Create useProfileCompletion.js custom hook
-- [ ] Refactor HeroSection.jsx to use new subcomponents
+## Tareas Pendientes
 
-## SearchBar Refactoring
-- [ ] Create LocationInput.jsx subcomponent
-- [ ] Create DateInputs.jsx subcomponent
-- [ ] Create GuestSelector.jsx subcomponent
-- [ ] Create useSearchData.js custom hook
-- [ ] Create useDropdownPosition.js custom hook
-- [ ] Create useSuggestions.js custom hook
-- [ ] Create searchValidation.js utility function
-- [ ] Refactor SearchBar.jsx to use new subcomponents and hooks
+### Historias (PropertyStories)
+- [x] Centrar las historias en el contenedor
+- [x] Cambiar la forma de los avatares de circular a rectangular redondeado (diferente a Instagram)
+- [x] Ajustar estilos para una apariencia más única
 
-## Testing and Followup
-- [ ] Test refactored components for functionality
-- [ ] Update CSS files if needed
-- [ ] Add unit tests for new subcomponents
+### Barra de Búsqueda (SearchBar)
+- [x] Reducir el tamaño general de la barra (altura y padding)
+- [x] Mejorar el diseño para que sea más bonita (sombras suaves, bordes redondeados)
+- [x] Ajustar la ubicación para una mejor posición
+
+### Archivos a Editar
+- [x] src/components/PropertyStories/PropertyStories.css
+- [x] src/components/PropertyStories/PropertyStories.jsx
+- [x] src/components/common/Header/SearchBar.css
+- [x] src/components/common/Header/SearchBar.jsx
+
+### Pruebas
+- [ ] Verificar que las historias estén centradas
+- [ ] Confirmar que la forma de los avatares sea diferente
+- [ ] Asegurar que la barra de búsqueda sea más pequeña y atractiva
+- [ ] Probar responsividad en diferentes tamaños de pantalla

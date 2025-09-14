@@ -1,9 +1,10 @@
 /* src/components/SearchBar/SearchBar.css */
 .search-bar {
   background: white;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .search-bar-content {
@@ -16,9 +17,9 @@
   display: flex;
   flex: 1;
   align-items: center;
-  background: #f0f2f5;
-  border-radius: 8px;
-  padding: 4px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 6px;
 }
 
 .search-input {
@@ -55,22 +56,25 @@
 }
 
 .search-button {
-  background: #e1306c;
+  background: linear-gradient(135deg, #e1306c, #f56040);
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 12px 20px;
+  border-radius: 12px;
+  padding: 10px 16px;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 14px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
-  transition: background-color 0.2s;
+  gap: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(225, 48, 108, 0.3);
 }
 
 .search-button:hover {
-  background: #c13568;
+  background: linear-gradient(135deg, #c13568, #e04e2f);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(225, 48, 108, 0.4);
 }
 
 /* Responsive */
