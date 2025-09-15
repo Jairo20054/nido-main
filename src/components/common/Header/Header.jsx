@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
-import UserMenu from './UserMenu';
 import { 
   HomeIcon, 
   CalendarDaysIcon,
@@ -344,37 +343,9 @@ const Header = () => {
               <GlobeAltIcon className="desktop-header__language-icon" />
             </button>
 
-            {/* UserMenu para desktop */}
-            {isAuthenticated && (
-              <UserMenu
-                user={user}
-                notificationCount={notifications.length}
-                messageCount={0}
-                onProfileClick={() => navigate('/profile')}
-                onReservationsClick={() => navigate('/my-bookings')}
-                onPropertiesClick={() => navigate('/host/properties')}
-                onSettingsClick={() => navigate('/settings')}
-                onLogoutClick={onLogoutClick}
-                onMessagesClick={() => navigate('/messages')}
-                onFavoritesClick={() => navigate('/favorites')}
-                variant="default"
-              />
-            )}
 
-            {/* Botón menú hamburguesa */}
-            <button
-              className="desktop-header__menu-toggle"
-              onClick={toggleMobileMenu}
-              aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
-              aria-expanded={isMobileMenuOpen}
-              aria-controls="mobile-menu"
-            >
-              {isMobileMenuOpen ? (
-                <XMarkIcon className="desktop-header__menu-icon" aria-hidden="true" />
-              ) : (
-                <Bars3Icon className="desktop-header__menu-icon" aria-hidden="true" />
-              )}
-            </button>
+
+
           </div>
         </div>
       </header>
@@ -443,13 +414,7 @@ const Header = () => {
               )}
             </div>
 
-            {/* Filtros y menú */}
-            <div className="mobile-header__right-actions">
-              <button className="mobile-header__filter-btn" aria-label="Filtros">
-                <svg viewBox="0 0 16 16" className="mobile-header__filter-icon">
-                  <path d="M5 8a3 3 0 0 1 2.83 2H14v2H7.83A3 3 0 1 1 5 8zm0 2a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm6-8a3 3 0 1 1-2.83 4H2V4h6.17A3 3 0 0 1 11 2zm0 2a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" fill="currentColor"></path>
-                </svg>
-              </button>
+            
 
               {/* Toggle para menú móvil */}
               <button
@@ -467,7 +432,6 @@ const Header = () => {
               </button>
             </div>
           </div>
-        </div>
 
         {/* Menú móvil */}
         {isMobileMenuOpen && (
@@ -477,41 +441,6 @@ const Header = () => {
             role="navigation"
             aria-label="Menú móvil"
           >
-            <UserMenu
-              user={user}
-              notificationCount={notifications.length}
-              messageCount={0}
-              onProfileClick={() => {
-                closeMobileMenu();
-                navigate('/profile');
-              }}
-              onReservationsClick={() => {
-                closeMobileMenu();
-                navigate('/my-bookings');
-              }}
-              onPropertiesClick={() => {
-                closeMobileMenu();
-                navigate('/host/properties');
-              }}
-              onSettingsClick={() => {
-                closeMobileMenu();
-                navigate('/settings');
-              }}
-              onLogoutClick={() => {
-                closeMobileMenu();
-                onLogoutClick();
-              }}
-              onMessagesClick={() => {
-                closeMobileMenu();
-                navigate('/messages');
-              }}
-              onFavoritesClick={() => {
-                closeMobileMenu();
-                navigate('/favorites');
-              }}
-              menuItems={grokMenuItems}
-              variant="grok"
-            />
           </div>
         )}
 

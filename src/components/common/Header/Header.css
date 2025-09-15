@@ -35,7 +35,7 @@
   --spacing-2xl: 2rem;
 }
 
-/* ===== HEADER DESKTOP ===== */
+/* ===== HEADER DE ESCRITORIO ===== */
 .desktop-header {
   position: fixed;
   top: 0;
@@ -62,7 +62,7 @@
   margin: 0 auto;
 }
 
-/* Logo desktop */
+/* Logo de escritorio */
 .desktop-header__logo {
   display: flex;
   align-items: center;
@@ -97,7 +97,7 @@
   letter-spacing: -0.02em;
 }
 
-/* Navegación desktop */
+/* Navegación de escritorio */
 .desktop-header__nav {
   display: flex;
   align-items: center;
@@ -173,6 +173,8 @@
   border-radius: 0;
   transform: none;
 }
+
+/* Botón de menú en escritorio */
 .desktop-header__menu-toggle {
   width: 2.5rem;
   height: 2.5rem;
@@ -196,7 +198,7 @@
   height: 1.5rem;
 }
 
-/* Acciones desktop */
+/* Acciones de escritorio */
 .desktop-header__actions {
   display: flex;
   align-items: center;
@@ -313,7 +315,7 @@
   letter-spacing: -0.02em;
 }
 
-/* Acciones móvil */
+/* Acciones móviles */
 .mobile-header__actions {
   display: flex;
   align-items: center;
@@ -649,7 +651,7 @@
   -webkit-backdrop-filter: blur(3px);
 }
 
-/* ===== MEDIA QUERIES ===== */
+/* ===== MEDIAS QUERIES ===== */
 @media (max-width: 768px) {
   .desktop-header {
     display: none;

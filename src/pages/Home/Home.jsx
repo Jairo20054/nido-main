@@ -3,7 +3,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar';
 import PropertyStories from '../../components/PropertyStories/PropertyStories';
-import SearchBar from '../../components/common/Header/SearchBar';
 import PostCard from '../../components/PostCard/PostCard';
 import LoadingSpinner from '../../components/common/LoadingSpinner/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage/ErrorMessage';
@@ -140,9 +139,6 @@ const Home = () => {
         <div className="home-main-content">
           <div className="stories-and-search">
             <PropertyStories />
-            <div className="search-section">
-              <SearchBar onSearch={handleSearch} />
-            </div>
           </div>
           <ErrorMessage 
             message={error} 
@@ -161,11 +157,8 @@ const Home = () => {
       <div className="home-main-content">
         <div className="stories-and-search">
           <PropertyStories />
-          <div className="search-section">
-            <SearchBar onSearch={handleSearch} />
-          </div>
         </div>
-        
+
         <main className="social-feed">
           <div className="feed-container">
             <div className="posts-grid">
