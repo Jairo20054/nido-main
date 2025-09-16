@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './LeftSidebar.css';
 
-const LeftSidebar = () => {
+const LeftSidebar = ({ onExploreClick }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeItem, setActiveItem] = useState(location.pathname);
@@ -22,6 +22,10 @@ const LeftSidebar = () => {
   ];
 
   const handleItemClick = (path) => {
+    if (path === '/explore' && onExploreClick) {
+      onExploreClick();
+      return;
+    }
     setActiveItem(path);
     navigate(path);
   };

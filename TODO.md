@@ -1,7 +1,9 @@
-# TODO: Remove User Menu from Header
+# TODO: Implement SearchBar on Explore Click in LeftSidebar
 
-- [x] Remove UserMenu component from desktop header in Header.jsx
-- [x] Remove UserMenu component from mobile menu in Header.jsx
-- [x] Remove unused callbacks (onProfileClick, onLogoutClick) and related logic
-- [x] Remove grokMenuItems array if not used elsewhere
-- [ ] Test the application to ensure header works without user menu
+## Steps to Complete
+
+- [x] Modify LeftSidebar.jsx to accept onExploreClick prop and handle "Explorar" click with callback instead of navigation
+- [x] Modify Home.jsx to add showSearchBar state and toggle it via onExploreClick
+- [x] Pass onExploreClick prop from Home to LeftSidebar
+- [x] Conditionally render SearchBar in Home.jsx when showSearchBar is true
+- [ ] Test that clicking "Explorar" shows SearchBar without navigation, and other menu items navigate normally
