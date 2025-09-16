@@ -198,15 +198,7 @@ const Header = () => {
     [location]
   );
 
-  // Funciones para navegación del UserMenu
-  const onProfileClick = useCallback(() => {
-    navigate("/profile");
-  }, [navigate]);
 
-  const onLogoutClick = useCallback(() => {
-    // Lógica de cierre de sesión
-    navigate("/login");
-  }, [navigate]);
 
   return (
     <>
