@@ -44,6 +44,33 @@ const Home = () => {
       timestamp: "2 horas ago",
       isFollowing: false
     },
+
+    {
+      id: 1,
+      title: "Acabo de renovar mi apartamento en Zona Rosa! 📍",
+      location: "Zona Rosa, Bogotá",
+      price: 150000,
+      rating: 4.8,
+      images: [
+        "https://apartamento-bogota-zona-rosa.bogota-hotels-co.net/data/Photos/OriginalPhoto/1820/182016/182016102.JPEG",
+        "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXBhcnRtZW50fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
+        "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YXBhrtmentfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"
+      ],
+      amenities: ["WiFi", "Cocina", "Accesible"],
+      type: "apartment",
+      user: {
+        name: "Carlos Méndez",
+        avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+        verified: true
+      },
+      likes: 245,
+      comments: 32,
+      shares: 12,
+      description: "Después de meses de trabajo, finalmente terminé la renovación de mi apartamento. ¡Estoy encantado con los resultados! Tiene todas las comodidades para una estancia perfecta. #interiordesign #apartamento #bogota",
+      timestamp: "2 horas ago",
+      isFollowing: false
+    },
+
     // ... más propiedades (igual que en tu código original)
   ];
 
