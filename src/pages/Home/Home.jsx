@@ -189,9 +189,11 @@ const Home = () => {
       
       <div className="home-main-content">
         {showSearchBar && (
-          <SearchBar onSearch={(params) => {
-            setShowSearchBar(false);
-          }} />
+          <div className="search-section">
+            <SearchBar onSearch={(params) => {
+              setShowSearchBar(false);
+            }} />
+          </div>
         )}
 
         <div className="stories-and-search">

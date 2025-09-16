@@ -7,6 +7,7 @@ const LeftSidebar = ({ onExploreClick }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeItem, setActiveItem] = useState(location.pathname);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const menuItems = [
     { id: 1, icon: '🏠', label: 'Inicio', path: '/' },
@@ -16,8 +17,8 @@ const LeftSidebar = ({ onExploreClick }) => {
     { id: 5, icon: '🔔', label: 'Notificaciones', path: '/notifications' },
     { id: 6, icon: '❤️', label: 'Favoritos', path: '/favorites' },
     { id: 7, icon: '🏘️', label: 'Mis Propiedades', path: '/my-properties' },
-    { id: 8, icon: '👤', label: 'Remodelaciones', path: '/profile' },
-    { id: 9, icon: '👤', label: 'videos', path: '/profile' },
+    { id: 8, icon: '👷', label: 'Remodelaciones', path: '/profile' },
+    { id: 9, icon: '🎥', label: 'videos', path: '/profile' },
     { id: 10,icon: '👤', label: 'Perfil', path: '/profile' },
   ];
 
@@ -30,9 +31,15 @@ const LeftSidebar = ({ onExploreClick }) => {
     navigate(path);
   };
 
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
   return (
-    <div className="left-sidebar">
-      
+    <div className={`left-sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+      <button className="toggle-button" onClick={toggleSidebar}>
+        {isCollapsed ? '▶' : '◀'}
+      </button>
       <div className="sidebar-menu">
         {menuItems.map(item => (
           <div 
@@ -41,23 +48,25 @@ const LeftSidebar = ({ onExploreClick }) => {
             onClick={() => handleItemClick(item.path)}
           >
             <span className="menu-icon">{item.icon}</span>
-            <span className="menu-label">{item.label}</span>
+            {!isCollapsed && <span className="menu-label">{item.label}</span>}
           </div>
         ))}
       </div>
       
-      <div className="sidebar-footer">
-        <div className="footer-links">
-          <a href="#">Privacidad</a>
-          <span>·</span>
-          <a href="#">Términos</a>
-          <span>·</span>
-          <a href="#">Publicidad</a>
+      {!isCollapsed && (
+        <div className="sidebar-footer">
+          <div className="footer-links">
+            <a href="#">Privacidad</a>
+            <span>·</span>
+            <a href="#">Términos</a>
+            <span>·</span>
+            <a href="#">Publicidad</a>
+          </div>
+          <div className="copyright">
+            © {new Date().getFullYear()} ViviendaSocial
+          </div>
         </div>
-        <div className="copyright">
-          © {new Date().getFullYear()} ViviendaSocial
-        </div>
-      </div>
+      )}
     </div>
   );
 };
