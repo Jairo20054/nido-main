@@ -16,7 +16,9 @@ const LeftSidebar = () => {
     { id: 5, icon: '🔔', label: 'Notificaciones', path: '/notifications' },
     { id: 6, icon: '❤️', label: 'Favoritos', path: '/favorites' },
     { id: 7, icon: '🏘️', label: 'Mis Propiedades', path: '/my-properties' },
-    { id: 8, icon: '👤', label: 'Perfil', path: '/profile' },
+    { id: 8, icon: '👤', label: 'Remodelaciones', path: '/profile' },
+    { id: 9, icon: '👤', label: 'videos', path: '/profile' },
+    { id: 10,icon: '👤', label: 'Perfil', path: '/profile' },
   ];
 
   const handleItemClick = (path) => {

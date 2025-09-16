@@ -35,8 +35,23 @@ const PropertyStories = () => {
       image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXBhcnRtZW50fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
       title: 'Apartamento premium'
     },
-    {
+     {
       id: 5,
+      user: 'Laura Sánchez',
+      avatar: 'https://randomuser.me/api/portraits/women/65.jpg',
+      image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXBhcnRtZW50fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
+      title: 'Apartamento premium'
+    },
+     {
+      id: 6,
+      user: 'Laura Sánchez',
+      avatar: 'https://randomuser.me/api/portraits/women/65.jpg',
+      image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXBhcnRtZW50fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
+      title: 'Apartamento premium'
+    },
+    
+    {
+      id: 7,
       user: 'Roberto Díaz',
       avatar: 'https://randomuser.me/api/portraits/men/72.jpg',
       image: 'https://images.unsplash.com/photo-1575517111839-3a3843ee7f5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGhvdXNlfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
