@@ -64,62 +64,6 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const grokMenuItems = [
-    {
-      id: 'voice',
-      label: 'Voz',
-      value: 'REIN',
-      icon: FaVolumeUp,
-      onClick: () => {},
-    },
-    {
-      id: 'language',
-      label: 'Idiomas',
-      value: 'ES',
-      icon: FaGlobe,
-      onClick: () => {},
-    },
-    {
-      id: 'theme',
-      label: 'Tema',
-      value: 'DÍA',
-      icon: FaSun,
-      onClick: () => {},
-    },
-    {
-      id: 'manage-memory',
-      label: 'Administrar memoria',
-      icon: FaBrain,
-      onClick: () => {},
-    },
-    {
-      id: 'send-feedback',
-      label: 'Enviar comentarios',
-      icon: FaThumbsUp,
-      onClick: () => {},
-    },
-    {
-      id: 'about',
-      label: 'Acerca de',
-      icon: FaInfoCircle,
-      onClick: () => {},
-    },
-    {
-      id: 'download-mobile',
-      label: 'Descargar aplicación móvil',
-      icon: FaMobileAlt,
-      onClick: () => {},
-    },
-    {
-      id: 'copilot-pro',
-      label: 'Haz más con Copilot Pro',
-      subLabel: 'Obtener Copilot Pro',
-      icon: FaCrown,
-      onClick: () => {},
-      isPromo: true,
-    },
-  ];
-
   const navigationItems = useMemo(
     () => [
       {
