@@ -188,46 +188,43 @@ const Home = () => {
       <LeftSidebar onExploreClick={handleExploreClick} />
       
       <div className="home-main-content">
-        {showSearchBar ? (
+        {showSearchBar && (
           <SearchBar onSearch={(params) => {
             setShowSearchBar(false);
-            handleSearch(params);
           }} />
-        ) : (
-          <>
-            <div className="stories-and-search">
-              <PropertyStories />
-            </div>
-
-            <main className="social-feed">
-              <div className="feed-container">
-                <div className="posts-grid">
-                  {loading ? (
-                    <div className="loading-container">
-                      <LoadingSpinner />
-                      <p className="loading-text">Cargando publicaciones...</p>
-                    </div>
-                  ) : (
-                    featuredProperties.map((property) => (
-                      <PostCard 
-                        key={property.id} 
-                        property={property} 
-                        onClick={handleCardClick}
-                        onLike={handleLike}
-                        onSave={handleSave}
-                        onFollow={handleFollow}
-                        currentImageIndex={currentImageIndexes[property.id] || 0}
-                        onImageChange={handleImageChange}
-                        isLiked={likedPosts[property.id]}
-                        isSaved={savedPosts[property.id]}
-                      />
-                    ))
-                  )}
-                </div>
-              </div>
-            </main>
-          </>
         )}
+
+        <div className="stories-and-search">
+          <PropertyStories />
+        </div>
+
+        <main className="social-feed">
+          <div className="feed-container">
+            <div className="posts-grid">
+              {loading ? (
+                <div className="loading-container">
+                  <LoadingSpinner />
+                  <p className="loading-text">Cargando publicaciones...</p>
+                </div>
+              ) : (
+                featuredProperties.map((property) => (
+                  <PostCard
+                    key={property.id}
+                    property={property}
+                    onClick={handleCardClick}
+                    onLike={handleLike}
+                    onSave={handleSave}
+                    onFollow={handleFollow}
+                    currentImageIndex={currentImageIndexes[property.id] || 0}
+                    onImageChange={handleImageChange}
+                    isLiked={likedPosts[property.id]}
+                    isSaved={savedPosts[property.id]}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        </main>
       </div>
       
     </div>

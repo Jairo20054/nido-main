@@ -10,7 +10,7 @@ const LeftSidebar = ({ onExploreClick }) => {
 
   const menuItems = [
     { id: 1, icon: '🏠', label: 'Inicio', path: '/' },
-    { id: 2, icon: '🔍', label: 'Explorar', path: '/explore' },
+    { id: 2, icon: '🔍', label: 'Buscar', path: '/explore' },
     { id: 3, icon: '📋', label: 'Reservas', path: '/bookings' },
     { id: 4, icon: '💬', label: 'Mensajes', path: '/messages' },
     { id: 5, icon: '🔔', label: 'Notificaciones', path: '/notifications' },
