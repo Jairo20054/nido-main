@@ -99,7 +99,7 @@ const Home = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [mockFeaturedProperties]);
 
   useEffect(() => {
     fetchFeaturedProperties();

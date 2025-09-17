@@ -174,9 +174,9 @@ const LoginForm = () => {
               <span className="checkmark"></span>
               Recordarme
             </label>
-            <a href="#" className="forgot-password" tabIndex={isLoading ? -1 : 0}>
+            <button type="button" className="forgot-password" tabIndex={isLoading ? -1 : 0}>
               ¿Olvidaste tu contraseña?
-            </a>
+            </button>
           </div>
           
           <button 
@@ -196,7 +196,7 @@ const LoginForm = () => {
         </form>
         
         <div className="auth-footer">
-          <p>¿No tienes cuenta? <a href="#" className="auth-link">Regístrate aquí</a></p>
+          <p>¿No tienes cuenta? <button type="button" className="auth-link">Regístrate aquí</button></p>
         </div>
       </div>
     </div>
