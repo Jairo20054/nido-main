@@ -1,24 +1,28 @@
-/* LeftSidebar.css — Estilo moderno / glassmorphism / micro-interactions */
+/* LeftSidebar.css — Versión ligera, moderna y accesible */
 
-/* ===== Variables (fáciles de ajustar) ===== */
+/* ===== Variables (ajustables) ===== */
 :root{
   --sidebar-width: 245px;
   --sidebar-collapsed-width: 72px;
-  --bg-gradient-start: #f2f4f8;   /* azul-noche */
-  --bg-gradient-end:   #fafafa;   /* azul profundo */
-  --glass-bg: rgba(255,255,255,0.06);
-  --glass-border: rgba(255,255,255,0.06);
-  --accent: #ffffff;              /* morado vivo */
-  --accent-2: #06b6d4;            /* cian */
-  --muted: #9ca3af;
-  --text: #e6edf3;
-  --shadow: 0 8px 30px rgba(2,6,23,0.6);
-  --radius-lg: 14px;
+
+  /* Light theme palette */
+  --bg-start: #f7fafc;       /* very light */
+  --bg-end:   #ffffff;       /* white */
+  --panel-bg: #ffffff;
+  --panel-border: #e6eef6;
+  --muted: #6b7280;          /* gray-500 */
+  --text: #0f172a;           /* gray-900 */
+  --accent: #7c3aed;         /* purple */
+  --accent-2: #06b6d4;       /* cyan */
+  --shadow-sm: 0 4px 10px rgba(16,24,40,0.06);
+  --shadow-lg: 0 12px 40px rgba(16,24,40,0.08);
+  --radius-lg: 12px;
   --radius-sm: 8px;
-  --transition: 220ms cubic-bezier(.2,.9,.2,1);
+  --transition: 200ms cubic-bezier(.2,.9,.2,1);
+  --glass: rgba(255,255,255,0.6);
 }
 
-/* ===== Container / layout ===== */
+/* ===== Container ===== */
 .left-sidebar {
   width: var(--sidebar-width);
   height: 100vh;
@@ -30,42 +34,41 @@
   flex-direction: column;
   gap: 12px;
   box-sizing: border-box;
-  backdrop-filter: blur(6px);
-  background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+  background: linear-gradient(180deg, var(--bg-start) 0%, var(--bg-end) 100%);
   color: var(--text);
-  border-right: 1px solid rgba(255,255,255,0.04);
-  box-shadow: var(--shadow);
-  transition: width var(--transition), padding var(--transition), transform var(--transition);
+  border-right: 1px solid var(--panel-border);
+  box-shadow: var(--shadow-lg);
+  transition: width var(--transition), padding var(--transition), gap var(--transition);
   z-index: 120;
   border-top-right-radius: var(--radius-lg);
   border-bottom-right-radius: var(--radius-lg);
   overflow: hidden;
 }
 
-/* Collapsed state */
 .left-sidebar.collapsed {
   width: var(--sidebar-collapsed-width);
-  padding: 16px 8px;
+  padding: 20px 12px; /* Ajustado para más espacio vertical en collapsed, centrando mejor los íconos */
+  gap: 8px; /* Gap reducido en collapsed para compactar el menú */
 }
 
 /* ===== Toggle button (floating circular) ===== */
 .toggle-button {
   position: absolute;
   top: 16px;
-  right: -14px; /* overlap outside sidebar */
+  right: -18px; /* overlap */
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.12);
-  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  border: 1px solid var(--panel-border);
+  background: var(--panel-bg);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text);
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(2,6,23,0.45);
-  transition: transform var(--transition), background var(--transition), right var(--transition);
-  backdrop-filter: blur(6px);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition), right var(--transition);
+  -webkit-tap-highlight-color: transparent;
 }
 .left-sidebar.collapsed .toggle-button {
   right: -12px;
@@ -73,10 +76,9 @@
 }
 .toggle-button:hover {
   transform: translateY(-3px) scale(1.03);
-  background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03));
 }
 
-/* ===== Sidebar header (logo / title area) ===== */
+/* ===== Header ===== */
 .sidebar-header {
   display: flex;
   align-items: center;
@@ -87,6 +89,7 @@
   margin: 0;
   font-weight: 700;
   letter-spacing: -0.2px;
+  color: var(--text);
 }
 .left-sidebar.collapsed .sidebar-header h2 {
   opacity: 0;
@@ -94,7 +97,7 @@
   pointer-events: none;
 }
 
-/* ===== Menu area ===== */
+/* ===== Menu ===== */
 .sidebar-menu {
   display: flex;
   flex-direction: column;
@@ -103,9 +106,17 @@
   flex: 1;
   overflow-y: auto;
   padding-right: 6px;
+  padding-left: 4px;
+  justify-content: flex-start; /* Asegura alineación superior en collapsed */
+  align-items: center; /* Centra íconos horizontalmente en collapsed */
 }
 
-/* Each item */
+.left-sidebar.collapsed .sidebar-menu {
+  justify-content: center; /* Centra verticalmente los ítems en collapsed si hay menos espacio */
+  gap: 10px; /* Gap ligeramente mayor en collapsed para separación visual */
+}
+
+/* Item */
 .menu-item {
   display: flex;
   align-items: center;
@@ -114,25 +125,51 @@
   border-radius: 10px;
   cursor: pointer;
   color: var(--text);
-  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+  transition: background var(--transition), transform var(--transition);
   position: relative;
-  overflow: visible;
+  width: 100%; /* Asegura que ocupe el ancho completo en expanded */
+  justify-content: flex-start;
 }
 
-/* Icon container */
+.left-sidebar.collapsed .menu-item {
+  justify-content: center; /* Centra el ícono en collapsed */
+  padding: 12px 8px; /* Padding ajustado para collapsed: más vertical, menos horizontal */
+  gap: 0; /* Elimina gap en collapsed ya que no hay label */
+  width: auto; /* Permite auto-width en collapsed para íconos centrados */
+}
+
+/* Provide keyboard focusability and role in JSX */
+.menu-item:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(124,58,237,0.08);
+  transform: translateX(4px);
+}
+
+.left-sidebar.collapsed .menu-item:focus {
+  transform: scale(1.05); /* Ajuste para focus en collapsed */
+}
+
+/* Icon box */
 .menu-icon {
   width: 40px;
   height: 40px;
   min-width: 40px;
   border-radius: 10px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  background: linear-gradient(180deg, rgba(15,23,42,0.02), rgba(15,23,42,0.01));
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 18px;
   color: var(--muted);
   transition: transform var(--transition), color var(--transition), background var(--transition);
-  box-shadow: inset 0 -2px 6px rgba(0,0,0,0.12);
+  flex-shrink: 0;
+}
+
+.left-sidebar.collapsed .menu-icon {
+  width: 44px; /* Ligeramente más grande en collapsed para mejor visibilidad */
+  height: 44px;
+  min-width: 44px;
+  font-size: 20px; /* Ícono más grande en collapsed */
 }
 
 /* Label */
@@ -144,18 +181,22 @@
   transition: opacity var(--transition), transform var(--transition);
 }
 
-/* Hover micro-interaction */
+/* Hover */
 .menu-item:hover {
   transform: translateX(6px);
-  background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  background: rgba(12,16,30,0.03);
 }
 .menu-item:hover .menu-icon {
-  transform: scale(1.06);
+  transform: scale(1.05);
   color: var(--accent);
-  background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(6,182,212,0.06));
+  background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(6,182,212,0.03));
 }
 
-/* Active indicator: vertical bar on left */
+.left-sidebar.collapsed .menu-item:hover {
+  transform: scale(1.05); /* Hover en collapsed: escala en lugar de translateX */
+}
+
+/* Active indicator */
 .menu-item.active::before {
   content: "";
   position: absolute;
@@ -165,45 +206,51 @@
   width: 4px;
   border-radius: 6px;
   background: linear-gradient(180deg, var(--accent), var(--accent-2));
-  box-shadow: 0 6px 18px rgba(12,11,47,0.25);
-  transform-origin: center;
+  box-shadow: 0 6px 18px rgba(12,16,40,0.06);
 }
-
-/* Active icon / label emphasis */
 .menu-item.active .menu-icon {
   color: white;
-  background: linear-gradient(135deg, rgba(124,58,237,0.18), rgba(6,182,212,0.08));
-  box-shadow: 0 10px 24px rgba(6,24,64,0.35);
+  background: linear-gradient(135deg, rgba(124,58,237,0.18), rgba(6,182,212,0.06));
 }
-.menu-item.active .menu-label {
-  color: #fff;
+.menu-item.active .menu-label { color: var(--text); }
+
+.left-sidebar.collapsed .menu-item.active::before {
+  left: 50%;
+  transform: translateX(-50%); /* Posiciona la barra vertical en el centro para collapsed */
+  top: 50%;
+  bottom: auto;
+  height: 4px; /* Barra horizontal en collapsed para indicador sutil */
+  width: 24px;
 }
 
-/* Collapsed view: hide labels and compact icons */
+/* Collapsed: hide labels but keep tooltip (see below) */
 .left-sidebar.collapsed .menu-label {
-  opacity: 0;
-  transform: translateX(-6px);
-  pointer-events: none;
-  width: 0;
-  height: 0;
-  display: none; /* your JSX already hides labels; keep this safe */
+  display: none;
 }
-.left-sidebar.collapsed .menu-icon {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  border-radius: 10px;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 20px;
+
+/* Tooltip for collapsed icons (pure CSS, requires data-label attr on .menu-item) */
+.left-sidebar.collapsed .menu-item[data-label]:hover::after {
+  content: attr(data-label);
+  position: fixed;
+  left: calc(var(--sidebar-collapsed-width) + 14px);
+  top: var(--tooltip-top, 50%);
+  transform: translateY(-50%);
+  background: var(--panel-bg);
+  color: var(--text);
+  border: 1px solid var(--panel-border);
+  padding: 8px 10px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  white-space: nowrap;
+  z-index: 140;
+  font-size: 13px;
 }
 
 /* Footer */
 .sidebar-footer {
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid rgba(255,255,255,0.04);
+  border-top: 1px solid var(--panel-border);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -214,41 +261,26 @@
   gap: 8px;
   font-size: 12px;
   color: var(--muted);
-  opacity: 0.9;
 }
 .footer-links a { color: var(--muted); text-decoration: none; }
-.footer-links a:hover { text-decoration: underline; color: white; }
+.footer-links a:hover { text-decoration: underline; color: var(--text); }
 
-.left-sidebar.collapsed .sidebar-footer {
-  display: none;
-}
+.left-sidebar.collapsed .sidebar-footer { display: none; }
 
-/* scrollbar styling (subtle) */
+/* scrollbar subtle */
 .sidebar-menu::-webkit-scrollbar { width: 8px; }
 .sidebar-menu::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.04);
+  background: rgba(10,10,10,0.06);
   border-radius: 8px;
-  border: 2px solid transparent;
-}
-
-/* ===== Accessibility: focus states ===== */
-.menu-item:focus {
-  outline: none;
-  box-shadow: 0 0 0 4px rgba(124,58,237,0.12);
-  transform: translateX(4px);
 }
 
 /* ===== Responsive ===== */
 @media (max-width: 1000px) {
-  .left-sidebar {
-    width: var(--sidebar-collapsed-width);
-  }
-  .left-sidebar .menu-label { display: none; }
+  .left-sidebar { width: var(--sidebar-collapsed-width); padding: 20px 12px; gap: 8px; }
   .sidebar-header { display: none; }
   .sidebar-footer { display: none; }
 }
 
-/* Mobile: bottom nav style */
 @media (max-width: 768px) {
   .left-sidebar {
     position: fixed;
@@ -264,16 +296,9 @@
     align-items: center;
     justify-content: space-between;
     border-right: none;
-    border-top: 1px solid rgba(255,255,255,0.04);
+    border-top: 1px solid var(--panel-border);
   }
-  .sidebar-menu {
-    flex-direction: row;
-    gap: 8px;
-    width: 100%;
-    justify-content: space-around;
-    padding: 0;
-    overflow: visible;
-  }
+  .sidebar-menu { flex-direction: row; gap: 8px; width: 100%; justify-content: space-around; padding: 0; overflow: visible; }
   .menu-item { padding: 8px; border-radius: 8px; flex-direction: column; gap: 6px; }
   .menu-icon { width: 36px; height: 36px; font-size: 18px; }
   .menu-label { display: none; }
