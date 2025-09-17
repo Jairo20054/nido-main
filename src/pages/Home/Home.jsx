@@ -7,6 +7,7 @@ import PostCard from '../../components/PostCard/PostCard';
 import LoadingSpinner from '../../components/common/LoadingSpinner/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage/ErrorMessage';
 import SearchBar from '../../components/common/Header/SearchBar';
+import UserMenu from '../../components/common/Header/UserMenu';
 import './Home.css';
 
 // Datos mock para propiedades destacadas
@@ -66,8 +67,6 @@ const mockFeaturedProperties = [
   // ... más propiedades (igual que en tu código original)
 ];
 
-import UserMenu from '../../components/common/Header/UserMenu';
-
 const Home = () => {
   const [featuredProperties, setFeaturedProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -82,11 +81,11 @@ const Home = () => {
   const fetchFeaturedProperties = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       setFeaturedProperties(mockFeaturedProperties);
-      
+
       // Inicializar índices de imágenes
       const initialIndexes = {};
       mockFeaturedProperties.forEach(property => {
@@ -99,15 +98,11 @@ const Home = () => {
     } finally {
       setLoading(false);
     }
-  }, [mockFeaturedProperties]);
+  }, []);
 
   useEffect(() => {
     fetchFeaturedProperties();
   }, [fetchFeaturedProperties]);
-
-  const handleSearch = useCallback((searchParams) => {
-    navigate('/search', { state: { searchParams } });
-  }, [navigate]);
 
   const handleExploreClick = useCallback(() => {
     setShowSearchBar(true);

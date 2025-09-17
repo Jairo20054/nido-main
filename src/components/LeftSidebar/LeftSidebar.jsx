@@ -60,11 +60,11 @@ const LeftSidebar = ({ onExploreClick, onProfileClick }) => {
       {!isCollapsed && (
         <div className="sidebar-footer">
           <div className="footer-links">
-            <a href="#">Privacidad</a>
+            <button>Privacidad</button>
             <span>·</span>
-            <a href="#">Términos</a>
+            <button>Términos</button>
             <span>·</span>
-            <a href="#">Publicidad</a>
+            <button>Publicidad</button>
           </div>
           <div className="copyright">
             © {new Date().getFullYear()} ViviendaSocial

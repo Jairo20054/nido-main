@@ -27,68 +27,68 @@ const MyBookings = () => {
   const [sortBy, setSortBy] = useState('date');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Datos simulados más completos
-  const mockBookings = [
-    {
-      id: 1,
-      property: 'Habitación Cómoda Centro',
-      location: 'Centro Histórico, Cartagena',
-      image: 'https://www.portobellostreet.es/mercurio_imagenes/Ideas-para-elegilr-la-mejor-comoda-para-tu-dormitorio-07.gif',
-      dates: '15-20 Jun 2025',
-      checkIn: '2025-06-15',
-      checkOut: '2025-06-20',
-      nights: 5,
-      guests: 2,
-      price: '$140.000',
-      totalPrice: '$700.000',
-      status: 'confirmada',
-      host: 'María González',
-      rating: 4.8,
-      reviews: 127,
-      bookingCode: 'BK001',
-      amenities: ['WiFi', 'AC', 'Parking']
-    },
-    {
-      id: 2,
-      property: 'Apartamento con Vista al Mar',
-      location: 'Bocagrande, Cartagena',
-      image: 'https://www.reservastodo.com//wp-content/uploads/2021/04/Apartamentos-vista-al-mar-Rodadero.jpg',
-      dates: '25-30 Jun 2025',
-      checkIn: '2025-06-25',
-      checkOut: '2025-06-30',
-      nights: 5,
-      guests: 4,
-      price: '$300.000',
-      totalPrice: '$1.500.000',
-      status: 'pendiente',
-      host: 'Carlos Martínez',
-      rating: 4.9,
-      reviews: 89,
-      bookingCode: 'BK002',
-      amenities: ['WiFi', 'Pool', 'Ocean View', 'Kitchen']
-    },
-    {
-      id: 3,
-      property: 'Casa Colonial Histórica',
-      location: 'San Diego, Cartagena',
-      image: 'https://img.freepik.com/fotos-premium/calle-antiguas-casas-coloniales-portuguesas-centro-historico-paraty-estado-rio-janeiro_70251-467.jpg',
-      dates: '05-08 Jul 2025',
-      checkIn: '2025-07-05',
-      checkOut: '2025-07-08',
-      nights: 3,
-      guests: 6,
-      price: '$450.000',
-      totalPrice: '$1.350.000',
-      status: 'cancelada',
-      host: 'Ana Rodríguez',
-      rating: 4.7,
-      reviews: 203,
-      bookingCode: 'BK003',
-      amenities: ['WiFi', 'Historic', 'Patio', 'Kitchen']
-    }
-  ];
-
   useEffect(() => {
+    // Datos simulados más completos
+    const mockBookings = [
+      {
+        id: 1,
+        property: 'Habitación Cómoda Centro',
+        location: 'Centro Histórico, Cartagena',
+        image: 'https://www.portobellostreet.es/mercurio_imagenes/Ideas-para-elegilr-la-mejor-comoda-para-tu-dormitorio-07.gif',
+        dates: '15-20 Jun 2025',
+        checkIn: '2025-06-15',
+        checkOut: '2025-06-20',
+        nights: 5,
+        guests: 2,
+        price: '$140.000',
+        totalPrice: '$700.000',
+        status: 'confirmada',
+        host: 'María González',
+        rating: 4.8,
+        reviews: 127,
+        bookingCode: 'BK001',
+        amenities: ['WiFi', 'AC', 'Parking']
+      },
+      {
+        id: 2,
+        property: 'Apartamento con Vista al Mar',
+        location: 'Bocagrande, Cartagena',
+        image: 'https://www.reservastodo.com//wp-content/uploads/2021/04/Apartamentos-vista-al-mar-Rodadero.jpg',
+        dates: '25-30 Jun 2025',
+        checkIn: '2025-06-25',
+        checkOut: '2025-06-30',
+        nights: 5,
+        guests: 4,
+        price: '$300.000',
+        totalPrice: '$1.500.000',
+        status: 'pendiente',
+        host: 'Carlos Martínez',
+        rating: 4.9,
+        reviews: 89,
+        bookingCode: 'BK002',
+        amenities: ['WiFi', 'Pool', 'Ocean View', 'Kitchen']
+      },
+      {
+        id: 3,
+        property: 'Casa Colonial Histórica',
+        location: 'San Diego, Cartagena',
+        image: 'https://img.freepik.com/fotos-premium/calle-antiguas-casas-coloniales-portuguesas-centro-historico-paraty-estado-rio-janeiro_70251-467.jpg',
+        dates: '05-08 Jul 2025',
+        checkIn: '2025-07-05',
+        checkOut: '2025-07-08',
+        nights: 3,
+        guests: 6,
+        price: '$450.000',
+        totalPrice: '$1.350.000',
+        status: 'cancelada',
+        host: 'Ana Rodríguez',
+        rating: 4.7,
+        reviews: 203,
+        bookingCode: 'BK003',
+        amenities: ['WiFi', 'Historic', 'Patio', 'Kitchen']
+      }
+    ];
+
     // Simular carga de datos
     const loadBookings = async () => {
       setLoading(true);
@@ -99,7 +99,7 @@ const MyBookings = () => {
     };
 
     loadBookings();
-  }, [mockBookings]);
+  }, []);
 
   useEffect(() => {
     let filtered = bookings.filter(booking => {

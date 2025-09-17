@@ -1,6 +1,6 @@
 // src/pages/Search/Search.jsx (Modified minimally for integration; added responsiveness notes in CSS if needed, but assuming existing CSS handles it)
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import useSearch from '../../hooks/useSearch';
 import SearchFilters from '../../components/Search/SearchFilters';
 import PropertyGrid from '../../components/property/PropertyGrid/PropertyGrid';
@@ -15,7 +15,6 @@ import SearchBar from '../../components/common/Header/SearchBar'; // Componente 
 import './Search.css';
 
 const Search = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const [urlParams, setUrlParams] = useSearchParams();
   
