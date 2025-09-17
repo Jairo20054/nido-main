@@ -66,6 +66,8 @@ const mockFeaturedProperties = [
   // ... más propiedades (igual que en tu código original)
 ];
 
+import UserMenu from '../../components/common/Header/UserMenu';
+
 const Home = () => {
   const [featuredProperties, setFeaturedProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -74,6 +76,7 @@ const Home = () => {
   const [likedPosts, setLikedPosts] = useState({});
   const [savedPosts, setSavedPosts] = useState({});
   const [showSearchBar, setShowSearchBar] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const navigate = useNavigate();
 
   const fetchFeaturedProperties = useCallback(async () => {
@@ -165,10 +168,14 @@ const Home = () => {
     });
   }, [featuredProperties]);
 
+  const toggleProfileMenu = () => {
+    setShowProfileMenu(prev => !prev);
+  };
+
   if (error) {
     return (
       <div className="home-page">
-        <LeftSidebar />
+        <LeftSidebar onProfileClick={toggleProfileMenu} />
         <div className="home-main-content">
           <div className="stories-and-search">
             <PropertyStories />
@@ -185,7 +192,7 @@ const Home = () => {
 
   return (
     <div className="home-page">
-      <LeftSidebar onExploreClick={handleExploreClick} />
+      <LeftSidebar onExploreClick={handleExploreClick} onProfileClick={toggleProfileMenu} />
       
       <div className="home-main-content">
         {showSearchBar && (
@@ -199,6 +206,12 @@ const Home = () => {
         <div className="stories-and-search">
           <PropertyStories />
         </div>
+
+        {showProfileMenu && (
+          <div className="mini-profile-menu">
+            <UserMenu />
+          </div>
+        )}
 
         <main className="social-feed">
           <div className="feed-container">

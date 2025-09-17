@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './LeftSidebar.css';
 
-const LeftSidebar = ({ onExploreClick }) => {
+const LeftSidebar = ({ onExploreClick, onProfileClick }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeItem, setActiveItem] = useState(location.pathname);
@@ -22,9 +22,13 @@ const LeftSidebar = ({ onExploreClick }) => {
     { id: 10,icon: '👤', label: 'Perfil', path: '/profile' },
   ];
 
-  const handleItemClick = (path) => {
+  const handleItemClick = (path, label) => {
     if (path === '/explore' && onExploreClick) {
       onExploreClick();
+      return;
+    }
+    if (label === 'Perfil' && onProfileClick) {
+      onProfileClick();
       return;
     }
     setActiveItem(path);
@@ -45,7 +49,7 @@ const LeftSidebar = ({ onExploreClick }) => {
           <div 
             key={item.id} 
             className={`menu-item ${activeItem === item.path ? 'active' : ''}`}
-            onClick={() => handleItemClick(item.path)}
+            onClick={() => handleItemClick(item.path, item.label)}
           >
             <span className="menu-icon">{item.icon}</span>
             {!isCollapsed && <span className="menu-label">{item.label}</span>}
