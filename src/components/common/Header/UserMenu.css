@@ -207,7 +207,12 @@
 /* Responsive */
 @media (max-width: 768px) {
   .user-menu-dropdown {
-    right: -50px;
-    width: 280px;
+    position: fixed;
+    top: 60px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+    max-width: 320px;
+    margin: 0 auto;
   }
 }

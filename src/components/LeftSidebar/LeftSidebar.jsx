@@ -10,7 +10,6 @@ const LeftSidebar = ({ onExploreClick, onProfileClick }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const menuItems = [
-    { id: 1, icon: '🏠', label: 'Inicio', path: '/' },
     { id: 2, icon: '🔍', label: 'Buscar', path: '/explore' },
     { id: 3, icon: '📋', label: 'Reservas', path: '/bookings' },
     { id: 4, icon: '💬', label: 'Mensajes', path: '/messages' },
