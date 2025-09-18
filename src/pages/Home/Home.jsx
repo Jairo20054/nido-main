@@ -1,12 +1,12 @@
 // src/pages/Home/Home.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import LeftSidebar from '../../components/LeftSidebar/LeftSidebar';
 import PropertyStories from '../../components/PropertyStories/PropertyStories';
 import PostCard from '../../components/PostCard/PostCard';
 import LoadingSpinner from '../../components/common/LoadingSpinner/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage/ErrorMessage';
 import SearchBar from '../../components/common/Header/SearchBar';
+import UserMenu from '../../components/common/Header/UserMenu';
 import './Home.css';
 
 // Datos mock para propiedades destacadas
@@ -65,8 +65,6 @@ const mockFeaturedProperties = [
 
   // ... más propiedades (igual que en tu código original)
 ];
-
-import UserMenu from '../../components/common/Header/UserMenu';
 
 const Home = () => {
   const [featuredProperties, setFeaturedProperties] = useState([]);
@@ -175,7 +173,6 @@ const Home = () => {
   if (error) {
     return (
       <div className="home-page">
-        <LeftSidebar onProfileClick={toggleProfileMenu} />
         <div className="home-main-content">
           <div className="stories-and-search">
             <PropertyStories />
@@ -192,8 +189,6 @@ const Home = () => {
 
   return (
     <div className="home-page">
-      <LeftSidebar onExploreClick={handleExploreClick} onProfileClick={toggleProfileMenu} />
-      
       <div className="home-main-content">
         {showSearchBar && (
           <div className="search-section">
