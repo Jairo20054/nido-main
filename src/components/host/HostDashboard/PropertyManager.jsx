@@ -191,158 +191,161 @@ const PropertyManager = () => {
   const stats = getStatsCards();
 
   return (
-    <div className="property-manager">
-      {/* Stats Cards */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon">🏠</div>
-          <div className="stat-info">
-            <h3>{stats.totalProperties}</h3>
-            <p>Total Propiedades</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">✅</div>
-          <div className="stat-info">
-            <h3>{stats.activeProperties}</h3>
-            <p>Propiedades Activas</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">📅</div>
-          <div className="stat-info">
-            <h3>{stats.totalBookings}</h3>
-            <p>Total Reservas</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">⭐</div>
-          <div className="stat-info">
-            <h3>{stats.avgRating}</h3>
-            <p>Calificación Promedio</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Header con filtros */}
-      <div className="section-header">
-        <h2 className="section-title">Mis Propiedades</h2>
-        <button className="add-property-btn" onClick={() => setShowForm(true)}>
-          <span className="btn-icon">+</span>
-          Añadir propiedad
-        </button>
-      </div>
-
-      {/* Filtros y búsqueda */}
-      <div className="filters-section">
-        <div className="search-box">
-          <input
-            type="text"
-            placeholder="Buscar por nombre o ubicación..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
-        </div>
-        <div className="filter-controls">
-          <select 
-            value={statusFilter} 
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="filter-select"
-          >
-            <option value="Todos">Todos los estados</option>
-            <option value="Activo">Activo</option>
-            <option value="Inactivo">Inactivo</option>
-          </select>
-          <select 
-            value={sortBy} 
-            onChange={(e) => setSortBy(e.target.value)}
-            className="filter-select"
-          >
-            <option value="name">Ordenar por nombre</option>
-            <option value="price">Ordenar por precio</option>
-            <option value="rating">Ordenar por calificación</option>
-            <option value="bookings">Ordenar por reservas</option>
-          </select>
-        </div>
-      </div>
-      
-      {/* Lista de propiedades */}
-      <div className="properties-grid">
-        {filteredProperties.map(property => (
-          <div key={property.id} className="property-card">
-            <div className="property-image">
-              <img src={property.image} alt={property.name} />
-              <div className={`property-status-badge ${property.status.toLowerCase()}`}>
-                {property.status}
-              </div>
-            </div>
-            <div className="property-content">
-              <div className="property-header">
-                <h3 className="property-name">{property.name}</h3>
-                <div className="property-rating">
-                  <span className="rating-icon">⭐</span>
-                  <span>{property.rating}</span>
-                </div>
-              </div>
-              <p className="property-location">📍 {property.location}</p>
-              <p className="property-description">{property.description}</p>
-              
-              <div className="property-amenities">
-                {property.amenities.slice(0, 3).map((amenity, index) => (
-                  <span key={index} className="amenity-tag">{amenity}</span>
-                ))}
-                {property.amenities.length > 3 && (
-                  <span className="amenity-tag more">+{property.amenities.length - 3}</span>
-                )}
-              </div>
-
-              <div className="property-meta">
-                <div className="property-price">
-                  {formatPrice(property.price)}
-                  <span className="price-period">/noche</span>
-                </div>
-                <div className="property-capacity">
-                  👥 {property.capacity} huéspedes
-                </div>
-              </div>
-
-              <div className="property-stats">
-                <span className="booking-count">📅 {property.bookings} reservas</span>
-              </div>
-
-              <div className="property-actions">
-                <button 
-                  className={`status-toggle-btn ${property.status.toLowerCase()}`}
-                  onClick={() => toggleStatus(property.id)}
-                >
-                  {property.status === 'Activo' ? '⏸️ Desactivar' : '▶️ Activar'}
-                </button>
-                <button 
-                  className="edit-btn"
-                  onClick={() => handleEdit(property)}
-                >
-                  ✏️ Editar
-                </button>
-                <button 
-                  className="delete-btn"
-                  onClick={() => setShowDeleteModal(property.id)}
-                >
-                  🗑️ Eliminar
-                </button>
-              </div>
+    <div className="property-manager-container">
+      {/* Contenido principal */}
+      <div className="property-main-content">
+        {/* Stats Cards */}
+        <div className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-icon">🏠</div>
+            <div className="stat-info">
+              <h3>{stats.totalProperties}</h3>
+              <p>Total Propiedades</p>
             </div>
           </div>
-        ))}
-      </div>
-
-      {filteredProperties.length === 0 && (
-        <div className="empty-state">
-          <div className="empty-icon">🏠</div>
-          <h3>No se encontraron propiedades</h3>
-          <p>Intenta ajustar los filtros de búsqueda o añade una nueva propiedad.</p>
+          <div className="stat-card">
+            <div className="stat-icon">✅</div>
+            <div className="stat-info">
+              <h3>{stats.activeProperties}</h3>
+              <p>Propiedades Activas</p>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon">📅</div>
+            <div className="stat-info">
+              <h3>{stats.totalBookings}</h3>
+              <p>Total Reservas</p>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon">⭐</div>
+            <div className="stat-info">
+              <h3>{stats.avgRating}</h3>
+              <p>Calificación Promedio</p>
+            </div>
+          </div>
         </div>
-      )}
+
+        {/* Header con filtros */}
+        <div className="section-header">
+          <h2 className="section-title">Mis Propiedades</h2>
+          <button className="add-property-btn" onClick={() => setShowForm(true)}>
+            <span className="btn-icon">+</span>
+            Añadir propiedad
+          </button>
+        </div>
+
+        {/* Filtros y búsqueda */}
+        <div className="filters-section">
+          <div className="search-box">
+            <input
+              type="text"
+              placeholder="Buscar por nombre o ubicación..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
+          <div className="filter-controls">
+            <select 
+              value={statusFilter} 
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="filter-select"
+            >
+              <option value="Todos">Todos los estados</option>
+              <option value="Activo">Activo</option>
+              <option value="Inactivo">Inactivo</option>
+            </select>
+            <select 
+              value={sortBy} 
+              onChange={(e) => setSortBy(e.target.value)}
+              className="filter-select"
+            >
+              <option value="name">Ordenar por nombre</option>
+              <option value="price">Ordenar por precio</option>
+              <option value="rating">Ordenar por calificación</option>
+              <option value="bookings">Ordenar por reservas</option>
+            </select>
+          </div>
+        </div>
+        
+        {/* Lista de propiedades */}
+        <div className="properties-grid">
+          {filteredProperties.map(property => (
+            <div key={property.id} className="property-card">
+              <div className="property-image">
+                <img src={property.image} alt={property.name} />
+                <div className={`property-status-badge ${property.status.toLowerCase()}`}>
+                  {property.status}
+                </div>
+              </div>
+              <div className="property-content">
+                <div className="property-header">
+                  <h3 className="property-name">{property.name}</h3>
+                  <div className="property-rating">
+                    <span className="rating-icon">⭐</span>
+                    <span>{property.rating}</span>
+                  </div>
+                </div>
+                <p className="property-location">📍 {property.location}</p>
+                <p className="property-description">{property.description}</p>
+                
+                <div className="property-amenities">
+                  {property.amenities.slice(0, 3).map((amenity, index) => (
+                    <span key={index} className="amenity-tag">{amenity}</span>
+                  ))}
+                  {property.amenities.length > 3 && (
+                    <span className="amenity-tag more">+{property.amenities.length - 3}</span>
+                  )}
+                </div>
+
+                <div className="property-meta">
+                  <div className="property-price">
+                    {formatPrice(property.price)}
+                    <span className="price-period">/noche</span>
+                  </div>
+                  <div className="property-capacity">
+                    👥 {property.capacity} huéspedes
+                  </div>
+                </div>
+
+                <div className="property-stats">
+                  <span className="booking-count">📅 {property.bookings} reservas</span>
+                </div>
+
+                <div className="property-actions">
+                  <button 
+                    className={`status-toggle-btn ${property.status.toLowerCase()}`}
+                    onClick={() => toggleStatus(property.id)}
+                  >
+                    {property.status === 'Activo' ? '⏸️ Desactivar' : '▶️ Activar'}
+                  </button>
+                  <button 
+                    className="edit-btn"
+                    onClick={() => handleEdit(property)}
+                  >
+                    ✏️ Editar
+                  </button>
+                  <button 
+                    className="delete-btn"
+                    onClick={() => setShowDeleteModal(property.id)}
+                  >
+                    🗑️ Eliminar
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {filteredProperties.length === 0 && (
+          <div className="empty-state">
+            <div className="empty-icon">🏠</div>
+            <h3>No se encontraron propiedades</h3>
+            <p>Intenta ajustar los filtros de búsqueda o añade una nueva propiedad.</p>
+          </div>
+        )}
+      </div>
       
       {/* Modal de formulario */}
       {showForm && (

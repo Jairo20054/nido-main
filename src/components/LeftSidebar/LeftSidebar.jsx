@@ -1,4 +1,3 @@
-// src/components/LeftSidebar/LeftSidebar.jsx
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './LeftSidebar.css';
@@ -10,19 +9,19 @@ const LeftSidebar = ({ onExploreClick, onProfileClick }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const menuItems = [
-    { id: 1, icon: '🔍', label: 'Buscar', path: '/explore' },
-    { id: 2, icon: '📋', label: 'Reservas', path: '/bookings' },
+    { id: 1, icon: '🔍', label: 'Buscar', path: '/search' },
+    { id: 2, icon: '📋', label: 'Reservas', path: '/my-bookings' },
     { id: 3, icon: '💬', label: 'Mensajes', path: '/messages' },
-    { id: 4, icon: '🔔', label: 'Notificaciones', path: '/notifications' },
+    { id: 4, icon: '🔔', label: 'Notificaciones', path: '/messages' },
     { id: 5, icon: '❤️', label: 'Favoritos', path: '/favorites' },
-    { id: 6, icon: '🏘️', label: 'Mis Propiedades', path: '/my-properties' },
+    { id: 6, icon: '🏘️', label: 'Mis Propiedades', path: '/host/properties' },
     { id: 7, icon: '👷', label: 'Remodelaciones', path: '/profile' },
     { id: 8, icon: '🎥', label: 'videos', path: '/profile' },
     { id: 9,icon: '👤', label: 'Perfil', path: '/profile' },
   ];
 
   const handleItemClick = (path, label) => {
-    if (path === '/explore' && onExploreClick) {
+    if (path === '/search' && onExploreClick) {
       onExploreClick();
       return;
     }
