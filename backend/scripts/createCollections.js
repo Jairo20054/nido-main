@@ -4,7 +4,9 @@
  */
 
 const mongoose = require('mongoose');
-const { connect, disconnect } = require('../config/db');
+
+// URI de conexión proporcionada por el usuario
+const MONGODB_URI = 'mongodb+srv://Castillojairo:Andres172001@nido.ydcbciq.mongodb.net/';
 
 // Importar todos los modelos para registrar los esquemas
 require('../models/User');
@@ -24,7 +26,12 @@ const collections = [
 async function createCollections() {
   try {
     console.log('Conectando a MongoDB...');
-    await connect();
+    await mongoose.connect(MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 30000,
+      socketTimeoutMS: 45000,
+    });
 
     console.log('Creando colecciones...');
 
@@ -52,7 +59,7 @@ async function createCollections() {
     process.exit(1);
   } finally {
     console.log('Desconectando de MongoDB...');
-    await disconnect();
+    await mongoose.disconnect();
     console.log('Desconexión completada.');
   }
 }
