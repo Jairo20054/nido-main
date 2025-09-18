@@ -1,19 +1,20 @@
-# PropertyManager Sidebar Removal - Completed Tasks
+# TODO - Mejorar LeftSidebar
 
-## ✅ Completed Tasks
-- [x] Remove `sidebarCollapsed` state variable from PropertyManager.jsx
-- [x] Remove entire sidebar div and content from JSX
-- [x] Remove sidebar-related CSS styles from PropertyManager.css
-- [x] Adjust main content to use full width (remove margin-left)
-- [x] Clean up responsive styles that referenced the sidebar
+- [ ] Actualizar LeftSidebar.jsx:
+  - [ ] Reemplazar iconos emoji por iconos SVG usando react-icons.
+  - [ ] Añadir header con logo o título.
+  - [ ] Añadir botón toggle visible y funcional para colapsar/expandir sidebar.
+  - [ ] Añadir tooltips para íconos cuando la barra esté colapsada.
+  - [ ] Mejorar accesibilidad (roles, aria-labels, focus).
+  - [ ] Mantener la funcionalidad actual de navegación y estado activo.
 
-## Summary
-The sidebar has been successfully removed from the PropertyManager component. The component now displays the main content in full width without the left sidebar that previously contained dashboard menu items and statistics.
+- [ ] Actualizar LeftSidebar.css:
+  - [ ] Ajustar variables de color y tipografía para estilo moderno y limpio.
+  - [ ] Mejorar estilos de menú, íconos y labels.
+  - [ ] Añadir animaciones suaves para hover y toggle.
+  - [ ] Mejorar estilos responsive para desktop, tablet y mobile.
+  - [ ] Estilizar tooltip para íconos colapsados.
+  - [ ] Mejorar footer para que sea más compacto y moderno.
 
-## Files Modified
-- `src/components/host/HostDashboard/PropertyManager.jsx`
-- `src/components/host/HostDashboard/PropertyManager.css`
-
-## Next Steps
-- Test the component to ensure proper layout and functionality
-- Verify responsive design works correctly on different screen sizes
+- [ ] Probar visualmente y funcionalmente los cambios.
+- [ ] Mostrar resultado al usuario.

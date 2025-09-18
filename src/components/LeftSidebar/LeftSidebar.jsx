@@ -1,5 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { 
+  FaSearch, 
+  FaClipboardList, 
+  FaComments, 
+  FaBell, 
+  FaHeart, 
+  FaHome, 
+  FaHardHat, 
+  FaVideo, 
+  FaUser, 
+  FaBars 
+} from 'react-icons/fa';
 import './LeftSidebar.css';
 
 const LeftSidebar = ({ onExploreClick, onProfileClick }) => {
@@ -9,15 +21,15 @@ const LeftSidebar = ({ onExploreClick, onProfileClick }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const menuItems = [
-    { id: 1, icon: '🔍', label: 'Buscar', path: '/search' },
-    { id: 2, icon: '📋', label: 'Reservas', path: '/my-bookings' },
-    { id: 3, icon: '💬', label: 'Mensajes', path: '/messages' },
-    { id: 4, icon: '🔔', label: 'Notificaciones', path: '/messages' },
-    { id: 5, icon: '❤️', label: 'Favoritos', path: '/favorites' },
-    { id: 6, icon: '🏘️', label: 'Mis Propiedades', path: '/host/properties' },
-    { id: 7, icon: '👷', label: 'Remodelaciones', path: '/profile' },
-    { id: 8, icon: '🎥', label: 'videos', path: '/profile' },
-    { id: 9,icon: '👤', label: 'Perfil', path: '/profile' },
+    { id: 1, icon: <FaSearch />, label: 'Buscar', path: '/search' },
+    { id: 2, icon: <FaClipboardList />, label: 'Reservas', path: '/my-bookings' },
+    { id: 3, icon: <FaComments />, label: 'Mensajes', path: '/messages' },
+    { id: 4, icon: <FaBell />, label: 'Notificaciones', path: '/messages' },
+    { id: 5, icon: <FaHeart />, label: 'Favoritos', path: '/favorites' },
+    { id: 6, icon: <FaHome />, label: 'Mis Propiedades', path: '/host/properties' },
+    { id: 7, icon: <FaHardHat />, label: 'Remodelaciones', path: '/profile' },
+    { id: 8, icon: <FaVideo />, label: 'Videos', path: '/profile' },
+    { id: 9, icon: <FaUser />, label: 'Perfil', path: '/profile' },
   ];
 
   const handleItemClick = (path, label) => {
@@ -38,16 +50,33 @@ const LeftSidebar = ({ onExploreClick, onProfileClick }) => {
   };
 
   return (
-    <div className={`left-sidebar ${isCollapsed ? 'collapsed' : ''}`}>
-      <button className="toggle-button" onClick={toggleSidebar}>
-        {isCollapsed ? '▶' : '◀'}
-      </button>
-      <div className="sidebar-menu">
+    <nav className={`left-sidebar ${isCollapsed ? 'collapsed' : ''}`} aria-label="Menú lateral">
+      <div className="sidebar-header">
+        <button 
+          className="toggle-button" 
+          onClick={toggleSidebar} 
+          aria-label={isCollapsed ? 'Expandir menú' : 'Colapsar menú'}
+          title={isCollapsed ? 'Expandir menú' : 'Colapsar menú'}
+        >
+          <FaBars />
+        </button>
+      </div>
+      <div className="sidebar-menu" role="menu">
         {menuItems.map(item => (
           <div 
             key={item.id} 
             className={`menu-item ${activeItem === item.path ? 'active' : ''}`}
             onClick={() => handleItemClick(item.path, item.label)}
+            role="menuitem"
+            tabIndex={0}
+            aria-current={activeItem === item.path ? 'page' : undefined}
+            data-label={item.label}
+            title={isCollapsed ? item.label : undefined}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleItemClick(item.path, item.label);
+              }
+            }}
           >
             <span className="menu-icon">{item.icon}</span>
             {!isCollapsed && <span className="menu-label">{item.label}</span>}
@@ -69,7 +98,7 @@ const LeftSidebar = ({ onExploreClick, onProfileClick }) => {
           </div>
         </div>
       )}
-    </div>
+    </nav>
   );
 };
 
