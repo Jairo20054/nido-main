@@ -10,7 +10,7 @@
   --bg-start: #f7fafc;       /* very light */
   --bg-end:   #ffffff;       /* white */
   --panel-bg: #ffffff;
-  --panel-border: #e6eef6;
+  --panel-border: #ffffff;
   --muted: #6b7280;          /* gray-500 */
   --text: #0f172a;           /* gray-900 */
   --accent: #7c3aed;         /* purple */
@@ -31,22 +31,22 @@
 /* ===== Container ===== */
 .left-sidebar {
   width: var(--sidebar-width);
-  height: 100vh;
+  height: calc(100vh - 5rem);
   position: fixed;
   left: 0;
-  top: 0;
+  top: 5rem;
   padding: 24px 16px; /* Padding aumentado para mejor respiración */
   display: flex;
   flex-direction: column;
   gap: 4px; /* Gap mínimo para compactar menú */
   box-sizing: border-box;
-  background: linear-gradient(180deg, var(--bg-start) 0%, var(--bg-end) 100%);
+  background: var(--white);
   color: var(--text);
   border-right: 1px solid var(--panel-border);
   box-shadow: var(--shadow-lg);
   transition: width var(--transition), padding var(--transition), gap var(--transition);
-  z-index: 120;
-  border-top-right-radius: var(--radius-lg);
+  z-index: 49;
+  border-top-right-radius: 0;
   border-bottom-right-radius: var(--radius-lg);
   overflow: hidden;
 }
