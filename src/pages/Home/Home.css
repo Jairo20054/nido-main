@@ -8,10 +8,11 @@
 .home-main-content {
   flex: 1;
   margin-left: 245px;
-  padding: 20px;
+  padding: 10px 20px 20px 20px; /* Reducido padding superior */
   display: flex;
   flex-direction: column;
   gap: 20px;
+  justify-content: flex-start; /* Asegura que el contenido no se empuje hacia abajo */
 }
 
 .stories-and-search {

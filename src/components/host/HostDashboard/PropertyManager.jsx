@@ -310,7 +310,6 @@ const PropertyManager = () => {
                 </div>
 
                 <div className="property-stats">
-                  <span className="booking-count">📅 {property.bookings} reservas</span>
                 </div>
 
                 <div className="property-actions">

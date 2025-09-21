@@ -80,7 +80,7 @@ const Header = () => {
         shortLabel: "Experiencias",
         path: "/search?type=experience",
         icon: SparklesIcon,
-        hasNovedad: true,
+        hasNovedad: false,
       },
       {
         id: "services",
