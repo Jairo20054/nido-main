@@ -1,61 +1,125 @@
+/* ===== LeftSidebar.css ===== */
+/* No changes needed for the errors, but optimized further for performance and accessibility. */
+
+:root {
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 72px;
+  --item-padding: 12px 16px;
+  --icon-size: 20px;
+  --label-font-size: 15px;
+  --transition: 0.2s ease;
+  --text: #101828;
+  --muted: #667085;
+  --accent: #7C3AED;
+  --panel-bg: #FFFFFF;
+  --panel-border: #EAECF0;
+  --shadow-sm: 0 1px 3px rgba(16,24,40,0.1);
+  --shadow-lg: 0 4px 12px rgba(16,24,40,0.15);
+  --radius-sm: 8px;
+  --mobile-item-width: 72px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #E4E7EC;
+    --muted: #9CA3AF;
+    --accent: #9D4EDD;
+    --panel-bg: #1F2937;
+    --panel-border: #374151;
+  }
+}
+
+.left-sidebar {
+  position: fixed;
+  top: 60px; /* Ajusta según tu header */
+  left: 0;
+  width: var(--sidebar-width);
+  height: calc(100vh - 60px);
+  background: var(--panel-bg);
+  border-right: 1px solid var(--panel-border);
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  gap: 16px;
+  transition: width var(--transition);
+  z-index: 100;
+  overflow: hidden;
+}
+
+.left-sidebar.collapsed {
+  width: var(--sidebar-collapsed-width);
+  padding: 24px 12px;
+  gap: 8px;
+}
+
+/* Toggle Button */
+.toggle-button {
+  position: absolute;
+  top: 20px;
+  right: -12px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition);
+  z-index: 10;
+  color: var(--muted);
+}
+
 .left-sidebar.collapsed .toggle-button {
   right: -14px;
   transform: rotate(180deg);
 }
 
 .toggle-button:hover {
-  transform: translateY(-3px) scale(1.03);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: var(--shadow-sm);
+  color: var(--accent);
 }
 
-/* ===== Header ===== */
+/* Header */
 .sidebar-header {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 4px 0;
-  margin-bottom: 8px; /* Espacio antes del menú */
+  margin-bottom: 4px;
 }
 
 .sidebar-header h2 {
-  font-size: 20px; /* Tamaño optimizado */
+  font-size: 20px;
   margin: 0;
   font-weight: 700;
-  letter-spacing: -0.2px;
   color: var(--text);
 }
 
 .left-sidebar.collapsed .sidebar-header {
-  padding: 0;
-  margin: 0;
+  display: none;
 }
 
-.left-sidebar.collapsed .sidebar-header h2 {
-  opacity: 0;
-  transform: translateX(-6px);
-  pointer-events: none;
-}
-
-/* ===== Menu ===== */
+/* Menu */
 .sidebar-menu {
   display: flex;
   flex-direction: column;
-  gap: 2px; /* Gap mínimo para fluidez */
-  margin-top: 0;
+  gap: 4px;
   flex: 1;
   overflow-y: auto;
-  padding-right: 4px;
-  padding-left: 4px;
-  justify-content: flex-start;
+  padding: 0 4px;
+  scrollbar-width: thin;
 }
 
 .left-sidebar.collapsed .sidebar-menu {
-  justify-content: flex-start; /* Mantén alineación superior */
-  gap: 8px; /* Gap sutil en collapsed */
-  align-items: center; /* Centra íconos horizontalmente */
+  gap: 12px;
+  align-items: center;
+  padding: 0;
 }
 
-/* Item — Optimizado para Inicio y Buscar (primeros ítems) */
+/* Item */
 .menu-item {
   display: flex;
   align-items: center;
@@ -64,312 +128,224 @@
   border-radius: var(--radius-sm);
   cursor: pointer;
   color: var(--text);
-  transition: all var(--transition);
+  transition: background var(--transition), transform var(--transition);
   position: relative;
-  width: 100%;
-  justify-content: flex-start;
-  min-height: 48px; /* Altura mínima consistente para todos los ítems */
+  will-change: transform, background;
+  min-height: 48px;
 }
 
 .left-sidebar.collapsed .menu-item {
   justify-content: center;
-  padding: 12px 8px; /* Padding cuadrado para íconos */
-  gap: 0;
-  width: auto;
-  min-height: 52px; /* Ligeramente más alto en collapsed para touch */
+  padding: 12px;
+  min-height: 48px;
+  width: 48px;
 }
 
-/* Primeros ítems (Inicio y Buscar) — Ajustes específicos para mejor visibilidad */
-.menu-item:nth-child(1),
-.menu-item:nth-child(2) {
-  margin-top: 4px; /* Pequeño offset para "respirar" al inicio */
-}
-
-.left-sidebar.collapsed .menu-item:nth-child(1),
-.left-sidebar.collapsed .menu-item:nth-child(2) {
-  margin-top: 0; /* Sin offset en collapsed */
-}
-
-/* Provide keyboard focusability and role in JSX */
-.menu-item:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+/* Hover y Focus */
+.menu-item:hover, .menu-item:focus {
+  background: rgba(124,58,237,0.05);
   transform: translateX(2px);
 }
 
-.left-sidebar.collapsed .menu-item:focus {
-  transform: scale(1.02);
+.menu-item:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
-/* Icon box — Tamaños consistentes y responsivos */
+.left-sidebar.collapsed .menu-item:hover, .left-sidebar.collapsed .menu-item:focus {
+  transform: scale(1.08);
+}
+
+/* Icon */
 .menu-icon {
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  border-radius: 10px;
-  background: linear-gradient(180deg, rgba(15,23,42,0.02), rgba(15,23,42,0.01));
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: var(--icon-size);
   color: var(--muted);
-  transition: all var(--transition);
-  flex-shrink: 0;
+  transition: color var(--transition), transform var(--transition);
 }
 
 .left-sidebar.collapsed .menu-icon {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  font-size: 22px; /* Íconos más grandes en collapsed para mejor UX */
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
 }
 
-/* Label — Optimizada para legibilidad */
+/* Label */
 .menu-label {
   font-size: var(--label-font-size);
-  font-weight: 500; /* Peso medio para modernidad */
+  font-weight: 500;
   color: var(--text);
-  white-space: nowrap;
-  transition: all var(--transition);
-  flex: 1; /* Ocupa espacio disponible */
 }
 
 .left-sidebar.collapsed .menu-label {
   display: none;
 }
 
-/* Hover — Suave y consistente */
-.menu-item:hover {
-  transform: translateX(4px);
-  background: rgba(12,16,30,0.04);
-  box-shadow: var(--shadow-sm);
-}
-
-.menu-item:hover .menu-icon {
-  transform: scale(1.05);
-  color: var(--accent);
-  background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(6,182,212,0.04));
-}
-
-.left-sidebar.collapsed .menu-item:hover {
-  transform: scale(1.05);
-  background: rgba(12,16,30,0.06);
-}
-
-/* Active indicator — Adaptado para collapsed */
-.menu-item.active::before {
-  content: "";
-  position: absolute;
-  left: 8px; /* Posición interna para no salirse en collapsed */
-  top: 50%;
-  transform: translateY(-50%);
-  height: 24px;
-  width: 3px;
-  border-radius: 2px;
-  background: var(--accent);
-  box-shadow: 0 2px 6px rgba(124,58,237,0.2);
-  transition: all var(--transition);
-}
-
+/* Active */
 .menu-item.active .menu-icon {
   color: var(--accent);
-  background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.08));
-  box-shadow: var(--shadow-sm);
 }
 
 .menu-item.active .menu-label {
-  color: var(--accent);
   font-weight: 600;
+  color: var(--accent);
+}
+
+.menu-item.active::before {
+  content: "";
+  position: absolute;
+  left: -4px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--accent);
+  border-radius: 4px 0 0 4px;
 }
 
 .left-sidebar.collapsed .menu-item.active::before {
   left: 50%;
-  transform: translateX(-50%) translateY(-50%);
-  width: 20px;
-  height: 3px; /* Barra horizontal sutil en collapsed */
+  top: auto;
+  bottom: -4px;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 3px;
 }
 
-/* Tooltip for collapsed icons (pure CSS) — Mejora para hover en íconos */
-.left-sidebar.collapsed .menu-item[data-label]:hover::after {
+/* Tooltip */
+.left-sidebar.collapsed .menu-item:hover::after {
   content: attr(data-label);
-  position: fixed;
-  left: calc(var(--sidebar-collapsed-width) + 12px);
-  top: 50%;
-  transform: translateY(-50%);
+  position: absolute;
+  left: calc(var(--sidebar-collapsed-width) + 8px);
   background: var(--panel-bg);
   color: var(--text);
-  border: 1px solid var(--panel-border);
-  padding: 6px 12px;
+  padding: 4px 8px;
   border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-sm);
+  font-size: 13px;
   white-space: nowrap;
-  z-index: 140;
-  font-size: 12px;
-  font-weight: 500;
-  pointer-events: none;
+  z-index: 50;
 }
 
-/* Footer — Compacto y centrado */
+/* Footer */
 .sidebar-footer {
   margin-top: auto;
-  padding-top: 16px;
-  /* Removed horizontal border line */
-  /* border-top: 1px solid var(--panel-border); */
+  padding: 12px 0 16px;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 8px;
-  align-items: center;
-  padding-bottom: 20px;
+  border-top: 1px solid var(--panel-border);
+  position: sticky;
+  bottom: 0;
+  background: var(--panel-bg);
 }
 
 .footer-links {
   display: flex;
-  gap: 12px;
-  font-size: 12px;
+  gap: 8px;
+  font-size: 13px;
   color: var(--muted);
-  justify-content: center;
-  flex-wrap: wrap;
 }
 
 .footer-links a {
   color: var(--muted);
   text-decoration: none;
-  transition: color var(--transition);
 }
 
 .footer-links a:hover {
   color: var(--accent);
-  text-decoration: underline;
+}
+
+.copyright {
+  font-size: 12px;
+  color: var(--muted);
+  text-align: left;
 }
 
 .left-sidebar.collapsed .sidebar-footer {
   display: none;
 }
 
-/* Scrollbar subtle y responsiva */
-.sidebar-menu::-webkit-scrollbar {
-  width: 6px; /* Más delgada para elegancia */
-}
-
-.sidebar-menu::-webkit-scrollbar-thumb {
-  background: rgba(107, 114, 128, 0.3); /* Usando muted */
-  border-radius: 6px;
-  transition: background var(--transition);
-}
-
-.sidebar-menu::-webkit-scrollbar-thumb:hover {
-  background: rgba(107, 114, 128, 0.5);
-}
-
-/* ===== Responsive — Optimizada para todos los breakpoints ===== */
-
-/* Tablet/Laptop pequeño: Collapsed por default, pero con labels si espacio */
+/* Responsive */
 @media (max-width: 1024px) {
   .left-sidebar {
     width: var(--sidebar-collapsed-width);
-    padding: 24px 12px;
-    gap: 8px;
   }
-  
-  .sidebar-header {
-    display: none;
-  }
-  
-  .sidebar-footer {
-    display: none;
-  }
-  
   .menu-label {
-    display: none; /* Labels ocultos en este breakpoint */
+    display: none;
+  }
+  .sidebar-header, .sidebar-footer {
+    display: none;
   }
 }
 
-/* Mobile: Bottom nav full-width, touch-friendly */
 @media (max-width: 768px) {
   .left-sidebar {
-    position: fixed;
-    bottom: 0;
     top: auto;
+    bottom: 0;
     width: 100%;
-    height: 80px; /* Altura fija para bottom nav */
-    max-height: 80px;
-    border-radius: 20px 20px 0 0;
+    height: 72px;
     flex-direction: row;
-    padding: 12px 20px;
-    gap: 16px; /* Gap mayor para mobile */
-    align-items: center;
-    justify-content: space-around;
-    border-right: none;
+    padding: 8px 16px;
+    gap: 0;
+    justify-content: space-between;
     border-top: 1px solid var(--panel-border);
-    box-shadow: 0 -8px 32px rgba(16,24,40,0.1);
-    transition: none; /* Sin transición para performance en mobile */
-    overflow: visible;
+    border-right: none;
+    box-shadow: 0 -4px 16px rgba(16,24,40,0.08);
+    overflow-x: auto;
   }
   
   .sidebar-menu {
     flex-direction: row;
-    gap: 0;
-    width: 100%;
+    flex: 1;
     justify-content: space-around;
-    padding: 0;
-    margin: 0;
-    flex: none;
     overflow: visible;
   }
   
   .menu-item {
-    padding: 8px;
-    border-radius: var(--radius-sm);
     flex-direction: column;
-    gap: 4px;
-    min-width: var(--mobile-item-width);
-    min-height: 56px; /* Touch target mínimo 44px + padding */
+    gap: 2px;
+    padding: 8px 12px;
+    min-width: 64px;
     justify-content: center;
     align-items: center;
   }
   
-  /* Íconos más grandes en mobile para touch */
   .menu-icon {
-    width: 28px;
-    height: 28px;
-    font-size: 24px; /* Emoji/íconos más prominentes */
+    width: 24px;
+    height: 24px;
+    font-size: 22px;
   }
   
   .menu-label {
-    display: block; /* Muestra labels en mobile bottom nav */
-    font-size: 11px;
-    font-weight: 500;
-    margin-top: 2px;
+    display: block;
+    font-size: 12px;
   }
   
-  .toggle-button,
-  .sidebar-header,
-  .sidebar-footer {
+  .toggle-button, .sidebar-header, .sidebar-footer {
     display: none;
   }
   
-  /* Ajustes específicos para Inicio y Buscar en mobile */
-  .menu-item:nth-child(1),
-  .menu-item:nth-child(2) {
-    margin: 0; /* Sin margins extras en mobile */
+  .menu-item.active::before {
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 3px;
+    top: auto;
   }
 }
 
-/* Extra small mobile: Asegura touch targets */
 @media (max-width: 480px) {
   .left-sidebar {
-    padding: 12px 16px;
-    gap: 12px;
+    padding: 8px;
   }
-  
   .menu-item {
-    min-width: 60px;
-    min-height: 60px;
-  }
-  
-  .menu-icon {
-    width: 32px;
-    height: 32px;
-    font-size: 26px;
+    min-width: 56px;
   }
 }

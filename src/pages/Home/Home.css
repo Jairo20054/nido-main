@@ -1,94 +1,132 @@
-/* src/pages/Home/Home.css */
+/* ===== Home.css ===== */
+/* Mejoras:
+- Centrado perfecto: feed-container con margin: 0 auto y max-width ajustable.
+- Eliminado espacio inicial: padding-top: 0 en main-content, sticky stories ajustado.
+- Responsive: Mejorado para mobile, con paddings adaptativos.
+- Dark mode support.
+- Performance: Usado clamp para sizes, reduced shadows.
+- Footer: No hay footer en home, asumiendo está en sidebar o app global.
+*/
+
 .home-page {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
   background-color: #fafafa;
+  padding: 0; /* Sin padding extra */
+}
+
+@media (prefers-color-scheme: dark) {
+  .home-page {
+    background-color: #1a1a1a;
+  }
 }
 
 .home-main-content {
   flex: 1;
-  margin-left: 245px;
-  padding: 10px 20px 20px 20px; /* Reducido padding superior */
+  margin-left: var(--sidebar-width); /* Ajusta a var del sidebar */
+  padding: 0 24px 24px; /* Reducido top padding */
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  justify-content: flex-start; /* Asegura que el contenido no se empuje hacia abajo */
+  gap: 16px;
 }
 
 .stories-and-search {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
   position: sticky;
-  top: 0;
-  z-index: 10;
-  background: #fafafa;
-  padding: 10px 0;
-  margin-bottom: 10px;
+  top: 60px; /* Ajusta a height de header */
+  z-index: 20;
+  background: inherit;
+  padding: 12px 0;
+  margin: 0;
+  border-bottom: 1px solid #eee; /* Sutil separator */
 }
 
 .search-section {
-  background: white;
+  background: #fff;
   border-radius: 12px;
+  padding: 12px;
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 120px; /* Debajo de stories */
+  z-index: 15;
+}
+
+.mini-profile-menu {
+  position: absolute;
+  top: 60px;
+  right: 24px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
   padding: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  z-index: 30;
 }
 
 .social-feed {
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .feed-container {
-  max-width: 630px;
+  max-width: clamp(320px, 100%, 680px); /* Responsive width */
   margin: 0 auto;
   width: 100%;
 }
 
 .posts-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
 }
 
 .loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 40px;
-  background: white;
+  padding: 32px;
+  background: #fff;
   border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
+  margin: 16px 0;
 }
 
 .loading-text {
-  margin-top: 16px;
-  color: #8e8e8e;
+  margin-top: 12px;
+  color: #666;
   font-size: 14px;
 }
 
 /* Responsive */
-@media (max-width: 1000px) {
+@media (max-width: 1024px) {
   .home-main-content {
-    margin-left: 73px;
-    padding: 10px;
+    margin-left: var(--sidebar-collapsed-width);
+    padding: 0 16px 16px;
   }
 }
 
 @media (max-width: 768px) {
   .home-main-content {
     margin-left: 0;
-    padding: 0;
+    margin-bottom: 72px; /* Espacio para bottom nav */
+    padding: 0 12px 12px;
   }
   
   .stories-and-search {
-    position: static;
-    padding: 10px;
+    position: relative;
+    top: 0;
+    padding: 8px 0;
   }
   
   .search-section {
+    position: relative;
+    top: 0;
     border-radius: 0;
     box-shadow: none;
-    border-bottom: 1px solid #dbdbdb;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .posts-grid {
+    gap: 16px;
   }
 }
