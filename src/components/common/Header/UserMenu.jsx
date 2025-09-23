@@ -1,6 +1,6 @@
 // src/components/UserMenu/UserMenu.jsx
 import React, { useState, useRef, useEffect } from 'react';
-import { useAuthContext } from '../../context/AuthContext';
+import { useAuthContext } from '../../../context/AuthContext';
 import './UserMenu.css';
 
 // Iconos SVG actualizados

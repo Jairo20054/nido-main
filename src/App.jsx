@@ -67,6 +67,10 @@ const Analytics = lazyLoad(() => import('./components/host/HostDashboard/Analyti
 const BecomeHost = lazyLoad(() => import('./pages/BecomeHost/BecomeHost'));
 const ErrorState = lazyLoad(() => import('./components/common/ErrorState/ErrorState'));
 
+// Social Pages
+const Reels = lazyLoad(() => import('./pages/Reels/Reels'));
+const Composer = lazyLoad(() => import('./components/social/Composer'));
+
 // Host components with explicit export names
 const HostCalendar = lazyLoad(() => import('./pages/Host/HostCalendar'), 'HostCalendar');
 const HostFinances = lazyLoad(() => import('./pages/Host/HostFinances'), 'HostFinances');
@@ -90,6 +94,10 @@ function App() {
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="/become-host" element={<BecomeHost />} />
+
+                  {/* Social Routes */}
+                  <Route path="/reels" element={<Reels />} />
+                  <Route path="/post/new" element={<Composer />} />
 
                   {/* User Protected */}
                   <Route element={<PrivateRoute />}>

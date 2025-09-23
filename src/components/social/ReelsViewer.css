@@ -1,0 +1,281 @@
+/* ReelsViewer.css - Reproductor de video vertical tipo TikTok */
+.reels-viewer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  background: #000000;
+  z-index: 999;
+}
+
+.reel-item {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  scroll-snap-align: start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.reel-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #000000;
+}
+
+.reel-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  color: white;
+  pointer-events: none;
+}
+
+.reel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 40px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: all;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #ff3b72;
+}
+
+.username {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.verified-badge {
+  color: #ff3b72;
+  font-size: 12px;
+}
+
+.reel-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin-bottom: 100px;
+  pointer-events: all;
+}
+
+.reel-description {
+  font-size: 16px;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  max-width: 80%;
+}
+
+.hashtags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.hashtag {
+  color: #ff3b72;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.reel-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 80px;
+  pointer-events: all;
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
+.action-btn.liked {
+  color: #ff3b72;
+}
+
+.action-btn.saved {
+  color: #ff3b72;
+}
+
+.action-btn span {
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Animación de doble tap */
+.double-tap-animation {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Botón de mute */
+.mute-button {
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: white;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  pointer-events: all;
+}
+
+.mute-button:hover {
+  background: rgba(0, 0, 0, 0.7);
+  transform: scale(1.1);
+}
+
+/* Loading state */
+.reels-viewer.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reels-viewer-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  color: #6b7280;
+  font-size: 18px;
+}
+
+/* Responsive design */
+@media (min-width: 768px) {
+  .reels-viewer {
+    border-radius: 12px;
+    width: 400px;
+    height: 700px;
+    position: relative;
+    margin: 20px auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  .reel-overlay {
+    padding: 16px;
+  }
+
+  .reel-header {
+    margin-top: 20px;
+  }
+
+  .reel-actions {
+    margin-bottom: 40px;
+  }
+}
+
+/* Modo oscuro (ya es oscuro por defecto) */
+@media (prefers-color-scheme: light) {
+  .reels-viewer {
+    background: #ffffff;
+  }
+
+  .reel-overlay {
+    color: #000000;
+  }
+
+  .action-btn {
+    color: #000000;
+  }
+
+  .mute-button {
+    background: rgba(255, 255, 255, 0.9);
+    color: #000000;
+  }
+}
+
+/* Estados de accesibilidad */
+.reel-item:focus {
+  outline: 2px solid #ff3b72;
+  outline-offset: -2px;
+}
+
+.action-btn:focus-visible {
+  outline: 2px solid #ff3b72;
+  outline-offset: 2px;
+}
+
+.mute-button:focus-visible {
+  outline: 2px solid #ff3b72;
+  outline-offset: 2px;
+}
+
+/* Animaciones de carga */
+.reel-video {
+  transition: opacity 0.3s ease;
+}
+
+.reel-video[loading] {
+  opacity: 0.5;
+}
+
+/* Indicadores de progreso */
+.reel-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ff3b72 0%, transparent 100%);
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.reel-item.active::before {
+  opacity: 1;
+}
