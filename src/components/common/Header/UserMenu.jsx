@@ -1,5 +1,6 @@
 // src/components/UserMenu/UserMenu.jsx
 import React, { useState, useRef, useEffect } from 'react';
+import { useAuthContext } from '../../context/AuthContext';
 import './UserMenu.css';
 
 // Iconos SVG actualizados
@@ -44,12 +45,12 @@ const LogoutIcon = () => (
 const UserMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const { user, logout, loading } = useAuthContext();
 
-  const user = {
-    name: 'Jairo',
-    email: 'jairitovasquez352@gmail.com',
-    plan: 'Gratis'
-  };
+  // Si no hay usuario autenticado, no mostrar el menú
+  if (!user) {
+    return null;
+  }
 
   const menuItems = [
     { id: 1, type: 'email', label: user.email },
@@ -110,10 +111,20 @@ const UserMenu = () => {
                   <button 
                     key={item.id} 
                     className={`menu-item ${item.type === 'email' ? 'email-item' : ''}`}
-                    onClick={() => {
+                    onClick={async () => {
                       if (item.type !== 'email') {
-                        console.log('Clicked:', item.label);
-                        setIsOpen(false);
+                        if (item.label === 'Cerrar sesión') {
+                          try {
+                            await logout();
+                            setIsOpen(false);
+                            window.location.href = '/';
+                          } catch (error) {
+                            console.error('Error al cerrar sesión:', error);
+                          }
+                        } else {
+                          console.log('Clicked:', item.label);
+                          setIsOpen(false);
+                        }
                       }
                     }}
                   >

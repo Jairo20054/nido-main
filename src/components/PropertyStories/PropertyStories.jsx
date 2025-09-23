@@ -35,21 +35,20 @@ const PropertyStories = () => {
       image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXBhcnRtZW50fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
       title: 'Apartamento premium'
     },
-     {
+    {
       id: 5,
-      user: 'Laura Sánchez',
-      avatar: 'https://randomuser.me/api/portraits/women/65.jpg',
-      image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXBhcnRtZW50fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
-      title: 'Apartamento premium'
+      user: 'Ana Gómez',
+      avatar: 'https://randomuser.me/api/portraits/women/66.jpg',
+      image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
+      title: 'Apartamento moderno'
     },
-     {
+    {
       id: 6,
-      user: 'Laura Sánchez',
-      avatar: 'https://randomuser.me/api/portraits/women/65.jpg',
-      image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXBhcnRtZW50fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
-      title: 'Apartamento premium'
+      user: 'Luis Martínez',
+      avatar: 'https://randomuser.me/api/portraits/men/45.jpg',
+      image: 'https://images.unsplash.com/photo-1494526585095-c41746248156?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
+      title: 'Loft céntrico'
     },
-    
     {
       id: 7,
       user: 'Roberto Díaz',

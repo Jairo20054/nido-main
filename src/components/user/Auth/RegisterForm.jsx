@@ -1,209 +1,254 @@
 import React, { useState } from 'react';
+import { useAuthContext } from '../../../context/AuthContext';
+import authService from '../../../services/authService';
 import './RegisterForm.css';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     confirmPassword: ''
   });
 
-  const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
-  // Validación en tiempo real
-  const validateField = (name, value) => {
-    const newErrors = { ...errors };
+  const { register, loading, error, clearError } = useAuthContext();
 
-    switch (name) {
-      case 'name':
-        if (!value.trim()) {
-          newErrors.name = 'El nombre es requerido';
-        } else if (value.trim().length < 2) {
-          newErrors.name = 'El nombre debe tener al menos 2 caracteres';
-        } else {
-          delete newErrors.name;
-        }
-        break;
+  const validateForm = () => {
+    const newErrors = {};
 
-      case 'email':
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!value) {
-          newErrors.email = 'El email es requerido';
-        } else if (!emailRegex.test(value)) {
-          newErrors.email = 'Ingresa un email válido';
-        } else {
-          delete newErrors.email;
-        }
-        break;
+    // Validar nombre
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'El nombre es requerido';
+    } else if (formData.firstName.trim().length < 2) {
+      newErrors.firstName = 'El nombre debe tener al menos 2 caracteres';
+    } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(formData.firstName.trim())) {
+      newErrors.firstName = 'El nombre solo puede contener letras y espacios';
+    }
 
-      case 'password':
-        if (!value) {
-          newErrors.password = 'La contraseña es requerida';
-        } else if (value.length < 8) {
-          newErrors.password = 'Mínimo 8 caracteres';
-        } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
-          newErrors.password = 'Debe incluir mayúscula, minúscula y número';
-        } else {
-          delete newErrors.password;
-        }
-        
-        // Revalidar confirmación si ya tiene valor
-        if (formData.confirmPassword && value !== formData.confirmPassword) {
-          newErrors.confirmPassword = 'Las contraseñas no coinciden';
-        } else if (formData.confirmPassword && value === formData.confirmPassword) {
-          delete newErrors.confirmPassword;
-        }
-        break;
+    // Validar apellido
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'El apellido es requerido';
+    } else if (formData.lastName.trim().length < 2) {
+      newErrors.lastName = 'El apellido debe tener al menos 2 caracteres';
+    } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(formData.lastName.trim())) {
+      newErrors.lastName = 'El apellido solo puede contener letras y espacios';
+    }
 
-      case 'confirmPassword':
-        if (!value) {
-          newErrors.confirmPassword = 'Confirma tu contraseña';
-        } else if (value !== formData.password) {
-          newErrors.confirmPassword = 'Las contraseñas no coinciden';
-        } else {
-          delete newErrors.confirmPassword;
-        }
-        break;
+    // Validar email
+    if (!formData.email) {
+      newErrors.email = 'El email es requerido';
+    } else if (!authService.validateEmail(formData.email)) {
+      newErrors.email = 'El email no es válido';
+    }
 
-      default:
-        break;
+    // Validar contraseña
+    if (!formData.password) {
+      newErrors.password = 'La contraseña es requerida';
+    } else {
+      const passwordValidation = authService.validatePassword(formData.password);
+      if (!passwordValidation.isValid) {
+        newErrors.password = passwordValidation.errors[0];
+      }
+    }
+
+    // Validar confirmación de contraseña
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Debes confirmar tu contraseña';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Las contraseñas no coinciden';
+    }
+
+    // Validar términos y condiciones
+    if (!acceptTerms) {
+      newErrors.terms = 'Debes aceptar los términos y condiciones';
     }
 
     setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
-    // Validar campo después de un pequeño delay
-    setTimeout(() => validateField(name, value), 300);
+
+    // Limpiar errores cuando el usuario empiece a escribir
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validar todos los campos
-    Object.keys(formData).forEach(key => {
-      validateField(key, formData[key]);
-    });
 
-    if (!termsAccepted) {
-      setErrors(prev => ({ ...prev, terms: 'Debes aceptar los términos y condiciones' }));
+    if (!validateForm()) {
       return;
     }
 
-    // Si hay errores, no enviar
-    if (Object.keys(errors).length > 0) {
-      return;
-    }
-
-    setIsLoading(true);
+    // Limpiar errores previos
+    clearError();
 
     try {
-      // Simular llamada a API
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Aquí iría la lógica real de registro
-      console.log('Registrando usuario:', formData);
-      
-      // Resetear formulario en caso de éxito
-      setFormData({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
-      });
-      setTermsAccepted(false);
-      
-      alert('¡Registro exitoso!');
-      
+      const userData = {
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        email: formData.email.toLowerCase().trim(),
+        password: formData.password
+      };
+
+      const result = await register(userData);
+
+      if (result.success) {
+        // Limpiar formulario después del éxito
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          password: '',
+          confirmPassword: ''
+        });
+        setAcceptTerms(false);
+        setErrors({});
+
+        // Redirigir al dashboard o página principal
+        window.location.href = '/dashboard';
+      } else {
+        setErrors({ general: result.error });
+      }
     } catch (error) {
-      setErrors({ submit: 'Error al registrar. Intenta nuevamente.' });
-    } finally {
-      setIsLoading(false);
+      console.error('Error al registrarse:', error);
+      setErrors({ general: 'Error inesperado al registrarse. Inténtalo de nuevo.' });
     }
   };
 
-  const getPasswordStrength = (password) => {
-    if (!password) return { strength: 0, label: '' };
-    
-    let strength = 0;
-    if (password.length >= 8) strength++;
-    if (/[a-z]/.test(password)) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/\d/.test(password)) strength++;
-    if (/[^a-zA-Z\d]/.test(password)) strength++;
-
-    const labels = ['', 'Muy débil', 'Débil', 'Buena', 'Fuerte', 'Muy fuerte'];
-    return { strength, label: labels[strength] };
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
-  const passwordStrength = getPasswordStrength(formData.password);
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
           <h2 className="auth-title">Crear Cuenta</h2>
-          <p className="auth-subtitle">Únete a nuestra plataforma</p>
+          <p className="auth-subtitle">Regístrate para comenzar</p>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="auth-form" noValidate>
-          <div className="form-group">
-            <label htmlFor="name" className="form-label">
-              Nombre Completo *
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className={`form-input ${errors.name ? 'error' : ''}`}
-              placeholder="Ingresa tu nombre completo"
-              required
-              aria-describedby={errors.name ? 'name-error' : undefined}
-            />
-            {errors.name && (
-              <span id="name-error" className="error-message" role="alert">
-                {errors.name}
-              </span>
-            )}
+          {(errors.general || error) && (
+            <div className="error-message general-error">
+              {errors.general || error}
+            </div>
+          )}
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="firstName" className="form-label">
+                Nombre <span className="required">*</span>
+              </label>
+              <div className="input-wrapper">
+                <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  className={`form-input ${errors.firstName ? 'error' : ''}`}
+                  placeholder="Tu nombre"
+                  disabled={loading}
+                  autoComplete="given-name"
+                  aria-describedby={errors.firstName ? 'firstName-error' : undefined}
+                />
+                <span className="input-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                </span>
+              </div>
+              {errors.firstName && (
+                <span id="firstName-error" className="error-message" role="alert">
+                  {errors.firstName}
+                </span>
+              )}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="lastName" className="form-label">
+                Apellido <span className="required">*</span>
+              </label>
+              <div className="input-wrapper">
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  className={`form-input ${errors.lastName ? 'error' : ''}`}
+                  placeholder="Tu apellido"
+                  disabled={loading}
+                  autoComplete="family-name"
+                  aria-describedby={errors.lastName ? 'lastName-error' : undefined}
+                />
+                <span className="input-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                </span>
+              </div>
+              {errors.lastName && (
+                <span id="lastName-error" className="error-message" role="alert">
+                  {errors.lastName}
+                </span>
+              )}
+            </div>
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="email" className="form-label">
-              Email *
+              Email <span className="required">*</span>
             </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className={`form-input ${errors.email ? 'error' : ''}`}
-              placeholder="ejemplo@correo.com"
-              required
-              aria-describedby={errors.email ? 'email-error' : undefined}
-            />
+            <div className="input-wrapper">
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className={`form-input ${errors.email ? 'error' : ''}`}
+                placeholder="ejemplo@correo.com"
+                disabled={loading}
+                autoComplete="email"
+                aria-describedby={errors.email ? 'email-error' : undefined}
+              />
+              <span className="input-icon email-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+              </span>
+            </div>
             {errors.email && (
               <span id="email-error" className="error-message" role="alert">
                 {errors.email}
               </span>
             )}
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="password" className="form-label">
-              Contraseña *
+              Contraseña <span className="required">*</span>
             </label>
-            <div className="password-input-container">
+            <div className="input-wrapper">
               <input
                 type={showPassword ? 'text' : 'password'}
                 id="password"
@@ -211,45 +256,43 @@ const RegisterForm = () => {
                 value={formData.password}
                 onChange={handleChange}
                 className={`form-input ${errors.password ? 'error' : ''}`}
-                placeholder="Mínimo 8 caracteres"
-                required
-                aria-describedby={errors.password ? 'password-error' : 'password-help'}
+                placeholder="Crea una contraseña segura"
+                disabled={loading}
+                autoComplete="new-password"
+                aria-describedby={errors.password ? 'password-error' : undefined}
               />
               <button
                 type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
+                className="input-icon password-toggle"
+                onClick={togglePasswordVisibility}
+                disabled={loading}
                 aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
               >
-                {showPassword ? '👁️' : '👁️‍🗨️'}
+                {showPassword ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                  </svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                )}
               </button>
             </div>
-            
-            {formData.password && (
-              <div className="password-strength">
-                <div className={`strength-bar strength-${passwordStrength.strength}`}>
-                  <div className="strength-fill"></div>
-                </div>
-                <span className="strength-label">{passwordStrength.label}</span>
-              </div>
-            )}
-            
             {errors.password && (
               <span id="password-error" className="error-message" role="alert">
                 {errors.password}
               </span>
             )}
-            
-            <small id="password-help" className="form-help">
-              Incluye mayúscula, minúscula y número
-            </small>
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="confirmPassword" className="form-label">
-              Confirmar Contraseña *
+              Confirmar Contraseña <span className="required">*</span>
             </label>
-            <div className="password-input-container">
+            <div className="input-wrapper">
               <input
                 type={showConfirmPassword ? 'text' : 'password'}
                 id="confirmPassword"
@@ -258,99 +301,73 @@ const RegisterForm = () => {
                 onChange={handleChange}
                 className={`form-input ${errors.confirmPassword ? 'error' : ''}`}
                 placeholder="Repite tu contraseña"
-                required
-                aria-describedby={errors.confirmPassword ? 'confirm-password-error' : undefined}
+                disabled={loading}
+                autoComplete="new-password"
+                aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
               />
               <button
                 type="button"
-                className="password-toggle"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="input-icon password-toggle"
+                onClick={toggleConfirmPasswordVisibility}
+                disabled={loading}
                 aria-label={showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
               >
-                {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+                {showConfirmPassword ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                  </svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                )}
               </button>
             </div>
             {errors.confirmPassword && (
-              <span id="confirm-password-error" className="error-message" role="alert">
+              <span id="confirmPassword-error" className="error-message" role="alert">
                 {errors.confirmPassword}
               </span>
             )}
           </div>
-          
-          <div className="terms-container">
-            <input 
-              type="checkbox" 
-              id="terms" 
-              checked={termsAccepted}
-              onChange={(e) => {
-                setTermsAccepted(e.target.checked);
-                if (e.target.checked) {
-                  setErrors(prev => {
-                    const newErrors = { ...prev };
-                    delete newErrors.terms;
-                    return newErrors;
-                  });
-                }
-              }}
-              className={errors.terms ? 'error' : ''}
-              required 
-            />
-            <label htmlFor="terms" className="terms-label">
-              Acepto los{' '}
-              <a 
-                href="/terminos" 
-                className="terms-link"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Términos y Condiciones
-              </a>
-              {' '}y la{' '}
-              <a 
-                href="/privacidad" 
-                className="terms-link"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Política de Privacidad
-              </a>
+
+          <div className="form-group">
+            <label className="checkbox-container">
+              <input
+                type="checkbox"
+                checked={acceptTerms}
+                onChange={() => setAcceptTerms(!acceptTerms)}
+                disabled={loading}
+              />
+              <span className="checkmark"></span>
+              Acepto los <a href="/terms" target="_blank" rel="noopener noreferrer">términos y condiciones</a> y la <a href="/privacy" target="_blank" rel="noopener noreferrer">política de privacidad</a>
             </label>
+            {errors.terms && (
+              <span className="error-message" role="alert">
+                {errors.terms}
+              </span>
+            )}
           </div>
-          {errors.terms && (
-            <span className="error-message" role="alert">
-              {errors.terms}
-            </span>
-          )}
-          
-          {errors.submit && (
-            <div className="submit-error" role="alert">
-              {errors.submit}
-            </div>
-          )}
-          
-          <button 
-            type="submit" 
-            className="auth-submit-btn"
-            disabled={isLoading || Object.keys(errors).length > 0}
+
+          <button
+            type="submit"
+            className={`auth-submit-btn ${loading ? 'loading' : ''}`}
+            disabled={loading}
           >
-            {isLoading ? (
+            {loading ? (
               <>
-                <span className="loading-spinner"></span>
-                Registrando...
+                <span className="spinner"></span>
+                Creando cuenta...
               </>
             ) : (
-              'Registrarse'
+              'Crear Cuenta'
             )}
           </button>
         </form>
-        
+
         <div className="auth-footer">
-          <p>
-            ¿Ya tienes cuenta?{' '}
-            <a href="/login" className="auth-link">
-              Inicia Sesión
-            </a>
-          </p>
+          <p>¿Ya tienes cuenta? <a href="/login" className="auth-link">Inicia sesión aquí</a></p>
         </div>
       </div>
     </div>

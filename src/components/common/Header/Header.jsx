@@ -26,6 +26,7 @@ import {
   FaCrown
 } from 'react-icons/fa';
 import SearchBar from './SearchBar';
+import UserMenu from './UserMenu';
 import './Header.css';
 
 // Función throttle optimizada
@@ -279,9 +280,19 @@ const Header = () => {
               <GlobeAltIcon className="desktop-header__language-icon" />
             </button>
 
+            {/* Menú de usuario - solo si está autenticado */}
+            {isAuthenticated && <UserMenu />}
 
-
-
+            {/* Botón de login/registro - solo si no está autenticado */}
+            {!isAuthenticated && (
+              <button
+                className="desktop-header__auth-btn"
+                onClick={handleAuthAction}
+                aria-label="Iniciar sesión o registrarse"
+              >
+                <span>Iniciar sesión</span>
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -352,7 +363,10 @@ const Header = () => {
 
             
 
-              {/* Toggle para menú móvil */}
+            {/* Menú de usuario móvil - solo si está autenticado */}
+            {isAuthenticated && <UserMenu />}
+
+            {/* Toggle para menú móvil */}
               <button
                 className="mobile-header__menu-toggle"
                 onClick={toggleMobileMenu}
