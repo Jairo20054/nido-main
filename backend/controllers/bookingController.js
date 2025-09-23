@@ -376,11 +376,214 @@ const deleteBooking = async (req, res) => {
   }
 };
 
+/**
+ * Obtener reservas del usuario autenticado
+ * @param {Object} req - Objeto de solicitud
+ * @param {Object} res - Objeto de respuesta
+ */
+const getUserBookings = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const filter = { userId: req.user.id };
+
+    if (req.query.status) {
+      filter.status = req.query.status;
+    }
+
+    const bookings = await Booking.find(filter)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .populate('propertyId', 'title city price images');
+
+    const total = await Booking.countDocuments(filter);
+
+    res.json({
+      success: true,
+      data: bookings,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    console.error('Error al obtener reservas del usuario:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor'
+    });
+  }
+};
+
+/**
+ * Obtener detalle de una reserva específica
+ * @param {Object} req - Objeto de solicitud
+ * @param {Object} res - Objeto de respuesta
+ */
+const getBookingDetail = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const booking = await Booking.findById(id)
+      .populate('propertyId', 'title city price images host')
+      .populate('userId', 'name email');
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Reserva no encontrada'
+      });
+    }
+
+    // Verificar permisos
+    if (booking.userId._id.toString() !== req.user.id && req.user.role !== 'admin') {
+      const property = await Property.findById(booking.propertyId._id);
+      if (!property || property.host.toString() !== req.user.id) {
+        return res.status(403).json({
+          success: false,
+          message: 'No tienes permiso para ver esta reserva'
+        });
+      }
+    }
+
+    res.json({
+      success: true,
+      data: booking
+    });
+  } catch (error) {
+    console.error('Error al obtener detalle de reserva:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor'
+    });
+  }
+};
+
+/**
+ * Cancelar una reserva
+ * @param {Object} req - Objeto de solicitud
+ * @param {Object} res - Objeto de respuesta
+ */
+const cancelBooking = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const booking = await Booking.findById(id);
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Reserva no encontrada'
+      });
+    }
+
+    // Verificar permisos
+    if (booking.userId.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'No tienes permiso para cancelar esta reserva'
+      });
+    }
+
+    // Verificar que la reserva esté en estado pendiente
+    if (booking.status !== 'pending') {
+      return res.status(400).json({
+        success: false,
+        message: 'Solo se pueden cancelar reservas en estado pendiente'
+      });
+    }
+
+    // Verificar ventana de cancelación (24 horas antes)
+    const checkInDate = new Date(booking.startDate);
+    const now = new Date();
+    const hoursUntilCheckIn = (checkInDate - now) / (1000 * 60 * 60);
+
+    if (hoursUntilCheckIn < 24) {
+      return res.status(400).json({
+        success: false,
+        message: 'No se puede cancelar con menos de 24 horas de anticipación'
+      });
+    }
+
+    booking.status = 'cancelled';
+    await booking.save();
+
+    res.json({
+      success: true,
+      message: 'Reserva cancelada exitosamente'
+    });
+  } catch (error) {
+    console.error('Error al cancelar reserva:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor'
+    });
+  }
+};
+
+/**
+ * Obtener reservas para el dashboard del anfitrión
+ * @param {Object} req - Objeto de solicitud
+ * @param {Object} res - Objeto de respuesta
+ */
+const getHostBookings = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    // Obtener propiedades del anfitrión
+    const properties = await Property.find({ host: req.user.id }).select('_id');
+    const propertyIds = properties.map(p => p._id);
+
+    const filter = { propertyId: { $in: propertyIds } };
+
+    if (req.query.status) {
+      filter.status = req.query.status;
+    }
+
+    const bookings = await Booking.find(filter)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .populate('userId', 'name email')
+      .populate('propertyId', 'title city');
+
+    const total = await Booking.countDocuments(filter);
+
+    res.json({
+      success: true,
+      data: bookings,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    console.error('Error al obtener reservas del anfitrión:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor'
+    });
+  }
+};
+
 module.exports = {
   getAllBookings,
   getBookingById,
   getBookingsByUserId,
+  getUserBookings,
+  getBookingDetail,
   createBooking,
   updateBooking,
-  deleteBooking
+  deleteBooking,
+  cancelBooking,
+  getHostBookings
 };

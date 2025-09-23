@@ -112,7 +112,20 @@ const verifyRole = (roles) => {
   };
 };
 
+/**
+ * Middleware para verificar si el usuario está autenticado
+ * Alias para verifyToken
+ */
+const required = verifyToken;
+
+/**
+ * Middleware para verificar si el usuario es anfitrión
+ */
+const hostOnly = verifyRole(['host', 'admin']);
+
 module.exports = {
   verifyToken,
-  verifyRole
+  verifyRole,
+  required,
+  hostOnly
 };
