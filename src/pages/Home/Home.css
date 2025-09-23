@@ -129,12 +129,101 @@
   cursor: pointer;
 }
 
+/* Botón flotante para crear posts */
+.floating-create-btn {
+  position: fixed;
+  bottom: 80px; /* Por encima de BottomNav */
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  background: #ff3b72;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(255, 59, 114, 0.4);
+  z-index: 1000;
+  transition: all 0.2s ease;
+}
+
+.floating-create-btn:hover {
+  background: #e6355f;
+  transform: scale(1.1);
+  box-shadow: 0 6px 24px rgba(255, 59, 114, 0.5);
+}
+
+.floating-create-btn:active {
+  transform: scale(0.95);
+}
+
+/* Ocultar en desktop ya que BottomNav no está visible */
+@media (min-width: 768px) {
+  .floating-create-btn {
+    display: none;
+  }
+}
+
+/* Mejorar layout social */
+.social-feed {
+  padding: 0 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.posts-grid {
+  gap: 24px;
+}
+
+/* Header social mejorado */
+.home-page {
+  background: #ffffff;
+}
+
+.home-main-content {
+  background: #ffffff;
+  min-height: 100vh;
+}
+
 /* Responsive improvements (tablet & mobile) */
 @media (max-width: 1024px) {
   :root { --sidebar-width: 73px; --content-max: 760px; }
   .stories-and-search { top: 64px; }
+  .social-feed {
+    padding: 0 16px;
+  }
 }
 @media (max-width: 768px) {
   .floating-avatars { display:none; } /* ocultar en mobile para no tapar la UI */
   .feed-container { padding: 0 12px; }
+  .social-feed {
+    padding: 0 12px;
+  }
+  .floating-create-btn {
+    bottom: 90px; /* Más espacio en mobile */
+    right: 16px;
+  }
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .home-page {
+    background: #111827;
+  }
+
+  .home-main-content {
+    background: #111827;
+  }
+
+  .floating-create-btn {
+    background: #ff3b72;
+    box-shadow: 0 4px 20px rgba(255, 59, 114, 0.6);
+  }
+
+  .floating-create-btn:hover {
+    background: #e6355f;
+    box-shadow: 0 6px 24px rgba(255, 59, 114, 0.7);
+  }
 }
