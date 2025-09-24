@@ -2,9 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PostCardEnhanced from '../../components/PostCard/PostCardEnhanced';
 import StoriesBar from '../../components/Stories/StoriesBar';
+import ReelsViewer from '../../components/social/ReelsViewer';
 import BottomNav from '../../components/social/BottomNav';
 import Composer from '../../components/social/Composer';
-import { mockPosts, mockStories } from '../../utils/socialMocks';
+import { mockPosts, mockStories, mockReels } from '../../utils/socialMocks';
 import './Home.css';
 
 const Home = () => {

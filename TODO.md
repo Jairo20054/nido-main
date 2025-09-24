@@ -1,9 +1,9 @@
-# TODO: Fix ESLint Warnings in Header.jsx
+# TODO: Agregar ReelsViewer al Home y Mejorarlo
 
-- [x] Remove unused imports: CalendarDaysIcon, HeartIcon, ClockIcon, HomeModernIcon, MapPinIcon, FaVolumeUp, FaGlobe, FaSun, FaBrain, FaThumbsUp, FaInfoCircle, FaMobileAlt, FaCrown
-- [x] Remove unused state variables: notifications, hasNewNotifications
-- [x] Remove unused user destructuring from useAuth
-- [x] Remove unused handleNotificationClick function
-- [x] Remove the useEffect that sets mock notifications
-- [x] Add eslint-disable-next-line for useCallback exhaustive-deps warning
-- [x] Run ESLint to verify fixes
+## Tareas Pendientes
+- [ ] Importar ReelsViewer y mockReels en Home.jsx
+- [ ] Agregar ReelsViewer al layout del Home después de StoriesBar
+- [ ] Agregar manejadores para interacciones de reels (like, comment, share, save)
+- [ ] Mejorar ReelsViewer: agregar barra de progreso del video
+- [ ] Mejorar ReelsViewer: agregar modal de comentarios
+- [ ] Probar la funcionalidad en el navegador
