@@ -104,7 +104,7 @@ export const mockReels = [
   {
     id: 1,
     user: mockUsers[0],
-    videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     poster: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=700&fit=crop",
     description: "Tour por mi nuevo apartamento en Zona Rosa! 😍",
     hashtags: ["apartamento", "tour", "bogota", "zonarosa"],
@@ -118,7 +118,7 @@ export const mockReels = [
   {
     id: 2,
     user: mockUsers[1],
-    videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
     poster: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&h=700&fit=crop",
     description: "Amanecer desde la terraza de mi casa en Chapinero 🌅",
     hashtags: ["casa", "terraza", "amanecer", "chapinero"],
@@ -132,7 +132,7 @@ export const mockReels = [
   {
     id: 3,
     user: mockUsers[2],
-    videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_3mb.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
     poster: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=700&fit=crop",
     description: "Tips de decoración para espacios pequeños ✨",
     hashtags: ["decoracion", "tips", "pequeños", "usaquen"],

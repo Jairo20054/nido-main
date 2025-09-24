@@ -12,6 +12,8 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
   const videoRefs = useRef({});
   const containerRef = useRef(null);
   const lastTapRef = useRef(0);
+  const playingVideosRef = useRef(new Set());
+  const playTimeoutsRef = useRef({});
 
   // Auto-play cuando el reel está visible
   useEffect(() => {
@@ -19,10 +21,37 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
       (entries) => {
         entries.forEach((entry) => {
           const video = entry.target;
+          const videoId = video.dataset.reelId;
+
           if (entry.isIntersecting) {
-            video.play();
+            // Throttle play calls to prevent rapid toggling
+            if (playTimeoutsRef.current[videoId]) {
+              clearTimeout(playTimeoutsRef.current[videoId]);
+            }
+
+            playTimeoutsRef.current[videoId] = setTimeout(async () => {
+              try {
+                if (!playingVideosRef.current.has(videoId) && video.readyState >= 2) {
+                  await video.play();
+                  playingVideosRef.current.add(videoId);
+                }
+              } catch (error) {
+                console.warn('Video play interrupted or failed:', error);
+              }
+            }, 100);
           } else {
-            video.pause();
+            // Clear any pending play timeout
+            if (playTimeoutsRef.current[videoId]) {
+              clearTimeout(playTimeoutsRef.current[videoId]);
+              delete playTimeoutsRef.current[videoId];
+            }
+
+            try {
+              video.pause();
+              playingVideosRef.current.delete(videoId);
+            } catch (error) {
+              console.warn('Video pause failed:', error);
+            }
           }
         });
       },
@@ -33,7 +62,12 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
       if (video) observer.observe(video);
     });
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      // Clear all timeouts on cleanup
+      Object.values(playTimeoutsRef.current).forEach(timeout => clearTimeout(timeout));
+      playTimeoutsRef.current = {};
+    };
   }, [currentIndex]);
 
   // Manejar scroll vertical u horizontal
@@ -77,7 +111,9 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
   const toggleMute = useCallback(() => {
     setMuted(prev => !prev);
     Object.values(videoRefs.current).forEach((video) => {
-      if (video) video.muted = !muted;
+      if (video) {
+        video.muted = !muted;
+      }
     });
   }, [muted]);
 
@@ -112,10 +148,21 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
               loop
               playsInline
               className="reel-video"
-              onLoadedData={(e) => {
+              data-reel-id={reel.id}
+              onLoadedData={async (e) => {
                 if (index === currentIndex) {
-                  e.target.play();
+                  try {
+                    if (!playingVideosRef.current.has(reel.id) && e.target.readyState >= 2) {
+                      await e.target.play();
+                      playingVideosRef.current.add(reel.id);
+                    }
+                  } catch (error) {
+                    console.warn('Video play failed on load:', error);
+                  }
                 }
+              }}
+              onError={(e) => {
+                console.warn('Video failed to load:', reel.videoUrl, e);
               }}
             />
 
