@@ -3,7 +3,7 @@ import { Heart, MessageCircle, Share, Bookmark, Volume2, VolumeX } from 'lucide-
 import { motion, AnimatePresence } from 'framer-motion';
 import './ReelsViewer.css';
 
-const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave }) => {
+const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizontal = false }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [likedReels, setLikedReels] = useState({});
   const [savedReels, setSavedReels] = useState({});
@@ -36,15 +36,22 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave }) => {
     return () => observer.disconnect();
   }, [currentIndex]);
 
-  // Manejar scroll vertical
+  // Manejar scroll vertical u horizontal
   const handleScroll = useCallback((e) => {
-    const { scrollTop, clientHeight, scrollHeight } = e.target;
-    const newIndex = Math.round(scrollTop / clientHeight);
-
-    if (newIndex !== currentIndex && newIndex >= 0 && newIndex < reels.length) {
-      setCurrentIndex(newIndex);
+    if (horizontal) {
+      const { scrollLeft, clientWidth } = e.target;
+      const newIndex = Math.round(scrollLeft / clientWidth);
+      if (newIndex !== currentIndex && newIndex >= 0 && newIndex < reels.length) {
+        setCurrentIndex(newIndex);
+      }
+    } else {
+      const { scrollTop, clientHeight } = e.target;
+      const newIndex = Math.round(scrollTop / clientHeight);
+      if (newIndex !== currentIndex && newIndex >= 0 && newIndex < reels.length) {
+        setCurrentIndex(newIndex);
+      }
     }
-  }, [currentIndex, reels.length]);
+  }, [currentIndex, reels.length, horizontal]);
 
   // Doble tap para like
   const handleDoubleTap = useCallback((reelId) => {

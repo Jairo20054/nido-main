@@ -35,7 +35,7 @@ const LeftSidebar = ({ onExploreClick, onProfileClick }) => {
     { id: 5, icon: <FaHeart />, label: 'Favoritos', path: '/favorites' },
     { id: 6, icon: <FaHome />, label: 'Mis Propiedades', path: '/host/properties' },
     { id: 7, icon: <FaHardHat />, label: 'Remodelaciones', path: '/remodelations' },
-    { id: 8, icon: <FaVideo />, label: 'Videos', path: '/videos' },
+    { id: 8, icon: <FaVideo />, label: 'Reels', path: '/reels' },
     { id: 9, icon: <FaUser />, label: 'Perfil', path: '/profile' },
   ], []);
 
