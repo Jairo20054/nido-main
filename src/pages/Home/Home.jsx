@@ -15,6 +15,8 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
+  const [likedReels, setLikedReels] = useState({});
+  const [savedReels, setSavedReels] = useState({});
 
   // Load initial posts
   useEffect(() => {
@@ -89,6 +91,24 @@ const Home = () => {
     setIsComposerOpen(false);
   };
 
+  const handleReelLike = (reelId) => {
+    setLikedReels(prev => ({ ...prev, [reelId]: !prev[reelId] }));
+  };
+
+  const handleReelComment = (reelId) => {
+    // Aquí iría la lógica para abrir modal de comentarios
+    console.log('Abrir comentarios para reel:', reelId);
+  };
+
+  const handleReelShare = (reelId) => {
+    // Aquí iría la lógica para compartir
+    console.log('Compartir reel:', reelId);
+  };
+
+  const handleReelSave = (reelId) => {
+    setSavedReels(prev => ({ ...prev, [reelId]: !prev[reelId] }));
+  };
+
   return (
     <motion.div
       className="home-container"
@@ -103,6 +123,22 @@ const Home = () => {
         transition={{ delay: 0.1, duration: 0.5 }}
       >
         <StoriesBar stories={mockStories} />
+      </motion.div>
+
+      {/* Reels Section */}
+      <motion.div
+        className="reels-section"
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+      >
+        <ReelsViewer
+          reels={mockReels}
+          onLike={handleReelLike}
+          onComment={handleReelComment}
+          onShare={handleReelShare}
+          onSave={handleReelSave}
+        />
       </motion.div>
 
       {/* Feed Section */}

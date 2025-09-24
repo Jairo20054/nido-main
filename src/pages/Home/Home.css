@@ -28,6 +28,7 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  animation: fadeInUp 0.5s ease-out;
 }
 
 /* ===== Feed Container ===== */
@@ -237,10 +238,6 @@
   }
 }
 
-.home-container {
-  animation: fadeInUp 0.5s ease-out;
-}
-
 /* ===== ACCESSIBILITY ===== */
 .fab-button:focus {
   outline: 2px solid var(--primary-color);
@@ -250,4 +247,27 @@
 .loading-container:focus-within {
   outline: 2px solid var(--primary-color);
   outline-offset: 2px;
+}
+
+/* ===== Reels Section ===== */
+.reels-section {
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 16px;
+  margin-bottom: 24px;
+}
+
+.reels-section .reels-viewer {
+  position: relative;
+  height: 400px;
+  max-height: 50vh;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.reels-section .reel-item {
+  height: 400px;
+  max-height: 50vh;
 }
