@@ -8,6 +8,7 @@ const compression = require('compression');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
+const passport = require('passport');
 
 const validateEnv = require('./config/validateEnv');
 const config = require('./config');
@@ -17,6 +18,9 @@ const requestLogger = require('./middleware/requestLogger');
 const errorHandler = require('./middleware/errorHandler');
 
 const logger = require('./utils/logger');
+
+// Inicializar Passport con estrategias OAuth
+require('./config/passport');
 
 (async () => {
   // Validate environment and normalize config

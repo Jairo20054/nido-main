@@ -2,104 +2,190 @@ const User = require('../models/User');
 const AuthService = require('../services/authService');
 const { validationResult } = require('express-validator');
 
+// Controlador de autenticación con métodos para registro, login y OAuth
 const authController = {
-  // Registro
+  // Registro de usuario tradicional
   register: async (req, res) => {
     try {
+      // Validar datos de entrada con express-validator
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({
+          error: 'Datos de registro inválidos',
+          detalles: errors.array()
+        });
       }
 
-      const { email, password, firstName, lastName } = req.body;
+      const { name, email, password } = req.body;
 
-      // Check if user exists
+      // Verificar si el usuario ya existe
       const existingUser = await User.findOne({ email });
       if (existingUser) {
-        return res.status(409).json({ message: 'User already exists' });
+        return res.status(409).json({
+          error: 'El email ya está registrado'
+        });
       }
 
-      // Create user
+      // Crear nuevo usuario
       const user = new User({
+        name,
         email,
-        password,
-        firstName,
-        lastName
+        password
       });
 
       await user.save();
 
-      // Generate tokens
-      const tokens = AuthService.generateTokens(user);
+      // Generar token JWT
+      const { token } = AuthService.generateTokens(user);
 
+      // Responder con éxito
       res.status(201).json({
-        message: 'User created successfully',
-        user: {
-          id: user._id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName
-        },
-        tokens
+        mensaje: 'Usuario registrado exitosamente',
+        usuario: user.toPublicData(),
+        token
       });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      console.error('Error en registro:', error);
+      res.status(500).json({
+        error: 'Error interno del servidor durante el registro'
+      });
     }
   },
 
-  // Login
+  // Login tradicional con email y contraseña
   login: async (req, res) => {
     try {
+      // Validar datos de entrada
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({
+          error: 'Datos de login inválidos',
+          detalles: errors.array()
+        });
       }
 
       const { email, password } = req.body;
 
-      // Find user
+      // Buscar usuario por email
       const user = await User.findOne({ email });
       if (!user) {
-        return res.status(401).json({ message: 'Invalid credentials' });
+        return res.status(401).json({
+          error: 'Credenciales inválidas'
+        });
       }
 
-      // Check password
-      const isMatch = await user.comparePassword(password);
-      if (!isMatch) {
-        return res.status(401).json({ message: 'Invalid credentials' });
+      // Verificar contraseña
+      const isValidPassword = await user.comparePassword(password);
+      if (!isValidPassword) {
+        return res.status(401).json({
+          error: 'Credenciales inválidas'
+        });
       }
 
-      // Generate tokens
-      const tokens = AuthService.generateTokens(user);
+      // Generar token JWT
+      const { token } = AuthService.generateTokens(user);
 
+      // Responder con éxito
       res.json({
-        message: 'Login successful',
-        user: {
-          id: user._id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName
-        },
-        tokens
+        mensaje: 'Login exitoso',
+        usuario: user.toPublicData(),
+        token
       });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      console.error('Error en login:', error);
+      res.status(500).json({
+        error: 'Error interno del servidor durante el login'
+      });
     }
   },
 
-  // Refresh token
-  refreshToken: async (req, res) => {
+  // Obtener perfil del usuario autenticado
+  getProfile: async (req, res) => {
     try {
-      const { refreshToken } = req.body;
+      // El usuario ya está disponible en req.user gracias al middleware
+      const user = req.user;
 
-      if (!refreshToken) {
-        return res.status(401).json({ message: 'Refresh token required' });
-      }
-
-      const tokens = await AuthService.refreshAccessToken(refreshToken);
-      res.json(tokens);
+      res.json({
+        mensaje: 'Perfil obtenido exitosamente',
+        usuario: user.toPublicData()
+      });
     } catch (error) {
-      res.status(401).json({ message: error.message });
+      console.error('Error al obtener perfil:', error);
+      res.status(500).json({
+        error: 'Error interno del servidor'
+      });
+    }
+  },
+
+  // Callback de autenticación con Google
+  googleCallback: async (req, res) => {
+    try {
+      // Usuario autenticado por Passport
+      const user = req.user;
+
+      // Generar token JWT
+      const { token } = AuthService.generateTokens(user);
+
+      // Redirigir al frontend con el token
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      res.redirect(`${frontendUrl}/auth/callback?token=${token}&provider=google`);
+    } catch (error) {
+      console.error('Error en callback de Google:', error);
+      res.status(500).json({
+        error: 'Error en autenticación con Google'
+      });
+    }
+  },
+
+  // Callback de autenticación con Facebook
+  facebookCallback: async (req, res) => {
+    try {
+      // Usuario autenticado por Passport
+      const user = req.user;
+
+      // Generar token JWT
+      const { token } = AuthService.generateTokens(user);
+
+      // Redirigir al frontend con el token
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      res.redirect(`${frontendUrl}/auth/callback?token=${token}&provider=facebook`);
+    } catch (error) {
+      console.error('Error en callback de Facebook:', error);
+      res.status(500).json({
+        error: 'Error en autenticación con Facebook'
+      });
+    }
+  },
+
+  // Verificar token (para debugging o validación manual)
+  verifyToken: async (req, res) => {
+    try {
+      // El middleware ya verificó el token, solo confirmar
+      res.json({
+        mensaje: 'Token válido',
+        usuario: req.user.toPublicData()
+      });
+    } catch (error) {
+      console.error('Error al verificar token:', error);
+      res.status(500).json({
+        error: 'Error interno del servidor'
+      });
+    }
+  },
+
+  // Logout (opcional, ya que JWT es stateless)
+  logout: async (req, res) => {
+    try {
+      // En una implementación con refresh tokens, aquí se invalidarían
+      // Por ahora, solo responder con éxito
+      res.json({
+        mensaje: 'Logout exitoso'
+      });
+    } catch (error) {
+      console.error('Error en logout:', error);
+      res.status(500).json({
+        error: 'Error interno del servidor'
+      });
     }
   }
 };

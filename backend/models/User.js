@@ -1,61 +1,55 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+// Esquema del modelo Usuario para autenticación completa
 const userSchema = new mongoose.Schema({
+  // Nombre completo del usuario (requerido)
   name: {
     type: String,
-    required: [true, 'Name is required'],
+    required: [true, 'El nombre es requerido'],
     trim: true
   },
+  // Email único del usuario (requerido)
   email: {
     type: String,
-    required: [true, 'Email is required'],
+    required: [true, 'El email es requerido'],
     unique: true,
     lowercase: true,
     trim: true
   },
+  // Contraseña hasheada (requerida para login tradicional)
   password: {
     type: String,
-    required: [true, 'Password is required'],
+    required: function() {
+      // La contraseña es requerida solo si no hay googleId o facebookId
+      return !this.googleId && !this.facebookId;
+    },
     minlength: 6
   },
-  role: {
-    type: String,
-    enum: ['user', 'host'],
-    default: 'user'
-  },
-  avatar: {
+  // ID de Google para OAuth (opcional)
+  googleId: {
     type: String,
     default: null
   },
-  phone: {
+  // ID de Facebook para OAuth (opcional)
+  facebookId: {
     type: String,
     default: null
   },
-  bio: {
-    type: String,
-    maxlength: 500,
-    default: null
-  },
-  isVerified: {
-    type: Boolean,
-    default: false
-  },
+  // Fecha de creación del usuario
   createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
     type: Date,
     default: Date.now
   }
 });
 
-// Hash password before saving
+// Middleware para hashear la contraseña antes de guardar
 userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
+  // Solo hashear si la contraseña fue modificada y existe
+  if (!this.isModified('password') || !this.password) return next();
   
   try {
+    // Generar salt y hashear la contraseña
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     next();
@@ -64,9 +58,19 @@ userSchema.pre('save', async function(next) {
   }
 });
 
-// Compare password method
+// Método para comparar contraseñas
 userSchema.methods.comparePassword = async function(candidatePassword) {
+  // Verificar que la contraseña del usuario existe
+  if (!this.password) return false;
   return await bcrypt.compare(candidatePassword, this.password);
+};
+
+// Método para obtener datos públicos del usuario (sin contraseña)
+userSchema.methods.toPublicData = function() {
+  const userObject = this.toObject();
+  delete userObject.password;
+  delete userObject.__v;
+  return userObject;
 };
 
 module.exports = mongoose.model('User', userSchema);

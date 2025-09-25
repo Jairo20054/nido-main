@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useAuthContext } from '../../../context/AuthContext';
 import authService from '../../../services/authService';
+import GoogleLoginButton from './GoogleLoginButton';
+import FacebookLoginButton from './FacebookLoginButton';
 import './LoginForm.css';
 
 const LoginForm = () => {
@@ -199,7 +201,18 @@ const LoginForm = () => {
             )}
           </button>
         </form>
-        
+
+        {/* Separador para login social */}
+        <div className="social-login-separator">
+          <span>O continúa con</span>
+        </div>
+
+        {/* Botones de login social */}
+        <div className="social-login-buttons">
+          <GoogleLoginButton />
+          <FacebookLoginButton />
+        </div>
+
         <div className="auth-footer">
           <p>¿No tienes cuenta? <a href="#" className="auth-link">Regístrate aquí</a></p>
         </div>
