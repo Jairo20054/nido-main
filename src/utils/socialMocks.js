@@ -40,9 +40,9 @@ export const mockPosts = [
     id: 1,
     user: mockUsers[0],
     images: [
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=800&h=600&fit=crop"
+      "https://picsum.photos/800/600?random=1",
+      "https://picsum.photos/800/600?random=2",
+      "https://picsum.photos/800/600?random=3"
     ],
     description: "¡Nuevo apartamento en Zona Rosa! 🏠✨ Perfecto para tu estadía en Bogotá. Con todas las comodidades y una vista increíble de la ciudad. ¿Quién se anima a reservar?",
     hashtags: ["apartamento", "bogota", "zonarosa", "alquiler", "viajes"],
@@ -61,8 +61,8 @@ export const mockPosts = [
     id: 2,
     user: mockUsers[1],
     images: [
-      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=800&h=600&fit=crop"
+      "https://picsum.photos/800/600?random=4",
+      "https://picsum.photos/800/600?random=5"
     ],
     description: "Casa moderna en Chapinero con jardín privado 🌳 Ideal para familias o grupos de amigos. Espacios amplios y luminosos con acabados de lujo.",
     hashtags: ["casa", "chapinero", "jardin", "familia", "lujo"],
@@ -81,9 +81,9 @@ export const mockPosts = [
     id: 3,
     user: mockUsers[2],
     images: [
-      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1567767292278-a4f21aa2d36e?w=800&h=600&fit=crop"
+      "https://picsum.photos/800/600?random=6",
+      "https://picsum.photos/800/600?random=7",
+      "https://picsum.photos/800/600?random=8"
     ],
     description: "Estudio minimalista en el corazón de Usaquén 🎨 Perfecto para creativos y profesionales. Ambiente tranquilo y funcional con todo lo necesario.",
     hashtags: ["estudio", "usaquen", "minimalista", "creativos", "profesional"],
@@ -105,7 +105,7 @@ export const mockReels = [
     id: 1,
     user: mockUsers[0],
     videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    poster: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=700&fit=crop",
+    poster: "https://picsum.photos/400/700?random=9",
     description: "Tour por mi nuevo apartamento en Zona Rosa! 😍",
     hashtags: ["apartamento", "tour", "bogota", "zonarosa"],
     likes: 145,
@@ -119,7 +119,7 @@ export const mockReels = [
     id: 2,
     user: mockUsers[1],
     videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-    poster: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&h=700&fit=crop",
+    poster: "https://picsum.photos/400/700?random=10",
     description: "Amanecer desde la terraza de mi casa en Chapinero 🌅",
     hashtags: ["casa", "terraza", "amanecer", "chapinero"],
     likes: 98,
@@ -133,7 +133,7 @@ export const mockReels = [
     id: 3,
     user: mockUsers[2],
     videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-    poster: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=700&fit=crop",
+    poster: "https://picsum.photos/400/700?random=11",
     description: "Tips de decoración para espacios pequeños ✨",
     hashtags: ["decoracion", "tips", "pequeños", "usaquen"],
     likes: 267,
@@ -152,12 +152,12 @@ export const mockStories = [
     media: [
       {
         type: "image",
-        url: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=600&fit=crop",
+        url: "https://picsum.photos/400/600?random=12",
         duration: 5000
       },
       {
         type: "image",
-        url: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=600&fit=crop",
+        url: "https://picsum.photos/400/600?random=13",
         duration: 3000
       }
     ],
@@ -183,7 +183,7 @@ export const mockStories = [
     media: [
       {
         type: "image",
-        url: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=600&fit=crop",
+        url: "https://picsum.photos/400/600?random=14",
         duration: 4000
       }
     ],

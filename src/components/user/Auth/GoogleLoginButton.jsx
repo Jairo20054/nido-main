@@ -1,6 +1,6 @@
 import React from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
-import axios from 'axios';
+import { api } from '../../../services/api';
 import { useAuthContext } from '../../../context/AuthContext';
 import config from '../../../config';
 
@@ -13,11 +13,11 @@ const GoogleLoginButton = () => {
     onSuccess: async (tokenResponse) => {
       try {
         // Enviar el access token de Google al backend para validación
-        const response = await axios.post('http://localhost:5000/api/auth/google/token', {
+        const response = await api.post('/auth/google/token', {
           access_token: tokenResponse.access_token
         });
 
-        const { token, usuario } = response.data;
+        const { token, usuario } = response;
 
         if (token && usuario) {
           // Guardar token en localStorage y actualizar contexto de autenticación

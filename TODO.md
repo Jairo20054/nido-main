@@ -1,21 +1,30 @@
-# TODO: Fix React App Errors
+# TODO: Solucionar Errores en la Aplicación
 
-## High Priority
-- [x] Add GoogleOAuthProvider to src/index.js to fix GoogleLoginButton render error
-- [x] Update GoogleLoginButton.jsx with error handling for missing clientId
-- [x] Start backend server to enable WebSocket connections (ws://localhost:5000/ws)
+## Información Recopilada
+- Errores de carga de imágenes (ERR_CERT_AUTHORITY_INVALID) para URLs de Unsplash en socialMocks.js debido a problemas de certificado en Codespaces.
+- Error de CORS en manifest.json por redirecciones de túnel en Codespaces.
+- Error de renderizado en GoogleLoginButton por llamada fallida a API hardcoded.
+- Fallos de WebSocket a ws://localhost:5000/ws desde webpack-dev-server (HMR mal configurado para puerto 5000).
+- Archivos clave: GoogleLoginButton.jsx, socialMocks.js, public/index.html, api.js.
+- Proyecto: React CRA frontend, backend Node en puerto 5000.
 
-## Medium Priority
-- [x] Fix CORS on manifest.json by updating public/manifest.json and public/_headers
-- [ ] Replace external HTTPS image URLs (Unsplash, Picsum) with local HTTP placeholders in components (Home.jsx, PostCardEnhanced.jsx, socialMocks.js)
-- [ ] Replace external video URLs (sample-videos.com) with local placeholders in ReelsViewer.jsx
+## Plan de Cambios
+- [x] 1. Actualizar GoogleLoginButton.jsx: Usar API configurable en lugar de hardcoded.
+- [x] 2. Reemplazar imágenes en socialMocks.js: Usar URLs directas o placeholders locales.
+2. Crear src/setupProxy.js: Proxy para /api y /ws a localhost:5000.
+3. Configurar .env: REACT_APP_API_URL y PUBLIC_URL.
+4. Actualizar package.json: Script start con --host 0.0.0.0.
+5. Verificar manifest.json: start_url y scope correctos.
 
-## Low Priority
-- [ ] Verify REACT_APP_GOOGLE_CLIENT_ID env var is set in Codespaces
-- [ ] Test login functionality and console errors in browser
-- [ ] Update ErrorBoundary for better error logging if needed
+## Archivos Dependientes
+- src/components/user/Auth/GoogleLoginButton.jsx
+- src/utils/socialMocks.js
+- src/setupProxy.js (nuevo)
+- .env (nuevo o editar)
+- package.json
+- public/manifest.json
 
-## Notes
-- Backend needs to be running for WebSocket and auth endpoints
-- Use `npm run dev` to start both frontend and backend
-- Check console after each fix to confirm errors are resolved
+## Pasos de Seguimiento
+- Reiniciar frontend y backend.
+- Probar carga de app, login Google, páginas sociales.
+- Verificar consola sin errores.
