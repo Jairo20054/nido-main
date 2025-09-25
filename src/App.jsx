@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // Protected Routes
 import PrivateRoute from './components/user/Auth/PrivateRoute';
@@ -9,6 +10,9 @@ import HostRoute from './components/user/Auth/HostRoute';
 import { AuthProvider } from './context/AuthContext';
 import { BookingProvider } from './context/BookingContext';
 import { SearchProvider } from './context/SearchContext';
+
+// Config
+import config from './config';
 
 // Layout & Loading
 import Layout from './components/common/Layout/Layout';
@@ -80,13 +84,14 @@ const HostSettings = lazyLoad(() => import('./pages/Host/HostSettings'), 'HostSe
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <SearchProvider> {/* SearchProvider debe envolver todo el contenido que use useSearch */}
-          <BookingProvider>
-            <Layout>
-              <Suspense fallback={<LoadingSpinner />}>
-                <Routes>
+    <GoogleOAuthProvider clientId={config.auth.googleClientId}>
+      <Router>
+        <AuthProvider>
+          <SearchProvider> {/* SearchProvider debe envolver todo el contenido que use useSearch */}
+            <BookingProvider>
+              <Layout>
+                <Suspense fallback={<LoadingSpinner />}>
+                  <Routes>
                   {/* Public Routes */}
                   <Route path="/" element={<Home />} />
                   <Route path="/search" element={<Search />} />
@@ -144,13 +149,14 @@ function App() {
                       />
                     }
                   />
-                </Routes>
-              </Suspense>
-            </Layout>
-          </BookingProvider>
-        </SearchProvider>
-      </AuthProvider>
-    </Router>
+                  </Routes>
+                </Suspense>
+              </Layout>
+            </BookingProvider>
+          </SearchProvider>
+        </AuthProvider>
+      </Router>
+    </GoogleOAuthProvider>
   );
 }
 

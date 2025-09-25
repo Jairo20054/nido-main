@@ -129,7 +129,7 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
 
   return (
     <div className="reels-viewer" ref={containerRef} onScroll={handleScroll}>
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="popLayout">
         {reels.map((reel, index) => (
           <motion.div
             key={reel.id}

@@ -11,6 +11,7 @@ const config = {
     tokenKey: 'nido_auth_token',
     refreshTokenKey: 'nido_refresh_token',
     tokenExpiry: 24 * 60 * 60 * 1000, // 24 hours
+    googleClientId: process.env.REACT_APP_GOOGLE_CLIENT_ID
   },
 
   // App Features Configuration

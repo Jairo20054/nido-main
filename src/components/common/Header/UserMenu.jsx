@@ -47,6 +47,19 @@ const UserMenu = () => {
   const dropdownRef = useRef(null);
   const { user, logout, loading } = useAuthContext();
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   // Si no hay usuario autenticado, no mostrar el menú
   if (!user) {
     return null;
@@ -61,19 +74,6 @@ const UserMenu = () => {
     { id: 6, type: 'divider' },
     { id: 7, type: 'item', icon: <LogoutIcon />, label: 'Cerrar sesión', checked: false }
   ];
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   return (
     <div className="user-menu" ref={dropdownRef}>
