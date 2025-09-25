@@ -2,10 +2,11 @@ import React from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import { useAuthContext } from '../../../context/AuthContext';
+import config from '../../../config';
 
 // Componente para iniciar sesión con Google OAuth
 const GoogleLoginButton = () => {
-  const { login } = useAuthContext();
+  const hasClientId = config.auth.googleClientId && config.auth.googleClientId.trim() !== '';
 
   // Configurar login con Google usando @react-oauth/google
   const loginGoogle = useGoogleLogin({
