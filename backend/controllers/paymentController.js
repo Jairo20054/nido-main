@@ -2,7 +2,7 @@ const Payment = require('../models/Payment');
 const Booking = require('../models/Booking'); // Asumido para validación de booking
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Joi = require('joi');
-const sanitize = require('mongo-sanitize');
+const { sanitizeInput, sanitizeSearchInput, sanitizeObjectId } = require('../utils/sanitizer');
 
 // Constantes para estandarización (facilita cambios globales y testing)
 const STATUS_CODES = {
@@ -172,7 +172,14 @@ const createPayment = async (req, res) => {
     const { bookingId, amount, paymentMethodId } = value;
 
     // Validar booking existe y pertenece al usuario
-    const booking = await Booking.findById(sanitize(bookingId));
+    const sanitizedBookingId = sanitizeObjectId(bookingId);
+    if (!sanitizedBookingId) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        success: false,
+        message: ERROR_MESSAGES.VALIDATION_ERROR,
+      });
+    }
+    const booking = await Booking.findById(sanitizedBookingId);
     if (!booking) {
       return res.status(STATUS_CODES.NOT_FOUND).json({
         success: false,

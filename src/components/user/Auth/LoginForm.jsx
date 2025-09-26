@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import { useAuthContext } from '../../../context/AuthContext';
+import authService from '../../../services/authService';
+import GoogleLoginButton from './GoogleLoginButton';
+import FacebookLoginButton from './FacebookLoginButton';
 import './LoginForm.css';
 
 const LoginForm = () => {
@@ -6,11 +10,12 @@ const LoginForm = () => {
     email: '',
     password: ''
   });
-  
+
   const [rememberMe, setRememberMe] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+
+  const { login, loading, error, clearError } = useAuthContext();
 
   const validateForm = () => {
     const newErrors = {};
@@ -43,29 +48,31 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
-    setIsLoading(true);
-    
+
+    // Limpiar errores previos
+    clearError();
+
     try {
-      // Simular llamada a API
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Aquí iría tu lógica de autenticación
-      console.log('Datos del formulario:', { ...formData, rememberMe });
-      
-      // Limpiar formulario después del éxito
-      setFormData({ email: '', password: '' });
-      setRememberMe(false);
-      
+      const result = await login(formData.email, formData.password);
+
+      if (result.success) {
+        // Limpiar formulario después del éxito
+        setFormData({ email: '', password: '' });
+        setRememberMe(false);
+        setErrors({});
+
+        // Redirigir al dashboard o página principal
+        window.location.href = '/dashboard';
+      } else {
+        setErrors({ general: result.error });
+      }
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
-      setErrors({ general: 'Error al iniciar sesión. Inténtalo de nuevo.' });
-    } finally {
-      setIsLoading(false);
+      setErrors({ general: 'Error inesperado al iniciar sesión. Inténtalo de nuevo.' });
     }
   };
 
@@ -82,9 +89,9 @@ const LoginForm = () => {
         </div>
         
         <form onSubmit={handleSubmit} className="auth-form" noValidate>
-          {errors.general && (
+          {(errors.general || error) && (
             <div className="error-message general-error">
-              {errors.general}
+              {errors.general || error}
             </div>
           )}
           
@@ -101,7 +108,7 @@ const LoginForm = () => {
                 onChange={handleChange}
                 className={`form-input ${errors.email ? 'error' : ''}`}
                 placeholder="ejemplo@correo.com"
-                disabled={isLoading}
+                disabled={loading}
                 autoComplete="email"
                 aria-describedby={errors.email ? 'email-error' : undefined}
               />
@@ -132,7 +139,7 @@ const LoginForm = () => {
                 onChange={handleChange}
                 className={`form-input ${errors.password ? 'error' : ''}`}
                 placeholder="Ingresa tu contraseña"
-                disabled={isLoading}
+                disabled={loading}
                 autoComplete="current-password"
                 aria-describedby={errors.password ? 'password-error' : undefined}
               />
@@ -140,7 +147,7 @@ const LoginForm = () => {
                 type="button"
                 className="input-icon password-toggle"
                 onClick={togglePasswordVisibility}
-                disabled={isLoading}
+                disabled={loading}
                 aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
               >
                 {showPassword ? (
@@ -169,22 +176,22 @@ const LoginForm = () => {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={() => setRememberMe(!rememberMe)}
-                disabled={isLoading}
+                disabled={loading}
               />
               <span className="checkmark"></span>
               Recordarme
             </label>
-            <button type="button" className="forgot-password" tabIndex={isLoading ? -1 : 0}>
+            <a href="/forgot-password" className="forgot-password" tabIndex={loading ? -1 : 0}>
               ¿Olvidaste tu contraseña?
-            </button>
+            </a>
           </div>
           
-          <button 
-            type="submit" 
-            className={`auth-submit-btn ${isLoading ? 'loading' : ''}`}
-            disabled={isLoading}
+          <button
+            type="submit"
+            className={`auth-submit-btn ${loading ? 'loading' : ''}`}
+            disabled={loading}
           >
-            {isLoading ? (
+            {loading ? (
               <>
                 <span className="spinner"></span>
                 Iniciando sesión...
@@ -194,9 +201,20 @@ const LoginForm = () => {
             )}
           </button>
         </form>
-        
+
+        {/* Separador para login social */}
+        <div className="social-login-separator">
+          <span>O continúa con</span>
+        </div>
+
+        {/* Botones de login social */}
+        <div className="social-login-buttons">
+          <GoogleLoginButton />
+          <FacebookLoginButton />
+        </div>
+
         <div className="auth-footer">
-          <p>¿No tienes cuenta? <button type="button" className="auth-link">Regístrate aquí</button></p>
+          <p>¿No tienes cuenta? <a href="#" className="auth-link">Regístrate aquí</a></p>
         </div>
       </div>
     </div>

@@ -8,7 +8,8 @@
     "dev": "nodemon server.js",
     "test": "jest --runInBand",
     "lint": "eslint . --ext .js",
-    "docker:build": "docker build -t nido-backend ."
+    "docker:build": "docker build -t nido-backend .",
+    "create-collections": "node scripts/createCollections.js"
   },
   "keywords": [
     "node",
@@ -26,12 +27,14 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-rate-limit": "^6.7.0",
+    "express-validator": "^7.2.1",
     "helmet": "^6.0.1",
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.0",
     "mongodb": "^6.19.0",
     "mongoose": "^7.8.7",
     "morgan": "^1.10.0",
+    "validator": "^13.15.15",
     "winston": "^3.9.0"
   },
   "devDependencies": {

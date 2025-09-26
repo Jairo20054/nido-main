@@ -1,243 +1,228 @@
-// src/pages/Home/Home.jsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import LeftSidebar from '../../components/LeftSidebar/LeftSidebar';
-import PropertyStories from '../../components/PropertyStories/PropertyStories';
-import PostCard from '../../components/PostCard/PostCard';
-import LoadingSpinner from '../../components/common/LoadingSpinner/LoadingSpinner';
-import ErrorMessage from '../../components/common/ErrorMessage/ErrorMessage';
-import SearchBar from '../../components/common/Header/SearchBar';
-import UserMenu from '../../components/common/Header/UserMenu';
+import { motion, AnimatePresence } from 'framer-motion';
+import PostCardEnhanced from '../../components/PostCard/PostCardEnhanced';
+import StoriesBar from '../../components/Stories/StoriesBar';
+import ReelsViewer from '../../components/social/ReelsViewer';
+import BottomNav from '../../components/social/BottomNav';
+import Composer from '../../components/social/Composer';
+import { mockPosts, mockStories, mockReels } from '../../utils/socialMocks';
 import './Home.css';
 
-// Datos mock para propiedades destacadas
-const mockFeaturedProperties = [
-  {
-    id: 1,
-    title: "Acabo de renovar mi apartamento en Zona Rosa! 📍",
-    location: "Zona Rosa, Bogotá",
-    price: 150000,
-    rating: 4.8,
-    images: [
-      "https://apartamento-bogota-zona-rosa.bogota-hotels-co.net/data/Photos/OriginalPhoto/1820/182016/182016102.JPEG",
-      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXBhcnRtZW50fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YXBhrtmentfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"
-    ],
-    amenities: ["WiFi", "Cocina", "Accesible"],
-    type: "apartment",
-    user: {
-      name: "Carlos Méndez",
-      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-      verified: true
-    },
-    likes: 245,
-    comments: 32,
-    shares: 12,
-    description: "Después de meses de trabajo, finalmente terminé la renovación de mi apartamento. ¡Estoy encantado con los resultados! Tiene todas las comodidades para una estancia perfecta. #interiordesign #apartamento #bogota",
-    timestamp: "2 horas ago",
-    isFollowing: false
-  },
-
-  {
-    id: 1,
-    title: "Acabo de renovar mi apartamento en Zona Rosa! 📍",
-    location: "Zona Rosa, Bogotá",
-    price: 150000,
-    rating: 4.8,
-    images: [
-      "https://apartamento-bogota-zona-rosa.bogota-hotels-co.net/data/Photos/OriginalPhoto/1820/182016/182016102.JPEG",
-      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXBhcnRtZW50fGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YXBhrtmentfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60"
-    ],
-    amenities: ["WiFi", "Cocina", "Accesible"],
-    type: "apartment",
-    user: {
-      name: "Carlos Méndez",
-      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-      verified: true
-    },
-    likes: 245,
-    comments: 32,
-    shares: 12,
-    description: "Después de meses de trabajo, finalmente terminé la renovación de mi apartamento. ¡Estoy encantado con los resultados! Tiene todas las comodidades para una estancia perfecta. #interiordesign #apartamento #bogota",
-    timestamp: "2 horas ago",
-    isFollowing: false
-  },
-
-  // ... más propiedades (igual que en tu código original)
-];
-
 const Home = () => {
-  const [featuredProperties, setFeaturedProperties] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [currentImageIndexes, setCurrentImageIndexes] = useState({});
-  const [likedPosts, setLikedPosts] = useState({});
-  const [savedPosts, setSavedPosts] = useState({});
-  const [showSearchBar, setShowSearchBar] = useState(false);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const navigate = useNavigate();
+  const [posts, setPosts] = useState([]);
+  const [currentImageIndices, setCurrentImageIndices] = useState({});
+  const [isComposerOpen, setIsComposerOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+  const [likedReels, setLikedReels] = useState({});
+  const [savedReels, setSavedReels] = useState({});
 
-  const fetchFeaturedProperties = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setFeaturedProperties(mockFeaturedProperties);
-
-      // Inicializar índices de imágenes
-      const initialIndexes = {};
-      mockFeaturedProperties.forEach(property => {
-        initialIndexes[property.id] = 0;
-      });
-      setCurrentImageIndexes(initialIndexes);
-    } catch (err) {
-      console.error("Error fetching featured properties:", err);
-      setError("No pudimos cargar las propiedades destacadas. Intenta de nuevo más tarde.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
+  // Load initial posts
   useEffect(() => {
-    fetchFeaturedProperties();
-  }, [fetchFeaturedProperties]);
-
-  const handleExploreClick = useCallback(() => {
-    setShowSearchBar(true);
+    setPosts(mockPosts.slice(0, 10));
+    setPage(1);
   }, []);
 
-  const handleRetry = useCallback(() => {
-    fetchFeaturedProperties();
-  }, [fetchFeaturedProperties]);
+  // Infinite scroll handler
+  const loadMorePosts = useCallback(() => {
+    if (isLoading || !hasMore) return;
 
-  const handleCardClick = useCallback((propertyId) => {
-    navigate(`/property/${propertyId}`);
-  }, [navigate]);
+    setIsLoading(true);
+    setTimeout(() => {
+      const nextPage = page + 1;
+      const newPosts = mockPosts.slice(0, nextPage * 10);
 
-  const handleLike = useCallback((propertyId, e) => {
-    e.stopPropagation();
-    setLikedPosts(prev => ({
-      ...prev,
-      [propertyId]: !prev[propertyId]
-    }));
-  }, []);
-
-  const handleSave = useCallback((propertyId, e) => {
-    e.stopPropagation();
-    setSavedPosts(prev => ({
-      ...prev,
-      [propertyId]: !prev[propertyId]
-    }));
-  }, []);
-
-  const handleFollow = useCallback((propertyId, e) => {
-    e.stopPropagation();
-    setFeaturedProperties(prev => 
-      prev.map(property => 
-        property.id === propertyId 
-          ? { ...property, isFollowing: !property.isFollowing } 
-          : property
-      )
-    );
-  }, []);
-
-  const handleImageChange = useCallback((propertyId, direction) => {
-    setCurrentImageIndexes(prevIndexes => {
-      const currentIndex = prevIndexes[propertyId];
-      const property = featuredProperties.find(p => p.id === propertyId);
-      if (!property) return prevIndexes;
-      
-      let newIndex;
-      if (direction === 'next') {
-        newIndex = (currentIndex + 1) % property.images.length;
-      } else {
-        newIndex = (currentIndex - 1 + property.images.length) % property.images.length;
+      if (newPosts.length >= mockPosts.length) {
+        setHasMore(false);
       }
-      
-      return {
-        ...prevIndexes,
-        [propertyId]: newIndex
-      };
-    });
-  }, [featuredProperties]);
 
-  const toggleProfileMenu = () => {
-    setShowProfileMenu(prev => !prev);
+      setPosts(newPosts);
+      setPage(nextPage);
+      setIsLoading(false);
+    }, 1000);
+  }, [page, isLoading, hasMore]);
+
+  const handleImageChange = (postId, direction) => {
+    setCurrentImageIndices((prev) => {
+      const currentIndex = prev[postId] || 0;
+      const post = posts.find((p) => p.id === postId);
+      if (!post) return prev;
+      const imagesCount = post.images.length;
+      let newIndex = currentIndex;
+      if (direction === 'next') {
+        newIndex = (currentIndex + 1) % imagesCount;
+      } else if (direction === 'prev') {
+        newIndex = (currentIndex - 1 + imagesCount) % imagesCount;
+      }
+      return { ...prev, [postId]: newIndex };
+    });
   };
 
-  if (error) {
-    return (
-      <div className="home-page">
-        <LeftSidebar onProfileClick={toggleProfileMenu} />
-        <div className="home-main-content">
-          <div className="stories-and-search">
-            <PropertyStories />
-          </div>
-          <ErrorMessage 
-            message={error} 
-            onRetry={handleRetry}
-            className="home-error"
-          />
-        </div>
-      </div>
+  const handleLike = (postId) => {
+    setPosts((prev) =>
+      prev.map((post) =>
+        post.id === postId ? { ...post, isLiked: !post.isLiked, likes: post.isLiked ? post.likes - 1 : post.likes + 1 } : post
+      )
     );
-  }
+  };
+
+  const handleSave = (postId) => {
+    setPosts((prev) =>
+      prev.map((post) =>
+        post.id === postId ? { ...post, isSaved: !post.isSaved } : post
+      )
+    );
+  };
+
+  const handleFollow = (postId) => {
+    setPosts((prev) =>
+      prev.map((post) =>
+        post.id === postId ? { ...post, isFollowing: !post.isFollowing } : post
+      )
+    );
+  };
+
+  const openComposer = () => {
+    setIsComposerOpen(true);
+  };
+
+  const closeComposer = () => {
+    setIsComposerOpen(false);
+  };
+
+  const handleReelLike = (reelId) => {
+    setLikedReels(prev => ({ ...prev, [reelId]: !prev[reelId] }));
+  };
+
+  const handleReelComment = (reelId) => {
+    // Aquí iría la lógica para abrir modal de comentarios
+    console.log('Abrir comentarios para reel:', reelId);
+  };
+
+  const handleReelShare = (reelId) => {
+    // Aquí iría la lógica para compartir
+    console.log('Compartir reel:', reelId);
+  };
+
+  const handleReelSave = (reelId) => {
+    setSavedReels(prev => ({ ...prev, [reelId]: !prev[reelId] }));
+  };
 
   return (
-    <div className="home-page">
-      <LeftSidebar onExploreClick={handleExploreClick} onProfileClick={toggleProfileMenu} />
-      
-      <div className="home-main-content">
-        {showSearchBar && (
-          <div className="search-section">
-            <SearchBar onSearch={(params) => {
-              setShowSearchBar(false);
-            }} />
-          </div>
+    <motion.div
+      className="home-container"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* Stories Section */}
+      <motion.div
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.1, duration: 0.5 }}
+      >
+        <StoriesBar stories={mockStories} />
+      </motion.div>
+
+      {/* Reels Section */}
+      <motion.div
+        className="reels-section"
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+      >
+        <ReelsViewer
+          reels={mockReels}
+          onLike={handleReelLike}
+          onComment={handleReelComment}
+          onShare={handleReelShare}
+          onSave={handleReelSave}
+        />
+      </motion.div>
+
+      {/* Feed Section */}
+      <main className="feed-container">
+        <AnimatePresence>
+          {posts.map((post, index) => (
+            <motion.div
+              key={post.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ delay: index * 0.1, duration: 0.5 }}
+            >
+              <PostCardEnhanced
+                property={post}
+                currentImageIndex={currentImageIndices[post.id] || 0}
+                onImageChange={handleImageChange}
+                onLike={handleLike}
+                onSave={handleSave}
+                onFollow={handleFollow}
+              />
+            </motion.div>
+          ))}
+        </AnimatePresence>
+
+        {/* Loading indicator */}
+        {isLoading && (
+          <motion.div
+            className="loading-container"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="loading-spinner"></div>
+            <p className="loading-text">Cargando más publicaciones...</p>
+          </motion.div>
         )}
 
-        <div className="stories-and-search">
-          <PropertyStories />
-        </div>
-
-        {showProfileMenu && (
-          <div className="mini-profile-menu">
-            <UserMenu />
-          </div>
+        {/* End of feed message */}
+        {!hasMore && posts.length > 0 && (
+          <motion.div
+            className="end-feed"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            <p>¡Has visto todas las publicaciones! 🎉</p>
+          </motion.div>
         )}
+      </main>
 
-        <main className="social-feed">
-          <div className="feed-container">
-            <div className="posts-grid">
-              {loading ? (
-                <div className="loading-container">
-                  <LoadingSpinner />
-                  <p className="loading-text">Cargando publicaciones...</p>
-                </div>
-              ) : (
-                featuredProperties.map((property) => (
-                  <PostCard
-                    key={property.id}
-                    property={property}
-                    onClick={handleCardClick}
-                    onLike={handleLike}
-                    onSave={handleSave}
-                    onFollow={handleFollow}
-                    currentImageIndex={currentImageIndexes[property.id] || 0}
-                    onImageChange={handleImageChange}
-                    isLiked={likedPosts[property.id]}
-                    isSaved={savedPosts[property.id]}
-                  />
-                ))
-              )}
-            </div>
-          </div>
-        </main>
-      </div>
-      
-    </div>
+      {/* Floating Action Button */}
+      <motion.button
+        className="fab-button"
+        onClick={openComposer}
+        aria-label="Crear nueva publicación"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: 1, type: "spring", stiffness: 260, damping: 20 }}
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </motion.button>
+
+      {/* Composer Modal */}
+      <AnimatePresence>
+        {isComposerOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Composer onClose={closeComposer} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Bottom Navigation */}
+      <BottomNav />
+    </motion.div>
   );
 };
 

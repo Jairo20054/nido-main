@@ -1,6 +1,6 @@
 
-import { useState, useCallback } from 'react';
 import { toast } from 'react-toastify'; // Opcional: para notificaciones
+import React, { useState, useCallback } from 'react';
 // Configuración de la API
 const API_CONFIG = {
   baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',

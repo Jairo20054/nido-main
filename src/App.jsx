@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // Protected Routes
 import PrivateRoute from './components/user/Auth/PrivateRoute';
@@ -9,6 +10,9 @@ import HostRoute from './components/user/Auth/HostRoute';
 import { AuthProvider } from './context/AuthContext';
 import { BookingProvider } from './context/BookingContext';
 import { SearchProvider } from './context/SearchContext';
+
+// Config
+import config from './config';
 
 // Layout & Loading
 import Layout from './components/common/Layout/Layout';
@@ -67,6 +71,10 @@ const Analytics = lazyLoad(() => import('./components/host/HostDashboard/Analyti
 const BecomeHost = lazyLoad(() => import('./pages/BecomeHost/BecomeHost'));
 const ErrorState = lazyLoad(() => import('./components/common/ErrorState/ErrorState'));
 
+// Social Pages
+const Reels = lazyLoad(() => import('./pages/Reels/Reels'));
+const Composer = lazyLoad(() => import('./components/social/Composer'));
+
 // Host components with explicit export names
 const HostCalendar = lazyLoad(() => import('./pages/Host/HostCalendar'), 'HostCalendar');
 const HostFinances = lazyLoad(() => import('./pages/Host/HostFinances'), 'HostFinances');
@@ -76,13 +84,14 @@ const HostSettings = lazyLoad(() => import('./pages/Host/HostSettings'), 'HostSe
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <SearchProvider> {/* SearchProvider debe envolver todo el contenido que use useSearch */}
-          <BookingProvider>
-            <Layout>
-              <Suspense fallback={<LoadingSpinner />}>
-                <Routes>
+    <GoogleOAuthProvider clientId={config.auth.googleClientId}>
+      <Router>
+        <AuthProvider>
+          <SearchProvider> {/* SearchProvider debe envolver todo el contenido que use useSearch */}
+            <BookingProvider>
+              <Layout>
+                <Suspense fallback={<LoadingSpinner />}>
+                  <Routes>
                   {/* Public Routes */}
                   <Route path="/" element={<Home />} />
                   <Route path="/search" element={<Search />} />
@@ -90,6 +99,10 @@ function App() {
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="/become-host" element={<BecomeHost />} />
+
+                  {/* Social Routes */}
+                  <Route path="/reels" element={<Reels />} />
+                  <Route path="/post/new" element={<Composer />} />
 
                   {/* User Protected */}
                   <Route element={<PrivateRoute />}>
@@ -136,13 +149,14 @@ function App() {
                       />
                     }
                   />
-                </Routes>
-              </Suspense>
-            </Layout>
-          </BookingProvider>
-        </SearchProvider>
-      </AuthProvider>
-    </Router>
+                  </Routes>
+                </Suspense>
+              </Layout>
+            </BookingProvider>
+          </SearchProvider>
+        </AuthProvider>
+      </Router>
+    </GoogleOAuthProvider>
   );
 }
 

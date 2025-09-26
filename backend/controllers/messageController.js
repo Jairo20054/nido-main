@@ -1,6 +1,6 @@
 const Message = require('../models/Message');
 const Joi = require('joi');
-const sanitize = require('mongo-sanitize');
+const { sanitizeInput, sanitizeSearchInput, sanitizeObjectId } = require('../utils/sanitizer');
 
 // Constantes para estandarización
 const STATUS_CODES = {
@@ -42,10 +42,13 @@ const getMessagesByUser = async (req, res) => {
     };
 
     if (receiver) {
-      filter.$or = [
-        { sender: req.user.id, receiver: sanitize(receiver) },
-        { sender: sanitize(receiver), receiver: req.user.id },
-      ];
+      const sanitizedReceiver = sanitizeObjectId(receiver);
+      if (sanitizedReceiver) {
+        filter.$or = [
+          { sender: req.user.id, receiver: sanitizedReceiver },
+          { sender: sanitizedReceiver, receiver: req.user.id },
+        ];
+      }
     }
 
     const [messages, total] = await Promise.all([
@@ -105,7 +108,7 @@ const createMessage = async (req, res) => {
     const messageData = {
       sender: req.user.id, // Desde autenticación
       receiver: value.receiver,
-      content: sanitize(value.content), // Sanitizar para seguridad
+      content: sanitizeInput(value.content), // Sanitizar para seguridad
     };
 
     const message = new Message(messageData);

@@ -1,14 +1,30 @@
-n# TODO: Fix ESLint Errors in React Project
+# TODO: Solucionar Errores en la Aplicación
 
-## Pending Tasks
-- [x] Install dependencies in nido-main/ directory
-- [ ] Fix ESLint errors by editing the files:
-  - [x] nido-main/src/components/user/Auth/LoginForm.jsx: Fix href="#" to buttons or valid links
-  - [x] nido-main/src/components/user/Dashboard/MyBookings.jsx: Add 'mockBookings' to useEffect deps
-  - [x] nido-main/src/hooks/useBooking.js: Add 'bookingData' to useMemo deps for priceBreakdown
-  - [x] nido-main/src/pages/Home/Home.jsx: Add 'mockFeaturedProperties' to useCallback deps
-  - [ ] nido-main/src/pages/Host/Dashboard.jsx: Remove unused activeTab and setActiveTab
-  - [ ] nido-main/src/pages/Search/Search.jsx: Remove unused 'location' or use it
-  - [ ] nido-main/src/pages/User/Dashboard.jsx: Remove unused activeTab and setActiveTab
-  - [ ] nido-main/src/utils/api.js: Remove unused 'React' import
-- [ ] Verify fixes by running npm start or checking ESLint
+## Información Recopilada
+- Errores de carga de imágenes (ERR_CERT_AUTHORITY_INVALID) para URLs de Unsplash en socialMocks.js debido a problemas de certificado en Codespaces.
+- Error de CORS en manifest.json por redirecciones de túnel en Codespaces.
+- Error de renderizado en GoogleLoginButton por llamada fallida a API hardcoded.
+- Fallos de WebSocket a ws://localhost:5000/ws desde webpack-dev-server (HMR mal configurado para puerto 5000).
+- Archivos clave: GoogleLoginButton.jsx, socialMocks.js, public/index.html, api.js.
+- Proyecto: React CRA frontend, backend Node en puerto 5000.
+
+## Plan de Cambios
+- [x] 1. Actualizar GoogleLoginButton.jsx: Usar API configurable en lugar de hardcoded.
+- [x] 2. Reemplazar imágenes en socialMocks.js: Usar URLs directas o placeholders locales.
+2. Crear src/setupProxy.js: Proxy para /api y /ws a localhost:5000.
+3. Configurar .env: REACT_APP_API_URL y PUBLIC_URL.
+4. Actualizar package.json: Script start con --host 0.0.0.0.
+5. Verificar manifest.json: start_url y scope correctos.
+
+## Archivos Dependientes
+- src/components/user/Auth/GoogleLoginButton.jsx
+- src/utils/socialMocks.js
+- src/setupProxy.js (nuevo)
+- .env (nuevo o editar)
+- package.json
+- public/manifest.json
+
+## Pasos de Seguimiento
+- Reiniciar frontend y backend.
+- Probar carga de app, login Google, páginas sociales.
+- Verificar consola sin errores.

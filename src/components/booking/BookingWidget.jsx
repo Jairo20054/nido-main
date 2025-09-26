@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Users, Star, Clock, Shield } from 'lucide-react';
+import { Calendar, Users, Star, Clock, Shield } from 'lucide-react';
 
 // Objeto con valores predeterminados
 const defaultProperty = {

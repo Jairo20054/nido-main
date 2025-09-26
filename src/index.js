@@ -1,8 +1,10 @@
 // src/index.js
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import App from './App';
 import { SearchProvider } from './context/SearchContext';
+import config from './config';
 
 // Importar estilos
 import './assets/styles/variables.css';
@@ -101,9 +103,11 @@ if (!rootElement) {
     const AppWithProviders = () => (
       <React.StrictMode>
         <ErrorBoundary>
-          <SearchProvider>
-            <App />
-          </SearchProvider>
+          <GoogleOAuthProvider clientId={config.auth.googleClientId || ''}>
+            <SearchProvider>
+              <App />
+            </SearchProvider>
+          </GoogleOAuthProvider>
         </ErrorBoundary>
       </React.StrictMode>
     );

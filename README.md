@@ -1,129 +1,216 @@
-# Nido - Plataforma de Alquiler de Viviendas
+# Nido - Sistema de Autenticación Completo
 
-Plataforma completa de alquiler de viviendas con frontend en React y backend en Node.js/Express.
+Aplicación web completa para alquiler de viviendas con sistema de autenticación JWT y OAuth (Google y Facebook).
 
-## Descripción
+## 🚀 Características
 
-Nido es una plataforma de alquiler de viviendas que permite a los usuarios buscar, reservar y gestionar propiedades. Incluye funcionalidades para anfitriones y huéspedes, con un sistema de autenticación seguro y una interfaz intuitiva.
+- **Autenticación tradicional**: Registro y login con email/contraseña
+- **OAuth Social**: Login con Google y Facebook
+- **JWT Tokens**: Autenticación stateless con tokens seguros
+- **Rutas protegidas**: Middleware para proteger endpoints
+- **Frontend moderno**: React con componentes reutilizables
+- **Backend robusto**: Node.js/Express con validaciones
+- **Base de datos**: MongoDB con Mongoose
 
-## Características
+## 📋 Requisitos Previos
 
-### Frontend
-- Interfaz de usuario moderna y responsive con React
-- Navegación intuitiva y experiencia de usuario fluida
-- Sistema de búsqueda y filtrado de propiedades
-- Gestión de reservas y perfiles de usuario
-- Integración con mapas para visualización de ubicaciones
-
-### Backend
-- API RESTful con Node.js y Express
-- Base de datos MongoDB con Mongoose
-- Autenticación JWT segura
-- Encriptación de contraseñas con bcrypt
-- Validación de datos y manejo de errores
-- Logging de solicitudes y respuestas
-
-## Tecnologías
-
-### Frontend
-- React 18
-- React Router para navegación
-- Material-UI y TailwindCSS para estilos
-- React Query para gestión de estado asíncrono
-- Zustand para gestión de estado global
-- Framer Motion para animaciones
-
-### Backend
-- Node.js
-- Express.js
-- MongoDB con Mongoose
-- JWT para autenticación
-- Bcrypt para encriptación de contraseñas
-- Nodemon para desarrollo
-
-## Requisitos
-
-- Node.js >= 14.x
-- MongoDB >= 4.x
+- Node.js (v16 o superior)
+- MongoDB (local o Atlas)
 - npm o yarn
+- Cuentas de desarrollador en Google y Facebook para OAuth
 
-## Instalación
+## 🛠️ Instalación y Configuración
 
-1. Clonar el repositorio:
+### 1. Clonar el repositorio
+
 ```bash
-git clone <repositorio-url>
-cd nido
+git clone <url-del-repositorio>
+cd nido-main
 ```
 
-2. Instalar dependencias del frontend:
+### 2. Instalar dependencias del backend
+
 ```bash
+cd backend
 npm install
 ```
 
-3. Instalar dependencias del backend (ya incluidas en package.json):
+### 3. Instalar dependencias del frontend
+
 ```bash
-# Las dependencias del backend ya están incluidas en el package.json principal
+cd ..
+npm install
 ```
 
-4. Crear archivo `.env` basado en `.env.example`:
+### 4. Configurar variables de entorno
+
+#### Backend (.env)
+Copia el archivo de ejemplo y configura las variables:
+
 ```bash
-cp .env.example .env
+cp backend/.env.example backend/.env
 ```
 
-5. Configurar las variables de entorno en `.env`
+Edita `backend/.env` con tus valores:
 
-## Uso
+```env
+# Base de datos
+MONGODB_URI=mongodb://localhost:27017/nido
 
-### Desarrollo
+# JWT
+JWT_SECRET=tu_clave_secreta_muy_segura_aqui
 
-#### Frontend
+# URLs
+FRONTEND_URL=http://localhost:3000
+
+# Google OAuth (obtén de Google Cloud Console)
+GOOGLE_CLIENT_ID=tu_google_client_id
+GOOGLE_CLIENT_SECRET=tu_google_client_secret
+
+# Facebook OAuth (obtén de Facebook Developers)
+FACEBOOK_APP_ID=tu_facebook_app_id
+FACEBOOK_APP_SECRET=tu_facebook_app_secret
+```
+
+#### Configurar OAuth
+
+**Google OAuth:**
+1. Ve a [Google Cloud Console](https://console.cloud.google.com/)
+2. Crea un proyecto o selecciona uno existente
+3. Habilita Google+ API
+4. Crea credenciales OAuth 2.0
+5. Agrega `http://localhost:5000/api/auth/google/callback` como URI de redirección autorizada
+
+**Facebook OAuth:**
+1. Ve a [Facebook Developers](https://developers.facebook.com/)
+2. Crea una app
+3. Agrega producto "Facebook Login"
+4. Configura OAuth redirect URIs: `http://localhost:5000/api/auth/facebook/callback`
+
+### 5. Iniciar MongoDB
+
+Asegúrate de que MongoDB esté ejecutándose localmente o configura la URI de Atlas.
+
+### 6. Ejecutar la aplicación
+
+#### Opción 1: Ejecutar por separado
+
+Terminal 1 (Backend):
+```bash
+cd backend
+npm run dev
+```
+
+Terminal 2 (Frontend):
 ```bash
 npm start
 ```
 
-#### Backend
+#### Opción 2: Ejecutar simultáneamente
+
 ```bash
-npm run dev:backend
+npm run dev
 ```
 
-### Producción
+## 🔧 Uso
+
+### Endpoints de API
+
+#### Autenticación
+- `POST /api/auth/register` - Registro de usuario
+- `POST /api/auth/login` - Login tradicional
+- `GET /api/auth/google` - Iniciar OAuth Google
+- `GET /api/auth/facebook` - Iniciar OAuth Facebook
+- `GET /api/auth/profile` - Obtener perfil (requiere token)
+- `POST /api/auth/logout` - Logout
+
+#### Rutas protegidas
+Todas las rutas bajo `/api/` requieren autenticación JWT en el header:
+```
+Authorization: Bearer <token>
+```
+
+### Frontend
+
+- **Login**: `/login` - Formulario con botones sociales
+- **Registro**: `/register` - Registro tradicional
+- **Dashboard**: `/dashboard` - Área protegida para usuarios autenticados
+
+## 🧪 Pruebas
+
+### Backend
+```bash
+cd backend
+npm test
+```
+
+### Frontend
+```bash
+npm test
+```
+
+## 📁 Estructura del Proyecto
+
+```
+nido-main/
+├── backend/                 # API REST
+│   ├── controllers/         # Controladores
+│   ├── models/             # Modelos de MongoDB
+│   ├── routes/             # Definición de rutas
+│   ├── services/           # Servicios de negocio
+│   ├── middleware/         # Middlewares personalizados
+│   ├── config/             # Configuración
+│   └── server.js           # Punto de entrada
+├── src/                    # Frontend React
+│   ├── components/         # Componentes reutilizables
+│   ├── pages/             # Páginas de la aplicación
+│   ├── context/           # Context API
+│   ├── services/          # Servicios del frontend
+│   └── utils/             # Utilidades
+├── public/                 # Archivos estáticos
+└── package.json           # Dependencias del frontend
+```
+
+## 🔒 Seguridad
+
+- **Hashing de contraseñas**: bcryptjs
+- **JWT tokens**: Expiración de 24 horas
+- **Rate limiting**: Protección contra ataques de fuerza bruta
+- **Validación de entrada**: express-validator
+- **CORS**: Configurado para orígenes específicos
+- **Helmet**: Headers de seguridad HTTP
+
+## 🚀 Despliegue
+
+### Backend
+```bash
+cd backend
+npm run build
+npm start
+```
+
+### Frontend
 ```bash
 npm run build
+# Servir con nginx/apache o servicio de hosting
 ```
 
-## Estructura del Proyecto
+## 🤝 Contribución
 
-```
-nido/
-├── config/          # Configuración de la aplicación
-├── controllers/      # Controladores de las rutas
-├── middleware/       # Middleware personalizado
-├── models/          # Modelos de la base de datos
-├── public/          # Archivos estáticos del frontend
-├── routes/          # Definición de rutas
-├── src/             # Código fuente del frontend
-│   ├── components/  # Componentes de React
-│   ├── pages/       # Páginas de la aplicación
-│   ├── context/     # Contextos de React
-│   ├── hooks/       # Hooks personalizados
-│   ├── services/    # Servicios y llamadas a la API
-│   ├── utils/       # Funciones auxiliares
-│   └── assets/      # Recursos estáticos
-├── utils/           # Funciones auxiliares del backend
-├── server.js        # Punto de entrada del backend
-├── .env.example     # Ejemplo de variables de entorno
-├── .gitignore       # Archivos ignorados por git
-├── package.json     # Dependencias y scripts
-└── README.md        # Documentación
-```
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit tus cambios (`git commit -am 'Agrega nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Abre un Pull Request
 
-## Contribuir
+## 📝 Licencia
 
-1. Crear una rama para la nueva funcionalidad (`git checkout -b feature/nueva-funcionalidad`)
-2. Hacer commit de los cambios (`git commit -am 'Agregar nueva funcionalidad'`)
-3. Hacer push a la rama (`git push origin feature/nueva-funcionalidad`)
-4. Crear un nuevo Pull Request
+Este proyecto está bajo la Licencia MIT.
 
-## Licencia
+## 📞 Soporte
 
-MIT
+Para soporte técnico o preguntas, por favor abre un issue en el repositorio.
+
+---
+
+¡Gracias por usar Nido! 🏠✨

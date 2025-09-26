@@ -14,6 +14,7 @@ import {
 import './Dashboard.css';
 
 const Dashboard = () => {
+  const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({});
   const [properties, setProperties] = useState([]);

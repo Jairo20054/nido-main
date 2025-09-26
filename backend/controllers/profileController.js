@@ -4,7 +4,7 @@ const Property = require('../models/Property');
 const Booking = require('../models/Booking');
 const Joi = require('joi');
 const mongoose = require('mongoose');
-const sanitize = require('mongo-sanitize');
+const { sanitizeInput, sanitizeSearchInput, sanitizeObjectId } = require('../utils/sanitizer');
 
 // Logger centralizado con fallback
 let logger;
@@ -54,13 +54,13 @@ const profileUpdateSchema = Joi.object({
 const IMMUTABLE_FIELDS = ['_id', 'id', 'email', 'password', 'role', 'createdAt', 'updatedAt'];
 
 // Sanitizar input y quitar campos inmutables
-const sanitizeInput = (input) => {
+const sanitizeUserInput = (input) => {
   const sanitized = {};
   Object.entries(input).forEach(([key, value]) => {
     if (IMMUTABLE_FIELDS.includes(key)) return;
     sanitized[key] = typeof value === 'string'
-      ? sanitize(value.trim())
-      : sanitize(value);
+      ? sanitizeInput(value.trim())
+      : sanitizeInput(value);
   });
   return sanitized;
 };
@@ -147,7 +147,7 @@ const updateProfile = asyncHandler(async (req, res) => {
   }
 
   // Sanitizar datos
-  const safeUpdate = sanitizeInput(value);
+  const safeUpdate = sanitizeUserInput(value);
 
   if (Object.keys(safeUpdate).length === 0) {
     return res.status(HTTP_STATUS.BAD_REQUEST).json({

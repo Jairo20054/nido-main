@@ -1,7 +1,7 @@
 const Property = require('../models/Property');
 const User = require('../models/User');
 const Joi = require('joi'); // Para validación
-const sanitize = require('mongo-sanitize'); // Para sanitizar entradas
+const { sanitizeInput, sanitizeSearchInput, sanitizeObjectId } = require('../utils/sanitizer'); // Para sanitizar entradas
 
 // Constantes para mensajes y códigos de estado
 const STATUS_CODES = {
@@ -46,7 +46,7 @@ const buildPropertyFilter = (query) => {
 
   // Sanitizar y filtrar por ciudad
   if (query.location) {
-    filter.city = { $regex: sanitize(query.location), $options: 'i' };
+    filter.city = { $regex: sanitizeSearchInput(query.location), $options: 'i' };
   }
 
   // Filtro geoespacial
@@ -68,7 +68,7 @@ const buildPropertyFilter = (query) => {
 
   // Filtro de tipo de propiedad
   if (query.propertyType) {
-    filter.propertyType = sanitize(query.propertyType);
+    filter.propertyType = sanitizeSearchInput(query.propertyType);
   }
 
   return filter;

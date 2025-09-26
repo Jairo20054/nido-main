@@ -8,12 +8,14 @@
     "@emotion/styled": "^11.14.1",
     "@heroicons/react": "^2.2.0",
     "@mui/material": "^7.2.0",
+    "@react-oauth/google": "^0.12.2",
     "@reduxjs/toolkit": "^2.8.2",
     "@tanstack/react-query": "^5.81.5",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/user-event": "^13.5.0",
     "aos": "^2.3.4",
+    "axios": "^1.12.2",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
     "cors": "^2.8.5",
@@ -29,6 +31,7 @@
     "react": "^19.1.0",
     "react-datepicker": "^8.4.0",
     "react-dom": "^19.1.0",
+    "react-facebook-login": "^4.1.1",
     "react-hook-form": "^7.59.0",
     "react-icons": "^5.5.0",
     "react-redux": "^9.2.0",
@@ -40,13 +43,13 @@
     "zustand": "^5.0.6"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "DANGEROUSLY_DISABLE_HOST_CHECK=true react-scripts start --host 0.0.0.0",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "start:backend": "node backend/src/server.js",
     "dev:backend": "nodemon backend/src/server.js",
-    "dev": "concurrently \"DANGEROUSLY_DISABLE_HOST_CHECK=true npm start\" \"npm run dev:backend\""
+    "dev": "concurrently \"DANGEROUSLY_DISABLE_HOST_CHECK=true npm start --host 0.0.0.0\" \"npm run dev:backend\""
   },
   "eslintConfig": {
     "extends": [

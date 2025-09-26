@@ -8,6 +8,9 @@ const compression = require('compression');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
+const passport = require('passport');
+const http = require('http');
+const socketIo = require('socket.io');
 
 const validateEnv = require('./config/validateEnv');
 const config = require('./config');
@@ -18,11 +21,22 @@ const errorHandler = require('./middleware/errorHandler');
 
 const logger = require('./utils/logger');
 
+// Inicializar Passport con estrategias OAuth
+require('./config/passport');
+
 (async () => {
   // Validate environment and normalize config
   const env = validateEnv();
 
   const app = express();
+  const server = http.createServer(app);
+  const io = socketIo(server, {
+    cors: {
+      origin: env.CORS_ORIGINS,
+      methods: ['GET', 'POST'],
+      credentials: true
+    }
+  });
 
   // Connect to DB (await to fail fast if cannot connect)
   try {
@@ -85,8 +99,19 @@ const logger = require('./utils/logger');
   // Error handler (last middleware)
   app.use(errorHandler);
 
+  // Socket.io connection handling
+  io.on('connection', (socket) => {
+    console.log('A user connected:', socket.id);
+
+    socket.on('disconnect', () => {
+      console.log('User disconnected:', socket.id);
+    });
+
+    // Add more socket event handlers here as needed
+  });
+
   // Graceful shutdown
-  const server = app.listen(env.PORT, env.HOST, () => {
+  server.listen(env.PORT, env.HOST, () => {
     logger.info('=== SERVIDOR BACKEND NIDO ===', {
       host: env.HOST,
       port: env.PORT,
@@ -100,6 +125,7 @@ const logger = require('./utils/logger');
   const shutdown = async (signal) => {
     try {
       logger.info(`Received ${signal}. Graceful shutdown start`);
+      io.close(() => logger.info('Socket.io server closed'));
       server.close(() => logger.info('HTTP server closed'));
       await db.disconnect();
       logger.info('Database disconnected');

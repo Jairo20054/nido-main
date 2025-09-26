@@ -1,31 +1,17 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
-import { 
-  HomeIcon, 
-  CalendarDaysIcon,
-  HeartIcon,
+import {
+  HomeIcon,
   BellIcon,
-  ClockIcon,
-  HomeModernIcon,
   SparklesIcon,
   MagnifyingGlassIcon,
   Bars3Icon,
   XMarkIcon,
-  GlobeAltIcon,
-  MapPinIcon
+  GlobeAltIcon
 } from '@heroicons/react/24/outline';
-import { 
-  FaVolumeUp,
-  FaGlobe,
-  FaSun,
-  FaBrain,
-  FaThumbsUp,
-  FaInfoCircle,
-  FaMobileAlt,
-  FaCrown
-} from 'react-icons/fa';
 import SearchBar from './SearchBar';
+import UserMenu from './UserMenu';
 import './Header.css';
 
 // Función throttle optimizada
@@ -53,14 +39,12 @@ function throttle(func, limit) {
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [notifications, setNotifications] = useState([]);
-  const [hasNewNotifications, setHasNewNotifications] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [showMobileHeader, setShowMobileHeader] = useState(true);
   const headerRef = useRef(null);
 
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -80,7 +64,7 @@ const Header = () => {
         shortLabel: "Experiencias",
         path: "/search?type=experience",
         icon: SparklesIcon,
-        hasNovedad: true,
+        hasNovedad: false,
       },
       {
         id: "services",
@@ -96,6 +80,7 @@ const Header = () => {
 
 
   // Manejo del scroll para ocultar/mostrar header móvil y efecto de reducción
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleScroll = useCallback(
     throttle(() => {
       const currentScrollY = window.scrollY;
@@ -150,18 +135,6 @@ const Header = () => {
     };
   }, [isMobileMenuOpen]);
 
-  // Notificaciones simuladas
-  useEffect(() => {
-    if (isAuthenticated) {
-      const mockNotifications = [
-        { id: 1, message: "Nueva reserva confirmada", unread: true },
-        { id: 2, message: "Mensaje del anfitrión", unread: true },
-      ];
-      setNotifications(mockNotifications);
-      setHasNewNotifications(mockNotifications.some((n) => n.unread));
-    }
-  }, [isAuthenticated]);
-
   const handleAuthAction = useCallback(() => {
     navigate(isAuthenticated ? "/dashboard" : "/login");
   }, [isAuthenticated, navigate]);
@@ -173,11 +146,6 @@ const Header = () => {
   const closeMobileMenu = useCallback(() => {
     setIsMobileMenuOpen(false);
   }, []);
-
-  const handleNotificationClick = useCallback(() => {
-    navigate("/notifications");
-    setHasNewNotifications(false);
-  }, [navigate]);
 
   const toggleSearchExpanded = useCallback(() => {
     setIsSearchExpanded(prev => !prev);
@@ -279,9 +247,19 @@ const Header = () => {
               <GlobeAltIcon className="desktop-header__language-icon" />
             </button>
 
+            {/* Menú de usuario - solo si está autenticado */}
+            {isAuthenticated && <UserMenu />}
 
-
-
+            {/* Botón de login/registro - solo si no está autenticado */}
+            {!isAuthenticated && (
+              <button
+                className="desktop-header__auth-btn"
+                onClick={handleAuthAction}
+                aria-label="Iniciar sesión o registrarse"
+              >
+                <span>Iniciar sesión</span>
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -352,7 +330,10 @@ const Header = () => {
 
             
 
-              {/* Toggle para menú móvil */}
+            {/* Menú de usuario móvil - solo si está autenticado */}
+            {isAuthenticated && <UserMenu />}
+
+            {/* Toggle para menú móvil */}
               <button
                 className="mobile-header__menu-toggle"
                 onClick={toggleMobileMenu}
