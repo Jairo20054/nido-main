@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, MessageCircle, Share, Bookmark, MoreHorizontal } from 'lucide-react';
+import { MessageCircle, Share, MoreHorizontal } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './PostCard.css';
 

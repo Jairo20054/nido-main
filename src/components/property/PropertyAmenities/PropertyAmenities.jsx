@@ -19,7 +19,6 @@ const PropertyAmenities = ({ amenities }) => {
   const column1 = amenities.slice(0, half);
   const column2 = amenities.slice(half);
   
-  const visibleAmenities = showAll ? amenities : amenities.slice(0, 10);
   const showToggle = amenities.length > 10;
 
   return (
