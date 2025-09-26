@@ -186,11 +186,7 @@ const PostCardEnhanced = ({
             whileTap={{ scale: 0.9 }}
             animate={isLiked ? { scale: [1, 1.2, 1] } : { scale: 1 }}
           >
-            <Heart
-              size={24}
-              fill={isLiked ? "#ed4956" : "none"}
-              stroke={isLiked ? "#ed4956" : "currentColor"}
-            />
+            {isLiked ? '❤️' : '🤍'}
           </motion.button>
 
           <motion.button
@@ -199,7 +195,7 @@ const PostCardEnhanced = ({
             aria-label="Comentar"
             whileTap={{ scale: 0.9 }}
           >
-            <MessageCircle size={24} />
+            💬
           </motion.button>
 
           <motion.button
@@ -208,7 +204,7 @@ const PostCardEnhanced = ({
             aria-label="Compartir"
             whileTap={{ scale: 0.9 }}
           >
-            <Share size={24} />
+            🔗
           </motion.button>
         </div>
 
@@ -219,11 +215,7 @@ const PostCardEnhanced = ({
           whileTap={{ scale: 0.9 }}
           animate={isSaved ? { rotate: [0, 10, -10, 0] } : { rotate: 0 }}
         >
-          <Bookmark
-            size={24}
-            fill={isSaved ? "currentColor" : "none"}
-            stroke="currentColor"
-          />
+          {isSaved ? '🔖' : '🔖'}
         </motion.button>
       </div>
 

@@ -1,10 +1,17 @@
 /* src/components/PostCard/PostCard.css */
 .post-card {
-  background: white;
-  border-radius: 12px;
+  background: #ffffff;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #f1f5f9;
+}
+
+.post-card:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
 }
 
 .post-header {
@@ -74,7 +81,7 @@
 .post-image {
   position: relative;
   width: 100%;
-  height: 400px;
+  height: 500px;
   overflow: hidden;
 }
 
@@ -146,23 +153,46 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0;
+  padding: 8px;
+  font-size: 24px;
+  transition: transform 0.2s ease;
 }
 
-.action-button.liked svg {
-  color: #ed4956;
+.action-button:hover {
+  transform: scale(1.1);
+}
+
+.action-button.liked {
+  animation: heartPulse 0.6s ease;
+}
+
+@keyframes heartPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }
 
 .save-button {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0;
+  padding: 8px;
+  font-size: 24px;
+  transition: transform 0.2s ease;
 }
 
-.save-button.saved svg {
-  color: #262626;
-  fill: #262626;
+.save-button:hover {
+  transform: scale(1.1);
+}
+
+.save-button.saved {
+  animation: bookmarkPulse 0.6s ease;
+}
+
+@keyframes bookmarkPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }
 
 .post-stats {
@@ -223,22 +253,28 @@
 }
 
 .reserve-button {
-  background: #0095f6;
+  background: linear-gradient(135deg, #ff3b72 0%, #ff6b9d 100%);
   color: white;
   border: none;
-  border-radius: 6px;
-  padding: 8px 16px;
+  border-radius: 8px;
+  padding: 10px 20px;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   margin-bottom: 8px;
+  box-shadow: 0 2px 8px rgba(255, 59, 114, 0.3);
 }
 
 .reserve-button:hover {
-  background: #0080d4;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #e63366 0%, #ff5c91 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(255, 59, 114, 0.4);
+}
+
+.reserve-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(255, 59, 114, 0.3);
 }
 
 .post-time {
@@ -276,14 +312,27 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .post-image {
-    height: 300px;
+  .post-card {
+    border-radius: 12px;
+    margin-bottom: 16px;
   }
-  
+
+  .post-image {
+    height: 350px;
+  }
+
   .post-header,
   .post-actions,
   .post-stats,
   .add-comment {
     padding: 12px;
+  }
+
+  .action-button {
+    font-size: 20px;
+  }
+
+  .save-button {
+    font-size: 20px;
   }
 }
