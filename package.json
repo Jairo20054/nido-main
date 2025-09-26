@@ -8,7 +8,6 @@
     "@emotion/styled": "^11.14.1",
     "@heroicons/react": "^2.2.0",
     "@mui/material": "^7.2.0",
-    "@react-oauth/google": "^0.12.2",
     "@reduxjs/toolkit": "^2.8.2",
     "@tanstack/react-query": "^5.81.5",
     "@testing-library/dom": "^10.4.0",
@@ -43,13 +42,13 @@
     "zustand": "^5.0.6"
   },
   "scripts": {
-    "start": "DANGEROUSLY_DISABLE_HOST_CHECK=true react-scripts start --host 0.0.0.0",
+    "start": "cross-env DANGEROUSLY_DISABLE_HOST_CHECK=true react-scripts start --host 0.0.0.0",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "start:backend": "node backend/src/server.js",
     "dev:backend": "nodemon backend/src/server.js",
-    "dev": "concurrently \"DANGEROUSLY_DISABLE_HOST_CHECK=true npm start --host 0.0.0.0\" \"npm run dev:backend\""
+    "dev": "concurrently \"cross-env DANGEROUSLY_DISABLE_HOST_CHECK=true react-scripts start --host 0.0.0.0\" \"npm run dev:backend\""
   },
   "eslintConfig": {
     "extends": [
@@ -72,6 +71,7 @@
   "devDependencies": {
     "@testing-library/react": "^16.3.0",
     "concurrently": "^8.2.2",
+    "cross-env": "^10.0.0",
     "jest": "^27.5.1",
     "nodemon": "^2.0.22"
   }

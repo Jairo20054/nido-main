@@ -1,7 +1,6 @@
 // src/index.js
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { GoogleOAuthProvider } from '@react-oauth/google';
 import App from './App';
 import { SearchProvider } from './context/SearchContext';
 import config from './config';
@@ -103,11 +102,9 @@ if (!rootElement) {
     const AppWithProviders = () => (
       <React.StrictMode>
         <ErrorBoundary>
-          <GoogleOAuthProvider clientId={config.auth.googleClientId || ''}>
-            <SearchProvider>
-              <App />
-            </SearchProvider>
-          </GoogleOAuthProvider>
+          <SearchProvider>
+            <App />
+          </SearchProvider>
         </ErrorBoundary>
       </React.StrictMode>
     );

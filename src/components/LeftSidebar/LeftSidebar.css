@@ -21,22 +21,24 @@
 /* ===== Container Principal ===== */
 .left-sidebar {
   position: fixed;
-  top: 0;
+  top: 5rem;
   left: 0;
   width: var(--sidebar-width);
-  height: 100vh;
+  height: calc(100vh - 5rem);
   background: var(--background-color);
   border-right: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
-  transition: width var(--transition-duration) var(--transition-easing);
+  transition: all var(--transition-duration) var(--transition-easing);
   z-index: 1000;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  transform: translateX(0);
 }
 
 .left-sidebar.collapsed {
   width: var(--sidebar-collapsed-width);
+  transform: translateX(calc(-1 * (var(--sidebar-width) - var(--sidebar-collapsed-width))));
 }
 
 /* ===== Botón de Toggle - CORREGIDO ===== */

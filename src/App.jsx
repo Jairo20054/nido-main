@@ -1,6 +1,5 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // Protected Routes
 import PrivateRoute from './components/user/Auth/PrivateRoute';
@@ -84,8 +83,7 @@ const HostSettings = lazyLoad(() => import('./pages/Host/HostSettings'), 'HostSe
 
 function App() {
   return (
-    <GoogleOAuthProvider clientId={config.auth.googleClientId}>
-      <Router>
+    <Router>
         <AuthProvider>
           <SearchProvider> {/* SearchProvider debe envolver todo el contenido que use useSearch */}
             <BookingProvider>
@@ -156,7 +154,6 @@ function App() {
           </SearchProvider>
         </AuthProvider>
       </Router>
-    </GoogleOAuthProvider>
   );
 }
 

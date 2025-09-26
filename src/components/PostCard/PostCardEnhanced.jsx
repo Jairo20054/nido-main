@@ -264,6 +264,18 @@ const PostCardEnhanced = ({
           <span className="night">/noche</span>
         </div>
 
+        <button
+          className="reserve-button"
+          onClick={(e) => {
+            e.stopPropagation();
+            // Aquí iría la lógica de reserva
+            console.log('Reservar propiedad:', property.id);
+          }}
+          aria-label="Reservar propiedad"
+        >
+          Reservar
+        </button>
+
         <time className="post-time" dateTime={property.timestamp}>
           {property.timestamp}
         </time>

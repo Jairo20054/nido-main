@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuthContext } from '../../../context/AuthContext';
 import authService from '../../../services/authService';
-import GoogleLoginButton from './GoogleLoginButton';
 import FacebookLoginButton from './FacebookLoginButton';
 import './LoginForm.css';
 
@@ -209,7 +208,6 @@ const LoginForm = () => {
 
         {/* Botones de login social */}
         <div className="social-login-buttons">
-          <GoogleLoginButton />
           <FacebookLoginButton />
         </div>
 
