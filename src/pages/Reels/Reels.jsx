@@ -25,8 +25,7 @@ const generateMockReels = (count = 10) => Array.from({ length: count }, (_, i) =
 const Reels = () => {
   const [reels, setReels] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [likedReels, setLikedReels] = useState({});
-  const [savedReels, setSavedReels] = useState({});
+  // ReelsViewer maneja likes/saves internamente
 
   useEffect(() => {
     // Simular carga de datos

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuthContext } from '../../../context/AuthContext';
-import authService from '../../../services/authService';
 import FacebookLoginButton from './FacebookLoginButton';
 import './LoginForm.css';
 
@@ -212,7 +212,7 @@ const LoginForm = () => {
         </div>
 
         <div className="auth-footer">
-          <p>¿No tienes cuenta? <a href="#" className="auth-link">Regístrate aquí</a></p>
+          <p>¿No tienes cuenta? <Link to="/register" className="auth-link">Regístrate aquí</Link></p>
         </div>
       </div>
     </div>

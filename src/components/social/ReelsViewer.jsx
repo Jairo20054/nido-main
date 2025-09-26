@@ -87,6 +87,12 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
     }
   }, [currentIndex, reels.length, horizontal]);
 
+  // Definir handleLike antes de usarlo en handleDoubleTap
+  const handleLike = useCallback((reelId) => {
+    setLikedReels(prev => ({ ...prev, [reelId]: !prev[reelId] }));
+    onLike?.(reelId);
+  }, [onLike]);
+
   // Doble tap para like
   const handleDoubleTap = useCallback((reelId) => {
     const now = Date.now();
@@ -97,11 +103,6 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
     }
     lastTapRef.current = now;
   }, [handleLike]);
-
-  const handleLike = useCallback((reelId) => {
-    setLikedReels(prev => ({ ...prev, [reelId]: !prev[reelId] }));
-    onLike?.(reelId);
-  }, [onLike]);
 
   const handleSave = useCallback((reelId) => {
     setSavedReels(prev => ({ ...prev, [reelId]: !prev[reelId] }));

@@ -212,7 +212,7 @@ export const useBooking = () => {
       pricePerNight: property.price,
       nights: dates.nights
     };
-  }, [bookingData.property, bookingData.dates]);
+  }, [bookingData]);
 
   // Estado de la reserva
   const bookingStatus = useMemo(() => {

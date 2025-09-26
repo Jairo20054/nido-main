@@ -10,9 +10,6 @@ import { AuthProvider } from './context/AuthContext';
 import { BookingProvider } from './context/BookingContext';
 import { SearchProvider } from './context/SearchContext';
 
-// Config
-import config from './config';
-
 // Layout & Loading
 import Layout from './components/common/Layout/Layout';
 import LoadingSpinner from './components/common/LoadingSpinner/LoadingSpinner';

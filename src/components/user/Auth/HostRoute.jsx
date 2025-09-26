@@ -9,7 +9,7 @@ const HostRoute = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [notifications, setNotifications] = useState(3);
+  const [notifications] = useState(3);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [properties, setProperties] = useState([]);

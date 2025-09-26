@@ -15,8 +15,7 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
-  const [likedReels, setLikedReels] = useState({});
-  const [savedReels, setSavedReels] = useState({});
+  // Estados de reels manejados internamente en ReelsViewer
 
   // Load initial posts
   useEffect(() => {
@@ -24,24 +23,7 @@ const Home = () => {
     setPage(1);
   }, []);
 
-  // Infinite scroll handler
-  const loadMorePosts = useCallback(() => {
-    if (isLoading || !hasMore) return;
 
-    setIsLoading(true);
-    setTimeout(() => {
-      const nextPage = page + 1;
-      const newPosts = mockPosts.slice(0, nextPage * 10);
-
-      if (newPosts.length >= mockPosts.length) {
-        setHasMore(false);
-      }
-
-      setPosts(newPosts);
-      setPage(nextPage);
-      setIsLoading(false);
-    }, 1000);
-  }, [page, isLoading, hasMore]);
 
   const handleImageChange = (postId, direction) => {
     setCurrentImageIndices((prev) => {

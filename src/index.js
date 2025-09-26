@@ -3,7 +3,6 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { SearchProvider } from './context/SearchContext';
-import config from './config';
 
 // Importar estilos
 import './assets/styles/variables.css';

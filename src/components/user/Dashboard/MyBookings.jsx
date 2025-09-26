@@ -99,7 +99,7 @@ const MyBookings = () => {
     };
 
     loadBookings();
-  }, []);
+  }, [mockBookings]);
 
   useEffect(() => {
     let filtered = bookings.filter(booking => {
