@@ -96,7 +96,7 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
       setTimeout(() => setIsDoubleTapping(false), 1000);
     }
     lastTapRef.current = now;
-  }, []);
+  }, [handleLike]);
 
   const handleLike = useCallback((reelId) => {
     setLikedReels(prev => ({ ...prev, [reelId]: !prev[reelId] }));
@@ -116,8 +116,6 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
       }
     });
   }, [muted]);
-
-  const currentReel = reels[currentIndex];
 
   if (!reels.length) {
     return (
