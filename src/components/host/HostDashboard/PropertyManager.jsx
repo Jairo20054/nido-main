@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Home, Menu, FileText, BarChart3, MessageCircle, Settings, LogOut, HelpCircle } from 'lucide-react';
 import './PropertyManager.css';
 
 const PropertyManager = () => {
