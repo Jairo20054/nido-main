@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useUiHost } from '../../context/UiHostProvider';
 import './LeftSidebar.css';
 
 // ========== SISTEMA DE ICONOS MODERNOS ==========
@@ -81,16 +82,18 @@ const ChevronRightIcon = ({ size = 20 }) => (
   </svg>
 );
 
-const LeftSidebar = ({ 
-  user = { 
-    name: 'Maria Rodriguez', 
-    subtitle: 'Host Verificado', 
-    avatar: null 
-  }, 
-  onNavigate, 
+const LeftSidebar = ({
+  user = {
+    name: 'Maria Rodriguez',
+    subtitle: 'Host Verificado',
+    avatar: null
+  },
+  onNavigate,
   activeItemId = 'busqueda',
   badgeCounts = {}
 }) => {
+  const { showSearch } = useUiHost();
+
   // ========== ESTADOS Y REFERENCIAS ==========
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -138,6 +141,10 @@ const LeftSidebar = ({
 
   // ========== MANEJADOR DE NAVEGACIÓN ==========
   const handleItemClick = (id) => {
+    if (id === 'busqueda') {
+      showSearch();
+      return;
+    }
     if (onNavigate) onNavigate(id);
     if (isMobile) setIsMobileOpen(false);
   };

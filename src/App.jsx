@@ -9,6 +9,7 @@ import HostRoute from './components/user/Auth/HostRoute';
 import { AuthProvider } from './context/AuthContext';
 import { BookingProvider } from './context/BookingContext';
 import { SearchProvider } from './context/SearchContext';
+import { UiHostProvider } from './context/UiHostProvider';
 
 // Layout & Loading
 import Layout from './components/common/Layout/Layout';
@@ -81,12 +82,13 @@ const HostSettings = lazyLoad(() => import('./pages/Host/HostSettings'), 'HostSe
 function App() {
   return (
     <Router>
-        <AuthProvider>
-          <SearchProvider> {/* SearchProvider debe envolver todo el contenido que use useSearch */}
-            <BookingProvider>
-              <Layout>
-                <Suspense fallback={<LoadingSpinner />}>
-                  <Routes>
+        <UiHostProvider>
+          <AuthProvider>
+            <SearchProvider> {/* SearchProvider debe envolver todo el contenido que use useSearch */}
+              <BookingProvider>
+                <Layout>
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <Routes>
                   {/* Public Routes */}
                   <Route path="/" element={<Home />} />
                   <Route path="/search" element={<Search />} />
@@ -144,12 +146,13 @@ function App() {
                       />
                     }
                   />
-                  </Routes>
-                </Suspense>
-              </Layout>
-            </BookingProvider>
-          </SearchProvider>
-        </AuthProvider>
+                    </Routes>
+                  </Suspense>
+                </Layout>
+              </BookingProvider>
+            </SearchProvider>
+          </AuthProvider>
+        </UiHostProvider>
       </Router>
   );
 }
