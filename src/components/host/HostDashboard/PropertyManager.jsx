@@ -50,6 +50,7 @@ const PropertyManager = () => {
   const [statusFilter, setStatusFilter] = useState('Todos');
   const [sortBy, setSortBy] = useState('name');
   const [showDeleteModal, setShowDeleteModal] = useState(null);
+  const [activeMenu, setActiveMenu] = useState('Propiedades');
 
   const [formData, setFormData] = useState({
     name: '',
@@ -62,6 +63,15 @@ const PropertyManager = () => {
   });
 
   const availableAmenities = ['WiFi', 'Cocina', 'Parking', 'Piscina', 'Jardín', 'BBQ', 'Aire acondicionado', 'Terraza', 'Gym', 'Spa'];
+
+  const menuItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
+    { id: 'properties', label: 'Propiedades', icon: '🏠' },
+    { id: 'bookings', label: 'Reservas', icon: '📅' },
+    { id: 'analytics', label: 'Analytics', icon: '📈' },
+    { id: 'messages', label: 'Mensajes', icon: '💬' },
+    { id: 'settings', label: 'Configuración', icon: '⚙️' }
+  ];
 
   // Filtrar y ordenar propiedades
   const filteredProperties = properties
@@ -192,6 +202,7 @@ const PropertyManager = () => {
 
   return (
     <div className="property-manager-container">
+
       {/* Contenido principal */}
       <div className="property-main-content">
         {/* Stats Cards */}
@@ -274,7 +285,13 @@ const PropertyManager = () => {
           {filteredProperties.map(property => (
             <div key={property.id} className="property-card">
               <div className="property-image">
-                <img src={property.image} alt={property.name} />
+                <img 
+                  src={property.image} 
+                  alt={property.name}
+                  onError={(e) => {
+                    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRTVFNUU1Ii8+CjxwYXRoIGQ9Ik0xMjUgODVDMTM4LjgwNyA4NSAxNTAgNzMuODA3MSAxNTAgNjBDMTUwIDQ2LjE5MjkgMTM4LjgwNyAzNSAxMjUgMzVDMTExLjE5MyAzNSAxMDAgNDYuMTkyOSAxMDAgNjBDMTAwIDczLjgwNzEgMTExLjE5MyA4NSAxMjUgODVaTTEyNSA5MEMxMDguNDMzIDkwIDk1IDEwMy40MzMgOTUgMTIwVjEzMEgxNTVWMTIwQzE1NSAxMDMuNDMzIDE0MS41NjcgOTAgMTI1IDkwWiIgZmlsbD0iIzk5OTk5OSIvPgo8L3N2Zz4K';
+                  }}
+                />
                 <div className={`property-status-badge ${property.status.toLowerCase()}`}>
                   {property.status}
                 </div>
@@ -307,9 +324,6 @@ const PropertyManager = () => {
                   <div className="property-capacity">
                     👥 {property.capacity} huéspedes
                   </div>
-                </div>
-
-                <div className="property-stats">
                 </div>
 
                 <div className="property-actions">
