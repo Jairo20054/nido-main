@@ -261,14 +261,14 @@
 
 .reels-section .reels-viewer {
   position: relative;
-  height: 400px;
-  max-height: 50vh;
+  height: 500px; /* Cambiado de 400px a 500px para igualar altura con las tarjetas */
+  max-height: none; /* Eliminado max-height para evitar limitación */
   border-radius: var(--border-radius);
   overflow: hidden;
   box-shadow: var(--shadow-lg);
 }
 
 .reels-section .reel-item {
-  height: 400px;
-  max-height: 50vh;
+  height: 500px; /* Cambiado para igualar altura con las tarjetas */
+  max-height: none;
 }

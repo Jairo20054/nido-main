@@ -130,85 +130,95 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
     <div className="reels-viewer" ref={containerRef} onScroll={handleScroll}>
       <AnimatePresence mode="popLayout">
         {reels.map((reel, index) => (
-          <motion.div
+          <motion.article
             key={reel.id}
-            className={`reel-item ${index === currentIndex ? 'active' : ''}`}
+            className={`post-card ${index === currentIndex ? 'active' : ''}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: index === currentIndex ? 1 : 0.3 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             onDoubleClick={() => handleDoubleTap(reel.id)}
+            role="article"
+            aria-labelledby={`reel-${reel.id}-title`}
           >
-            <video
-              ref={(el) => (videoRefs.current[reel.id] = el)}
-              src={reel.videoUrl}
-              poster={reel.poster}
-              muted={muted}
-              loop
-              playsInline
-              className="reel-video"
-              data-reel-id={reel.id}
-              onLoadedData={async (e) => {
-                if (index === currentIndex) {
-                  try {
-                    if (!playingVideosRef.current.has(reel.id) && e.target.readyState >= 2) {
-                      await e.target.play();
-                      playingVideosRef.current.add(reel.id);
+            <div className="post-image">
+              <video
+                ref={(el) => (videoRefs.current[reel.id] = el)}
+                src={reel.videoUrl}
+                poster={reel.poster}
+                muted={muted}
+                loop
+                playsInline
+                className="reel-video"
+                data-reel-id={reel.id}
+                onLoadedData={async (e) => {
+                  if (index === currentIndex) {
+                    try {
+                      if (!playingVideosRef.current.has(reel.id) && e.target.readyState >= 2) {
+                        await e.target.play();
+                        playingVideosRef.current.add(reel.id);
+                      }
+                    } catch (error) {
+                      console.warn('Video play failed on load:', error);
                     }
-                  } catch (error) {
-                    console.warn('Video play failed on load:', error);
                   }
-                }
-              }}
-              onError={(e) => {
-                console.warn('Video failed to load:', reel.videoUrl, e);
-              }}
-            />
+                }}
+                onError={(e) => {
+                  console.warn('Video failed to load:', reel.videoUrl, e);
+                }}
+              />
+            </div>
 
             {/* Overlay con información */}
-            <div className="reel-overlay">
-              <div className="reel-header">
-                <div className="user-info">
-                  <img src={reel.user.avatar} alt={reel.user.name} className="user-avatar" />
-                  <span className="username">{reel.user.name}</span>
+            <div className="post-header">
+              <div className="user-info">
+                <img src={reel.user.avatar} alt={reel.user.name} className="user-avatar" />
+                <div className="user-details">
+                  <button className="username" aria-label={`Perfil de ${reel.user.name}`}>
+                    {reel.user.name}
+                  </button>
                   {reel.user.verified && <span className="verified-badge">✓</span>}
                 </div>
               </div>
+            </div>
 
-              <div className="reel-content">
-                <p className="reel-description">{reel.description}</p>
-                {reel.hashtags && (
-                  <div className="hashtags">
-                    {reel.hashtags.map((tag, i) => (
-                      <span key={i} className="hashtag">#{tag}</span>
-                    ))}
-                  </div>
-                )}
-              </div>
+            <div className="post-caption">
+              <p className="caption">{reel.description}</p>
+              {reel.hashtags && (
+                <div className="hashtags">
+                  {reel.hashtags.map((tag, i) => (
+                    <span key={i} className="hashtag">#{tag}</span>
+                  ))}
+                </div>
+              )}
+            </div>
 
-              <div className="reel-actions">
+            <div className="post-actions">
+              <div className="action-buttons">
                 <button
-                  className={`action-btn ${likedReels[reel.id] ? 'liked' : ''}`}
+                  className={`action-button ${likedReels[reel.id] ? 'liked' : ''}`}
                   onClick={() => handleLike(reel.id)}
+                  aria-label={likedReels[reel.id] ? 'Quitar me gusta' : 'Me gusta'}
                 >
-                  <Heart size={28} fill={likedReels[reel.id] ? '#ff3b72' : 'none'} />
+                  <Heart size={24} fill={likedReels[reel.id] ? '#ff3b72' : 'none'} />
                   <span>{reel.likes + (likedReels[reel.id] ? 1 : 0)}</span>
                 </button>
 
-                <button className="action-btn" onClick={() => onComment?.(reel.id)}>
-                  <MessageCircle size={28} />
+                <button className="action-button" onClick={() => onComment?.(reel.id)} aria-label="Comentar">
+                  <MessageCircle size={24} />
                   <span>{reel.comments}</span>
                 </button>
 
-                <button className="action-btn" onClick={() => onShare?.(reel.id)}>
-                  <Share size={28} />
+                <button className="action-button" onClick={() => onShare?.(reel.id)} aria-label="Compartir">
+                  <Share size={24} />
                 </button>
 
                 <button
-                  className={`action-btn ${savedReels[reel.id] ? 'saved' : ''}`}
+                  className={`save-button ${savedReels[reel.id] ? 'saved' : ''}`}
                   onClick={() => handleSave(reel.id)}
+                  aria-label={savedReels[reel.id] ? 'Quitar de guardados' : 'Guardar'}
                 >
-                  <Bookmark size={28} fill={savedReels[reel.id] ? '#ff3b72' : 'none'} />
+                  <Bookmark size={24} fill={savedReels[reel.id] ? '#ff3b72' : 'none'} />
                 </button>
               </div>
             </div>
@@ -229,10 +239,10 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
             </AnimatePresence>
 
             {/* Botón de mute/unmute */}
-            <button className="mute-button" onClick={toggleMute}>
+            <button className="mute-button" onClick={toggleMute} aria-label={muted ? 'Activar sonido' : 'Silenciar'}>
               {muted ? <VolumeX size={24} /> : <Volume2 size={24} />}
             </button>
-          </motion.div>
+          </motion.article>
         ))}
       </AnimatePresence>
     </div>

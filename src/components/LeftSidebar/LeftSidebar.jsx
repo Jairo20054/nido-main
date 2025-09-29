@@ -1,6 +1,3 @@
-// ===== LeftSidebar.jsx =====
-// No changes needed for the errors, but added improvements like useMemo for menuItems and better ARIA.
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
@@ -43,7 +40,11 @@ const LeftSidebar = ({ onExploreClick, onProfileClick }) => {
     if (path === '/search' && onExploreClick) return onExploreClick();
     if (label === 'Perfil' && onProfileClick) return onProfileClick();
     setActiveItem(path);
-    navigate(path);
+    try {
+      navigate(path);
+    } catch (error) {
+      alert('Error al navegar a ' + label + ': ' + error.message);
+    }
   };
 
   const toggleSidebar = () => setIsCollapsed(prev => !prev);
@@ -77,6 +78,7 @@ const LeftSidebar = ({ onExploreClick, onProfileClick }) => {
                 handleItemClick(item.path, item.label);
               }
             }}
+            title={isCollapsed ? item.label : undefined}
           >
             <span className="menu-icon">{item.icon}</span>
             {!isCollapsed && <span className="menu-label">{item.label}</span>}
