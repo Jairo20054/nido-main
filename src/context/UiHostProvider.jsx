@@ -31,11 +31,25 @@ export const UiHostProvider = ({ children }) => {
   return (
     <UiHostContext.Provider value={{ showSearch, hideSearch }}>
       {children}
-      {/* Portal-like mount point for SearchHub */}
+      {/* Portal-like mount point for Intelligent Search Panel */}
       {isSearchVisible && (
-        <div className="uihost-search-container" role="dialog" aria-modal="true" aria-label="Búsqueda">
-          <SearchHub key={searchKey} onClose={hideSearch} />
-        </div>
+        <>
+          {/* Backdrop semitransparente */}
+          <div 
+            className="uihost-backdrop" 
+            onClick={hideSearch}
+            aria-hidden="true"
+          />
+          {/* Panel de búsqueda inteligente - slide-in desde izquierda */}
+          <div 
+            className="uihost-intelligent-search-panel" 
+            role="dialog" 
+            aria-modal="true" 
+            aria-label="Búsqueda inteligente"
+          >
+            <SearchHub key={searchKey} onClose={hideSearch} />
+          </div>
+        </>
       )}
     </UiHostContext.Provider>
   );

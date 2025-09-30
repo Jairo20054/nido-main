@@ -15,7 +15,6 @@ import SearchBar from '../../components/common/Header/SearchBar'; // Componente 
 import './Search.css';
 
 const Search = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const [urlParams, setUrlParams] = useSearchParams();
   
@@ -278,30 +277,28 @@ const Search = () => {
 
       {/* Layout principal */}
       <div className="search-layout">
-        {/* Filtros (ahora ocultos por defecto, accesibles desde la barra de búsqueda) */}
-        {filtersVisible && (
-          <aside 
-            className="filters-container"
-            aria-label="Filtros de búsqueda"
+      {/* Filtros siempre visibles debajo de la barra de búsqueda */}
+      <aside 
+        className="filters-container"
+        aria-label="Filtros de búsqueda"
+      >
+        <div className="filters-header">
+          <h2>Filtros</h2>
+          <button 
+            className="clear-filters"
+            onClick={handleClearFilters}
+            disabled={loading}
           >
-            <div className="filters-header">
-              <h2>Filtros</h2>
-              <button 
-                className="clear-filters"
-                onClick={handleClearFilters}
-                disabled={loading}
-              >
-                Limpiar
-              </button>
-            </div>
-            
-            <SearchFilters 
-              filters={searchParams} 
-              onFilterChange={handleFilterChange}
-              disabled={loading}
-            />
-          </aside>
-        )}
+            Limpiar
+          </button>
+        </div>
+        
+        <SearchFilters 
+          filters={searchParams} 
+          onFilterChange={handleFilterChange}
+          disabled={loading}
+        />
+      </aside>
 
         {/* Resultados */}
         <main className="results-container" role="main">

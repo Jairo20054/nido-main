@@ -15,7 +15,8 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
-  // Estados de reels manejados internamente en ReelsViewer
+  const [likedReels, setLikedReels] = useState({});
+  const [savedReels, setSavedReels] = useState({});
 
   // Load initial posts
   useEffect(() => {

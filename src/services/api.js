@@ -1,4 +1,5 @@
 
+import React, { useState, useCallback } from 'react';
 import { toast } from 'react-toastify'; // Opcional: para notificaciones
 // Configuración de la API
 const API_CONFIG = {
