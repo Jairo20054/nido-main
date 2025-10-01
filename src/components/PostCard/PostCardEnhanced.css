@@ -47,7 +47,7 @@
 .username {
   font-weight: 600;
   font-size: 14px;
-  color: #111827;
+  color: var(--text-primary);
   background: none;
   border: none;
   cursor: pointer;
@@ -56,12 +56,12 @@
 }
 
 .username:hover {
-  color: #ff3b72;
+  color: var(--accent-color);
 }
 
 .location {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .verified-badge {
@@ -81,7 +81,7 @@
 }
 
 .follow-button {
-  background: #ff3b72;
+  background: var(--accent-color);
   color: white;
   border: none;
   border-radius: 8px;
@@ -93,7 +93,7 @@
 }
 
 .follow-button:hover {
-  background: #e6355f;
+  background: var(--accent-hover);
 }
 
 .follow-button.following {
@@ -108,7 +108,7 @@
 .more-button {
   background: none;
   border: none;
-  color: #6b7280;
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
@@ -123,7 +123,7 @@
 /* Imagen del post */
 .post-image {
   position: relative;
-  aspect-ratio: 1;
+  height: 500px;
   overflow: hidden;
   background: #f3f4f6;
 }
@@ -215,7 +215,7 @@
 .action-button {
   background: none;
   border: none;
-  color: #374151;
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
@@ -236,7 +236,7 @@
 .save-button {
   background: none;
   border: none;
-  color: #6b7280;
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
@@ -249,7 +249,7 @@
 }
 
 .save-button.saved {
-  color: #111827;
+  color: var(--text-primary);
 }
 
 /* Estadísticas del post */
@@ -263,7 +263,7 @@
 .likes-count {
   font-weight: 600;
   font-size: 14px;
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .post-caption {
@@ -274,14 +274,14 @@
 
 .caption {
   font-size: 14px;
-  color: #374151;
+  color: var(--text-primary);
   line-height: 1.4;
 }
 
 .view-comments {
   background: none;
   border: none;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 14px;
   cursor: pointer;
   text-align: left;
@@ -302,12 +302,12 @@
 .price {
   font-weight: 700;
   font-size: 16px;
-  color: #ff3b72;
+  color: var(--accent-color);
 }
 
 .night {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .post-time {
@@ -338,12 +338,12 @@
 .comment-user {
   font-weight: 600;
   font-size: 14px;
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .comment-text {
   font-size: 14px;
-  color: #374151;
+  color: var(--text-primary);
   line-height: 1.4;
 }
 
@@ -367,12 +367,12 @@
 }
 
 .add-comment input:focus {
-  border-color: #ff3b72;
+  border-color: var(--accent-color);
   box-shadow: 0 0 0 2px rgba(255, 59, 114, 0.1);
 }
 
 .post-comment-button {
-  background: #ff3b72;
+  background: var(--accent-color);
   color: white;
   border: none;
   border-radius: 20px;
@@ -384,7 +384,7 @@
 }
 
 .post-comment-button:hover:not(:disabled) {
-  background: #e6355f;
+  background: var(--accent-hover);
 }
 
 .post-comment-button:disabled {
@@ -520,36 +520,45 @@
 
 /* Modo oscuro */
 @media (prefers-color-scheme: dark) {
+  :root {
+    --card-bg: #1f2937;
+    --card-border: #374151;
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+  }
+
   .post-card {
-    background: #1f2937;
-    border-color: #374151;
+    background: var(--card-bg);
+    border-color: var(--card-border);
   }
 
   .post-card:hover {
     border-color: #4b5563;
   }
 
-  .username,
+  .username, .caption, .comment-text,
   .likes-count,
   .comment-user {
-    color: #f9fafb;
+    color: var(--text-primary);
   }
 
-  .location,
-  .caption,
-  .comment-text,
+  .location, 
   .view-comments,
   .post-time {
-    color: #9ca3af;
+    color: var(--text-secondary);
   }
 
   .follow-button {
-    background: #ff3b72;
+    background: var(--accent-color);
   }
 
   .follow-button.following {
     background: #374151;
     color: #d1d5db;
+  }
+  
+  .action-button {
+    color: var(--text-secondary);
   }
 
   .action-button:hover,
@@ -557,12 +566,12 @@
   .more-button:hover {
     background: #374151;
   }
-
+  
   .comments-section {
     background: #111827;
-    border-color: #374151;
+    border-color: var(--card-border);
   }
-
+  
   .add-comment input {
     background: #374151;
     border-color: #4b5563;
@@ -571,24 +580,24 @@
 
   .share-content {
     background: #1f2937;
-    color: #f9fafb;
+    color: var(--text-primary);
   }
 
   .share-option {
     background: #374151;
-    color: #f9fafb;
+    color: var(--text-primary);
   }
 
   .share-option:hover {
     background: #4b5563;
   }
-
+  
   .close-share {
     background: #374151;
     border-color: #4b5563;
-    color: #f9fafb;
+    color: var(--text-primary);
   }
-
+  
   .close-share:hover {
     background: #4b5563;
     border-color: #6b7280;
@@ -597,7 +606,7 @@
 
 /* Estados de accesibilidad */
 .post-card:focus-visible {
-  outline: 2px solid #ff3b72;
+  outline: var(--focus-outline);
   outline-offset: 2px;
 }
 
@@ -608,12 +617,12 @@
 .view-comments:focus-visible,
 .username:focus-visible,
 .dot:focus-visible {
-  outline: 2px solid #ff3b72;
+  outline: var(--focus-outline);
   outline-offset: 2px;
 }
 
 .add-comment input:focus {
-  border-color: #ff3b72;
+  border-color: var(--accent-color);
   box-shadow: 0 0 0 2px rgba(255, 59, 114, 0.1);
 }
 
