@@ -1,4 +1,4 @@
- import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
 import {
@@ -8,7 +8,8 @@ import {
   MagnifyingGlassIcon,
   Bars3Icon,
   XMarkIcon,
-  GlobeAltIcon
+  GlobeAltIcon,
+  ChatBubbleLeftEllipsisIcon
 } from '@heroicons/react/24/outline';
 import SearchBar from './SearchBar';
 import UserMenu from './UserMenu';
@@ -51,19 +52,19 @@ const Header = () => {
   const navigationItems = useMemo(
     () => [
       {
-        id: "stays",
-        label: "Alojamientos",
-        shortLabel: "Alojamientos",
-        path: "/search?type=stay",
-        icon: HomeIcon,
+        id: "messages",
+        label: "Mensajes",
+        shortLabel: "Mensajes",
+        path: "/messages",
+        icon: ChatBubbleLeftEllipsisIcon,
         hasNovedad: false,
       },
       {
-        id: "experiences",
-        label: "Experiencias",
-        shortLabel: "Experiencias",
-        path: "/search?type=experience",
-        icon: SparklesIcon,
+        id: "marketplace",
+        label: "Marketplace",
+        shortLabel: "Marketplace",
+        path: "/marketplace",
+        icon: GlobeAltIcon,
         hasNovedad: false,
       },
       {

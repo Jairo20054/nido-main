@@ -166,13 +166,13 @@ const LeftSidebar = ({
     { 
       id: 'busqueda', 
       icon: <SearchIcon />, 
-      label: 'Búsqueda Inteligente',
+      label: 'Búscar',
       description: 'Encuentra propiedades ideales'
     },
     { 
       id: 'reels', 
       icon: <ReelsIcon />, 
-      label: 'Video Tours',
+      label: 'Reels',
       description: 'Recorridos virtuales en video',
       badge: badgeCounts.reels || 0
     },
@@ -335,14 +335,7 @@ const LeftSidebar = ({
         <div className="sidebar-footer">
           {!isCollapsed && (
             <div className="sidebar-stats">
-              <div className="stat-item">
-                <span className="stat-number">24</span>
-                <span className="stat-label">Propiedades</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-number">156</span>
-                <span className="stat-label">Reservas</span>
-              </div>
+              
             </div>
           )}
         </div>

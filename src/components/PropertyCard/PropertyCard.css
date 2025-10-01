@@ -1,16 +1,34 @@
-/* PropertyCard.css - Modern, elegant styling for property cards */
-
 .property-card {
+  /* Fondo blanco para la tarjeta principal */
   background-color: #ffffff;
-  border-radius: 20px;
+  /* Bordes redondeados para un aspecto moderno y diferenciado de Instagram */
+  border-radius: 28px;
+  /* Sombra sutil para dar profundidad y elegancia */
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  /* Espaciado interno para separar el contenido */
   padding: 16px;
+  /* Cursor pointer para indicar que es interactivo */
   cursor: pointer;
+  /* Ocultar contenido que se desborde */
   overflow: hidden;
+  /* Transición suave para efectos de hover */
   transition: transform 300ms ease-in-out, box-shadow 300ms ease-in-out;
-  width: 100%;
-  max-width: 420px;
+  /* Ancho completo con máximo aumentado para hacer las tarjetas más grandes */
+  width: 200%;
+  max-width: 650px; /* Slightly increased from 600px for a bit wider cards */
   margin: 0 auto;
+}
+
+.property-card-image {
+  width: 500px; /* Increased from 450px to make image wider */
+  height: 355px; /* Adjusted height proportionally */
+  object-fit: cover;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 300ms ease-in-out;
 }
 
 .property-card:hover {
@@ -34,18 +52,6 @@
 
 .property-card:hover .property-card-image-container {
   transform: scale(1.02);
-}
-
-.property-card-image {
-  width: 100%;
-  height: 256px;
-  object-fit: cover;
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  opacity: 0;
-  transition: opacity 300ms ease-in-out;
 }
 
 .property-card-image.active {
@@ -210,6 +216,6 @@
   }
 
   .property-card-image {
-    height: 200px;
+    height: 250px;
   }
 }
