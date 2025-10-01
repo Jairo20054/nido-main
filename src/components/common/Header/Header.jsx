@@ -245,7 +245,7 @@ const Header = () => {
 
             {/* Idioma */}
             <button className="desktop-header__language-btn" aria-label="Seleccionar idioma">
-              <GlobeAltIcon className="desktop-header__language-icon" />
+              
             </button>
 
             {/* Menú de usuario - solo si está autenticado */}
