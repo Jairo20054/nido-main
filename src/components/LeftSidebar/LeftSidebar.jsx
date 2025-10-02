@@ -64,6 +64,12 @@ const MapIcon = ({ size = 20 }) => (
   </svg>
 );
 
+const MessageIcon = ({ size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+);
+
 const MenuIcon = ({ size = 20 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="3" y1="12" x2="21" y2="12"/>
@@ -152,10 +158,10 @@ const LeftSidebar = ({
     // Navegación a rutas específicas
     const routeMap = {
       'reels': '/reels',
-      'remodelaciones': '/remodelaciones',
-      'tendencias': '/tendencias',
+      'mensajes': '/messages',
+      'perfil': '/dashboard', // Asumiendo que perfil va al dashboard
       'mapa': '/mapa',
-      'perfil': '/dashboard' // Asumiendo que perfil va al dashboard
+      'tendencias': '/tendencias'
     };
 
     if (routeMap[id]) {
@@ -181,51 +187,43 @@ const LeftSidebar = ({
 
   // ========== ITEMS DE NAVEGACIÓN INNOVADORES ==========
   const navigationItems = [
-    { 
-      id: 'busqueda', 
-      icon: <SearchIcon />, 
+    {
+      id: 'busqueda',
+      icon: <SearchIcon />,
       label: 'Búscar',
       description: 'Encuentra propiedades ideales'
     },
-    { 
-      id: 'reels', 
-      icon: <ReelsIcon />, 
+    {
+      id: 'reels',
+      icon: <ReelsIcon />,
       label: 'Reels',
       description: 'Recorridos virtuales en video',
       badge: badgeCounts.reels || 0
     },
-    { 
-      id: 'ProyectosInmobiliarios', 
-      icon: <HomeModernIcon />, 
-      label: 'Proyectos inmobiliarios',
-      description: 'Explora nuevas construcciones',
-      badge: badgeCounts.reels || 0
+    {
+      id: 'mensajes',
+      icon: <MessageIcon />,
+      label: 'Mensajes',
+      description: 'Conversaciones y chats',
+      badge: badgeCounts.mensajes || 0
     },
-    { 
-      id: 'remodelaciones', 
-      icon: <RenovationIcon />, 
-      label: 'Remodelaciones',
-      description: 'Transforma tus espacios'
-    },
-    { 
-      id: 'tendencias', 
-      icon: <TrendingIcon />, 
-      label: 'Tendencias',
-      description: 'Mercado en tiempo real',
-      badge: badgeCounts.trending || 0
-    },
-
-    { 
-      id: 'mapa', 
-      icon: <MapIcon />, 
-      label: 'Mapa Interactivo',
-      description: 'Ubicaciones estratégicas'
-    },
-    { 
-      id: 'perfil', 
-      icon: <UserIcon />, 
+    {
+      id: 'perfil',
+      icon: <UserIcon />,
       label: 'Mi Perfil',
       description: 'Gestiona tu cuenta'
+    },
+    {
+      id: 'mapa',
+      icon: <MapIcon />,
+      label: 'Mapa Interactivo',
+      description: 'Explora propiedades en mapa'
+    },
+    {
+      id: 'tendencias',
+      icon: <TrendingIcon />,
+      label: 'Tendencias',
+      description: 'Descubre las últimas tendencias'
     }
   ];
 

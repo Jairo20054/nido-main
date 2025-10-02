@@ -52,11 +52,11 @@ const Header = () => {
   const navigationItems = useMemo(
     () => [
       {
-        id: "messages",
-        label: "Mensajes",
-        shortLabel: "Mensajes",
-        path: "/messages",
-        icon: ChatBubbleLeftEllipsisIcon,
+        id: "remodelaciones",
+        label: "Remodelaciones",
+        shortLabel: "Remodelaciones",
+        path: "/remodelaciones",
+        icon: HomeIcon,
         hasNovedad: false,
       },
       {
@@ -64,7 +64,7 @@ const Header = () => {
         label: "Marketplace",
         shortLabel: "Marketplace",
         path: "/marketplace",
-        icon: GlobeAltIcon,
+        icon: BellIcon,
         hasNovedad: false,
       },
       {
