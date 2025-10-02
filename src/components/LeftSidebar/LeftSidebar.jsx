@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUiHost } from '../../context/UiHostProvider';
 import './LeftSidebar.css';
+import { HomeModernIcon } from '@heroicons/react/24/outline';
 
 // ========== SISTEMA DE ICONOS MODERNOS ==========
 const SearchIcon = ({ size = 20 }) => (
@@ -191,6 +192,13 @@ const LeftSidebar = ({
       icon: <ReelsIcon />, 
       label: 'Reels',
       description: 'Recorridos virtuales en video',
+      badge: badgeCounts.reels || 0
+    },
+    { 
+      id: 'ProyectosInmobiliarios', 
+      icon: <HomeModernIcon />, 
+      label: 'Proyectos inmobiliarios',
+      description: 'Explora nuevas construcciones',
       badge: badgeCounts.reels || 0
     },
     { 
