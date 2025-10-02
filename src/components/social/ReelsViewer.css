@@ -3,7 +3,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
+  width: 190%;
   height: 100vh;
   overflow-y: scroll;
   scroll-snap-type: y mandatory;
@@ -24,7 +24,7 @@
 }
 
 .reel-video {
-  width: 100%;
+  width: 560px;
   height: 100%;
   object-fit: cover;
   background: #000000;
