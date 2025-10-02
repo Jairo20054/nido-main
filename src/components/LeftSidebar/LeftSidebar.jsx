@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useUiHost } from '../../context/UiHostProvider';
 import './LeftSidebar.css';
 
@@ -93,6 +94,7 @@ const LeftSidebar = ({
   badgeCounts = {}
 }) => {
   const { showSearch } = useUiHost();
+  const navigate = useNavigate();
 
   // ========== ESTADOS Y REFERENCIAS ==========
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -145,7 +147,22 @@ const LeftSidebar = ({
       showSearch();
       return;
     }
-    if (onNavigate) onNavigate(id);
+
+    // Navegación a rutas específicas
+    const routeMap = {
+      'reels': '/reels',
+      'remodelaciones': '/remodelaciones',
+      'tendencias': '/tendencias',
+      'mapa': '/mapa',
+      'perfil': '/dashboard' // Asumiendo que perfil va al dashboard
+    };
+
+    if (routeMap[id]) {
+      navigate(routeMap[id]);
+    } else if (onNavigate) {
+      onNavigate(id);
+    }
+
     if (isMobile) setIsMobileOpen(false);
   };
 
@@ -189,12 +206,7 @@ const LeftSidebar = ({
       description: 'Mercado en tiempo real',
       badge: badgeCounts.trending || 0
     },
-    { 
-      id: 'smart-home', 
-      icon: <SmartHomeIcon />, 
-      label: 'Smart Home',
-      description: 'Tecnología inteligente'
-    },
+
     { 
       id: 'mapa', 
       icon: <MapIcon />, 

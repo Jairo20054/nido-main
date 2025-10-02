@@ -81,6 +81,11 @@ const HostStats = lazyLoad(() => import('./pages/Host/HostStats'), 'HostStats');
 const HostMessages = lazyLoad(() => import('./pages/Host/HostMessages'), 'HostMessages');
 const HostSettings = lazyLoad(() => import('./pages/Host/HostSettings'), 'HostSettings');
 
+// New Pages - Mapa Interactivo, Tendencias, Remodelaciones
+const MapaInteractivo = lazyLoad(() => import('./pages/MapaInteractivo/MapaInteractivo'));
+const Tendencias = lazyLoad(() => import('./pages/Tendencias/Tendencias'));
+const Remodelaciones = lazyLoad(() => import('./pages/Remodelaciones/Remodelaciones'));
+
 function App() {
   return (
     <Router>
@@ -101,6 +106,11 @@ function App() {
                   <Route path="/messages" element={<Messages />} />
                   <Route path="/services" element={<Services />} />
                   <Route path="/marketplace" element={<Marketplace />} />
+
+                  {/* New Routes - Mapa, Tendencias, Remodelaciones */}
+                  <Route path="/mapa" element={<MapaInteractivo />} />
+                  <Route path="/tendencias" element={<Tendencias />} />
+                  <Route path="/remodelaciones" element={<Remodelaciones />} />
 
                   {/* Social Routes */}
                   <Route path="/reels" element={<Reels />} />
