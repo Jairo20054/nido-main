@@ -250,7 +250,7 @@
   outline-offset: 2px;
 }
 
-/* ===== Reels Section ===== */
+/* ===== Sección de Reels ===== */
 .reels-section {
   max-width: var(--max-content-width);
   margin: 0 auto;
@@ -261,14 +261,21 @@
 
 .reels-section .reels-viewer {
   position: relative;
-  height: 320px; /* Cambiado para igualar altura con las tarjetas */
-  max-height: none; /* Eliminado max-height para evitar limitación */
+  height: 320px; /* Altura por defecto para modo vertical */
+  max-height: none;
   border-radius: 24px;
   overflow: hidden;
   box-shadow: var(--shadow-lg);
 }
 
+.reels-section .reels-viewer.horizontal {
+  height: auto; /* Altura automática para carrusel horizontal */
+  border-radius: 16px;
+  box-shadow: none; /* Sin sombra para carrusel */
+  padding: 0; /* Sin padding extra */
+}
+
 .reels-section .reel-item {
-  height: 320px; /* Cambiado para igualar altura con las tarjetas */
+  height: 320px;
   max-height: none;
 }

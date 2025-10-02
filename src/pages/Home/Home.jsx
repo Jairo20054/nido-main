@@ -108,21 +108,7 @@ const Home = () => {
         <StoriesBar stories={mockStories} />
       </motion.div>
 
-      {/* Reels Section */}
-      <motion.div
-        className="reels-section"
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.5 }}
-      >
-        <ReelsViewer
-          reels={mockReels}
-          onLike={handleReelLike}
-          onComment={handleReelComment}
-          onShare={handleReelShare}
-          onSave={handleReelSave}
-        />
-      </motion.div>
+     
 
       {/* Feed Section */}
       <main className="feed-container">
@@ -146,6 +132,23 @@ const Home = () => {
             </motion.div>
           ))}
         </AnimatePresence>
+
+         {/* Sección de Reels - Carrusel horizontal como Facebook */}
+      <motion.div
+        className="reels-section"
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+      >
+        <ReelsViewer
+          reels={mockReels}
+          onLike={handleReelLike}
+          onComment={handleReelComment}
+          onShare={handleReelShare}
+          onSave={handleReelSave}
+          horizontal={true}
+        />
+      </motion.div>
 
         {/* Loading indicator */}
         {isLoading && (

@@ -243,10 +243,6 @@ const Header = () => {
               <span>Conviértete en anfitrión</span>
             </Link>
 
-            {/* Idioma */}
-            <button className="desktop-header__language-btn" aria-label="Seleccionar idioma">
-            </button>
-
             {/* Menú de usuario - solo si está autenticado */}
             {isAuthenticated && <UserMenu />}
 

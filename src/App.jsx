@@ -59,6 +59,8 @@ const Profile = lazyLoad(() => import('./components/user/Dashboard/Profile'));
 const MyBookings = lazyLoad(() => import('./components/user/Dashboard/MyBookings'));
 const Favorites = lazyLoad(() => import('./components/user/Dashboard/Favorites'));
 const Messages = lazyLoad(() => import('./components/user/Messages/MessageCenter'));
+const Services = lazyLoad(() => import('./components/user/Services/Services'));
+const Marketplace = lazyLoad(() => import('./components/user/Marketplace/Marketplace'));
 const HostDashboard = lazyLoad(() => import('./pages/Host/Dashboard'));
 const PropertyManager = lazyLoad(() => import('./components/host/HostDashboard/PropertyManager'));
 const AddProperty = lazyLoad(() => import('./components/host/PropertyForm/PropertyForm'));
@@ -96,6 +98,9 @@ function App() {
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="/become-host" element={<BecomeHost />} />
+                  <Route path="/messages" element={<Messages />} />
+                  <Route path="/services" element={<Services />} />
+                  <Route path="/marketplace" element={<Marketplace />} />
 
                   {/* Social Routes */}
                   <Route path="/reels" element={<Reels />} />
@@ -107,7 +112,7 @@ function App() {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/my-bookings" element={<MyBookings />} />
                     <Route path="/favorites" element={<Favorites />} />
-                    <Route path="/messages" element={<Messages />} />
+                    
                     <Route path="/booking" element={<BookingPage />} />
                     <Route path="/booking/:propertyId" element={<BookingPage />} />
                   </Route>

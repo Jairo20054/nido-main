@@ -15,7 +15,7 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
   const playingVideosRef = useRef(new Set());
   const playTimeoutsRef = useRef({});
 
-  // Auto-play cuando el reel está visible
+  // Auto-reproducir cuando el reel está visible
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -24,7 +24,7 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
           const videoId = video.dataset.reelId;
 
           if (entry.isIntersecting) {
-            // Throttle play calls to prevent rapid toggling
+            // Throttle play calls para evitar toggling rápido
             if (playTimeoutsRef.current[videoId]) {
               clearTimeout(playTimeoutsRef.current[videoId]);
             }
@@ -36,11 +36,11 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
                   playingVideosRef.current.add(videoId);
                 }
               } catch (error) {
-                console.warn('Video play interrupted or failed:', error);
+                console.warn('Reproducción de video interrumpida o fallida:', error);
               }
             }, 100);
           } else {
-            // Clear any pending play timeout
+            // Limpiar timeout pendiente de play
             if (playTimeoutsRef.current[videoId]) {
               clearTimeout(playTimeoutsRef.current[videoId]);
               delete playTimeoutsRef.current[videoId];
@@ -50,7 +50,7 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
               video.pause();
               playingVideosRef.current.delete(videoId);
             } catch (error) {
-              console.warn('Video pause failed:', error);
+              console.warn('Pausa de video fallida:', error);
             }
           }
         });
@@ -64,7 +64,7 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
 
     return () => {
       observer.disconnect();
-      // Clear all timeouts on cleanup
+      // Limpiar todos los timeouts al desmontar
       Object.values(playTimeoutsRef.current).forEach(timeout => clearTimeout(timeout));
       playTimeoutsRef.current = {};
     };
@@ -127,12 +127,16 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
   }
 
   return (
-    <div className="reels-viewer" ref={containerRef} onScroll={handleScroll}>
+    <div
+      className={`reels-viewer ${horizontal ? 'horizontal' : 'vertical'}`}
+      ref={containerRef}
+      onScroll={handleScroll}
+    >
       <AnimatePresence mode="popLayout">
         {reels.map((reel, index) => (
           <motion.article
             key={reel.id}
-            className={`post-card ${index === currentIndex ? 'active' : ''}`}
+            className={`reel-item ${index === currentIndex ? 'active' : ''}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: index === currentIndex ? 1 : 0.3 }}
             exit={{ opacity: 0 }}
@@ -141,7 +145,7 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
             role="article"
             aria-labelledby={`reel-${reel.id}-title`}
           >
-            <div className="post-image">
+            <div className="reel-video-container">
               <video
                 ref={(el) => (videoRefs.current[reel.id] = el)}
                 src={reel.videoUrl}
@@ -159,44 +163,44 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
                         playingVideosRef.current.add(reel.id);
                       }
                     } catch (error) {
-                      console.warn('Video play failed on load:', error);
+                      console.warn('Reproducción de video fallida al cargar:', error);
                     }
                   }
                 }}
                 onError={(e) => {
-                  console.warn('Video failed to load:', reel.videoUrl, e);
+                  console.warn('Video falló al cargar:', reel.videoUrl, e);
                 }}
               />
             </div>
 
             {/* Overlay con información */}
-            <div className="post-header">
-              <div className="user-info">
-                <img src={reel.user.avatar} alt={reel.user.name} className="user-avatar" />
-                <div className="user-details">
-                  <button className="username" aria-label={`Perfil de ${reel.user.name}`}>
-                    {reel.user.name}
-                  </button>
-                  {reel.user.verified && <span className="verified-badge">✓</span>}
+            <div className="reel-overlay">
+              <div className="reel-header">
+                <div className="user-info">
+                  <img src={reel.user.avatar} alt={reel.user.name} className="user-avatar" />
+                  <div className="user-details">
+                    <button className="username" aria-label={`Perfil de ${reel.user.name}`}>
+                      {reel.user.name}
+                    </button>
+                    {reel.user.verified && <span className="verified-badge">✓</span>}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="post-caption">
-              <p className="caption">{reel.description}</p>
-              {reel.hashtags && (
-                <div className="hashtags">
-                  {reel.hashtags.map((tag, i) => (
-                    <span key={i} className="hashtag">#{tag}</span>
-                  ))}
-                </div>
-              )}
-            </div>
+              <div className="reel-content">
+                <p className="reel-description">{reel.description}</p>
+                {reel.hashtags && (
+                  <div className="hashtags">
+                    {reel.hashtags.map((tag, i) => (
+                      <span key={i} className="hashtag">#{tag}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-            <div className="post-actions">
-              <div className="action-buttons">
+              <div className="reel-actions">
                 <button
-                  className={`action-button ${likedReels[reel.id] ? 'liked' : ''}`}
+                  className={`action-btn ${likedReels[reel.id] ? 'liked' : ''}`}
                   onClick={() => handleLike(reel.id)}
                   aria-label={likedReels[reel.id] ? 'Quitar me gusta' : 'Me gusta'}
                 >
@@ -204,44 +208,44 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
                   <span>{reel.likes + (likedReels[reel.id] ? 1 : 0)}</span>
                 </button>
 
-                <button className="action-button" onClick={() => onComment?.(reel.id)} aria-label="Comentar">
+                <button className="action-btn" onClick={() => onComment?.(reel.id)} aria-label="Comentar">
                   <MessageCircle size={24} />
                   <span>{reel.comments}</span>
                 </button>
 
-                <button className="action-button" onClick={() => onShare?.(reel.id)} aria-label="Compartir">
+                <button className="action-btn" onClick={() => onShare?.(reel.id)} aria-label="Compartir">
                   <Share size={24} />
                 </button>
 
                 <button
-                  className={`save-button ${savedReels[reel.id] ? 'saved' : ''}`}
+                  className={`action-btn ${savedReels[reel.id] ? 'saved' : ''}`}
                   onClick={() => handleSave(reel.id)}
                   aria-label={savedReels[reel.id] ? 'Quitar de guardados' : 'Guardar'}
                 >
                   <Bookmark size={24} fill={savedReels[reel.id] ? '#ff3b72' : 'none'} />
                 </button>
               </div>
+
+              {/* Animación de doble tap */}
+              <AnimatePresence>
+                {isDoubleTapping && index === currentIndex && (
+                  <motion.div
+                    className="double-tap-animation"
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 1.5, opacity: 0 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <Heart size={80} fill="#ff3b72" color="#ff3b72" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Botón de mute/unmute */}
+              <button className="mute-button" onClick={toggleMute} aria-label={muted ? 'Activar sonido' : 'Silenciar'}>
+                {muted ? <VolumeX size={24} /> : <Volume2 size={24} />}
+              </button>
             </div>
-
-            {/* Animación de doble tap */}
-            <AnimatePresence>
-              {isDoubleTapping && index === currentIndex && (
-                <motion.div
-                  className="double-tap-animation"
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 1.5, opacity: 0 }}
-                  transition={{ duration: 0.6 }}
-                >
-                  <Heart size={80} fill="#ff3b72" color="#ff3b72" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Botón de mute/unmute */}
-            <button className="mute-button" onClick={toggleMute} aria-label={muted ? 'Activar sonido' : 'Silenciar'}>
-              {muted ? <VolumeX size={24} /> : <Volume2 size={24} />}
-            </button>
           </motion.article>
         ))}
       </AnimatePresence>
