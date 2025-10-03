@@ -5,8 +5,7 @@ import './RegisterForm.css';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     password: '',
     confirmPassword: ''
@@ -23,21 +22,12 @@ const RegisterForm = () => {
     const newErrors = {};
 
     // Validar nombre
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = 'El nombre es requerido';
-    } else if (formData.firstName.trim().length < 2) {
-      newErrors.firstName = 'El nombre debe tener al menos 2 caracteres';
-    } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(formData.firstName.trim())) {
-      newErrors.firstName = 'El nombre solo puede contener letras y espacios';
-    }
-
-    // Validar apellido
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = 'El apellido es requerido';
-    } else if (formData.lastName.trim().length < 2) {
-      newErrors.lastName = 'El apellido debe tener al menos 2 caracteres';
-    } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(formData.lastName.trim())) {
-      newErrors.lastName = 'El apellido solo puede contener letras y espacios';
+    if (!formData.name.trim()) {
+      newErrors.name = 'El nombre es requerido';
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = 'El nombre debe tener al menos 2 caracteres';
+    } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(formData.name.trim())) {
+      newErrors.name = 'El nombre solo puede contener letras y espacios';
     }
 
     // Validar email
@@ -95,8 +85,7 @@ const RegisterForm = () => {
 
     try {
       const userData = {
-        firstName: formData.firstName.trim(),
-        lastName: formData.lastName.trim(),
+        name: formData.name.trim(),
         email: formData.email.toLowerCase().trim(),
         password: formData.password
       };
@@ -106,8 +95,7 @@ const RegisterForm = () => {
       if (result.success) {
         // Limpiar formulario después del éxito
         setFormData({
-          firstName: '',
-          lastName: '',
+          name: '',
           email: '',
           password: '',
           confirmPassword: ''
@@ -149,68 +137,35 @@ const RegisterForm = () => {
             </div>
           )}
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="firstName" className="form-label">
-                Nombre <span className="required">*</span>
-              </label>
-              <div className="input-wrapper">
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  className={`form-input ${errors.firstName ? 'error' : ''}`}
-                  placeholder="Tu nombre"
-                  disabled={loading}
-                  autoComplete="given-name"
-                  aria-describedby={errors.firstName ? 'firstName-error' : undefined}
-                />
-                <span className="input-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
-                  </svg>
-                </span>
-              </div>
-              {errors.firstName && (
-                <span id="firstName-error" className="error-message" role="alert">
-                  {errors.firstName}
-                </span>
-              )}
+          <div className="form-group">
+            <label htmlFor="name" className="form-label">
+              Nombre Completo <span className="required">*</span>
+            </label>
+            <div className="input-wrapper">
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className={`form-input ${errors.name ? 'error' : ''}`}
+                placeholder="Tu nombre completo"
+                disabled={loading}
+                autoComplete="name"
+                aria-describedby={errors.name ? 'name-error' : undefined}
+              />
+              <span className="input-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </span>
             </div>
-
-            <div className="form-group">
-              <label htmlFor="lastName" className="form-label">
-                Apellido <span className="required">*</span>
-              </label>
-              <div className="input-wrapper">
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  className={`form-input ${errors.lastName ? 'error' : ''}`}
-                  placeholder="Tu apellido"
-                  disabled={loading}
-                  autoComplete="family-name"
-                  aria-describedby={errors.lastName ? 'lastName-error' : undefined}
-                />
-                <span className="input-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
-                  </svg>
-                </span>
-              </div>
-              {errors.lastName && (
-                <span id="lastName-error" className="error-message" role="alert">
-                  {errors.lastName}
-                </span>
-              )}
-            </div>
+            {errors.name && (
+              <span id="name-error" className="error-message" role="alert">
+                {errors.name}
+              </span>
+            )}
           </div>
 
           <div className="form-group">

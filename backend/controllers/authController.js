@@ -40,8 +40,8 @@ const authController = {
 
       // Responder con éxito
       res.status(201).json({
-        mensaje: 'Usuario registrado exitosamente',
-        usuario: user.toPublicData(),
+        message: 'Usuario registrado exitosamente',
+        user: user.toPublicData(),
         token
       });
     } catch (error) {
@@ -87,8 +87,8 @@ const authController = {
 
       // Responder con éxito
       res.json({
-        mensaje: 'Login exitoso',
-        usuario: user.toPublicData(),
+        message: 'Login exitoso',
+        user: user.toPublicData(),
         token
       });
     } catch (error) {

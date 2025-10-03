@@ -181,24 +181,8 @@ export const authService = {
   validatePassword(password) {
     const errors = [];
 
-    if (password.length < 8) {
-      errors.push('La contraseña debe tener al menos 8 caracteres');
-    }
-
-    if (!/(?=.*[a-z])/.test(password)) {
-      errors.push('La contraseña debe contener al menos una letra minúscula');
-    }
-
-    if (!/(?=.*[A-Z])/.test(password)) {
-      errors.push('La contraseña debe contener al menos una letra mayúscula');
-    }
-
-    if (!/(?=.*\d)/.test(password)) {
-      errors.push('La contraseña debe contener al menos un número');
-    }
-
-    if (!/(?=.*[@$!%*?&])/.test(password)) {
-      errors.push('La contraseña debe contener al menos un carácter especial');
+    if (password.length < 6) {
+      errors.push('La contraseña debe tener al menos 6 caracteres');
     }
 
     return {

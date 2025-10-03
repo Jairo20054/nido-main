@@ -1,16 +1,25 @@
-# TODO: Fix Errors in GitHub.dev Environment
+# TODO: Implement Local Authentication
 
-## 1. Update CORS Configuration ✅
-- Modified `backend/config/index.js` to include GitHub.dev frontend origin in CORS_ORIGIN default.
+## 1. Fix Backend Response Format
+- Change authController responses from 'usuario'/'token' to 'user'/'token' to match frontend expectations
 
-## 2. Update OAuth Callback URLs ✅
-- Modified `backend/config/passport.js` to use GitHub.dev domain for OAuth callbacks.
+## 2. Update AuthContext API Endpoint
+- Change /auth/me to /auth/profile in AuthContext.js
 
-## 3. Add Placeholder Image Route ✅
-- Added route in `backend/routes/index.js` for `/api/placeholder/:width/:height` to serve SVG placeholder images.
+## 3. Remove OAuth Components from Frontend
+- Remove Facebook login button from LoginForm.jsx
+- Remove social login sections
 
-## 4. Verify WebSocket CORS ✅
-- WebSocket server in `backend/server.js` uses the same CORS_ORIGINS, now updated.
+## 4. Adjust User Model and Forms
+- Update RegisterForm to use 'name' field instead of firstName/lastName
+- Adjust validation to match backend (min 6 chars for password)
 
-## 5. Test Changes
-- Restart backend and test frontend for resolved errors.
+## 5. Update Password Validation
+- Change frontend authService validatePassword to min 6 chars
+
+## 6. Fix Redirect After Auth
+- Check if /dashboard exists, otherwise redirect to home page
+
+## 7. Test Authentication Flow
+- Test register and login functionality
+- Verify JWT persistence and protected routes
