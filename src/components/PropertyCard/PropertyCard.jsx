@@ -5,6 +5,7 @@ const PropertyCard = ({
   property,
   onViewDetails,
   onContact,
+  onReserve,
   isLiked = false
 }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -26,6 +27,11 @@ const PropertyCard = ({
   const handleContact = (e) => {
     e.stopPropagation();
     onContact?.(property.id);
+  };
+
+  const handleReserve = (e) => {
+    e.stopPropagation();
+    onReserve?.(property.id);
   };
 
   const nextImage = (e) => {
@@ -149,6 +155,13 @@ const PropertyCard = ({
             aria-label="Contactar anfitrión"
           >
             Contactar
+          </button>
+          <button
+            className="property-card-button property-card-button--reserve"
+            onClick={handleReserve}
+            aria-label="Reservar propiedad"
+          >
+            Reservar
           </button>
           <button
             className="property-card-button property-card-button--details"

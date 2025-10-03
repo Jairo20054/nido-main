@@ -5,6 +5,7 @@ import PropertyInfo from '../../components/property/PropertyInfo/PropertyInfo';
 import PropertyAmenities from '../../components/property/PropertyAmenities/PropertyAmenities';
 import PropertyLocation from '../../components/property/PropertyLocation/PropertyLocation';
 import PropertyReviews from '../../components/property/PropertyReviews/PropertyReviews';
+import PropertyDescription from '../../components/property/PropertyDescription/PropertyDescription';
 import BookingWidget from '../../components/booking/BookingWidget';
 import HostInfo from '../../components/property/HostInfo/HostInfo';
 import SimilarProperties from '../../components/property/SimilarProperties/SimilarProperties';
@@ -23,6 +24,7 @@ const Property = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [activeSection, setActiveSection] = useState('info');
 
   // Función para manejar errores de forma más robusta
   const handleError = useCallback((error, context) => {
@@ -109,9 +111,33 @@ const Property = () => {
     setProperty(null);
     setLoading(true);
     setError(null);
-    
+
     loadPropertyData();
   }, [id, loadPropertyData]);
+
+  // Efecto para observer de secciones activas
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '-80px 0px -50% 0px',
+      threshold: 0
+    };
+
+    const observerCallback = (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+    const sections = document.querySelectorAll('.property-section[id]');
+
+    sections.forEach((section) => observer.observe(section));
+
+    return () => observer.disconnect();
+  }, [property]);
 
   // Función para scroll suave a secciones
   const scrollToSection = useCallback((sectionId) => {
@@ -152,8 +178,29 @@ const Property = () => {
   return (
     <div className="property-page">
       {/* Navegación interna (opcional) */}
-      <PropertyNavigation onNavigate={scrollToSection} />
-      
+      <PropertyNavigation onNavigate={scrollToSection} activeSection={activeSection} />
+
+      {/* Hero Section */}
+      <section className="property-hero">
+        <div className="property-hero-content">
+          <h1 className="property-title">{property.title}</h1>
+          <div className="property-meta">
+            <div className="property-location">
+              📍 {property.location}
+            </div>
+            {property.rating && (
+              <div className="property-rating">
+                ⭐ {property.rating.toFixed(1)} ({property.totalReviews || 0} reseñas)
+              </div>
+            )}
+          </div>
+          <div className="property-price">
+            <span className="price-amount">${property.price?.toLocaleString() || 'N/A'}</span>
+            <span className="price-unit">/ noche</span>
+          </div>
+        </div>
+      </section>
+
       <div className="property-main">
         {/* Galería de imágenes */}
         <section className="property-gallery-section">
@@ -236,33 +283,33 @@ const Property = () => {
 };
 
 // Componente de navegación interna
-const PropertyNavigation = ({ onNavigate }) => (
+const PropertyNavigation = ({ onNavigate, activeSection }) => (
   <nav className="property-navigation" aria-label="Navegación de la propiedad">
     <div className="nav-items">
-      <button 
+      <button
         onClick={() => onNavigate('info')}
-        className="nav-item"
+        className={`nav-item ${activeSection === 'info' ? 'active' : ''}`}
         type="button"
       >
         Información
       </button>
-      <button 
+      <button
         onClick={() => onNavigate('amenities')}
-        className="nav-item"
+        className={`nav-item ${activeSection === 'amenities' ? 'active' : ''}`}
         type="button"
       >
         Servicios
       </button>
-      <button 
+      <button
         onClick={() => onNavigate('location')}
-        className="nav-item"
+        className={`nav-item ${activeSection === 'location' ? 'active' : ''}`}
         type="button"
       >
         Ubicación
       </button>
-      <button 
+      <button
         onClick={() => onNavigate('reviews')}
-        className="nav-item"
+        className={`nav-item ${activeSection === 'reviews' ? 'active' : ''}`}
         type="button"
       >
         Reseñas
@@ -271,39 +318,6 @@ const PropertyNavigation = ({ onNavigate }) => (
   </nav>
 );
 
-// Componente de descripción mejorado
-const PropertyDescription = ({ description }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  
-  if (!description) {
-    return null;
-  }
 
-  const paragraphs = description.split('\n').filter(p => p.trim());
-  const shouldTruncate = paragraphs.length > 3;
-  const displayParagraphs = isExpanded ? paragraphs : paragraphs.slice(0, 3);
-
-  return (
-    <div className="property-description">
-      <h2>Descripción</h2>
-      <div className="description-content">
-        {displayParagraphs.map((paragraph, index) => (
-          <p key={index}>{paragraph}</p>
-        ))}
-        
-        {shouldTruncate && (
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="description-toggle"
-            type="button"
-            aria-expanded={isExpanded}
-          >
-            {isExpanded ? 'Mostrar menos' : 'Mostrar más'}
-          </button>
-        )}
-      </div>
-    </div>
-  );
-};
 
 export default Property;
