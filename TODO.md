@@ -1,30 +1,16 @@
-# TODO: Solucionar Errores en la Aplicación
+# TODO: Fix Errors in GitHub.dev Environment
 
-## Información Recopilada
-- Errores de carga de imágenes (ERR_CERT_AUTHORITY_INVALID) para URLs de Unsplash en socialMocks.js debido a problemas de certificado en Codespaces.
-- Error de CORS en manifest.json por redirecciones de túnel en Codespaces.
-- Error de renderizado en GoogleLoginButton por llamada fallida a API hardcoded.
-- Fallos de WebSocket a ws://localhost:5000/ws desde webpack-dev-server (HMR mal configurado para puerto 5000).
-- Archivos clave: GoogleLoginButton.jsx, socialMocks.js, public/index.html, api.js.
-- Proyecto: React CRA frontend, backend Node en puerto 5000.
+## 1. Update CORS Configuration ✅
+- Modified `backend/config/index.js` to include GitHub.dev frontend origin in CORS_ORIGIN default.
 
-## Plan de Cambios
-- [x] 1. Actualizar GoogleLoginButton.jsx: Usar API configurable en lugar de hardcoded.
-- [x] 2. Reemplazar imágenes en socialMocks.js: Usar URLs directas o placeholders locales.
-2. Crear src/setupProxy.js: Proxy para /api y /ws a localhost:5000.
-3. Configurar .env: REACT_APP_API_URL y PUBLIC_URL.
-4. Actualizar package.json: Script start con --host 0.0.0.0.
-5. Verificar manifest.json: start_url y scope correctos.
+## 2. Update OAuth Callback URLs ✅
+- Modified `backend/config/passport.js` to use GitHub.dev domain for OAuth callbacks.
 
-## Archivos Dependientes
-- src/components/user/Auth/GoogleLoginButton.jsx
-- src/utils/socialMocks.js
-- src/setupProxy.js (nuevo)
-- .env (nuevo o editar)
-- package.json
-- public/manifest.json
+## 3. Add Placeholder Image Route ✅
+- Added route in `backend/routes/index.js` for `/api/placeholder/:width/:height` to serve SVG placeholder images.
 
-## Pasos de Seguimiento
-- Reiniciar frontend y backend.
-- Probar carga de app, login Google, páginas sociales.
-- Verificar consola sin errores.
+## 4. Verify WebSocket CORS ✅
+- WebSocket server in `backend/server.js` uses the same CORS_ORIGINS, now updated.
+
+## 5. Test Changes
+- Restart backend and test frontend for resolved errors.

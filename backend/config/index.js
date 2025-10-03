@@ -15,7 +15,7 @@ const envSchema = Joi.object({
   JWT_SECRET: Joi.string().min(12).required(),
   JWT_EXPIRATION: Joi.string().default('24h'),
 
-  CORS_ORIGIN: Joi.string().default('http://localhost:3000'),
+  CORS_ORIGIN: Joi.string().default('http://localhost:3000,https://super-yodel-4jg6pgx4pqwwh554v-3000.app.github.dev'),
   CORS_CREDENTIALS: Joi.boolean().truthy('true').falsy('false').default(true),
 
   LOG_LEVEL: Joi.string().valid('error', 'warn', 'info', 'debug').default('info'),

@@ -26,7 +26,7 @@ passport.deserializeUser(async (id, done) => {
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback'
+  callbackURL: process.env.GOOGLE_CALLBACK_URL || 'https://super-yodel-4jg6pgx4pqwwh554v-3000.app.github.dev/api/auth/google/callback'
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     // Extraer información del perfil de Google
@@ -50,7 +50,7 @@ passport.use(new GoogleStrategy({
 passport.use(new FacebookStrategy({
   clientID: process.env.FACEBOOK_APP_ID,
   clientSecret: process.env.FACEBOOK_APP_SECRET,
-  callbackURL: process.env.FACEBOOK_CALLBACK_URL || 'http://localhost:5000/api/auth/facebook/callback',
+  callbackURL: process.env.FACEBOOK_CALLBACK_URL || 'https://super-yodel-4jg6pgx4pqwwh554v-3000.app.github.dev/api/auth/facebook/callback',
   profileFields: ['id', 'emails', 'name'] // Campos que queremos obtener
 }, async (accessToken, refreshToken, profile, done) => {
   try {
