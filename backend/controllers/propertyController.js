@@ -23,6 +23,19 @@ const MESSAGES = {
   PROPERTY_DELETED: 'Propiedad eliminada exitosamente',
 };
 
+// Función helper para calcular distancia entre dos puntos (fórmula de Haversine)
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // Radio de la Tierra en km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
+
 // Esquema de validación para query params en getAllProperties
 const searchSchema = Joi.object({
   page: Joi.number().integer().min(1).default(1),
@@ -98,13 +111,79 @@ const getAllProperties = async (req, res) => {
     const filter = buildPropertyFilter(filters);
 
     // Ejecutar consulta con lean para mejor rendimiento
+    let sortOption = { createdAt: -1 };
+
+    // Si hay coordenadas del usuario, buscar propiedades cercanas primero
+    if (filters.lat && filters.lon) {
+      // Para simplificar, usamos $near que ordena por distancia automáticamente
+      // Pero necesitamos ajustar el filtro para incluir el radio si está especificado
+      const geoFilter = { ...filter };
+      if (filters.radius) {
+        geoFilter.location = {
+          $near: {
+            $geometry: { type: 'Point', coordinates: [parseFloat(filters.lon), parseFloat(filters.lat)] },
+            $maxDistance: parseFloat(filters.radius) * 1000, // km a metros
+          },
+        };
+      } else {
+        // Sin radio específico, buscar en un área razonable (50km)
+        geoFilter.location = {
+          $near: {
+            $geometry: { type: 'Point', coordinates: [parseFloat(filters.lon), parseFloat(filters.lat)] },
+            $maxDistance: 50000, // 50km
+          },
+        };
+      }
+
+      // Ejecutar consulta geoespacial
+      const properties = await Property.find(geoFilter)
+        .limit(limit * 2) // Obtener más para ordenar después
+        .lean()
+        .select('title city price propertyType images location');
+
+      // Calcular distancias y ordenar en JavaScript (para demo)
+      const userLat = parseFloat(filters.lat);
+      const userLon = parseFloat(filters.lon);
+
+      properties.forEach(property => {
+        if (property.location && property.location.coordinates) {
+          const [propLon, propLat] = property.location.coordinates;
+          const distance = calculateDistance(userLat, userLon, propLat, propLon);
+          property.distance = distance;
+        }
+      });
+
+      properties.sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity));
+
+      // Aplicar paginación después del ordenamiento
+      const paginatedProperties = properties.slice(skip, skip + limit);
+
+      const total = await Property.countDocuments(geoFilter);
+
+      // Retornar resultado
+      res.status(STATUS_CODES.OK).json({
+        success: true,
+        data: paginatedProperties,
+        pagination: {
+          page,
+          limit,
+          total,
+          pages: Math.ceil(total / limit),
+          next: page * limit < total ? `${baseUrl}?page=${page + 1}&limit=${limit}&lat=${filters.lat}&lon=${filters.lon}` : null,
+          prev: page > 1 ? `${baseUrl}?page=${page - 1}&limit=${limit}&lat=${filters.lat}&lon=${filters.lon}` : null,
+        },
+      });
+      return;
+    }
+
+    // Consulta normal sin coordenadas
     const [properties, total] = await Promise.all([
       Property.find(filter)
         .skip(skip)
         .limit(limit)
-        .sort({ createdAt: -1 })
+        .sort(sortOption)
         .lean()
-        .select('title city price propertyType images'), // Proyección
+        .select('title city price propertyType images location'),
       Property.countDocuments(filter),
     ]);
 
