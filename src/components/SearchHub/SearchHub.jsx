@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import debounce from 'lodash.debounce';
 import './SearchHub.css';
 
@@ -199,8 +199,8 @@ const IntelligentSearchPanel = ({ onClose }) => {
   }, []);
 
   // Sugerencias de autocomplete
-  const mockSuggestions = ['Bogotá', 'Medellín', 'Cali', 'Cartagena', 'Santa Marta', 'Barranquilla', 'Pereira', 'Manizales'];
   useEffect(() => {
+    const mockSuggestions = ['Bogotá', 'Medellín', 'Cali', 'Cartagena', 'Santa Marta', 'Barranquilla', 'Pereira', 'Manizales'];
     if (query.length > 1) {
       const filteredSuggestions = mockSuggestions.filter(s =>
         s.toLowerCase().includes(query.toLowerCase())
@@ -237,7 +237,7 @@ const IntelligentSearchPanel = ({ onClose }) => {
   }, []);
 
   // Debounced search
-  const debouncedSearch = useCallback(debounce((filters) => {
+  const debouncedSearch = useMemo(() => debounce((filters) => {
     setPage(1);
     performSearch(filters, 1);
   }, 400), [performSearch]);

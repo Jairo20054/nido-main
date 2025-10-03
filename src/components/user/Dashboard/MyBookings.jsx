@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Calendar, 
   MapPin, 
@@ -99,7 +99,7 @@ const MyBookings = () => {
     };
 
     loadBookings();
-  }, [mockBookings]);
+  }, []);
 
   useEffect(() => {
     let filtered = bookings.filter(booking => {
@@ -349,4 +349,3 @@ const MyBookings = () => {
   );
 };
 
-export default MyBookings;

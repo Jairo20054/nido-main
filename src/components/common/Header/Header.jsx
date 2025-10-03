@@ -4,12 +4,9 @@ import useAuth from '../../../hooks/useAuth';
 import {
   HomeIcon,
   BellIcon,
-  SparklesIcon,
   MagnifyingGlassIcon,
   Bars3Icon,
-  XMarkIcon,
-  GlobeAltIcon,
-  ChatBubbleLeftEllipsisIcon
+  XMarkIcon
 } from '@heroicons/react/24/outline';
 import SearchBar from './SearchBar';
 import UserMenu from './UserMenu';
