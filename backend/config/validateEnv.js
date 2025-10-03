@@ -12,10 +12,9 @@ const schema = Joi.object({
   MONGODB_URI: Joi.string().required(),
   DB_NAME: Joi.string().default('nido'),
 
-  JWT_SECRET: Joi.string().min(32).required(),
-  JWT_REFRESH_SECRET: Joi.string().min(32).required(),
-  JWT_EXPIRE: Joi.string().default('7d'),
-  JWT_REFRESH_EXPIRE: Joi.string().default('30d'),
+  JWT_SECRET: Joi.string().min(12).required(),
+  JWT_ACCESS_EXPIRY: Joi.string().default('15m'),
+  JWT_REFRESH_EXPIRY: Joi.string().default('7d'),
   BCRYPT_SALT_ROUNDS: Joi.number().default(12),
 
   COOKIE_SECRET: Joi.string().min(32).required(),
@@ -23,9 +22,13 @@ const schema = Joi.object({
   COOKIE_HTTP_ONLY: Joi.boolean().default(true),
   COOKIE_SAME_SITE: Joi.string().valid('lax','strict','none').default('lax'),
 
-  EMAIL_SERVICE: Joi.string().allow('', null),
-  EMAIL_USER: Joi.string().allow('', null),
-  EMAIL_PASS: Joi.string().allow('', null),
+  SMTP_HOST: Joi.string().allow('', null),
+  SMTP_PORT: Joi.number().default(587),
+  SMTP_SECURE: Joi.boolean().default(false),
+  SMTP_USER: Joi.string().allow('', null),
+  SMTP_PASS: Joi.string().allow('', null),
+
+  CLIENT_URL: Joi.string().default('http://localhost:3000'),
 
   STRIPE_SECRET_KEY: Joi.string().allow('', null),
   STRIPE_PUBLISHABLE_KEY: Joi.string().allow('', null),
@@ -46,6 +49,8 @@ const schema = Joi.object({
   RATE_LIMIT_MAX_REQUESTS: Joi.number().default(100),
 
   LOG_LEVEL: Joi.string().default('info'),
+  REQUIRE_EMAIL_VERIFICATION: Joi.boolean().default(false),
+
   ENABLE_SWAGGER: Joi.boolean().default(true),
   ENABLE_EMAIL_VERIFICATION: Joi.boolean().default(true),
   ENABLE_PAYMENT_PROCESSING: Joi.boolean().default(true),

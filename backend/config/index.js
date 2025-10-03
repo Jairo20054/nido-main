@@ -13,7 +13,8 @@ const envSchema = Joi.object({
   MONGODB_URI: Joi.string().uri().required(),
 
   JWT_SECRET: Joi.string().min(12).required(),
-  JWT_EXPIRATION: Joi.string().default('24h'),
+  JWT_ACCESS_EXPIRY: Joi.string().default('15m'),
+  JWT_REFRESH_EXPIRY: Joi.string().default('7d'),
 
   CORS_ORIGIN: Joi.string().default('http://localhost:3000,https://super-yodel-4jg6pgx4pqwwh554v-3000.app.github.dev'),
   CORS_CREDENTIALS: Joi.boolean().truthy('true').falsy('false').default(true),
@@ -28,6 +29,26 @@ const envSchema = Joi.object({
 
   RATE_LIMIT_MAX: Joi.number().default(100),
   RATE_LIMIT_WINDOW: Joi.string().default('15m'),
+
+  // Email SMTP
+  SMTP_HOST: Joi.string().allow(''),
+  SMTP_PORT: Joi.number().default(587),
+  SMTP_SECURE: Joi.boolean().truthy('true').falsy('false').default(false),
+  SMTP_USER: Joi.string().allow(''),
+  SMTP_PASS: Joi.string().allow(''),
+
+  // URLs
+  CLIENT_URL: Joi.string().default('http://localhost:3000'),
+
+  // Cookies
+  COOKIE_SECRET: Joi.string().min(12).default('default_cookie_secret_change_in_production'),
+
+  // Features
+  REQUIRE_EMAIL_VERIFICATION: Joi.boolean().truthy('true').falsy('false').default(false),
+
+  // Rate limiting específico para auth
+  RATE_LIMIT_WINDOW_MS: Joi.number().default(900000),
+  RATE_LIMIT_MAX_REQUESTS: Joi.number().default(5),
 }).unknown(); // permite otras variables que no estén en el schema
 
 // 📌 Validar el archivo .env
@@ -64,6 +85,13 @@ const config = Object.freeze({
     jwtExpiration: env.JWT_EXPIRATION,
   },
 
+  // 🔐 JWT
+  jwt: {
+    secret: env.JWT_SECRET,
+    accessTokenExpiry: env.JWT_ACCESS_EXPIRY,
+    refreshTokenExpiry: env.JWT_REFRESH_EXPIRY,
+  },
+
   // 🔓 CORS
   cors: {
     origin: env.CORS_ORIGIN.split(','),
@@ -95,9 +123,37 @@ const config = Object.freeze({
     window: env.RATE_LIMIT_WINDOW,
   },
 
-  // ⚙️ Flags de características (ejemplo)
+  // 📧 Email SMTP
+  email: {
+    smtp: {
+      host: env.SMTP_HOST,
+      port: env.SMTP_PORT,
+      secure: env.SMTP_SECURE,
+      user: env.SMTP_USER,
+      pass: env.SMTP_PASS,
+    },
+  },
+
+  // 🌐 URLs
+  urls: {
+    client: env.CLIENT_URL,
+  },
+
+  // 🍪 Cookies
+  cookies: {
+    secret: env.COOKIE_SECRET,
+  },
+
+  // ⚙️ Flags de características
   features: {
     enableNewUI: env.NODE_ENV !== 'production',
+    requireEmailVerification: env.REQUIRE_EMAIL_VERIFICATION,
+  },
+
+  // 🚦 Rate limiting para auth
+  authRateLimit: {
+    windowMs: env.RATE_LIMIT_WINDOW_MS,
+    max: env.RATE_LIMIT_MAX_REQUESTS,
   },
 });
 
