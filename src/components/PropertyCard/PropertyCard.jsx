@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './PropertyCard.css';
 
 const PropertyCard = ({
@@ -8,6 +9,7 @@ const PropertyCard = ({
   onReserve,
   isLiked = false
 }) => {
+  const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -31,7 +33,7 @@ const PropertyCard = ({
 
   const handleReserve = (e) => {
     e.stopPropagation();
-    onReserve?.(property.id);
+    navigate(`/property/${property.id}`);
   };
 
   const nextImage = (e) => {

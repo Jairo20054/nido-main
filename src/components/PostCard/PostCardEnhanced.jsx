@@ -63,7 +63,7 @@ const PostCardEnhanced = ({
   };
 
   const handleCardClick = () => {
-    onClick(property.id);
+    onClick?.(property.id);
   };
 
   return (

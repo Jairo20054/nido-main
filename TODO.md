@@ -1,21 +1,51 @@
-# TODO: Reorganizar componente Property para mejor apariencia
+# TODO: Transformar Remodelaciones a Feed Social
 
-## Tareas Pendientes
+## Pasos para Implementar
 
-- [x] Verificar navegación del botón "Reservar" en PropertyCard (ya funciona)
-- [x] Crear componente PropertyDescription separado
-- [x] Reorganizar Property.jsx: agregar hero section, mejorar navegación con estado activo
-- [x] Mejorar estilos en Property.css para apariencia más atractiva
-- [x] Probar el layout reorganizado y responsividad
+### 1. Actualizar Estructura de Datos y Estados
+- [x] Cambiar `projects` por `posts` con nueva estructura (usuario, contenido, medios, interacciones)
+- [x] Actualizar estados: `selectedPost` en lugar de `selectedProject`
+- [x] Agregar nuevos estados para interacciones (likes, comentarios)
 
-## Información Recopilada
+### 2. Agregar Nuevos Íconos
+- [x] HeartIcon para likes
+- [x] CommentIcon para comentarios
+- [x] ShareIcon para compartir
+- [x] PlayIcon para videos
+- [x] VerifiedIcon para usuarios verificados
+- [x] ThreeDotsIcon para menú de opciones
 
-- El botón "Reservar" en PropertyCard ya navega a /property/:id
-- Property.jsx tiene layout con galería, secciones de info, widget de reserva
-- Se necesita reorganizar para mejor visual y UX
+### 3. Actualizar Lógica de Componente
+- [x] Cambiar `handleProjectClick` por `handlePostClick`
+- [x] Actualizar filtros para publicaciones
+- [x] Implementar lógica de likes y comentarios (mock)
+- [x] Agregar soporte para videos (embed YouTube)
 
-## Archivos a Modificar
+### 4. Rediseñar UI del Feed
+- [x] Crear tarjetas de publicación con encabezado de usuario
+- [x] Implementar carrusel de imágenes
+- [x] Agregar reproductor de video
+- [x] Botones de interacción (like, comment, share)
+- [x] Etiquetas de categoría en publicaciones
 
-- src/components/property/PropertyDescription/PropertyDescription.jsx (nuevo)
-- src/pages/Property/Property.jsx
-- src/pages/Property/Property.css
+### 5. Actualizar Modal de Detalles
+- [x] Cambiar a vista detallada de publicación
+- [x] Agregar sección de comentarios
+- [x] Expandir galería de medios
+- [x] Botones de acción (seguir, compartir)
+
+### 6. Actualizar Encabezado y Estadísticas
+- [x] Cambiar subtítulo a enfoque comunitario
+- [x] Actualizar estadísticas a métricas sociales
+- [x] Mantener filtros de categoría
+
+### 7. Crear/Actualizar CSS
+- [x] Estilos para feed social
+- [x] Diseño responsivo para móvil y desktop
+- [x] Animaciones y transiciones
+- [x] Tema visual coherente
+
+### 8. Pruebas y Ajustes
+- [ ] Verificar funcionalidad en diferentes dispositivos
+- [ ] Asegurar accesibilidad
+- [ ] Optimizar rendimiento
