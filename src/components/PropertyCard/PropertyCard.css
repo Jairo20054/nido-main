@@ -214,12 +214,12 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .property-card {
     max-width: 100%;
   }
 
-  .property-card-image {
-    height: 250px;
+  .property-card-image-container {
+    max-width: 100%;
   }
 }
