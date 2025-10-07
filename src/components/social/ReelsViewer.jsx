@@ -87,6 +87,11 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
     }
   }, [currentIndex, reels.length, horizontal]);
 
+  const handleLike = useCallback((reelId) => {
+    setLikedReels(prev => ({ ...prev, [reelId]: !prev[reelId] }));
+    onLike?.(reelId);
+  }, [onLike]);
+
   // Doble tap para like
   const handleDoubleTap = useCallback((reelId) => {
     const now = Date.now();
@@ -96,12 +101,7 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
       setTimeout(() => setIsDoubleTapping(false), 1000);
     }
     lastTapRef.current = now;
-  }, []);
-
-  const handleLike = useCallback((reelId) => {
-    setLikedReels(prev => ({ ...prev, [reelId]: !prev[reelId] }));
-    onLike?.(reelId);
-  }, [onLike]);
+  }, [handleLike]);
 
   const handleSave = useCallback((reelId) => {
     setSavedReels(prev => ({ ...prev, [reelId]: !prev[reelId] }));
@@ -116,8 +116,6 @@ const ReelsViewer = ({ reels = [], onLike, onComment, onShare, onSave, horizonta
       }
     });
   }, [muted]);
-
-  const currentReel = reels[currentIndex];
 
   if (!reels.length) {
     return (

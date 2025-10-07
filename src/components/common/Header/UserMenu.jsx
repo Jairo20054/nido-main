@@ -3,12 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useAuthContext } from '../../../context/AuthContext';
 import './UserMenu.css';
 
-// Iconos SVG actualizados
-const ProfileIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-  </svg>
-);
+
 
 const PlanIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18">
@@ -45,7 +40,7 @@ const LogoutIcon = () => (
 const UserMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const { user, logout, loading } = useAuthContext();
+  const { user, logout } = useAuthContext();
 
   useEffect(() => {
     const handleClickOutside = (event) => {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiHome, FiList, FiCalendar, FiDollarSign, FiBarChart2, FiMessageSquare, FiSettings, FiLogOut } from 'react-icons/fi';
+import { FiHome, FiList, FiCalendar, FiBarChart2, FiMessageSquare, FiSettings, FiLogOut } from 'react-icons/fi';
 import './HostRoute.css';
 
 const HostRoute = () => {
@@ -9,7 +9,7 @@ const HostRoute = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [notifications, setNotifications] = useState(3);
+  const [notifications] = useState(3);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [properties, setProperties] = useState([]);

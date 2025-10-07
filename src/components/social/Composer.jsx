@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { X, Image, Video, MapPin, Hash, DollarSign, Send } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { X, Image, MapPin, DollarSign, Send } from 'lucide-react';
+import { motion } from 'framer-motion';
 import './Composer.css';
 
 const Composer = ({ onPublish, onClose, initialMedia = null }) => {

@@ -4,7 +4,7 @@ import './BookingSummary.css';
 
 const BookingSummary = () => {
   const { bookingId } = useParams();
-  const [booking, setBooking] = useState(null);
+  const [booking] = useState(null);
 
   useEffect(() => {
     // Fetch booking details
