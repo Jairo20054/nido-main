@@ -136,7 +136,9 @@ const Property = () => {
 
     sections.forEach((section) => observer.observe(section));
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+    };
   }, [property]);
 
   // Función para scroll suave a secciones

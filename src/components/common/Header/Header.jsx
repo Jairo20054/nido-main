@@ -111,8 +111,8 @@ const Header = () => {
     setIsSearchExpanded(false);
   }, [location.pathname]);
 
-  // Control de tecla Escape y overflow
-  useEffect(() => {
+  // Control de tecla Escape y overflow - usar useLayoutEffect para manipulación de layout
+  useLayoutEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape") {
         setIsMobileMenuOpen(false);

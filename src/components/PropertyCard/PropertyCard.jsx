@@ -58,15 +58,17 @@ const PropertyCard = ({
     >
       {/* Carrusel de imágenes */}
       <div className="property-card-image-container">
-        {property.images?.map((image, index) => (
-          <img
-            key={index}
-            src={image}
-            alt={`${property.title} - Imagen ${index + 1}`}
-            className={`property-card-image ${index === currentImageIndex ? 'active' : ''}`}
-            loading="lazy"
-          />
-        ))}
+        <div className="property-card-image-wrapper" style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}>
+          {property.images?.map((image, index) => (
+            <img
+              key={index}
+              src={image}
+              alt={`${property.title} - Imagen ${index + 1}`}
+              className="property-card-image"
+              loading="lazy"
+            />
+          ))}
+        </div>
         <div className="property-card-image-overlay" />
         <div className="property-card-badges">
           {property.isSuperhost && (
