@@ -1,23 +1,29 @@
-
 import React, { useState, useCallback } from 'react';
 import { toast } from 'react-toastify'; // Opcional: para notificaciones
 // Configuración de la API
 const API_CONFIG = {
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
-  timeout: 30000, // 30 segundos
+  baseURL: process.env.REACT_APP_API_URL || 'https://api.nido.com',
+  timeout: 30000,
   retryAttempts: 3,
-  retryDelay: 1000, // 1 segundo
+  retryDelay: 1000,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  },
+  withCredentials: true
 };
 
-// Clase para errores de API personalizados
-export class ApiError extends Error {
-  constructor(message, status, data = null) {
+// Clase personalizada para errores de API
+class ApiError extends Error {
+  constructor(message, status, data = {}) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.data = data;
   }
 }
+
+
 
 // Función para manejar timeouts
 const withTimeout = (promise, timeout) => {

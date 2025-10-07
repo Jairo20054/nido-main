@@ -46,10 +46,13 @@
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+/* Glassmorphism para la tarjeta */
 .auth-card {
-  background-color: white;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
   border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-xl);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10), var(--shadow-xl);
   padding: 40px;
   width: 100%;
   max-width: 450px;
@@ -57,6 +60,21 @@
   transition: var(--transition);
   position: relative;
   overflow: hidden;
+}
+
+/* Animación de entrada para la tarjeta */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.auth-card {
+  animation: fadeInUp 0.7s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .auth-card::before {
@@ -245,7 +263,7 @@
 /* Checkbox personalizado */
 .checkbox-container {
   display: flex;
-  align-items: center;
+  align-items: left;
   cursor: pointer;
   user-select: none;
   font-size: 0.875rem;
@@ -295,6 +313,7 @@
   cursor: not-allowed;
 }
 
+
 .checkmark:after {
   content: "";
   display: none;
@@ -343,7 +362,7 @@
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--transition);
+  transition: var(--transition), box-shadow 0.25s cubic-bezier(0.4,0,0.2,1);
   position: relative;
   overflow: hidden;
   display: flex;
@@ -355,9 +374,9 @@
 }
 
 .auth-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 24px 0 rgba(16,185,129,0.10), var(--shadow-md);
   background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
 }
 
 .auth-submit-btn:active:not(:disabled) {
@@ -382,7 +401,7 @@
   border: 2px solid transparent;
   border-top: 2px solid white;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 0.7s linear infinite;
 }
 
 @keyframes spin {
@@ -437,8 +456,9 @@
   }
   
   .auth-card {
-    background-color: var(--gray-800);
+    background: rgba(31, 41, 55, 0.92);
     border-color: var(--gray-700);
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25), var(--shadow-xl);
   }
   
   .auth-title {
@@ -454,13 +474,14 @@
   }
   
   .form-input {
-    background-color: var(--gray-700);
+    background-color: var(--gray-800);
     border-color: var(--gray-600);
     color: var(--gray-100);
   }
   
   .form-input:focus {
     background-color: var(--gray-700);
+    border-color: var(--secondary-color);
   }
   
   .auth-footer p {
@@ -470,4 +491,31 @@
   .auth-footer {
     border-top-color: var(--gray-700);
   }
+}
+
+/* Mejoras responsive para móviles pequeños */
+@media (max-width: 350px) {
+  .auth-card {
+    padding: 12px;
+    max-width: 98vw;
+  }
+  .auth-title {
+    font-size: 1.1rem;
+  }
+}
+
+/* Mejora de foco visible */
+.form-input:focus, .auth-submit-btn:focus, .auth-link:focus, .forgot-password:focus {
+  outline: 2px solid var(--secondary-color);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
+}
+
+/* Mejora de contraste en mensajes de error */
+.error-message {
+  background: var(--error-light);
+  border-radius: 4px;
+  padding: 4px 8px;
+  color: var(--error-color);
+  font-weight: 600;
 }
