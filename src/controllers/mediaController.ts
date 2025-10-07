@@ -4,12 +4,33 @@ import { storageService } from '../services/storageService';
 import { prisma } from '../db/prisma';
 import { virusScanner } from '../services/virusScanner';
 import { mediaQueue } from '../queue';
+import { config } from '../utils/config';
 
 const initiateUpload = async (req: FastifyRequest, reply: FastifyReply) => {
   const { propertyId } = req.params as any;
   const body = req.body as any;
   const { filename, mimeType, size, kind } = body;
   const userId = (req as any).user.id;
+
+  // Validations
+  const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/avif'];
+  const allowedVideoTypes = ['video/mp4', 'video/mov', 'video/mkv', 'video/webm'];
+  const maxImageSize = config.MAX_IMAGE_SIZE_BYTES;
+  const maxVideoSize = config.MAX_VIDEO_SIZE_BYTES;
+
+  if (kind === 'image' && !allowedImageTypes.includes(mimeType)) {
+    return reply.status(400).send({ error: 'Invalid image type' });
+  }
+  if (kind === 'video' && !allowedVideoTypes.includes(mimeType)) {
+    return reply.status(400).send({ error: 'Invalid video type' });
+  }
+  if (kind === 'image' && size > maxImageSize) {
+    return reply.status(400).send({ error: `Image too large, max ${maxImageSize} bytes` });
+  }
+  if (kind === 'video' && size > maxVideoSize) {
+    return reply.status(400).send({ error: `Video too large, max ${maxVideoSize} bytes` });
+  }
+
   const tempId = uuidv4();
   const uploadKey = `${propertyId}/${tempId}/${filename}`;
   const uploadUrl = await storageService.getPresignedPutUrl(uploadKey, mimeType);
@@ -120,4 +141,18 @@ const deleteMedia = async (req: FastifyRequest, reply: FastifyReply) => {
   return reply.send({ ok: true });
 };
 
-export default { initiateUpload, completeUpload, multipartUpload, listMedia, getMedia, deleteMedia };
+const reprocesarMedia = async (req: FastifyRequest, reply: FastifyReply) => {
+  const { mediaId } = req.params as any;
+  const m = await prisma.media.findUnique({ where: { id: mediaId } });
+  if (!m) return reply.status(404).send({ error: 'Not found' });
+  await prisma.media.update({ where: { id: mediaId }, data: { status: 'processing' } });
+  await mediaQueue.add('process-media', { mediaId });
+  return reply.send({ ok: true });
+};
+
+const getQueueStatus = async (req: FastifyRequest, reply: FastifyReply) => {
+  // Simple status, in real app use Bull Board or API
+  return reply.send({ active: 0, waiting: 0, failed: 0 }); // placeholder
+};
+
+export default { initiateUpload, completeUpload, multipartUpload, listMedia, getMedia, deleteMedia, reprocesarMedia, getQueueStatus };

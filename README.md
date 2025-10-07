@@ -1,260 +1,207 @@
-# Nido Media Service
+# Nido Media Backend
 
-Backend service for uploading, processing and serving images and videos for Nido social rental platform.
+Complete backend service for uploading, processing, and serving real images and videos for the Nido rental social network.
 
-This repo includes:
-- Fastify API in TypeScript
-- Prisma + Postgres schema
-- MinIO for local S3-compatible storage
-- Redis + BullMQ queue for background processing
-- ClamAV for virus scanning
-- Worker with FFmpeg + sharp (Dockerized)
+## Features
 
-Quickstart (local):
+- **Upload Methods**: Presigned URLs (S3-compatible) and direct multipart/form-data
+- **Media Processing**: Thumbnails for images, transcoding to MP4/WebM + poster frames for videos
+- **Storage**: AWS S3, DigitalOcean Spaces, or MinIO (local)
+- **Background Jobs**: BullMQ + Redis for heavy processing
+- **Security**: Virus scanning with ClamAV, MIME type validation, size limits
+- **Permissions**: Property owner access control
+- **CDN Ready**: Signed URLs with configurable expiration
 
-1. Copy env file:
+## Tech Stack
 
+- **Language**: TypeScript (Node.js 18+)
+- **Framework**: Fastify
+- **ORM**: Prisma + PostgreSQL
+- **Queue**: BullMQ + Redis
+- **Storage**: AWS SDK (S3-compatible)
+- **Processing**: FFmpeg (videos) + Sharp (images)
+- **Security**: ClamAV for virus scanning
+- **Testing**: Jest + Supertest
+
+## Quick Start (Local Development)
+
+1. **Clone and setup**:
+   ```bash
+   git clone <repo>
+   cd nido-main
    cp .env.example .env
+   ```
 
-2. Start services:
+2. **Start services**:
+   ```bash
+   docker-compose up --build -d
+   ```
 
-   docker-compose up --build
-
-3. Install dependencies and run migrations:
-
+3. **Install dependencies**:
+   ```bash
    npm install
    npx prisma generate
    npx prisma migrate dev --name init
+   ```
 
-4. Start server:
-
+4. **Run the app**:
+   ```bash
    npm run dev
+   ```
 
-Endpoints (examples):
+The API will be available at `http://localhost:4000`.
 
-- POST /api/properties/:propertyId/media/initiate
-  Body: { filename, mimeType, size, kind }
+## Environment Variables
 
-  Example:
+See `.env.example` for all required variables. Key ones:
 
-  curl -X POST http://localhost:4000/api/properties/PROP_ID/media/initiate \
-    -H "Content-Type: application/json" \
-    -d '{"filename":"photo.jpg","mimeType":"image/jpeg","size":102400,"kind":"image"}'
+- `DATABASE_URL`: PostgreSQL connection string
+- `REDIS_URL`: Redis connection
+- `S3_*`: Storage configuration (use MinIO for local)
+- `JWT_SECRET`: For authentication
+- `MAX_IMAGE_SIZE_BYTES`: Default 10MB
+- `MAX_VIDEO_SIZE_BYTES`: Default 500MB
 
-See more details in the repository.
-# Nido - Sistema de Autenticación Completo
+## API Endpoints
 
-Aplicación web completa para alquiler de viviendas con sistema de autenticación JWT y OAuth (Google y Facebook).
+### Upload Flow
 
-## 🚀 Características
+1. **Initiate Upload**
+   ```
+   POST /api/properties/:propertyId/media/initiate
+   Body: { filename, mimeType, size, kind: "image"|"video" }
+   Response: { uploadUrl, uploadKey, uploadMethod, tempId }
+   ```
 
-- **Autenticación tradicional**: Registro y login con email/contraseña
-- **OAuth Social**: Login con Google y Facebook
-- **JWT Tokens**: Autenticación stateless con tokens seguros
-- **Rutas protegidas**: Middleware para proteger endpoints
-- **Frontend moderno**: React con componentes reutilizables
-- **Backend robusto**: Node.js/Express con validaciones
-- **Base de datos**: MongoDB con Mongoose
+2. **Complete Upload**
+   ```
+   POST /api/properties/:propertyId/media/complete
+   Body: { tempId, uploadKey }
+   Response: { mediaId, status: "processing" }
+   ```
 
-## 📋 Requisitos Previos
+### Direct Upload
+```
+POST /api/properties/:propertyId/media
+Content-Type: multipart/form-data
+Body: file + fields
+```
 
-- Node.js (v16 o superior)
-- MongoDB (local o Atlas)
-- npm o yarn
-- Cuentas de desarrollador en Google y Facebook para OAuth
+### Media Management
+```
+GET /api/properties/:propertyId/media
+GET /api/media/:mediaId
+DELETE /api/media/:mediaId
+```
 
-## 🛠️ Instalación y Configuración
+### Admin
+```
+POST /admin/media/:mediaId/reprocesar
+GET /admin/queue/status
+```
 
-### 1. Clonar el repositorio
+## Example cURL Commands
 
+**Initiate image upload**:
 ```bash
-git clone <url-del-repositorio>
-cd nido-main
+curl -X POST http://localhost:4000/api/properties/123/media/initiate \
+  -H "Authorization: Bearer YOUR_JWT" \
+  -H "Content-Type: application/json" \
+  -d '{"filename":"vacation.jpg","mimeType":"image/jpeg","size":2048000,"kind":"image"}'
 ```
 
-### 2. Instalar dependencias del backend
-
+**Upload to presigned URL**:
 ```bash
-cd backend
-npm install
+curl -X PUT "PRESIGNED_URL" \
+  -H "Content-Type: image/jpeg" \
+  --data-binary @vacation.jpg
 ```
 
-### 3. Instalar dependencias del frontend
-
+**Complete upload**:
 ```bash
-cd ..
-npm install
+curl -X POST http://localhost:4000/api/properties/123/media/complete \
+  -H "Authorization: Bearer YOUR_JWT" \
+  -H "Content-Type: application/json" \
+  -d '{"tempId":"temp-uuid","uploadKey":"123/temp-uuid/vacation.jpg"}'
 ```
 
-### 4. Configurar variables de entorno
-
-#### Backend (.env)
-Copia el archivo de ejemplo y configura las variables:
-
+**Get media list**:
 ```bash
-cp backend/.env.example backend/.env
+curl -X GET http://localhost:4000/api/properties/123/media \
+  -H "Authorization: Bearer YOUR_JWT"
 ```
 
-Edita `backend/.env` con tus valores:
+## Testing
 
-```env
-# Base de datos
-MONGODB_URI=mongodb://localhost:27017/nido
-
-# JWT
-JWT_SECRET=tu_clave_secreta_muy_segura_aqui
-
-# URLs
-FRONTEND_URL=http://localhost:3000
-
-# Google OAuth (obtén de Google Cloud Console)
-GOOGLE_CLIENT_ID=tu_google_client_id
-GOOGLE_CLIENT_SECRET=tu_google_client_secret
-
-# Facebook OAuth (obtén de Facebook Developers)
-FACEBOOK_APP_ID=tu_facebook_app_id
-FACEBOOK_APP_SECRET=tu_facebook_app_secret
-```
-
-#### Configurar OAuth
-
-**Google OAuth:**
-1. Ve a [Google Cloud Console](https://console.cloud.google.com/)
-2. Crea un proyecto o selecciona uno existente
-3. Habilita Google+ API
-4. Crea credenciales OAuth 2.0
-5. Agrega `http://localhost:5000/api/auth/google/callback` como URI de redirección autorizada
-
-**Facebook OAuth:**
-1. Ve a [Facebook Developers](https://developers.facebook.com/)
-2. Crea una app
-3. Agrega producto "Facebook Login"
-4. Configura OAuth redirect URIs: `http://localhost:5000/api/auth/facebook/callback`
-
-### 5. Iniciar MongoDB
-
-Asegúrate de que MongoDB esté ejecutándose localmente o configura la URI de Atlas.
-
-### 6. Ejecutar la aplicación
-
-#### Opción 1: Ejecutar por separado
-
-Terminal 1 (Backend):
-```bash
-cd backend
-npm run dev
-```
-
-Terminal 2 (Frontend):
-```bash
-npm start
-```
-
-#### Opción 2: Ejecutar simultáneamente
-
-```bash
-npm run dev
-```
-
-## 🔧 Uso
-
-### Endpoints de API
-
-#### Autenticación
-- `POST /api/auth/register` - Registro de usuario
-- `POST /api/auth/login` - Login tradicional
-- `GET /api/auth/google` - Iniciar OAuth Google
-- `GET /api/auth/facebook` - Iniciar OAuth Facebook
-- `GET /api/auth/profile` - Obtener perfil (requiere token)
-- `POST /api/auth/logout` - Logout
-
-#### Rutas protegidas
-Todas las rutas bajo `/api/` requieren autenticación JWT en el header:
-```
-Authorization: Bearer <token>
-```
-
-### Frontend
-
-- **Login**: `/login` - Formulario con botones sociales
-- **Registro**: `/register` - Registro tradicional
-- **Dashboard**: `/dashboard` - Área protegida para usuarios autenticados
-
-## 🧪 Pruebas
-
-### Backend
-```bash
-cd backend
-npm test
-```
-
-### Frontend
+Run unit tests:
 ```bash
 npm test
 ```
 
-## 📁 Estructura del Proyecto
-
-```
-nido-main/
-├── backend/                 # API REST
-│   ├── controllers/         # Controladores
-│   ├── models/             # Modelos de MongoDB
-│   ├── routes/             # Definición de rutas
-│   ├── services/           # Servicios de negocio
-│   ├── middleware/         # Middlewares personalizados
-│   ├── config/             # Configuración
-│   └── server.js           # Punto de entrada
-├── src/                    # Frontend React
-│   ├── components/         # Componentes reutilizables
-│   ├── pages/             # Páginas de la aplicación
-│   ├── context/           # Context API
-│   ├── services/          # Servicios del frontend
-│   └── utils/             # Utilidades
-├── public/                 # Archivos estáticos
-└── package.json           # Dependencias del frontend
-```
-
-## 🔒 Seguridad
-
-- **Hashing de contraseñas**: bcryptjs
-- **JWT tokens**: Expiración de 24 horas
-- **Rate limiting**: Protección contra ataques de fuerza bruta
-- **Validación de entrada**: express-validator
-- **CORS**: Configurado para orígenes específicos
-- **Helmet**: Headers de seguridad HTTP
-
-## 🚀 Despliegue
-
-### Backend
+Run with coverage:
 ```bash
-cd backend
-npm run build
-npm start
+npm run test:coverage
 ```
 
-### Frontend
-```bash
-npm run build
-# Servir con nginx/apache o servicio de hosting
+## Production Deployment
+
+1. **Database**: Use RDS PostgreSQL or similar
+2. **Redis**: ElastiCache or managed Redis
+3. **Storage**: AWS S3 or DigitalOcean Spaces
+4. **Worker**: Run separate worker process/container
+5. **ClamAV**: Run ClamAV daemon service
+6. **SSL**: Configure HTTPS with certbot/letsencrypt
+
+Example docker-compose.prod.yml:
+```yaml
+version: '3.8'
+services:
+  app:
+    image: nido-media:latest
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      # ... other env vars
+    ports:
+      - "80:4000"
+  worker:
+    image: nido-media-worker:latest
+    environment:
+      - NODE_ENV=production
+      # ... env vars
 ```
 
-## 🤝 Contribución
+## Security Notes
 
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit tus cambios (`git commit -am 'Agrega nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Abre un Pull Request
+- All uploads are scanned for viruses
+- MIME types are validated server-side
+- File sizes are enforced
+- Signed URLs prevent unauthorized access
+- Property ownership is verified for all operations
+- Rate limiting recommended for production
 
-## 📝 Licencia
+## Limitations
 
-Este proyecto está bajo la Licencia MIT.
+- Video processing is CPU-intensive; scale workers accordingly
+- ClamAV scanning adds latency; consider async scanning for large files
+- No built-in CDN; integrate with CloudFront or similar
+- Admin endpoints lack authentication (add middleware)
 
-## 📞 Soporte
+## Development
 
-Para soporte técnico o preguntas, por favor abre un issue en el repositorio.
+- **Linting**: `npm run lint`
+- **Build**: `npm run build`
+- **Migrations**: `npx prisma migrate dev`
+- **Seed**: `npx prisma db seed`
 
----
+## Contributing
 
-¡Gracias por usar Nido! 🏠✨
+1. Fork the repo
+2. Create feature branch
+3. Add tests
+4. Submit PR
+
+## License
+
+MIT

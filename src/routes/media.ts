@@ -10,4 +10,8 @@ export default async function (app: FastifyInstance) {
   app.get('/properties/:propertyId/media', { preHandler: authorizePropertyOwner }, mediaController.listMedia);
   app.get('/media/:mediaId', { preHandler: authorizeMediaOwner }, mediaController.getMedia);
   app.delete('/media/:mediaId', { preHandler: authorizeMediaOwner }, mediaController.deleteMedia);
+
+  // Admin endpoints (assume admin check elsewhere)
+  app.post('/admin/media/:mediaId/reprocesar', mediaController.reprocesarMedia);
+  app.get('/admin/queue/status', mediaController.getQueueStatus);
 }

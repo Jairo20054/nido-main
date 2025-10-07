@@ -1,4 +1,4 @@
-import { Queue, Worker, QueueScheduler } from 'bullmq';
+import { Queue, Worker, QueueEvents } from 'bullmq';
 import IORedis from 'ioredis';
 import { config } from '../utils/config';
 import pino from 'pino';
@@ -14,7 +14,7 @@ const connection = new IORedis(config.REDIS_URL);
 
 const mediaQueueName = 'media-processing';
 const queue = new Queue(mediaQueueName, { connection });
-new QueueScheduler(mediaQueueName, { connection });
+const queueEvents = new QueueEvents(mediaQueueName, { connection });
 
 const worker = new Worker(mediaQueueName, async job => {
   logger.info({ job: job.id, name: job.name }, 'Processing job');
@@ -57,8 +57,109 @@ async function processImage(media: any) {
 }
 
 async function processVideo(media: any) {
-  // For simplicity, skip video processing for now
+  const inputBuffer = await storageService.getBuffer(media.storageKey);
+  const tempInput = `/tmp/${media.id}-input`;
+  const tempOutput = `/tmp/${media.id}-output`;
+  fs.writeFileSync(tempInput, inputBuffer);
+
   const variants: any = {};
+
+  // Get metadata
+  const metadata = await new Promise<any>((resolve, reject) => {
+    ffmpeg.ffprobe(tempInput, (err: any, data: any) => {
+      if (err) reject(err);
+      else resolve(data);
+    });
+  });
+  const duration = metadata.format.duration;
+  const width = metadata.streams[0].width;
+  const height = metadata.streams[0].height;
+
+  // Update DB with metadata
+  await prisma.media.update({ where: { id: media.id }, data: { duration, width, height } });
+
+  // Generate poster frame (thumbnail)
+  const posterKey = `${media.storageKey}-poster.jpg`;
+  await new Promise<void>((resolve, reject) => {
+    ffmpeg(tempInput)
+      .screenshots({
+        count: 1,
+        folder: '/tmp',
+        filename: `${media.id}-poster.jpg`,
+        timemarks: ['1%']
+      })
+      .on('end', () => {
+        const posterBuffer = fs.readFileSync(`/tmp/${media.id}-poster.jpg`);
+        storageService.uploadBuffer(posterKey, posterBuffer, 'image/jpeg').then(() => resolve());
+      })
+      .on('error', reject);
+  });
+  variants.poster = { key: posterKey };
+
+  // Transcode to 360p MP4
+  const mp4_360_key = `${media.storageKey}-360.mp4`;
+  await new Promise<void>((resolve, reject) => {
+    ffmpeg(tempInput)
+      .videoCodec('libx264')
+      .size('640x360')
+      .audioCodec('aac')
+      .audioChannels(2)
+      .audioFrequency(44100)
+      .outputOptions(['-preset fast', '-crf 28'])
+      .output(tempOutput + '-360.mp4')
+      .on('end', () => {
+        const buffer = fs.readFileSync(tempOutput + '-360.mp4');
+        storageService.uploadBuffer(mp4_360_key, buffer, 'video/mp4').then(() => resolve());
+      })
+      .on('error', reject)
+      .run();
+  });
+  variants.mp4_360 = { key: mp4_360_key, width: 640, height: 360 };
+
+  // Transcode to 720p MP4
+  const mp4_720_key = `${media.storageKey}-720.mp4`;
+  await new Promise<void>((resolve, reject) => {
+    ffmpeg(tempInput)
+      .videoCodec('libx264')
+      .size('1280x720')
+      .audioCodec('aac')
+      .audioChannels(2)
+      .audioFrequency(44100)
+      .outputOptions(['-preset fast', '-crf 28'])
+      .output(tempOutput + '-720.mp4')
+      .on('end', () => {
+        const buffer = fs.readFileSync(tempOutput + '-720.mp4');
+        storageService.uploadBuffer(mp4_720_key, buffer, 'video/mp4').then(() => resolve());
+      })
+      .on('error', reject)
+      .run();
+  });
+  variants.mp4_720 = { key: mp4_720_key, width: 1280, height: 720 };
+
+  // Transcode to WebM
+  const webm_key = `${media.storageKey}.webm`;
+  await new Promise<void>((resolve, reject) => {
+    ffmpeg(tempInput)
+      .videoCodec('libvpx-vp9')
+      .audioCodec('libopus')
+      .outputOptions(['-b:v 1M', '-b:a 128k'])
+      .output(tempOutput + '.webm')
+      .on('end', () => {
+        const buffer = fs.readFileSync(tempOutput + '.webm');
+        storageService.uploadBuffer(webm_key, buffer, 'video/webm').then(() => resolve());
+      })
+      .on('error', reject)
+      .run();
+  });
+  variants.webm = { key: webm_key };
+
+  // Cleanup temp files
+  fs.unlinkSync(tempInput);
+  fs.unlinkSync(tempOutput + '-360.mp4');
+  fs.unlinkSync(tempOutput + '-720.mp4');
+  fs.unlinkSync(tempOutput + '.webm');
+  fs.unlinkSync(`/tmp/${media.id}-poster.jpg`);
+
   await prisma.media.update({ where: { id: media.id }, data: { variants } });
 }
 
