@@ -1,3 +1,47 @@
+# Nido Media Service
+
+Backend service for uploading, processing and serving images and videos for Nido social rental platform.
+
+This repo includes:
+- Fastify API in TypeScript
+- Prisma + Postgres schema
+- MinIO for local S3-compatible storage
+- Redis + BullMQ queue for background processing
+- ClamAV for virus scanning
+- Worker with FFmpeg + sharp (Dockerized)
+
+Quickstart (local):
+
+1. Copy env file:
+
+   cp .env.example .env
+
+2. Start services:
+
+   docker-compose up --build
+
+3. Install dependencies and run migrations:
+
+   npm install
+   npx prisma generate
+   npx prisma migrate dev --name init
+
+4. Start server:
+
+   npm run dev
+
+Endpoints (examples):
+
+- POST /api/properties/:propertyId/media/initiate
+  Body: { filename, mimeType, size, kind }
+
+  Example:
+
+  curl -X POST http://localhost:4000/api/properties/PROP_ID/media/initiate \
+    -H "Content-Type: application/json" \
+    -d '{"filename":"photo.jpg","mimeType":"image/jpeg","size":102400,"kind":"image"}'
+
+See more details in the repository.
 # Nido - Sistema de Autenticación Completo
 
 Aplicación web completa para alquiler de viviendas con sistema de autenticación JWT y OAuth (Google y Facebook).

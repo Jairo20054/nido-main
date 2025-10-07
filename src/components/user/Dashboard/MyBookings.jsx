@@ -99,7 +99,7 @@ const MyBookings = () => {
     };
 
     loadBookings();
-  }, []);
+  }, [mockBookings]);
 
   useEffect(() => {
     let filtered = bookings.filter(booking => {
@@ -348,4 +348,6 @@ const MyBookings = () => {
     </div>
   );
 };
+
+export default MyBookings;
 

@@ -3,12 +3,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { storageService } from '../services/storageService';
 import { prisma } from '../db/prisma';
 import { virusScanner } from '../services/virusScanner';
+import { mediaQueue } from '../queue';
 
 const initiateUpload = async (req: FastifyRequest, reply: FastifyReply) => {
   const { propertyId } = req.params as any;
   const body = req.body as any;
   const { filename, mimeType, size, kind } = body;
-  // TODO: auth & permissions
+  const userId = (req as any).user.id;
   const tempId = uuidv4();
   const uploadKey = `${propertyId}/${tempId}/${filename}`;
   const uploadUrl = await storageService.getPresignedPutUrl(uploadKey, mimeType);
@@ -17,7 +18,7 @@ const initiateUpload = async (req: FastifyRequest, reply: FastifyReply) => {
   await prisma.media.create({ data: {
     id: tempId,
     propertyId,
-    userId: 'unknown',
+    userId,
     storageKey: uploadKey,
     originalName: filename,
     mimeType,
@@ -32,6 +33,7 @@ const initiateUpload = async (req: FastifyRequest, reply: FastifyReply) => {
 const completeUpload = async (req: FastifyRequest, reply: FastifyReply) => {
   const { propertyId } = req.params as any;
   const { tempId, uploadKey } = req.body as any;
+  const userId = (req as any).user.id;
   // Validate file exists in storage
   const exists = await storageService.exists(uploadKey);
   if (!exists) return reply.status(400).send({ error: 'File not found in storage' });
@@ -44,7 +46,7 @@ const completeUpload = async (req: FastifyRequest, reply: FastifyReply) => {
   }
 
   // Enqueue processing job
-  // TODO: enqueue
+  await mediaQueue.add('process-media', { mediaId: tempId });
 
   await prisma.media.update({ where: { id: tempId }, data: { status: 'processing' } });
   return reply.send({ mediaId: tempId, status: 'processing' });
@@ -54,6 +56,7 @@ const multipartUpload = async (req: FastifyRequest, reply: FastifyReply) => {
   const { propertyId } = req.params as any;
   const data = await (req as any).file();
   const filename = data.filename;
+  const userId = (req as any).user.id;
   const tempId = uuidv4();
   const uploadKey = `${propertyId}/${tempId}/${filename}`;
 
@@ -64,7 +67,7 @@ const multipartUpload = async (req: FastifyRequest, reply: FastifyReply) => {
   await prisma.media.create({ data: {
     id: tempId,
     propertyId,
-    userId: 'unknown',
+    userId,
     storageKey: uploadKey,
     originalName: filename,
     mimeType: data.mimetype,
@@ -73,7 +76,8 @@ const multipartUpload = async (req: FastifyRequest, reply: FastifyReply) => {
     status: 'processing'
   }});
 
-  // TODO: enqueue
+  // Enqueue processing job
+  await mediaQueue.add('process-media', { mediaId: tempId });
 
   return reply.send({ mediaId: tempId, status: 'processing' });
 };
@@ -107,9 +111,10 @@ const getMedia = async (req: FastifyRequest, reply: FastifyReply) => {
 
 const deleteMedia = async (req: FastifyRequest, reply: FastifyReply) => {
   const { mediaId } = req.params as any;
-  // TODO: permissions
+  const userId = (req as any).user.id;
   const m = await prisma.media.findUnique({ where: { id: mediaId } });
   if (!m) return reply.status(404).send({ error: 'Not found' });
+  if (m.userId !== userId) return reply.status(403).send({ error: 'Forbidden' });
   await prisma.media.update({ where: { id: mediaId }, data: { status: 'deleted' } });
   // enqueue hard delete job
   return reply.send({ ok: true });

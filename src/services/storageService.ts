@@ -36,6 +36,15 @@ export const storageService = {
     const params = { Bucket: config.S3_BUCKET, Key: key, Body: stream, ContentType: contentType } as any;
     await s3.upload(params).promise();
   },
+  uploadBuffer: async (key: string, buffer: Buffer, contentType: string) => {
+    const params = { Bucket: config.S3_BUCKET, Key: key, Body: buffer, ContentType: contentType } as any;
+    await s3.upload(params).promise();
+  },
+  getBuffer: async (key: string): Promise<Buffer> => {
+    const params = { Bucket: config.S3_BUCKET, Key: key } as any;
+    const data = await s3.getObject(params).promise();
+    return data.Body as Buffer;
+  },
   delete: async (key: string) => {
     await s3.deleteObject({ Bucket: config.S3_BUCKET, Key: key }).promise();
   }

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuthContext } from '../../../context/AuthContext';
 import authService from '../../../services/authService';
 import './RegisterForm.css';
@@ -322,7 +323,7 @@ const RegisterForm = () => {
         </form>
 
         <div className="auth-footer">
-          <p>¿Ya tienes cuenta? <a href="/login" className="auth-link">Inicia sesión aquí</a></p>
+          <p>¿Ya tienes cuenta? <Link to="/login" className="auth-link">Inicia sesión aquí</Link></p>
         </div>
       </div>
     </div>
