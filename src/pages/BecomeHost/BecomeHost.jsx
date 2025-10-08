@@ -1,17 +1,36 @@
 // src/pages/BecomeHost/BecomeHost.jsx
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import HostTypeSelectionModal from '../../components/Host/HostTypeSelectionModal';
 import './BecomeHost.css'; // Estilos específicos para la página
 
 const BecomeHost = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedHostType, setSelectedHostType] = useState(null);
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleHostTypeSelect = (type) => {
+    setSelectedHostType(type);
+    setIsModalOpen(false);
+    // TODO: Show questions based on selection or navigate to appropriate form/page
+    alert(`Has seleccionado: ${type}. Aquí mostraríamos las preguntas correspondientes.`);
+  };
+
   return (
     <div className="become-host-container">
       {/* Hero */}
       <div className="become-host-hero">
         <h1>Convierte tu espacio en un ingreso extra</h1>
         <p>Únete a nuestra comunidad de anfitriones y ofrece alojamientos accesibles</p>
-        <Link to="/host/properties/add" className="cta-button">
+        <button className="cta-button" onClick={handleOpenModal}>
           Comenzar ahora
-        </Link>
+        </button>
       </div>
 
       {/* Beneficios */}
@@ -67,13 +86,19 @@ const BecomeHost = () => {
       {/* Call to Action */}
       <div className="cta-section">
         <h2>¿Listo para comenzar?</h2>
-        <Link to="/host/properties/add" className="cta-button primary">
+        <button className="cta-button primary" onClick={handleOpenModal}>
           Publicar mi espacio
-        </Link>
+        </button>
         <p className="small-text">
-          ¿Tienes dudas? <Link to="/contact">Contáctanos</Link>
+          ¿Tienes dudas? <a href="/contact">Contáctanos</a>
         </p>
       </div>
+
+      <HostTypeSelectionModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSelect={handleHostTypeSelect}
+      />
     </div>
   );
 };

@@ -1,207 +1,84 @@
-# Nido Media Backend
+# Host Onboarding Modal
 
-Complete backend service for uploading, processing, and serving real images and videos for the Nido rental social network.
+Este paquete contiene un flujo completo para el botón **"Conviértete en anfitrión"** implementado en React 18+, con soporte para autenticación simulada, formularios dinámicos, guardado automático en localStorage, y accesibilidad.
 
-## Features
+## Archivos principales
 
-- **Upload Methods**: Presigned URLs (S3-compatible) and direct multipart/form-data
-- **Media Processing**: Thumbnails for images, transcoding to MP4/WebM + poster frames for videos
-- **Storage**: AWS S3, DigitalOcean Spaces, or MinIO (local)
-- **Background Jobs**: BullMQ + Redis for heavy processing
-- **Security**: Virus scanning with ClamAV, MIME type validation, size limits
-- **Permissions**: Property owner access control
-- **CDN Ready**: Signed URLs with configurable expiration
+- `HostOnboardingModal.jsx`: Componente principal del modal que gestiona el flujo completo.
+- `QuestionsForm.jsx`: Formulario dinámico basado en JSON para las preguntas.
+- `questionsMap.js`: Mapa JSON con las preguntas para cada tipo de anfitrión.
+- `authMock.js`: Funciones simuladas para autenticación (`isAuthenticated()`, `login()`).
+- `utils/localDraft.js`: Helpers para guardar y recuperar borradores en `localStorage`.
+- `styles.css`: CSS puro, mobile-first, para el modal y componentes relacionados.
+- `ExampleHostOnboardingPage.jsx`: Ejemplo de uso con botón para abrir el modal.
 
-## Tech Stack
+## Integración
 
-- **Language**: TypeScript (Node.js 18+)
-- **Framework**: Fastify
-- **ORM**: Prisma + PostgreSQL
-- **Queue**: BullMQ + Redis
-- **Storage**: AWS SDK (S3-compatible)
-- **Processing**: FFmpeg (videos) + Sharp (images)
-- **Security**: ClamAV for virus scanning
-- **Testing**: Jest + Supertest
+1. Copia los archivos en tu proyecto React.
+2. Importa y usa el componente `HostOnboardingModal` donde necesites el flujo.
+3. Controla la apertura con la prop `open` y el cierre con `onClose`.
+4. Usa el callback `onComplete({ selectionId, answers })` para manejar el envío final.
 
-## Quick Start (Local Development)
+Ejemplo básico:
 
-1. **Clone and setup**:
-   ```bash
-   git clone <repo>
-   cd nido-main
-   cp .env.example .env
-   ```
+```jsx
+import HostOnboardingModal from './components/Host/HostOnboardingModal';
 
-2. **Start services**:
-   ```bash
-   docker-compose up --build -d
-   ```
+const [modalOpen, setModalOpen] = React.useState(false);
 
-3. **Install dependencies**:
-   ```bash
-   npm install
-   npx prisma generate
-   npx prisma migrate dev --name init
-   ```
-
-4. **Run the app**:
-   ```bash
-   npm run dev
-   ```
-
-The API will be available at `http://localhost:4000`.
-
-## Environment Variables
-
-See `.env.example` for all required variables. Key ones:
-
-- `DATABASE_URL`: PostgreSQL connection string
-- `REDIS_URL`: Redis connection
-- `S3_*`: Storage configuration (use MinIO for local)
-- `JWT_SECRET`: For authentication
-- `MAX_IMAGE_SIZE_BYTES`: Default 10MB
-- `MAX_VIDEO_SIZE_BYTES`: Default 500MB
-
-## API Endpoints
-
-### Upload Flow
-
-1. **Initiate Upload**
-   ```
-   POST /api/properties/:propertyId/media/initiate
-   Body: { filename, mimeType, size, kind: "image"|"video" }
-   Response: { uploadUrl, uploadKey, uploadMethod, tempId }
-   ```
-
-2. **Complete Upload**
-   ```
-   POST /api/properties/:propertyId/media/complete
-   Body: { tempId, uploadKey }
-   Response: { mediaId, status: "processing" }
-   ```
-
-### Direct Upload
-```
-POST /api/properties/:propertyId/media
-Content-Type: multipart/form-data
-Body: file + fields
+<HostOnboardingModal
+  open={modalOpen}
+  onClose={() => setModalOpen(false)}
+  onComplete={({ selectionId, answers }) => {
+    console.log('Formulario completado:', selectionId, answers);
+  }}
+/>
 ```
 
-### Media Management
-```
-GET /api/properties/:propertyId/media
-GET /api/media/:mediaId
-DELETE /api/media/:mediaId
+## Reemplazo de autenticación simulada
+
+Para integrar con autenticación real (e.g., Auth0, Firebase, NextAuth):
+
+1. Reemplaza las importaciones de `authMock` con tu servicio de auth real.
+2. Cambia `isAuthenticated()` por tu función de verificación de sesión.
+3. Cambia `login(email, password)` por tu función de login que retorne una promesa.
+4. Asegúrate de que el login modal sea reemplazado por tu UI de login si es necesario.
+
+Ejemplo con Auth0:
+
+```jsx
+// En HostOnboardingModal.jsx
+import { useAuth0 } from '@auth0/auth0-react';
+
+// Reemplaza isAuthenticated con useAuth0().isAuthenticated
+// Reemplaza login con useAuth0().loginWithRedirect o similar
 ```
 
-### Admin
-```
-POST /admin/media/:mediaId/reprocesar
-GET /admin/queue/status
-```
+## Dependencias
 
-## Example cURL Commands
+- React 18+
+- `focus-trap-react` (opcional, para focus trap; instala con `npm install focus-trap-react`)
 
-**Initiate image upload**:
+## Pruebas
+
+Ejecuta las pruebas unitarias con React Testing Library:
+
 ```bash
-curl -X POST http://localhost:4000/api/properties/123/media/initiate \
-  -H "Authorization: Bearer YOUR_JWT" \
-  -H "Content-Type: application/json" \
-  -d '{"filename":"vacation.jpg","mimeType":"image/jpeg","size":2048000,"kind":"image"}'
+npm test HostOnboardingModal.test.jsx
 ```
 
-**Upload to presigned URL**:
-```bash
-curl -X PUT "PRESIGNED_URL" \
-  -H "Content-Type: image/jpeg" \
-  --data-binary @vacation.jpg
-```
+## Notas técnicas
 
-**Complete upload**:
-```bash
-curl -X POST http://localhost:4000/api/properties/123/media/complete \
-  -H "Authorization: Bearer YOUR_JWT" \
-  -H "Content-Type: application/json" \
-  -d '{"tempId":"temp-uuid","uploadKey":"123/temp-uuid/vacation.jpg"}'
-```
+- CSS puro, mobile-first, sin frameworks como Tailwind o Bootstrap.
+- Accesibilidad: Focus trap, ARIA roles, navegación por teclado.
+- Guardado automático cada 5 segundos y al cambiar campos.
+- Validación en línea para campos requeridos.
+- Responsive: Grid de tarjetas se adapta a 1/2/3 columnas según ancho.
 
-**Get media list**:
-```bash
-curl -X GET http://localhost:4000/api/properties/123/media \
-  -H "Authorization: Bearer YOUR_JWT"
-```
+## QA Criterios
 
-## Testing
-
-Run unit tests:
-```bash
-npm test
-```
-
-Run with coverage:
-```bash
-npm run test:coverage
-```
-
-## Production Deployment
-
-1. **Database**: Use RDS PostgreSQL or similar
-2. **Redis**: ElastiCache or managed Redis
-3. **Storage**: AWS S3 or DigitalOcean Spaces
-4. **Worker**: Run separate worker process/container
-5. **ClamAV**: Run ClamAV daemon service
-6. **SSL**: Configure HTTPS with certbot/letsencrypt
-
-Example docker-compose.prod.yml:
-```yaml
-version: '3.8'
-services:
-  app:
-    image: nido-media:latest
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=${DATABASE_URL}
-      - REDIS_URL=${REDIS_URL}
-      # ... other env vars
-    ports:
-      - "80:4000"
-  worker:
-    image: nido-media-worker:latest
-    environment:
-      - NODE_ENV=production
-      # ... env vars
-```
-
-## Security Notes
-
-- All uploads are scanned for viruses
-- MIME types are validated server-side
-- File sizes are enforced
-- Signed URLs prevent unauthorized access
-- Property ownership is verified for all operations
-- Rate limiting recommended for production
-
-## Limitations
-
-- Video processing is CPU-intensive; scale workers accordingly
-- ClamAV scanning adds latency; consider async scanning for large files
-- No built-in CDN; integrate with CloudFront or similar
-- Admin endpoints lack authentication (add middleware)
-
-## Development
-
-- **Linting**: `npm run lint`
-- **Build**: `npm run build`
-- **Migrations**: `npx prisma migrate dev`
-- **Seed**: `npx prisma db seed`
-
-## Contributing
-
-1. Fork the repo
-2. Create feature branch
-3. Add tests
-4. Submit PR
-
-## License
-
-MIT
+- Modal abre al clic y recibe foco.
+- Selección no autenticada fuerza login; tras login continúa en la selección elegida.
+- Respuestas se persisten y se restauran al reabrir.
+- Formularios muestran errores si campos requeridos están vacíos y evitan submit.
+- Modal funcional en móvil y escritorio.
