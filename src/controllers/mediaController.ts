@@ -6,6 +6,7 @@ import { virusScanner } from '../services/virusScanner';
 import { mediaQueue } from '../queue';
 import { config } from '../utils/config';
 
+
 const initiateUpload = async (req: FastifyRequest, reply: FastifyReply) => {
   const { propertyId } = req.params as any;
   const body = req.body as any;
@@ -107,7 +108,7 @@ const listMedia = async (req: FastifyRequest, reply: FastifyReply) => {
   const { propertyId } = req.params as any;
   const items = await prisma.media.findMany({ where: { propertyId } });
   // map to include signed urls
-  const results = await Promise.all(items.map(async m => {
+  const results = await Promise.all(items.map(async (m: any) => {
     const urls = {
       original: await storageService.getPresignedGetUrl(m.storageKey)
     };
