@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
       abortControllerRef.current = new AbortController();
 
       try {
-        const userData = await api.get('/auth/me', {
+        const userData = await api.get('/auth/profile', {
           headers: { Authorization: `Bearer ${authToken}` },
           signal: abortControllerRef.current.signal
         });

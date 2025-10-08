@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { Home, Menu, FileText, BarChart3, MessageCircle, Settings, LogOut, HelpCircle } from 'lucide-react';
+import { useState } from 'react';
 import './PropertyManager.css';
 
 const PropertyManager = () => {
@@ -51,7 +50,7 @@ const PropertyManager = () => {
   const [statusFilter, setStatusFilter] = useState('Todos');
   const [sortBy, setSortBy] = useState('name');
   const [showDeleteModal, setShowDeleteModal] = useState(null);
-  const [activeMenu, setActiveMenu] = useState('Propiedades');
+  // const [activeMenu, setActiveMenu] = useState('Propiedades');
 
   const [formData, setFormData] = useState({
     name: '',
@@ -65,6 +64,7 @@ const PropertyManager = () => {
 
   const availableAmenities = ['WiFi', 'Cocina', 'Parking', 'Piscina', 'Jardín', 'BBQ', 'Aire acondicionado', 'Terraza', 'Gym', 'Spa'];
 
+  /*
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
     { id: 'properties', label: 'Propiedades', icon: '🏠' },
@@ -73,6 +73,7 @@ const PropertyManager = () => {
     { id: 'messages', label: 'Mensajes', icon: '💬' },
     { id: 'settings', label: 'Configuración', icon: '⚙️' }
   ];
+  */
 
   // Filtrar y ordenar propiedades
   const filteredProperties = properties

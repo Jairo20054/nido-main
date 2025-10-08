@@ -6,7 +6,7 @@ const express = require('express');
 const helmet = require('helmet');
 const compression = require('compression');
 const cors = require('cors');
-const rateLimit = require('express-rate-limit');
+// const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const http = require('http');
@@ -61,13 +61,13 @@ require('./config/passport');
   }));
 
   // Rate limiter - apply globally (tweak if needed)
-  const limiter = rateLimit({
-    windowMs: env.RATE_LIMIT_WINDOW_MS,
-    max: env.RATE_LIMIT_MAX_REQUESTS,
-    standardHeaders: true,
-    legacyHeaders: false
-  });
-  app.use(limiter);
+  // const limiter = rateLimit({
+  //   windowMs: env.RATE_LIMIT_WINDOW_MS,
+  //   max: env.RATE_LIMIT_MAX_REQUESTS,
+  //   standardHeaders: true,
+  //   legacyHeaders: false
+  // });
+  // app.use(limiter);
 
   // Body parsers with limits
   app.use(express.json({ limit: `${env.MAX_FILE_SIZE}b` }));

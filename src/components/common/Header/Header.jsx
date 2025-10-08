@@ -1,15 +1,12 @@
- import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef, useLayoutEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
 import {
   HomeIcon,
   BellIcon,
-  SparklesIcon,
   MagnifyingGlassIcon,
   Bars3Icon,
-  XMarkIcon,
-  GlobeAltIcon,
-  ChatBubbleLeftEllipsisIcon
+  XMarkIcon
 } from '@heroicons/react/24/outline';
 import SearchBar from './SearchBar';
 import UserMenu from './UserMenu';
@@ -114,8 +111,8 @@ const Header = () => {
     setIsSearchExpanded(false);
   }, [location.pathname]);
 
-  // Control de tecla Escape y overflow
-  useEffect(() => {
+  // Control de tecla Escape y overflow - usar useLayoutEffect para manipulación de layout
+  useLayoutEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape") {
         setIsMobileMenuOpen(false);

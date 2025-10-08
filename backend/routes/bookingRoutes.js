@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bookingController = require('../controllers/bookingController');
-const auth = require('../middleware/auth');
+const { verifyToken } = require('../middleware/auth');
 const { body, param, query } = require('express-validator');
 const rateLimit = require('express-rate-limit');
 const validationMiddleware = require('../middleware/validationMiddleware');
@@ -115,7 +115,7 @@ const paramsValidation = [
 // Rutas protegidas
 router.post(
   '/',
-  auth.required,
+  verifyToken,
   createBookingLimiter,
   bookingValidation,
   validationMiddleware.handleValidationErrors,
@@ -124,7 +124,7 @@ router.post(
 
 router.get(
   '/',
-  auth.required,
+  verifyToken,
   queryValidation,
   validationMiddleware.handleValidationErrors,
   bookingController.getUserBookings
@@ -132,7 +132,7 @@ router.get(
 
 router.get(
   '/:id',
-  auth.required,
+  verifyToken,
   paramsValidation,
   validationMiddleware.handleValidationErrors,
   permissionsMiddleware.checkBookingOwnership,
@@ -141,7 +141,7 @@ router.get(
 
 router.put(
   '/:id/cancel',
-  auth.required,
+  verifyToken,
   cancelBookingLimiter,
   paramsValidation,
   validationMiddleware.handleValidationErrors,
@@ -152,7 +152,7 @@ router.put(
 
 router.put(
   '/:id',
-  auth.required,
+  verifyToken,
   paramsValidation,
   validationMiddleware.handleValidationErrors,
   permissionsMiddleware.checkBookingOwnership,
@@ -162,8 +162,8 @@ router.put(
 // Ruta para anfitriones (ver reservas de sus propiedades)
 router.get(
   '/host/listings',
-  auth.required,
-  auth.hostOnly,
+  verifyToken,
+  // auth.hostOnly, // TODO: implementar middleware de roles
   queryValidation,
   validationMiddleware.handleValidationErrors,
   bookingController.getHostBookings

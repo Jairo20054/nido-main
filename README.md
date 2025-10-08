@@ -1,216 +1,84 @@
-# Nido - Sistema de Autenticación Completo
+# Host Onboarding Modal
 
-Aplicación web completa para alquiler de viviendas con sistema de autenticación JWT y OAuth (Google y Facebook).
+Este paquete contiene un flujo completo para el botón **"Conviértete en anfitrión"** implementado en React 18+, con soporte para autenticación simulada, formularios dinámicos, guardado automático en localStorage, y accesibilidad.
 
-## 🚀 Características
+## Archivos principales
 
-- **Autenticación tradicional**: Registro y login con email/contraseña
-- **OAuth Social**: Login con Google y Facebook
-- **JWT Tokens**: Autenticación stateless con tokens seguros
-- **Rutas protegidas**: Middleware para proteger endpoints
-- **Frontend moderno**: React con componentes reutilizables
-- **Backend robusto**: Node.js/Express con validaciones
-- **Base de datos**: MongoDB con Mongoose
+- `HostOnboardingModal.jsx`: Componente principal del modal que gestiona el flujo completo.
+- `QuestionsForm.jsx`: Formulario dinámico basado en JSON para las preguntas.
+- `questionsMap.js`: Mapa JSON con las preguntas para cada tipo de anfitrión.
+- `authMock.js`: Funciones simuladas para autenticación (`isAuthenticated()`, `login()`).
+- `utils/localDraft.js`: Helpers para guardar y recuperar borradores en `localStorage`.
+- `styles.css`: CSS puro, mobile-first, para el modal y componentes relacionados.
+- `ExampleHostOnboardingPage.jsx`: Ejemplo de uso con botón para abrir el modal.
 
-## 📋 Requisitos Previos
+## Integración
 
-- Node.js (v16 o superior)
-- MongoDB (local o Atlas)
-- npm o yarn
-- Cuentas de desarrollador en Google y Facebook para OAuth
+1. Copia los archivos en tu proyecto React.
+2. Importa y usa el componente `HostOnboardingModal` donde necesites el flujo.
+3. Controla la apertura con la prop `open` y el cierre con `onClose`.
+4. Usa el callback `onComplete({ selectionId, answers })` para manejar el envío final.
 
-## 🛠️ Instalación y Configuración
+Ejemplo básico:
 
-### 1. Clonar el repositorio
+```jsx
+import HostOnboardingModal from './components/Host/HostOnboardingModal';
+
+const [modalOpen, setModalOpen] = React.useState(false);
+
+<HostOnboardingModal
+  open={modalOpen}
+  onClose={() => setModalOpen(false)}
+  onComplete={({ selectionId, answers }) => {
+    console.log('Formulario completado:', selectionId, answers);
+  }}
+/>
+```
+
+## Reemplazo de autenticación simulada
+
+Para integrar con autenticación real (e.g., Auth0, Firebase, NextAuth):
+
+1. Reemplaza las importaciones de `authMock` con tu servicio de auth real.
+2. Cambia `isAuthenticated()` por tu función de verificación de sesión.
+3. Cambia `login(email, password)` por tu función de login que retorne una promesa.
+4. Asegúrate de que el login modal sea reemplazado por tu UI de login si es necesario.
+
+Ejemplo con Auth0:
+
+```jsx
+// En HostOnboardingModal.jsx
+import { useAuth0 } from '@auth0/auth0-react';
+
+// Reemplaza isAuthenticated con useAuth0().isAuthenticated
+// Reemplaza login con useAuth0().loginWithRedirect o similar
+```
+
+## Dependencias
+
+- React 18+
+- `focus-trap-react` (opcional, para focus trap; instala con `npm install focus-trap-react`)
+
+## Pruebas
+
+Ejecuta las pruebas unitarias con React Testing Library:
 
 ```bash
-git clone <url-del-repositorio>
-cd nido-main
+npm test HostOnboardingModal.test.jsx
 ```
 
-### 2. Instalar dependencias del backend
+## Notas técnicas
 
-```bash
-cd backend
-npm install
-```
+- CSS puro, mobile-first, sin frameworks como Tailwind o Bootstrap.
+- Accesibilidad: Focus trap, ARIA roles, navegación por teclado.
+- Guardado automático cada 5 segundos y al cambiar campos.
+- Validación en línea para campos requeridos.
+- Responsive: Grid de tarjetas se adapta a 1/2/3 columnas según ancho.
 
-### 3. Instalar dependencias del frontend
+## QA Criterios
 
-```bash
-cd ..
-npm install
-```
-
-### 4. Configurar variables de entorno
-
-#### Backend (.env)
-Copia el archivo de ejemplo y configura las variables:
-
-```bash
-cp backend/.env.example backend/.env
-```
-
-Edita `backend/.env` con tus valores:
-
-```env
-# Base de datos
-MONGODB_URI=mongodb://localhost:27017/nido
-
-# JWT
-JWT_SECRET=tu_clave_secreta_muy_segura_aqui
-
-# URLs
-FRONTEND_URL=http://localhost:3000
-
-# Google OAuth (obtén de Google Cloud Console)
-GOOGLE_CLIENT_ID=tu_google_client_id
-GOOGLE_CLIENT_SECRET=tu_google_client_secret
-
-# Facebook OAuth (obtén de Facebook Developers)
-FACEBOOK_APP_ID=tu_facebook_app_id
-FACEBOOK_APP_SECRET=tu_facebook_app_secret
-```
-
-#### Configurar OAuth
-
-**Google OAuth:**
-1. Ve a [Google Cloud Console](https://console.cloud.google.com/)
-2. Crea un proyecto o selecciona uno existente
-3. Habilita Google+ API
-4. Crea credenciales OAuth 2.0
-5. Agrega `http://localhost:5000/api/auth/google/callback` como URI de redirección autorizada
-
-**Facebook OAuth:**
-1. Ve a [Facebook Developers](https://developers.facebook.com/)
-2. Crea una app
-3. Agrega producto "Facebook Login"
-4. Configura OAuth redirect URIs: `http://localhost:5000/api/auth/facebook/callback`
-
-### 5. Iniciar MongoDB
-
-Asegúrate de que MongoDB esté ejecutándose localmente o configura la URI de Atlas.
-
-### 6. Ejecutar la aplicación
-
-#### Opción 1: Ejecutar por separado
-
-Terminal 1 (Backend):
-```bash
-cd backend
-npm run dev
-```
-
-Terminal 2 (Frontend):
-```bash
-npm start
-```
-
-#### Opción 2: Ejecutar simultáneamente
-
-```bash
-npm run dev
-```
-
-## 🔧 Uso
-
-### Endpoints de API
-
-#### Autenticación
-- `POST /api/auth/register` - Registro de usuario
-- `POST /api/auth/login` - Login tradicional
-- `GET /api/auth/google` - Iniciar OAuth Google
-- `GET /api/auth/facebook` - Iniciar OAuth Facebook
-- `GET /api/auth/profile` - Obtener perfil (requiere token)
-- `POST /api/auth/logout` - Logout
-
-#### Rutas protegidas
-Todas las rutas bajo `/api/` requieren autenticación JWT en el header:
-```
-Authorization: Bearer <token>
-```
-
-### Frontend
-
-- **Login**: `/login` - Formulario con botones sociales
-- **Registro**: `/register` - Registro tradicional
-- **Dashboard**: `/dashboard` - Área protegida para usuarios autenticados
-
-## 🧪 Pruebas
-
-### Backend
-```bash
-cd backend
-npm test
-```
-
-### Frontend
-```bash
-npm test
-```
-
-## 📁 Estructura del Proyecto
-
-```
-nido-main/
-├── backend/                 # API REST
-│   ├── controllers/         # Controladores
-│   ├── models/             # Modelos de MongoDB
-│   ├── routes/             # Definición de rutas
-│   ├── services/           # Servicios de negocio
-│   ├── middleware/         # Middlewares personalizados
-│   ├── config/             # Configuración
-│   └── server.js           # Punto de entrada
-├── src/                    # Frontend React
-│   ├── components/         # Componentes reutilizables
-│   ├── pages/             # Páginas de la aplicación
-│   ├── context/           # Context API
-│   ├── services/          # Servicios del frontend
-│   └── utils/             # Utilidades
-├── public/                 # Archivos estáticos
-└── package.json           # Dependencias del frontend
-```
-
-## 🔒 Seguridad
-
-- **Hashing de contraseñas**: bcryptjs
-- **JWT tokens**: Expiración de 24 horas
-- **Rate limiting**: Protección contra ataques de fuerza bruta
-- **Validación de entrada**: express-validator
-- **CORS**: Configurado para orígenes específicos
-- **Helmet**: Headers de seguridad HTTP
-
-## 🚀 Despliegue
-
-### Backend
-```bash
-cd backend
-npm run build
-npm start
-```
-
-### Frontend
-```bash
-npm run build
-# Servir con nginx/apache o servicio de hosting
-```
-
-## 🤝 Contribución
-
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit tus cambios (`git commit -am 'Agrega nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Abre un Pull Request
-
-## 📝 Licencia
-
-Este proyecto está bajo la Licencia MIT.
-
-## 📞 Soporte
-
-Para soporte técnico o preguntas, por favor abre un issue en el repositorio.
-
----
-
-¡Gracias por usar Nido! 🏠✨
+- Modal abre al clic y recibe foco.
+- Selección no autenticada fuerza login; tras login continúa en la selección elegida.
+- Respuestas se persisten y se restauran al reabrir.
+- Formularios muestran errores si campos requeridos están vacíos y evitan submit.
+- Modal funcional en móvil y escritorio.

@@ -1,30 +1,58 @@
-# TODO: Solucionar Errores en la Aplicación
+# TODO: Corrección de Responsividad y Layout Shifts en Nido App
 
 ## Información Recopilada
-- Errores de carga de imágenes (ERR_CERT_AUTHORITY_INVALID) para URLs de Unsplash en socialMocks.js debido a problemas de certificado en Codespaces.
-- Error de CORS en manifest.json por redirecciones de túnel en Codespaces.
-- Error de renderizado en GoogleLoginButton por llamada fallida a API hardcoded.
-- Fallos de WebSocket a ws://localhost:5000/ws desde webpack-dev-server (HMR mal configurado para puerto 5000).
-- Archivos clave: GoogleLoginButton.jsx, socialMocks.js, public/index.html, api.js.
-- Proyecto: React CRA frontend, backend Node en puerto 5000.
+- **Componentes principales revisados**: Header, Layout, PropertyCard, Home, Property, BookingWidget, modales
+- **Problemas identificados**:
+  - PropertyCard.css: width: 200% incorrecto (debe ser 100%)
+  - Carousel de imágenes con position absolute/opacity toggle sin reserva de espacio
+  - Manipulación de body.style.overflow en Header sin cleanup adecuado en navegación
+  - Falta useLayoutEffect en manipulación de layout
+  - Z-index inconsistente en modales
+  - Dimensiones fijas en imágenes sin aspect-ratio
+  - Animaciones framer-motion potencialmente causando shifts
+  - IntersectionObserver sin cleanup en Property
 
-## Plan de Cambios
-- [x] 1. Actualizar GoogleLoginButton.jsx: Usar API configurable en lugar de hardcoded.
-- [x] 2. Reemplazar imágenes en socialMocks.js: Usar URLs directas o placeholders locales.
-2. Crear src/setupProxy.js: Proxy para /api y /ws a localhost:5000.
-3. Configurar .env: REACT_APP_API_URL y PUBLIC_URL.
-4. Actualizar package.json: Script start con --host 0.0.0.0.
-5. Verificar manifest.json: start_url y scope correctos.
+## Plan de Corrección
 
-## Archivos Dependientes
-- src/components/user/Auth/GoogleLoginButton.jsx
-- src/utils/socialMocks.js
-- src/setupProxy.js (nuevo)
-- .env (nuevo o editar)
-- package.json
-- public/manifest.json
+### 1. Correcciones CSS/HTML
+- [ ] src/components/PropertyCard/PropertyCard.css: Corregir width: 200% → 100%
+- [ ] src/components/PropertyCard/PropertyCard.css: Implementar aspect-ratio para imágenes
+- [ ] src/components/PropertyCard/PropertyCard.css: Mejorar carousel con transform en lugar de opacity
+- [ ] src/components/common/Header/Header.css: Verificar z-index escala
+- [ ] src/assets/styles/global.css: Confirmar box-sizing global
+- [ ] Crear src/assets/styles/layout.css con utilidades (.container, .row, .col)
 
-## Pasos de Seguimiento
-- Reiniciar frontend y backend.
-- Probar carga de app, login Google, páginas sociales.
-- Verificar consola sin errores.
+### 2. Correcciones React/JS
+- [ ] src/components/common/Header/Header.jsx: Mejorar cleanup de body overflow con useLayoutEffect
+- [ ] src/pages/Property/Property.jsx: Cleanup de IntersectionObserver
+- [ ] src/components/PropertyCard/PropertyCard.jsx: Optimizar carousel con useLayoutEffect
+- [ ] Verificar keys estables en listas de propiedades
+- [ ] Añadir ResizeObserver donde sea necesario
+
+### 3. Responsive
+- [ ] Definir breakpoints consistentes: 320, 375, 425, 768, 1024, 1280, 1440
+- [ ] Ajustar media queries en todos los componentes
+- [ ] Verificar comportamiento hamburger menu
+- [ ] Prevenir horizontal overflow en mobile
+
+### 4. Pruebas/Validación
+- [ ] Crear tests Playwright/Cypress para navegación home → detail → back
+- [ ] Tests de viewport resize
+- [ ] Verificar CLS con Lighthouse
+- [ ] Snapshots visuales
+
+### 5. Extras
+- [ ] Implementar CSS reset mejorado
+- [ ] Añadir will-change con moderación
+- [ ] Optimizar performance de animaciones
+
+## Dependencias
+- PropertyCard.css depende de PropertyCard.jsx
+- Header.jsx depende de Layout.jsx
+- Tests dependen de todas las correcciones
+
+## Followup Steps
+- [ ] Ejecutar tests después de correcciones
+- [ ] Verificar en DevTools layout shifts
+- [ ] Medir CLS con Lighthouse
+- [ ] Pruebas manuales en diferentes viewports

@@ -14,21 +14,43 @@
   /* Transición suave para efectos de hover */
   transition: transform 300ms ease-in-out, box-shadow 300ms ease-in-out;
   /* Ancho completo con máximo aumentado para hacer las tarjetas más grandes */
-  width: 200%;
+  width: 100%;
   max-width: 650px; /* Slightly increased from 600px for a bit wider cards */
   margin: 0 auto;
 }
 
+.property-card-image-container {
+  position: relative;
+  margin-bottom: 16px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: transform 300ms ease-in-out;
+  /* Reservar espacio para prevenir layout shift */
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  max-width: 500px; /* Increased from 450px to make image wider */
+}
+
+.property-card:hover .property-card-image-container {
+  transform: scale(1.02);
+}
+
+.property-card-image-wrapper {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 300ms ease-in-out;
+}
+
 .property-card-image {
-  width: 500px; /* Increased from 450px to make image wider */
-  height: 355px; /* Adjusted height proportionally */
+  flex-shrink: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  opacity: 0;
-  transition: opacity 300ms ease-in-out;
+  /* Prevenir layout shift */
+  aspect-ratio: 16 / 9;
 }
 
 .property-card:hover {
@@ -39,24 +61,6 @@
 .property-card:focus {
   outline: 2px solid #2563eb;
   outline-offset: 2px;
-}
-
-.property-card-image-container {
-  position: relative;
-  margin-bottom: 16px;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  transition: transform 300ms ease-in-out;
-}
-
-.property-card:hover .property-card-image-container {
-  transform: scale(1.02);
-}
-
-.property-card-image.active {
-  opacity: 1;
-  position: relative;
 }
 
 .property-card-image-overlay {
@@ -210,12 +214,12 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .property-card {
     max-width: 100%;
   }
 
-  .property-card-image {
-    height: 250px;
+  .property-card-image-container {
+    max-width: 100%;
   }
 }
