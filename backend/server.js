@@ -94,13 +94,16 @@ require('./config/passport');
   });
 
   // Mount API routes under /api
+  // Servir archivos estáticos desde el directorio 'uploads'
+  app.use('/uploads', express.static('uploads'));
+
   app.use('/api', routes);
 
   // Error handler (last middleware)
   app.use(errorHandler);
 
   // Socket.io connection handling
-  io.on('connection', (socket) => {
+  // io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
     socket.on('disconnect', () => {
