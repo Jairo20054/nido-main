@@ -3,93 +3,65 @@ import { useNavigate } from 'react-router-dom';
 import { useUiHost } from '../../context/UiHostProvider';
 import './LeftSidebar.css';
 
-// ========== SISTEMA DE ICONOS MODERNOS ==========
-const SearchIcon = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="11" cy="11" r="8"/>
-    <path d="m21 21-4.3-4.3"/>
+// ========== SISTEMA DE ICONOS MEJORADOS Y COLORIDOS ==========
+const SearchIcon = ({ size = 20, color = "currentColor" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" 
+          stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
-const ReelsIcon = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/>
-    <line x1="7" y1="2" x2="7" y2="22"/>
-    <line x1="17" y1="2" x2="17" y2="22"/>
-    <line x1="2" y1="12" x2="22" y2="12"/>
-    <line x1="2" y1="7" x2="7" y2="7"/>
-    <line x1="2" y1="17" x2="7" y2="17"/>
-    <line x1="17" y1="17" x2="22" y2="17"/>
-    <line x1="17" y1="7" x2="22" y2="7"/>
+const ReelsIcon = ({ size = 20, color = "currentColor" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="2" y="2" width="20" height="20" rx="4" stroke={color} strokeWidth="2"/>
+    <path d="M8 2V22M16 2V22M2 8H8M2 16H8M16 8H22M16 16H22" stroke={color} strokeWidth="2" strokeLinecap="round"/>
   </svg>
 );
 
-/*
-const RenovationIcon = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-  </svg>
-);
-*/
-
-const UserIcon = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-    <circle cx="12" cy="7" r="4"/>
+const UserIcon = ({ size = 20, color = "currentColor" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="8" r="4" stroke={color} strokeWidth="2"/>
+    <path d="M5.337 18.32C5.813 15.619 8.144 13.5 11 13.5H13C15.856 13.5 18.187 15.619 18.663 18.32C18.859 19.373 18.075 20.5 17 20.5H7C5.925 20.5 5.141 19.373 5.337 18.32Z" 
+          stroke={color} strokeWidth="2"/>
   </svg>
 );
 
-/*
-const SmartHomeIcon = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-    <polyline points="7.5 4.21 12 6.81 16.5 4.21"/>
-    <polyline points="7.5 19.79 7.5 14.6 3 12"/>
-    <polyline points="21 12 16.5 14.6 16.5 19.79"/>
-    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-    <line x1="12" y1="22.08" x2="12" y2="12"/>
-  </svg>
-);
-*/
-
-const TrendingIcon = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-    <polyline points="17 6 23 6 23 12"/>
+const TrendingIcon = ({ size = 20, color = "currentColor" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M23 6L13.5 15.5L8.5 10.5L1 18" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M17 6H23V12" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
-const MapIcon = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
-    <line x1="8" y1="2" x2="8" y2="18"/>
-    <line x1="16" y1="6" x2="16" y2="22"/>
+const MapIcon = ({ size = 20, color = "currentColor" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M9 4L3 7V20L9 17M9 4L15 7M9 4V17M15 7L21 4V17L15 20M15 7V20M15 20L9 17" 
+          stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
-const MessageIcon = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+const MessageIcon = ({ size = 20, color = "currentColor" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 3.89 3.89 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" 
+          stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
-const MenuIcon = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="3" y1="12" x2="21" y2="12"/>
-    <line x1="3" y1="6" x2="21" y2="6"/>
-    <line x1="3" y1="18" x2="21" y2="18"/>
+const MenuIcon = ({ size = 20, color = "currentColor" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3 12H21M3 6H21M3 18H21" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
-const ChevronLeftIcon = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="15 18 9 12 15 6"/>
+const ChevronLeftIcon = ({ size = 20, color = "currentColor" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M15 18L9 12L15 6" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
-const ChevronRightIcon = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="9 18 15 12 9 6"/>
+const ChevronRightIcon = ({ size = 20, color = "currentColor" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M9 18L15 12L9 6" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
@@ -158,11 +130,11 @@ const LeftSidebar = ({
       return;
     }
 
-    // Navegación a rutas específicas
+    // Navegación a rutas específicas para arrendamiento de viviendas
     const routeMap = {
       'reels': '/reels',
       'mensajes': '/messages',
-      'perfil': '/dashboard', // Asumiendo que perfil va al dashboard
+      'perfil': '/profile',
       'mapa': '/mapa',
       'tendencias': '/tendencias'
     };
@@ -188,26 +160,26 @@ const LeftSidebar = ({
   const showTooltip = (id) => setTooltipVisible(id);
   const hideTooltip = () => setTooltipVisible(null);
 
-  // ========== ITEMS DE NAVEGACIÓN INNOVADORES ==========
+  // ========== ITEMS DE NAVEGACIÓN ESPECÍFICOS PARA ARRENDAMIENTO ==========
   const navigationItems = [
     {
       id: 'busqueda',
       icon: <SearchIcon />,
-      label: 'Búscar',
-      description: 'Encuentra propiedades ideales'
+      label: 'Buscar Propiedades',
+      description: 'Encuentra tu vivienda ideal'
     },
     {
       id: 'reels',
       icon: <ReelsIcon />,
-      label: 'Reels',
-      description: 'Recorridos virtuales en video',
+      label: 'Tours Virtuales',
+      description: 'Recorridos en video 360°',
       badge: badgeCounts.reels || 0
     },
     {
       id: 'mensajes',
       icon: <MessageIcon />,
       label: 'Mensajes',
-      description: 'Conversaciones y chats',
+      description: 'Chat con propietarios',
       badge: badgeCounts.mensajes || 0
     },
     {
@@ -220,20 +192,20 @@ const LeftSidebar = ({
       id: 'mapa',
       icon: <MapIcon />,
       label: 'Mapa Interactivo',
-      description: 'Explora propiedades en mapa'
+      description: 'Propiedades en el mapa'
     },
     {
       id: 'tendencias',
       icon: <TrendingIcon />,
       label: 'Tendencias',
-      description: 'Descubre las últimas tendencias'
+      description: 'Precios y mercado actual'
     }
   ];
 
-  // ========== RENDERIZADO ==========
+  // ========== RENDERIZADO MEJORADO ==========
   return (
     <>
-      {/* Overlay para móvil con animación */}
+      {/* Overlay para móvil */}
       {isMobile && isMobileOpen && (
         <div
           className="sidebar-overlay"
@@ -249,7 +221,7 @@ const LeftSidebar = ({
           onClick={() => setIsMobileOpen(true)}
           aria-label="Abrir menú de navegación"
         >
-          <MenuIcon size={24} />
+          <MenuIcon size={20} />
         </button>
       )}
 
@@ -263,17 +235,17 @@ const LeftSidebar = ({
           ${isMobile ? 'mobile' : ''}
         `}
         role="navigation"
-        aria-label="Navegación principal"
+        aria-label="Navegación principal de RentHome"
       >
-        {/* Header con información de usuario y toggle */}
+        {/* Header con información de usuario */}
         <div className="sidebar-header">
           <div className="user-block">
             <div className="user-avatar">
               <img
-                src={user?.avatar || '/api/placeholder/48/48'}
+                src={user?.avatar || '/api/placeholder/44/44'}
                 alt={`Avatar de ${user?.name}`}
                 onError={(e) => {
-                  e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjQiIGN5PSIyNCIgcj0iMjQiIGZpbGw9IiNGM0Y0RjYiLz4KPHBhdGggZD0iTTI0IDI2QzI3LjMxMzcgMjYgMzAgMjMuMzEzNyAzMCAyMEMzMCAxNi42ODYzIDI3LjMxMzcgMTQgMjQgMTRDMjAuNjg2MyAxNCAxOCAxNi42ODYzIDE4IDIwQzE4IDIzLjMxMzcgMjAuNjg2MyAyNiAyNCAyNlpNMjQgMjhDMTkuNTgyIDI4IDE2IDMxLjU4MiAxNiAzNkgyNEMzMiAzNig0MCAzNiA0MCAzNkM0MCAzMS41ODIgMzYuNDE4IDI4IDMyIDI4SDI0WiIgZmlsbD0iIzlBOUE5QSIvPgo8L3N2Zz4K';
+                  e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDQiIGhlaWdodD0iNDQiIHZpZXdCb3g9IjAgMCA0NCA0NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjIiIGN5PSIyMiIgcj0iMjIiIGZpbGw9IiNGM0Y0RjYiLz4KPHBhdGggZD0iTTIyIDI0QzI0LjIwOTEgMjQgMjYgMjIuMjA5MSAyNiAyMEMyNiAxNy43OTA5IDI0LjIwOTEgMTYgMjIgMTZDMTkuNzkwOSAxNiAxOCAxNy43OTA5IDE4IDIwQzE4IDIyLjIwOTEgMTkuNzkwOSAyNCAyMiAyNFpNMjIgMjZDMTguNjgzIDI2IDE2IDI4LjY4MyAxNiAzMkgyOEMzMiAzNiwzNCAzNiwzNCAzNkMzNCAzMS41ODIgMjkuNDE4IDI4IDI1IDI4SDIyWiIgZmlsbD0iIzlBOUE5QSIvPgo8L3N2Zz4K';
                 }}
               />
             </div>
@@ -290,10 +262,10 @@ const LeftSidebar = ({
             <button
               className="sidebar-toggle"
               onClick={toggleSidebar}
-              aria-label={isCollapsed ? 'Expandir sidebar' : 'Contraer sidebar'}
+              aria-label={isCollapsed ? 'Expandir menú' : 'Contraer menú'}
               aria-expanded={!isCollapsed}
             >
-              {isCollapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+              {isCollapsed ? <ChevronRightIcon size={16} /> : <ChevronLeftIcon size={16} />}
             </button>
           )}
         </div>
@@ -303,6 +275,7 @@ const LeftSidebar = ({
           {navigationItems.map((item) => (
             <li
               key={item.id}
+              data-item={item.id}
               className={`
                 menu-item 
                 ${activeItemId === item.id ? 'active' : ''}
@@ -356,7 +329,7 @@ const LeftSidebar = ({
         <div className="sidebar-footer">
           {!isCollapsed && (
             <div className="sidebar-stats">
-              
+              {/* Espacio para futuras estadísticas o información adicional */}
             </div>
           )}
         </div>

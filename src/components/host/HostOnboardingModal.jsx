@@ -1,80 +1,146 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import FocusTrap from 'focus-trap-react';
-import questionsMap from './questionsMap';
 import QuestionsForm from './QuestionsForm';
-import { isAuthenticated, login } from './authMock';
+import { questionsMap } from './questionsMap';
+import { useIsAuthenticated, useLogin } from './authMock';
 import { saveDraft, loadDraft, clearDraft } from '../../utils/localDraft';
-import './HostModal.css';
+import './styles.css';
 
 /**
- * HostOnboardingModal
- * Main modal component for "Conviértete en anfitrión" flow.
+ * HostOnboardingModal - Main modal component for host onboarding flow
+ *
  * Props:
- * - open: boolean to open/close modal
- * - onClose: function to close modal
- * - onComplete: function({ selectionId, answers }) called on form submit
+ * - open: boolean to control modal visibility
+ * - onClose: function called when modal should close
+ * - onComplete: function called with { selectionId, answers } when form is completed
  */
 const HostOnboardingModal = ({ open, onClose, onComplete }) => {
-  const [step, setStep] = useState('selection'); // 'selection', 'login', 'questions'
-  const [selectionId, setSelectionId] = useState(null);
-  const [authError, setAuthError] = useState('');
-  const [loginLoading, setLoginLoading] = useState(false);
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  const modalRef = useRef(null);
-  const lastFocusedElement = useRef(null);
+  const [step, setStep] = useState('selection'); // 'selection', 'auth', 'questions'
+  const [selectedCard, setSelectedCard] = useState(null);
+  const [answers, setAnswers] = useState({});
+  const [saveStatus, setSaveStatus] = useState(''); // '', 'saving', 'saved'
+  const [loginData, setLoginData] = useState({ email: '', password: '' });
+  const [loginError, setLoginError] = useState('');
 
-  // Save last focused element before modal opens
+  const modalRef = useRef(null);
+  const previousFocusRef = useRef(null);
+  const saveTimeoutRef = useRef(null);
+
+  const isAuthenticated = useIsAuthenticated();
+  const { loginUser, loading: loginLoading, error: loginErrorHook } = useLogin();
+
+  // Focus trap setup
   useEffect(() => {
     if (open) {
-      lastFocusedElement.current = document.activeElement;
-      setStep('selection');
-      setSelectionId(null);
-      setAuthError('');
-      setLoginEmail('');
-      setLoginPassword('');
+      previousFocusRef.current = document.activeElement;
+      modalRef.current?.focus();
+
+      const handleKeyDown = (e) => {
+        if (e.key === 'Escape') {
+          handleClose();
+        }
+      };
+
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    } else {
+      previousFocusRef.current?.focus();
     }
   }, [open]);
 
-  // Focus trap and return focus on close
+  // Load draft when modal opens and selection changes
   useEffect(() => {
-    if (!open && lastFocusedElement.current) {
-      lastFocusedElement.current.focus();
+    if (open && selectedCard) {
+      const draft = loadDraft(selectedCard);
+      if (draft) {
+        setAnswers(draft);
+      }
     }
-  }, [open]);
+  }, [open, selectedCard]);
 
-  const handleCardSelect = (id) => {
-    setSelectionId(id);
-    if (!isAuthenticated()) {
-      setStep('login');
+  // Autosave answers every 5 seconds
+  useEffect(() => {
+    if (Object.keys(answers).length > 0 && selectedCard) {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+
+      setSaveStatus('saving');
+      saveTimeoutRef.current = setTimeout(() => {
+        saveDraft(selectedCard, answers);
+        setSaveStatus('saved');
+        setTimeout(() => setSaveStatus(''), 2000);
+      }, 5000);
+    }
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [answers, selectedCard]);
+
+  // Handle card selection
+  const handleCardSelect = useCallback((cardId) => {
+    setSelectedCard(cardId);
+    if (!isAuthenticated) {
+      setStep('auth');
     } else {
       setStep('questions');
     }
+  }, [isAuthenticated]);
+
+  // Handle login form changes
+  const handleLoginChange = (field, value) => {
+    setLoginData(prev => ({ ...prev, [field]: value }));
+    setLoginError('');
   };
 
+  // Handle login submission
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    setLoginLoading(true);
-    setAuthError('');
     try {
-      await login(loginEmail, loginPassword);
+      await loginUser(loginData.email, loginData.password);
       setStep('questions');
+      setLoginError('');
     } catch (error) {
-      setAuthError(error.message);
-    } finally {
-      setLoginLoading(false);
+      setLoginError(error);
     }
   };
 
-  const handleQuestionsComplete = (data) => {
-    onComplete(data);
-    onClose();
-  };
+  // Handle questions form changes
+  const handleQuestionsChange = useCallback((newAnswers) => {
+    setAnswers(newAnswers);
+  }, []);
 
-  const handleBackToSelection = () => {
+  // Handle questions form submission
+  const handleQuestionsSubmit = useCallback((finalAnswers) => {
+    clearDraft(selectedCard);
+    onComplete({ selectionId: selectedCard, answers: finalAnswers });
+    handleClose();
+  }, [selectedCard, onComplete]);
+
+  // Handle modal close
+  const handleClose = useCallback(() => {
     setStep('selection');
-    setSelectionId(null);
+    setSelectedCard(null);
+    setAnswers({});
+    setSaveStatus('');
+    setLoginData({ email: '', password: '' });
+    setLoginError('');
+    onClose();
+  }, [onClose]);
+
+  // Handle back navigation
+  const handleBack = () => {
+    if (step === 'auth') {
+      setStep('selection');
+      setSelectedCard(null);
+    } else if (step === 'questions') {
+      setStep('selection');
+      setSelectedCard(null);
+      setAnswers({});
+    }
   };
 
   if (!open) return null;
@@ -83,83 +149,111 @@ const HostOnboardingModal = ({ open, onClose, onComplete }) => {
     {
       id: 'rentals',
       title: 'Arrendamiento',
-      image: '/images/rentals.jpg', // Replace with actual image path
-      alt: 'Imagen de arrendamiento de propiedades'
+      description: 'Ofrece alojamiento en tu propiedad',
+      image: '/images/rentals-card.jpg' // Placeholder - replace with actual image
     },
     {
       id: 'marketplace',
       title: 'Marketplace',
-      image: '/images/marketplace.jpg',
-      alt: 'Imagen de marketplace de productos'
+      description: 'Vende productos y artículos',
+      image: '/images/marketplace-card.jpg' // Placeholder - replace with actual image
     },
     {
       id: 'services',
       title: 'Productos y servicios adicionales',
-      image: '/images/services.jpg',
-      alt: 'Imagen de productos y servicios adicionales'
+      description: 'Ofrece servicios profesionales',
+      image: '/images/services-card.jpg' // Placeholder - replace with actual image
     }
   ];
 
   return (
-    <FocusTrap>
-      <div className="host-modal-overlay" onClick={onClose} role="presentation">
-        <div
-          className="host-modal"
-          ref={modalRef}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="modal-title"
-          onClick={(e) => e.stopPropagation()}
-        >
+    <div className="host-onboarding-modal-overlay" onClick={handleClose}>
+      <div
+        className="host-onboarding-modal"
+        ref={modalRef}
+        tabIndex="-1"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="modal-header">
+          {step !== 'selection' && (
+            <button
+              className="back-button"
+              onClick={handleBack}
+              aria-label="Volver"
+            >
+              ←
+            </button>
+          )}
+          <h2 id="modal-title" className="modal-title">
+            {step === 'selection' && '¿Qué te gustaría compartir?'}
+            {step === 'auth' && 'Inicia sesión para continuar'}
+            {step === 'questions' && `Configura tu ${cards.find(c => c.id === selectedCard)?.title.toLowerCase()}`}
+          </h2>
           <button
             className="close-button"
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="Cerrar modal"
-            tabIndex="0"
           >
             ×
           </button>
+        </div>
 
+        {/* Content */}
+        <div className="modal-content">
           {step === 'selection' && (
-            <>
-              <h2 id="modal-title">¿Qué te gustaría compartir?</h2>
-              <div className="cards-grid">
-                {cards.map((card) => (
-                  <div
-                    key={card.id}
-                    className={`selection-card ${selectionId === card.id ? 'selected' : ''}`}
-                    onClick={() => handleCardSelect(card.id)}
-                    tabIndex="0"
-                    role="button"
-                    aria-pressed={selectionId === card.id}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleCardSelect(card.id);
-                      }
-                    }}
-                  >
-                    <img src={card.image} alt={card.alt} className="card-image" />
-                    <h3>{card.title}</h3>
+            <div className="cards-grid">
+              {cards.map(card => (
+                <div
+                  key={card.id}
+                  className={`selection-card ${selectedCard === card.id ? 'selected' : ''}`}
+                  onClick={() => handleCardSelect(card.id)}
+                  tabIndex="0"
+                  role="button"
+                  aria-pressed={selectedCard === card.id}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleCardSelect(card.id);
+                    }
+                  }}
+                >
+                  <div className="card-image">
+                    <img
+                      src={card.image}
+                      alt={card.title}
+                      onError={(e) => {
+                        e.target.src = '/images/placeholder-card.jpg'; // Fallback image
+                      }}
+                    />
                   </div>
-                ))}
-              </div>
-            </>
+                  <div className="card-content">
+                    <h3>{card.title}</h3>
+                    <p>{card.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
 
-          {step === 'login' && (
-            <>
-              <h2 id="modal-title">Necesitamos tu cuenta para gestionar y publicar tu servicio</h2>
-              <form className="login-form" onSubmit={handleLoginSubmit}>
+          {step === 'auth' && (
+            <div className="auth-section">
+              <p className="auth-message">
+                Necesitamos tu cuenta para gestionar y publicar tu servicio
+              </p>
+              <form onSubmit={handleLoginSubmit} className="login-form">
                 <div className="form-group">
                   <label htmlFor="email">Email</label>
                   <input
                     type="email"
                     id="email"
-                    value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
+                    value={loginData.email}
+                    onChange={(e) => handleLoginChange('email', e.target.value)}
                     required
-                    tabIndex="0"
+                    disabled={loginLoading}
                   />
                 </div>
                 <div className="form-group">
@@ -167,36 +261,46 @@ const HostOnboardingModal = ({ open, onClose, onComplete }) => {
                   <input
                     type="password"
                     id="password"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
+                    value={loginData.password}
+                    onChange={(e) => handleLoginChange('password', e.target.value)}
                     required
-                    tabIndex="0"
+                    disabled={loginLoading}
                   />
                 </div>
-                {authError && <div className="error-message">{authError}</div>}
-                <button type="submit" disabled={loginLoading} className="login-button">
+                {(loginError || loginErrorHook) && (
+                  <div className="error-message" role="alert">
+                    {loginError || loginErrorHook}
+                  </div>
+                )}
+                <button
+                  type="submit"
+                  className="login-button"
+                  disabled={loginLoading}
+                >
                   {loginLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
                 </button>
-                <button type="button" onClick={handleBackToSelection} className="back-button">
-                  Volver
-                </button>
               </form>
-            </>
+            </div>
           )}
 
-          {step === 'questions' && selectionId && (
-            <>
-              <h2 id="modal-title">Completa la información para {cards.find(c => c.id === selectionId)?.title}</h2>
+          {step === 'questions' && selectedCard && (
+            <div className="questions-section">
+              {saveStatus && (
+                <div className={`save-status ${saveStatus}`}>
+                  {saveStatus === 'saving' ? 'Guardando...' : 'Guardado automáticamente'}
+                </div>
+              )}
               <QuestionsForm
-                selectionId={selectionId}
-                onComplete={handleQuestionsComplete}
-                onCancel={handleBackToSelection}
+                questions={questionsMap[selectedCard]}
+                initialAnswers={answers}
+                onChange={handleQuestionsChange}
+                onSubmit={handleQuestionsSubmit}
               />
-            </>
+            </div>
           )}
         </div>
       </div>
-    </FocusTrap>
+    </div>
   );
 };
 

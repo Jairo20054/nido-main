@@ -12,22 +12,26 @@ model User {
   email     String    @unique
   password  String
   createdAt DateTime  @default(now())
-  properties Property[]
-  media     Media[]
+  properties Property[] @relation("UserProperties")
+  media     Media[]    @relation("UserMedia")
+  stories   Story[]    @relation("UserStories")
 }
 
 model Property {
   id        String   @id @default(uuid())
   ownerId   String
+  owner     User     @relation("UserProperties", fields: [ownerId], references: [id])
   title     String
-  media     Media[]
+  media     Media[]  @relation("PropertyMedia")
   createdAt DateTime @default(now())
 }
 
 model Media {
   id           String   @id @default(uuid())
   propertyId   String
+  property     Property @relation("PropertyMedia", fields: [propertyId], references: [id])
   userId       String
+  user         User     @relation("UserMedia", fields: [userId], references: [id])
   storageKey   String   @unique
   originalName String
   mimeType     String
@@ -41,4 +45,12 @@ model Media {
   size         Int
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+model Story {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation("UserStories", fields: [userId], references: [id])
+  media     Json     // Array of media objects: [{ type: 'image'|'video', url: string, duration?: number }]
+  createdAt DateTime @default(now())
 }

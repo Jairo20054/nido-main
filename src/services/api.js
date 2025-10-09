@@ -305,6 +305,14 @@ export const api = {
     getFavorites: () => api.get('/users/favorites'),
     addFavorite: (propertyId) => api.post(`/users/favorites/${propertyId}`),
     removeFavorite: (propertyId) => api.delete(`/users/favorites/${propertyId}`)
+  },
+
+  stories: {
+    getStories: (params) => api.get('/stories', params),
+    getUserStories: (userId) => api.get(`/stories/user/${userId}`),
+    createStory: (data) => api.post('/stories', data),
+    uploadStory: (file) => api.upload('/stories/upload', file),
+    deleteStory: (id) => api.delete(`/stories/${id}`)
   }
 };
 

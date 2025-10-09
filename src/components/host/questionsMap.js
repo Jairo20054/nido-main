@@ -1,15 +1,14 @@
 // questionsMap.js
-// JSON structure for questions by selection type
-// Types: rentals (arrendamiento), marketplace, services (productos y servicios)
+// Configuration for dynamic questions based on host type selection
 
-const questionsMap = {
+export const questionsMap = {
   rentals: [
     {
       id: 'propertyType',
       type: 'select',
-      label: '¿Qué tipo de propiedad quieres arrendar?',
+      label: 'Tipo de propiedad',
       required: true,
-      hint: 'Selecciona el tipo de propiedad que ofreces.',
+      hint: 'Selecciona el tipo de alojamiento que ofreces',
       options: [
         { value: 'apartment', label: 'Apartamento' },
         { value: 'house', label: 'Casa' },
@@ -18,144 +17,162 @@ const questionsMap = {
       ]
     },
     {
-      id: 'duration',
-      type: 'select',
-      label: '¿Cuál es la duración mínima del arrendamiento?',
+      id: 'location',
+      type: 'text',
+      label: 'Ubicación',
       required: true,
-      hint: 'Elige la duración mínima permitida.',
-      options: [
-        { value: '1month', label: '1 mes' },
-        { value: '3months', label: '3 meses' },
-        { value: '6months', label: '6 meses' },
-        { value: '1year', label: '1 año' }
-      ]
+      hint: 'Dirección completa de la propiedad',
+      placeholder: 'Calle, número, ciudad, país'
     },
     {
       id: 'guests',
       type: 'number',
-      label: '¿Cuántos huéspedes pueden alojarse?',
+      label: 'Número máximo de huéspedes',
       required: true,
-      hint: 'Número máximo de huéspedes.',
       min: 1,
-      max: 20
+      max: 20,
+      hint: '¿Cuántas personas pueden alojarse?'
     },
     {
-      id: 'description',
-      type: 'text',
-      label: 'Describe tu propiedad',
-      required: false,
-      hint: 'Proporciona detalles atractivos sobre tu propiedad.',
-      placeholder: 'Escribe una descripción...'
+      id: 'bedrooms',
+      type: 'number',
+      label: 'Número de habitaciones',
+      required: true,
+      min: 1,
+      max: 10
     },
     {
-      id: 'amenities',
-      type: 'checkboxes',
-      label: '¿Qué comodidades ofreces?',
-      required: false,
-      hint: 'Selecciona todas las que apliquen.',
-      options: [
-        { value: 'wifi', label: 'WiFi' },
-        { value: 'parking', label: 'Estacionamiento' },
-        { value: 'pool', label: 'Piscina' },
-        { value: 'gym', label: 'Gimnasio' },
-        { value: 'kitchen', label: 'Cocina' }
-      ]
+      id: 'price',
+      type: 'number',
+      label: 'Precio por noche (€)',
+      required: true,
+      min: 10,
+      max: 1000,
+      hint: 'Precio base por noche'
     }
   ],
   marketplace: [
     {
-      id: 'serviceType',
+      id: 'itemType',
       type: 'select',
-      label: '¿Qué tipo de servicios quieres ofrecer?',
+      label: 'Tipo de artículo',
       required: true,
-      hint: 'Elige la categoría de tus productos o servicios.',
+      hint: '¿Qué tipo de producto vendes?',
       options: [
-        { value: 'food', label: 'Comida y bebidas' },
-        { value: 'entertainment', label: 'Entretenimiento' },
-        { value: 'tours', label: 'Tours y experiencias' },
-        { value: 'other', label: 'Otros' }
+        { value: 'electronics', label: 'Electrónicos' },
+        { value: 'clothing', label: 'Ropa y accesorios' },
+        { value: 'home', label: 'Hogar y jardín' },
+        { value: 'sports', label: 'Deportes' },
+        { value: 'books', label: 'Libros' },
+        { value: 'other', label: 'Otro' }
       ]
     },
     {
-      id: 'priceRange',
-      type: 'select',
-      label: '¿Cuál es el rango de precios de tus productos?',
-      required: true,
-      hint: 'Selecciona el rango aproximado.',
-      options: [
-        { value: 'low', label: 'Bajo (menos de $50)' },
-        { value: 'medium', label: '$50 - $200' },
-        { value: 'high', label: 'Alto (más de $200)' }
-      ]
-    },
-    {
-      id: 'availability',
-      type: 'radio',
-      label: '¿Cuándo están disponibles tus servicios?',
-      required: true,
-      hint: 'Indica la disponibilidad general.',
-      options: [
-        { value: 'weekdays', label: 'Días de semana' },
-        { value: 'weekends', label: 'Fines de semana' },
-        { value: 'always', label: 'Siempre' }
-      ]
-    },
-    {
-      id: 'details',
+      id: 'itemName',
       type: 'text',
-      label: 'Detalles adicionales',
+      label: 'Nombre del artículo',
+      required: true,
+      hint: 'Describe brevemente tu producto',
+      placeholder: 'Ej: Bicicleta de montaña Trek'
+    },
+    {
+      id: 'condition',
+      type: 'radio',
+      label: 'Estado del artículo',
+      required: true,
+      options: [
+        { value: 'new', label: 'Nuevo' },
+        { value: 'like_new', label: 'Como nuevo' },
+        { value: 'good', label: 'Buen estado' },
+        { value: 'fair', label: 'Estado regular' }
+      ]
+    },
+    {
+      id: 'price',
+      type: 'number',
+      label: 'Precio (€)',
+      required: true,
+      min: 1,
+      max: 10000,
+      hint: 'Precio de venta'
+    },
+    {
+      id: 'description',
+      type: 'text',
+      label: 'Descripción detallada',
       required: false,
-      hint: 'Cualquier información extra sobre tus ofertas.',
-      placeholder: 'Escribe detalles...'
+      hint: 'Proporciona más detalles sobre tu producto',
+      placeholder: 'Describe características, medidas, etc.'
     }
   ],
   services: [
     {
-      id: 'serviceCategory',
+      id: 'serviceType',
       type: 'select',
-      label: '¿Qué categoría de productos o servicios adicionales ofreces?',
+      label: 'Tipo de servicio',
       required: true,
-      hint: 'Selecciona la categoría principal.',
+      hint: '¿Qué tipo de servicio ofreces?',
       options: [
         { value: 'cleaning', label: 'Limpieza' },
-        { value: 'maintenance', label: 'Mantenimiento' },
-        { value: 'transport', label: 'Transporte' },
-        { value: 'other', label: 'Otros' }
+        { value: 'repair', label: 'Reparaciones' },
+        { value: 'tutoring', label: 'Clases particulares' },
+        { value: 'pet_care', label: 'Cuidado de mascotas' },
+        { value: 'gardening', label: 'Jardinería' },
+        { value: 'other', label: 'Otro' }
       ]
     },
     {
-      id: 'requirements',
+      id: 'serviceName',
       type: 'text',
-      label: '¿Tienes algún requisito especial para estos servicios?',
-      required: false,
-      hint: 'Describe requisitos como certificaciones o equipos necesarios.',
-      placeholder: 'Escribe requisitos...'
-    },
-    {
-      id: 'pricing',
-      type: 'number',
-      label: 'Precio base por servicio',
+      label: 'Nombre del servicio',
       required: true,
-      hint: 'Precio mínimo o base.',
-      min: 0
+      hint: 'Describe brevemente tu servicio',
+      placeholder: 'Ej: Limpieza de oficinas'
     },
     {
-      id: 'documents',
+      id: 'experience',
+      type: 'select',
+      label: 'Años de experiencia',
+      required: true,
+      options: [
+        { value: '0-1', label: 'Menos de 1 año' },
+        { value: '1-3', label: '1-3 años' },
+        { value: '3-5', label: '3-5 años' },
+        { value: '5+', label: 'Más de 5 años' }
+      ]
+    },
+    {
+      id: 'availability',
+      type: 'checkboxes',
+      label: 'Disponibilidad',
+      required: true,
+      hint: 'Selecciona los días que estás disponible',
+      options: [
+        { value: 'monday', label: 'Lunes' },
+        { value: 'tuesday', label: 'Martes' },
+        { value: 'wednesday', label: 'Miércoles' },
+        { value: 'thursday', label: 'Jueves' },
+        { value: 'friday', label: 'Viernes' },
+        { value: 'saturday', label: 'Sábado' },
+        { value: 'sunday', label: 'Domingo' }
+      ]
+    },
+    {
+      id: 'hourlyRate',
+      type: 'number',
+      label: 'Tarifa por hora (€)',
+      required: true,
+      min: 5,
+      max: 200,
+      hint: '¿Cuánto cobras por hora?'
+    },
+    {
+      id: 'certifications',
       type: 'file',
-      label: 'Sube documentos relevantes (opcional)',
+      label: 'Certificaciones (opcional)',
       required: false,
-      hint: 'Certificados, licencias, etc. (UI solo, no upload real).',
+      hint: 'Sube tus certificados o diplomas relevantes',
       accept: '.pdf,.jpg,.png'
-    },
-    {
-      id: 'contact',
-      type: 'text',
-      label: 'Información de contacto adicional',
-      required: false,
-      hint: 'Teléfono o email extra si es necesario.',
-      placeholder: 'Escribe contacto...'
     }
   ]
 };
-
-export default questionsMap;

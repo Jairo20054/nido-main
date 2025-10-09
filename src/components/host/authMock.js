@@ -1,29 +1,45 @@
 // authMock.js
-// Mock authentication functions for easy integration
-// Replace with real auth service (e.g., Auth0, Firebase) in production
+// Mock authentication functions for host onboarding flow
 
-let isLoggedIn = false; // Simulate auth state
+import { useContext, useState } from 'react';
+import { AuthContext } from '../../context/AuthContext';
 
-export const isAuthenticated = () => {
-  return isLoggedIn;
+/**
+ * Hook to check if user is authenticated
+ * @returns {boolean}
+ */
+export const useIsAuthenticated = () => {
+  const { isAuthenticated } = useContext(AuthContext);
+  return isAuthenticated;
 };
 
-export const login = (email, password) => {
-  // Simulate login process
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (email && password) {
-        isLoggedIn = true;
-        resolve({ id: 1, email, name: 'Usuario Mock' });
-      } else {
-        reject(new Error('Credenciales inválidas'));
+/**
+ * Hook to simulate login process
+ * @returns {function} login function that returns a promise resolving on success
+ */
+export const useLogin = () => {
+  const { login } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const loginUser = async (email, password) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await login(email, password);
+      if (!result.success) {
+        setError(result.error);
+        setLoading(false);
+        return Promise.reject(result.error);
       }
-    }, 1000); // Simulate network delay
-  });
-};
+      setLoading(false);
+      return Promise.resolve(result.user);
+    } catch (err) {
+      setError(err.message || 'Error inesperado');
+      setLoading(false);
+      return Promise.reject(err);
+    }
+  };
 
-export const logout = () => {
-  isLoggedIn = false;
+  return { loginUser, loading, error };
 };
-
-// For testing purposes, you can call login() with any email/password to simulate success

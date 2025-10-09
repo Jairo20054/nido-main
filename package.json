@@ -62,7 +62,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "start:backend": "node backend/src/server.js",
-    "dev:backend": "nodemon backend/src/server.js",
+    "dev:backend": "cd backend && npm run dev",
     "dev": "concurrently \"cross-env DANGEROUSLY_DISABLE_HOST_CHECK=true react-scripts start --host 0.0.0.0\" \"npm run dev:backend\""
   },
   "eslintConfig": {

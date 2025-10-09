@@ -10,6 +10,7 @@ import {
 } from '@heroicons/react/24/outline';
 import SearchBar from './SearchBar';
 import UserMenu from './UserMenu';
+import UserMenuOrLogin from './UserMenuOrLogin';
 import './Header.css';
 
 // Función throttle optimizada
@@ -133,9 +134,6 @@ const Header = () => {
     };
   }, [isMobileMenuOpen]);
 
-  const handleAuthAction = useCallback(() => {
-    navigate(isAuthenticated ? "/dashboard" : "/login");
-  }, [isAuthenticated, navigate]);
 
   const toggleMobileMenu = useCallback(() => {
     setIsMobileMenuOpen((prev) => !prev);
@@ -239,21 +237,9 @@ const Header = () => {
             >
               <span>Conviértete en anfitrión</span>
             </Link>
-
-            {/* Menú de usuario - solo si está autenticado */}
-            {isAuthenticated && <UserMenu />}
-
-            {/* Botón de login/registro - solo si no está autenticado */}
-            {!isAuthenticated && (
-              <button
-                className="desktop-header__auth-btn"
-                onClick={handleAuthAction}
-                aria-label="Iniciar sesión o registrarse"
-              >
-                <span>Iniciar sesión</span>
-              </button>
-            )}
           </div>
+
+          <UserMenuOrLogin />
         </div>
       </header>
 

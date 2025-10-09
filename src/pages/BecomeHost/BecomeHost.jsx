@@ -1,6 +1,6 @@
 // src/pages/BecomeHost/BecomeHost.jsx
 import { useState } from 'react';
-import HostTypeSelectionModal from '../../components/Host/HostTypeSelectionModal';
+import HostTypeSelectionModal from '../../components/host/HostTypeSelectionModal';
 import './BecomeHost.css'; // Estilos específicos para la página
 
 const BecomeHost = () => {

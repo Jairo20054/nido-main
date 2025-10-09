@@ -122,7 +122,7 @@ const getMedia = async (req: FastifyRequest, reply: FastifyReply) => {
   const m = await prisma.media.findUnique({ where: { id: mediaId } });
   if (!m) return reply.status(404).send({ error: 'Not found' });
   // attach signed urls for variants
-  const variants = m.variants || {};
+  const variants = (m.variants as Record<string, { key?: string; url?: string }>) || {};
   for (const k in variants) {
     if (variants[k].key) {
       variants[k].url = await storageService.getPresignedGetUrl(variants[k].key);

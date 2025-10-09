@@ -6,6 +6,7 @@ const authRoutes = require('./authRoutes');
 const propertyRoutes = require('./propertyRoutes');
 const userRoutes = require('./userRoutes');
 const bookingRoutes = require('./bookingRoutes');
+const storyRoutes = require('./storyRoutes');
 
 // Ruta para imágenes placeholder
 router.get('/placeholder/:width/:height', (req, res) => {
@@ -25,5 +26,6 @@ router.use('/auth', authRoutes);
 router.use('/properties', propertyRoutes);
 router.use('/users', userRoutes);
 router.use('/bookings', bookingRoutes);
+router.use('/stories', storyRoutes);
 
 module.exports = router;

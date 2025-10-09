@@ -10,7 +10,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const http = require('http');
-const socketIo = require('socket.io');
+// const socketIo = require('socket.io');
 
 const validateEnv = require('./config/validateEnv');
 const config = require('./config');
@@ -30,13 +30,13 @@ require('./config/passport');
 
   const app = express();
   const server = http.createServer(app);
-  const io = socketIo(server, {
-    cors: {
-      origin: env.CORS_ORIGINS,
-      methods: ['GET', 'POST'],
-      credentials: true
-    }
-  });
+  // const io = socketIo(server, {
+  //   cors: {
+  //     origin: env.CORS_ORIGINS,
+  //     methods: ['GET', 'POST'],
+  //     credentials: true
+  //   }
+  // });
 
   // Connect to DB (await to fail fast if cannot connect)
   try {
