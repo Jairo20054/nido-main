@@ -57,13 +57,13 @@
     "zustand": "^5.0.6"
   },
   "scripts": {
-    "start": "cross-env DANGEROUSLY_DISABLE_HOST_CHECK=true react-scripts start --host 0.0.0.0",
+    "start": "npx cross-env DANGEROUSLY_DISABLE_HOST_CHECK=true react-scripts start --host 0.0.0.0",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "start:backend": "node backend/src/server.js",
     "dev:backend": "nodemon backend/src/server.js",
-    "dev": "concurrently \"cross-env DANGEROUSLY_DISABLE_HOST_CHECK=true react-scripts start --host 0.0.0.0\" \"npm run dev:backend\""
+    "dev": "concurrently \"npx cross-env DANGEROUSLY_DISABLE_HOST_CHECK=true react-scripts start --host 0.0.0.0\" \"npm run dev:backend\""
   },
   "eslintConfig": {
     "extends": [
