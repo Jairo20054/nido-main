@@ -2,13 +2,13 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import Header from '../Header/Header';
 import LeftSidebar from '../../LeftSidebar/LeftSidebar';
-import SidebarRight from '../SidebarRight/SidebarRight';
+import SidebarRight from '../../SidebarRight/SidebarRight';
 import BottomNav from '../../social/BottomNav';
 import './Layout.css';
 
 const Layout = ({ children }) => {
   const location = useLocation();
-  const hideSidebarPaths = ['/host/properties'];
+  const hideSidebarPaths = ['/host/properties', '/'];
 
   const shouldHideSidebar = hideSidebarPaths.some(path => location.pathname.startsWith(path));
 

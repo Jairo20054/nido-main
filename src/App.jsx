@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ThemeProvider } from './context/ThemeContext';
 
 // Protected Routes
 import PrivateRoute from './components/user/Auth/PrivateRoute';
@@ -89,6 +90,7 @@ const Remodelaciones = lazyLoad(() => import('./pages/Remodelaciones/Remodelacio
 function App() {
   return (
     <Router>
+      <ThemeProvider>
         <UiHostProvider>
           <AuthProvider>
             <SearchProvider> {/* SearchProvider debe envolver todo el contenido que use useSearch */}
@@ -168,6 +170,7 @@ function App() {
             </SearchProvider>
           </AuthProvider>
         </UiHostProvider>
+      </ThemeProvider>
       </Router>
   );
 }

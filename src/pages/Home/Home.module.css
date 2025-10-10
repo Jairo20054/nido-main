@@ -1,0 +1,118 @@
+/* Home.module.css - Facebook-like Home Layout with 3-Column Grid */
+
+/* Main grid container */
+.homeGrid {
+  display: grid;
+  grid-template-columns: 280px 1fr 320px;
+  max-width: 1600px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 80px 16px 16px 16px; /* Add top padding for fixed header (64px + 16px) */
+  gap: 16px;
+}
+
+/* Sidebar containers */
+.leftSidebar,
+.rightSidebar {
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+}
+
+/* Main feed area */
+.mainFeed {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+}
+
+/* Stories bar */
+.storiesBar {
+  margin-bottom: 16px;
+}
+
+/* Feed container */
+.feedContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Reels section */
+.reelsSection {
+  margin-top: 32px;
+  padding: 0 16px;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.loading {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 20px;
+}
+
+/* Responsive design */
+
+/* Tablet: Reduce paddings and card sizes */
+@media (max-width: 1024px) {
+  .homeGrid {
+    grid-template-columns: 1fr;
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .leftSidebar,
+  .rightSidebar {
+    display: none;
+  }
+
+  .mainFeed {
+    max-width: none;
+    padding: 8px;
+  }
+
+  .feedContainer {
+    gap: 8px;
+  }
+
+  .reelsSection {
+    margin-top: 16px;
+    padding: 0 8px;
+  }
+}
+
+/* Mobile: Further reduce paddings */
+@media (max-width: 768px) {
+  .homeGrid {
+    padding: 8px;
+  }
+
+  .mainFeed {
+    padding: 8px;
+  }
+
+  .feedContainer {
+    gap: 8px;
+  }
+
+  .reelsSection {
+    padding: 0 8px;
+  }
+
+  .sectionTitle {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+}

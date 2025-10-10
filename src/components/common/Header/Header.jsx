@@ -1,3 +1,4 @@
+// src/components/Header/Header.jsx
 import { useState, useEffect, useCallback, useMemo, useRef, useLayoutEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
@@ -6,7 +7,15 @@ import {
   BellIcon,
   MagnifyingGlassIcon,
   Bars3Icon,
-  XMarkIcon
+  XMarkIcon,
+  EnvelopeIcon,
+  UserCircleIcon,
+  PlusIcon,
+  BuildingOffice2Icon,
+  WrenchScrewdriverIcon,
+  ShoppingBagIcon,
+  UsersIcon,
+  UserPlusIcon
 } from '@heroicons/react/24/outline';
 import SearchBar from './SearchBar';
 import UserMenu from './UserMenu';
@@ -49,28 +58,40 @@ const Header = () => {
   const navigationItems = useMemo(
     () => [
       {
-        id: "remodelaciones",
-        label: "Remodelaciones",
-        shortLabel: "Remodelaciones",
-        path: "/remodelaciones",
+        id: "home",
+        label: "Inicio",
+        path: "/",
         icon: HomeIcon,
-        hasNovedad: false,
       },
       {
-        id: "marketplace",
-        label: "Marketplace",
-        shortLabel: "Marketplace",
-        path: "/marketplace",
-        icon: BellIcon,
-        hasNovedad: false,
+        id: "properties",
+        label: "Propiedades",
+        path: "/properties",
+        icon: BuildingOffice2Icon,
       },
       {
         id: "services",
         label: "Servicios",
-        shortLabel: "Servicios",
         path: "/services",
-        icon: BellIcon,
-        hasNovedad: false,
+        icon: WrenchScrewdriverIcon,
+      },
+      {
+        id: "marketplace",
+        label: "Marketplace",
+        path: "/marketplace",
+        icon: ShoppingBagIcon,
+      },
+      {
+        id: "groups",
+        label: "Grupos",
+        path: "/groups",
+        icon: UsersIcon,
+      },
+      {
+        id: "profile",
+        label: "Perfil",
+        path: "/profile",
+        icon: UserCircleIcon,
       },
     ],
     []
@@ -168,203 +189,171 @@ const Header = () => {
 
   return (
     <>
-      {/* Header superior para desktop */}
-      <header 
+      <header
         ref={headerRef}
-        className={`desktop-header hide-mobile ${isScrolled ? "desktop-header--scrolled" : ""}`} 
+        className={`fixed top-0 left-0 right-0 z-40 bg-[var(--bg-secondary)] border-b border-[var(--border-primary)] transition-all duration-200 ${isScrolled ? "py-1" : "py-2"} ${showMobileHeader ? "" : "transform -translate-y-full"}`}
         role="banner"
       >
-        <div className="desktop-header__container">
-          {/* Logo */}
-          <Link to="/" className="desktop-header__logo" aria-label="Nido - Inicio">
-            <div className="desktop-header__logo-icon">
-              <svg
-                viewBox="0 0 32 32"
-                className="desktop-header__logo-svg"
-                aria-hidden="true"
-              >
-                <defs>
-                  <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#FF385C" />
-                    <stop offset="100%" stopColor="#FF385C" />
-                  </linearGradient>
-                </defs>
-                <path
-                  d="M16 2L3 9v14c0 5.55 3.84 11 13 11s13-5.45 13-11V9L16 2z"
-                  fill="url(#logoGradient)"
-                />
-                <path
-                  d="M16 8L8 12v8c0 3.31 2.69 6 8 6s8-2.69 8-6v-8L16 8z"
-                  fill="#a06666ff"
-                  opacity="0.9"
-                />
-                <circle cx="16" cy="16" r="3" fill="url(#logoGradient)" />
-              </svg>
+        <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
+          {/* Logo Left */}
+          <Link to="/" className="flex items-center space-x-2 flex-shrink-0" aria-label="RentHub - Inicio">
+            <div className="w-8 h-8 bg-[var(--fb-blue)] rounded-full flex items-center justify-center">
+              <span className="text-[var(--text-inverse)] font-bold text-sm">RH</span>
             </div>
-            <span className="desktop-header__logo-text" style={{color: 'var(--accent)', fontWeight: 'bold', fontSize: '20px'}}>RentHub</span>
+            <span className="text-[var(--text-primary)] font-bold text-xl">RentHub</span>
           </Link>
 
-          {/* Navegación central */}
-          <nav className="desktop-header__nav" aria-label="Navegación principal">
-            {navigationItems.map((item) => {
-              const isActive = isActiveNavItem(item.path);
-              const Icon = item.icon;
+          {/* Search Center */}
+          <div className="flex-1 max-w-md mx-4 hidden md:block">
+            <SearchBar
+              onSearch={(params) => {
+                console.log(params);
+              }}
+              className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] placeholder-[var(--text-quaternary)] border border-[var(--border-primary)] rounded-full px-4 py-2"
+            />
+          </div>
 
-              return (
-                <Link
-                  key={item.id}
-                  to={item.path}
-                  className={`desktop-header__nav-item ${
-                    isActive ? "desktop-header__nav-item--active" : ""
-                  }`}
-                  aria-current={isActive ? "page" : undefined}
-                >
-                  <div className="desktop-header__nav-icon-wrapper">
-                    <Icon className="desktop-header__nav-icon-desktop" aria-hidden="true" />
-                    {item.hasNovedad && <span className="desktop-header__novedad-badge">NOVEDAD</span>}
-                  </div>
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Acciones de usuario */}
-          <div className="desktop-header__actions">
-            {/* Botón para ser anfitrión */}
-            <Link
-              to="/become-host"
-              className="desktop-header__host-btn"
-              aria-label="Conviértete en anfitrión"
+          {/* Mobile Search Toggle */}
+          <div className="flex-1 max-w-md mx-4 md:hidden">
+            <button
+              className="w-full text-left p-2 rounded-full bg-[var(--bg-primary)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] border border-[var(--border-primary)] transition-colors"
+              onClick={toggleSearchExpanded}
+              aria-label="Buscar"
             >
-              <span>Conviértete en anfitrión</span>
-            </Link>
+              <div className="flex items-center space-x-2">
+                <MagnifyingGlassIcon className="w-5 h-5 flex-shrink-0" />
+                <div>
+                  <span className="block text-sm font-medium">¿A dónde vas?</span>
+                  <span className="block text-xs text-gray-500">Cualquier semana · Cualquier huésped</span>
+                </div>
+              </div>
+            </button>
+          </div>
 
-            {/* Menú de usuario - solo si está autenticado */}
-            {isAuthenticated && <UserMenu />}
-
-            {/* Botón de login/registro - solo si no está autenticado */}
+          {/* Right Actions */}
+          <div className="flex items-center space-x-2 flex-shrink-0">
+            {/* Become Host - Desktop */}
             {!isAuthenticated && (
-              <button
-                className="desktop-header__auth-btn"
-                onClick={handleAuthAction}
-                aria-label="Iniciar sesión o registrarse"
+              <Link
+                to="/become-host"
+                className="hidden md:block px-4 py-2 bg-[var(--fb-blue)] text-[var(--text-inverse)] rounded-full text-sm font-medium hover:bg-[var(--accent-dark)] transition-colors"
+                aria-label="Conviértete en anfitrión"
               >
-                <span>Iniciar sesión</span>
+                Anfitrión
+              </Link>
+            )}
+
+            {/* Icons - Desktop */}
+            <div className="hidden md:flex items-center space-x-2">
+              <Link to="/" className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full transition-colors" aria-label="Inicio">
+                <HomeIcon className="w-6 h-6" />
+              </Link>
+              <button className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full transition-colors relative" aria-label="Notificaciones">
+                <BellIcon className="w-6 h-6" />
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-[var(--error-500)] rounded-full"></span>
+              </button>
+              <Link to="/messages" className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full transition-colors" aria-label="Mensajes">
+                <EnvelopeIcon className="w-6 h-6" />
+              </Link>
+              <Link to="/post/new" className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full transition-colors bg-[var(--fb-blue)] text-[var(--text-inverse)] hover:bg-[var(--accent-dark)]" aria-label="Crear publicación">
+                <PlusIcon className="w-6 h-6" />
+              </Link>
+            </div>
+
+            {/* Icons - Mobile */}
+            <div className="flex items-center space-x-2 md:hidden">
+              <button className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full" aria-label="Notificaciones">
+                <BellIcon className="w-6 h-6" />
+              </button>
+              <Link to="/messages" className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full" aria-label="Mensajes">
+                <EnvelopeIcon className="w-6 h-6" />
+              </Link>
+              <Link to="/post/new" className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full bg-[var(--fb-blue)] text-[var(--text-inverse)]" aria-label="Crear publicación">
+                <PlusIcon className="w-6 h-6" />
+              </Link>
+            </div>
+
+            {/* User Menu or Auth Button */}
+            {isAuthenticated ? (
+              <UserMenu />
+            ) : (
+              <button
+                className="px-4 py-2 bg-[var(--fb-blue)] text-[var(--text-inverse)] rounded-full text-sm font-medium hover:bg-[var(--accent-dark)] transition-colors ml-2"
+                onClick={handleAuthAction}
+                aria-label="Iniciar sesión"
+              >
+                Iniciar sesión
               </button>
             )}
+
+            {/* Mobile Menu Toggle */}
+            <button
+              className="md:hidden p-2 ml-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full"
+              onClick={toggleMobileMenu}
+              aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
+              aria-expanded={isMobileMenuOpen}
+            >
+              {isMobileMenuOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6" />}
+            </button>
           </div>
         </div>
       </header>
 
-      {/* Header superior para móviles */}
-      <header 
-        ref={headerRef}
-        className={`mobile-header hide-desktop ${isScrolled ? "mobile-header--scrolled" : ""} ${showMobileHeader ? "" : "mobile-header--hidden"}`} 
-        role="banner"
-      >
-        <div className="mobile-header__container">
-          {/* Logo */}
-          <Link to="/" className="mobile-header__logo" aria-label="Nido - Inicio">
-            <div className="mobile-header__logo-icon">
-              <svg
-                viewBox="0 0 32 32"
-                className="mobile-header__logo-svg"
-                aria-hidden="true"
-              >
-                <defs>
-                  <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#FF385C" />
-                    <stop offset="100%" stopColor="#FF385C" />
-                  </linearGradient>
-                </defs>
-                <path
-                  d="M16 2L3 9v14c0 5.55 3.84 11 13 11s13-5.45 13-11V9L16 2z"
-                  fill="url(#logoGradient)"
-                />
-                <path
-                  d="M16 8L8 12v8c0 3.31 2.69 6 8 6s8-2.69 8-6v-8L16 8z"
-                  fill="#a06666ff"
-                  opacity="0.9"
-                />
-                <circle cx="16" cy="16" r="3" fill="url(#logoGradient)" />
-              </svg>
-            </div>
-            <span className="mobile-header__logo-text" style={{color: 'var(--accent)', fontWeight: 'bold', fontSize: '20px'}}>RentHub</span>
-          </Link>
-
-          {/* Acciones de usuario móvil */}
-          <div className="mobile-header__actions">
-            {/* Barra de búsqueda móvil */}
-            <div className="mobile-header__search-container">
-              {isSearchExpanded ? (
-                <SearchBar 
-                  onSearch={(params) => {
-                    console.log(params);
-                    setIsSearchExpanded(false);
-                  }} 
-                  onClose={() => setIsSearchExpanded(false)}
-                  autoFocus={true}
-                />
-              ) : (
-                <button 
-                  className="mobile-header__search-toggle"
-                  onClick={toggleSearchExpanded}
-                  aria-label="Buscar"
-                >
-                  <MagnifyingGlassIcon className="mobile-header__search-toggle-icon" />
-                  <div className="mobile-header__search-text">
-                    <span className="mobile-header__search-label">¿A dónde vas?</span>
-                    <span className="mobile-header__search-filters">Cualquier semana · Cualquier huésped</span>
-                  </div>
-                </button>
-              )}
-            </div>
-
-            
-
-            {/* Menú de usuario móvil - solo si está autenticado */}
-            {isAuthenticated && <UserMenu />}
-
-            {/* Toggle para menú móvil */}
-              <button
-                className="mobile-header__menu-toggle"
-                onClick={toggleMobileMenu}
-                aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
-                aria-expanded={isMobileMenuOpen}
-                aria-controls="mobile-menu"
-              >
-                {isMobileMenuOpen ? (
-                  <XMarkIcon className="mobile-header__menu-icon" aria-hidden="true" />
-                ) : (
-                  <Bars3Icon className="mobile-header__menu-icon" aria-hidden="true" />
-                )}
-              </button>
-            </div>
-          </div>
-
-        {/* Menú móvil */}
-        {isMobileMenuOpen && (
-          <div
-            id="mobile-menu"
-            className="mobile-header__menu"
-            role="navigation"
-            aria-label="Menú móvil"
-          >
-          </div>
-        )}
-
-        {/* Fondo difuminado para menú móvil */}
-        {isMobileMenuOpen && (
-          <div
-            className="mobile-header__backdrop"
-            onClick={closeMobileMenu}
-            aria-hidden="true"
+      {/* Mobile Expanded Search */}
+      {isSearchExpanded && (
+        <div className="md:hidden fixed top-16 left-0 right-0 z-40 bg-[var(--bg-secondary)] border-b border-[var(--border-primary)] p-4 shadow-sm">
+          <SearchBar
+            onSearch={(params) => {
+              console.log(params);
+              setIsSearchExpanded(false);
+            }}
+            onClose={() => setIsSearchExpanded(false)}
+            autoFocus={true}
+            className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] placeholder-[var(--text-quaternary)] border border-[var(--border-primary)] rounded-full px-4 py-2"
           />
-        )}
-      </header>
+        </div>
+      )}
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <>
+          <div className="md:hidden fixed top-16 left-0 right-0 z-40 bg-[var(--bg-secondary)] border-b border-[var(--border-primary)] max-h-screen overflow-y-auto py-4">
+            <nav className="px-4 space-y-2">
+              {navigationItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.id}
+                    to={item.path}
+                    className="flex items-center space-x-4 p-3 rounded-lg hover:bg-[var(--bg-tertiary)] transition-colors text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                    onClick={closeMobileMenu}
+                  >
+                    <Icon className="w-6 h-6 text-[var(--text-quaternary)] flex-shrink-0" />
+                    <span className="font-medium">{item.label}</span>
+                  </Link>
+                );
+              })}
+              {!isAuthenticated && (
+                <Link
+                  to="/become-host"
+                  className="flex items-center space-x-4 p-3 rounded-lg bg-[var(--fb-blue)] text-[var(--text-inverse)] transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  <UserPlusIcon className="w-6 h-6 flex-shrink-0" />
+                  <span className="font-medium">Conviértete en anfitrión</span>
+                </Link>
+              )}
+            </nav>
+          </div>
+          <div
+            className="md:hidden fixed inset-0 bg-[var(--bg-overlay)] z-30"
+            onClick={closeMobileMenu}
+          />
+        </>
+      )}
     </>
   );
+
 };
 
 export default Header;
