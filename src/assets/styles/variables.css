@@ -1,9 +1,9 @@
 /* Variables CSS */
 /* Variables CSS - Sistema de diseño mejorado */
 :root {
-  /* === SISTEMA DE COLORES === */
+  /* === SISTEMA DE COLORES === - Dark Mode Default (Facebook-like for RentHub) */
   
-  /* Colores primarios */
+  /* Colores primarios (preserved for accents) */
   --primary-50: #ECFDF5;
   --primary-100: #D1FAE5;
   --primary-200: #A7F3D0;
@@ -56,7 +56,7 @@
   --info-500: #3B82F6;
   --info-700: #1D4ED8;
   
-  /* Escala de grises */
+  /* Escala de grises (adjusted for dark base) */
   --gray-50: #F9FAFB;
   --gray-100: #F3F4F6;
   --gray-200: #E5E7EB;
@@ -67,6 +67,18 @@
   --gray-700: #374151;
   --gray-800: #1F2937;
   --gray-900: #111827;
+  
+  /* Dark Mode Facebook-like Colors */
+  --bg-primary: #18191a;
+  --bg-secondary: #242526;
+  --text-primary: #e4e5e9;
+  --accent: #0084ff;
+  --border: #373737;
+  
+  /* Additional for RentHub (prices, icons) */
+  --price-green: #00c851;
+  --sentiment-yellow: #f7b928;
+  --checkin-blue: #0084ff;
   
   /* === ALIASES SEMÁNTICOS === */
   
@@ -79,7 +91,7 @@
   --secondary-light: var(--secondary-100);
   --secondary-dark: var(--secondary-700);
   
-  --accent: var(--accent-500);
+  --accent: var(--accent); /* Override to Facebook blue */
   --accent-light: var(--accent-100);
   --accent-dark: var(--accent-700);
   
@@ -89,25 +101,25 @@
   --warning: var(--warning-500);
   --info: var(--info-500);
   
-  /* Texto */
-  --text-primary: var(--gray-900);
-  --text-secondary: var(--gray-700);
+  /* Texto (dark default) */
+  --text-primary: var(--text-primary);
+  --text-secondary: var(--gray-600);
   --text-tertiary: var(--gray-500);
   --text-quaternary: var(--gray-400);
   --text-disabled: var(--gray-300);
   --text-inverse: #FFFFFF;
   
-  /* Fondos */
-  --bg-primary: #FFFFFF;
-  --bg-secondary: var(--gray-50);
-  --bg-tertiary: var(--gray-100);
-  --bg-overlay: rgba(17, 24, 39, 0.5);
-  --bg-backdrop: rgba(17, 24, 39, 0.8);
+  /* Fondos (dark default) */
+  --bg-primary: var(--bg-primary);
+  --bg-secondary: var(--bg-secondary);
+  --bg-tertiary: #373737;
+  --bg-overlay: rgba(24, 25, 26, 0.5);
+  --bg-backdrop: rgba(24, 25, 26, 0.8);
   
-  /* Bordes */
-  --border-primary: var(--gray-200);
-  --border-secondary: var(--gray-300);
-  --border-focus: var(--primary-500);
+  /* Bordes (dark default) */
+  --border-primary: var(--border);
+  --border-secondary: var(--gray-600);
+  --border-focus: var(--accent);
   --border-error: var(--error-500);
   
   /* === TIPOGRAFÍA === */
@@ -309,28 +321,51 @@
   --z-tooltip: 1800;
 }
 
-/* === TEMA OSCURO === */
+/* === TEMA OSCURO (Exact Facebook-like, auto-support) === */
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Colores de texto invertidos */
-    --text-primary: #F9FAFB;
-    --text-secondary: #E5E7EB;
-    --text-tertiary: #9CA3AF;
-    --text-quaternary: #6B7280;
-    --text-disabled: #4B5563;
-    --text-inverse: var(--gray-900);
+    /* Exact dark mode colors */
+    --bg-primary: #18191a;
+    --bg-secondary: #242526;
+    --text-primary: #e4e5e9;
+    --accent: #0084ff;
+    --border: #373737;
     
-    /* Fondos oscuros */
-    --bg-primary: #111827;
-    --bg-secondary: #1F2937;
-    --bg-tertiary: #374151;
-    --bg-overlay: rgba(249, 250, 251, 0.1);
-    --bg-backdrop: rgba(17, 24, 39, 0.9);
+    /* Colores de texto */
+    --text-primary: #e4e5e9;
+    --text-secondary: #b0b3b8;
+    --text-tertiary: #8e9297;
+    --text-quaternary: #65676b;
+    --text-disabled: #4b4f54;
+    --text-inverse: #FFFFFF;
+    
+    /* Fondos */
+    --bg-primary: #18191a;
+    --bg-secondary: #242526;
+    --bg-tertiary: #373737;
+    --bg-overlay: rgba(24, 25, 26, 0.5);
+    --bg-backdrop: rgba(24, 25, 26, 0.8);
     
     /* Bordes */
-    --border-primary: #374151;
-    --border-secondary: #4B5563;
+    --border-primary: #373737;
+    --border-secondary: #4b4f54;
   }
+}
+
+/* Manual Dark Mode Toggle */
+body.dark {
+  --bg-primary: #18191a;
+  --bg-secondary: #242526;
+  --text-primary: #e4e5e9;
+  --accent: #0084ff;
+  --border: #373737;
+  
+  /* Apply to text, bg, etc. */
+  --text-primary: #e4e5e9;
+  --text-secondary: #b0b3b8;
+  --bg-primary: #18191a;
+  --bg-secondary: #242526;
+  --border-primary: #373737;
 }
 
 /* === VARIABLES DE COMPONENTES === */

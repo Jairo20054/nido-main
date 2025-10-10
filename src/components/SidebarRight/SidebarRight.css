@@ -1,0 +1,89 @@
+.sidebar-right {
+  width: 280px;
+  background-color: #242526;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.section h3 {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-3);
+}
+
+.contacts-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  transition: background-color 0.2s ease-in-out;
+}
+
+.contact-item:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.contact-item img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.ads-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ad-card {
+  background-color: var(--bg-primary);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out;
+}
+
+.ad-card:hover {
+  transform: scale(1.02);
+}
+
+.ad-card img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
+
+.ad-content {
+  padding: var(--space-2);
+}
+
+.ad-content .price {
+  color: #00c851;
+  font-weight: var(--font-bold);
+}
+
+.suggested-pages {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.page-item {
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-tertiary);
+  transition: background-color 0.2s ease-in-out;
+}
+
+.page-item:hover {
+  background-color: var(--border);
+}

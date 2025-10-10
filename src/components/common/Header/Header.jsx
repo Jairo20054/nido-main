@@ -6,7 +6,10 @@ import {
   BellIcon,
   MagnifyingGlassIcon,
   Bars3Icon,
-  XMarkIcon
+  XMarkIcon,
+  VideoCameraIcon,
+  ChatBubbleLeftIcon,
+  EllipsisHorizontalIcon
 } from '@heroicons/react/24/outline';
 import SearchBar from './SearchBar';
 import UserMenu from './UserMenu';
@@ -46,32 +49,14 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const navigationItems = useMemo(
+  // Facebook-like header icons
+  const headerIcons = useMemo(
     () => [
-      {
-        id: "remodelaciones",
-        label: "Remodelaciones",
-        shortLabel: "Remodelaciones",
-        path: "/remodelaciones",
-        icon: HomeIcon,
-        hasNovedad: false,
-      },
-      {
-        id: "marketplace",
-        label: "Marketplace",
-        shortLabel: "Marketplace",
-        path: "/marketplace",
-        icon: BellIcon,
-        hasNovedad: false,
-      },
-      {
-        id: "services",
-        label: "Servicios",
-        shortLabel: "Servicios",
-        path: "/services",
-        icon: BellIcon,
-        hasNovedad: false,
-      },
+      { id: "home", icon: HomeIcon, label: "Inicio" },
+      { id: "video", icon: VideoCameraIcon, label: "Video" },
+      { id: "messages", icon: ChatBubbleLeftIcon, label: "Mensajes" },
+      { id: "notifications", icon: BellIcon, label: "Notificaciones", hasBadge: true },
+      { id: "more", icon: EllipsisHorizontalIcon, label: "Más" },
     ],
     []
   );
@@ -201,58 +186,44 @@ const Header = () => {
                 <circle cx="16" cy="16" r="3" fill="url(#logoGradient)" />
               </svg>
             </div>
-            <span className="desktop-header__logo-text">Nido</span>
+            <span className="desktop-header__logo-text" style={{color: 'var(--accent)', fontWeight: 'bold', fontSize: '20px'}}>RentHub</span>
           </Link>
 
-          {/* Navegación central */}
-          <nav className="desktop-header__nav" aria-label="Navegación principal">
-            {navigationItems.map((item) => {
-              const isActive = isActiveNavItem(item.path);
-              const Icon = item.icon;
+          {/* Barra de búsqueda central */}
+          <div className="desktop-header__search">
+            <div className="desktop-header__search-container">
+              <MagnifyingGlassIcon className="desktop-header__search-icon" />
+              <input
+                type="text"
+                placeholder="Buscar en RentHub"
+                className="desktop-header__search-input"
+              />
+            </div>
+          </div>
 
+          {/* Íconos de acciones */}
+          <div className="desktop-header__actions">
+            {headerIcons.map((item) => {
+              const Icon = item.icon;
               return (
-                <Link
+                <button
                   key={item.id}
-                  to={item.path}
-                  className={`desktop-header__nav-item ${
-                    isActive ? "desktop-header__nav-item--active" : ""
-                  }`}
-                  aria-current={isActive ? "page" : undefined}
+                  className="desktop-header__action-btn"
+                  aria-label={item.label}
                 >
-                  <div className="desktop-header__nav-icon-wrapper">
-                    <Icon className="desktop-header__nav-icon-desktop" aria-hidden="true" />
-                    {item.hasNovedad && <span className="desktop-header__novedad-badge">NOVEDAD</span>}
-                  </div>
-                  <span>{item.label}</span>
-                </Link>
+                  <Icon className="desktop-header__action-icon" />
+                  {item.hasBadge && <span className="desktop-header__badge">3</span>}
+                </button>
               );
             })}
-          </nav>
-
-          {/* Acciones de usuario */}
-          <div className="desktop-header__actions">
-            {/* Botón para ser anfitrión */}
-            <Link
-              to="/become-host"
-              className="desktop-header__host-btn"
-              aria-label="Conviértete en anfitrión"
-            >
-              <span>Conviértete en anfitrión</span>
-            </Link>
-
-            {/* Menú de usuario - solo si está autenticado */}
-            {isAuthenticated && <UserMenu />}
-
-            {/* Botón de login/registro - solo si no está autenticado */}
-            {!isAuthenticated && (
-              <button
-                className="desktop-header__auth-btn"
-                onClick={handleAuthAction}
-                aria-label="Iniciar sesión o registrarse"
-              >
-                <span>Iniciar sesión</span>
-              </button>
-            )}
+            {/* Avatar de usuario */}
+            <div className="desktop-header__avatar">
+              <img
+                src="/api/placeholder/32/32"
+                alt="Perfil"
+                className="desktop-header__avatar-img"
+              />
+            </div>
           </div>
         </div>
       </header>
@@ -290,7 +261,7 @@ const Header = () => {
                 <circle cx="16" cy="16" r="3" fill="url(#logoGradient)" />
               </svg>
             </div>
-            <span className="mobile-header__logo-text">Nido</span>
+            <span className="mobile-header__logo-text" style={{color: 'var(--accent)', fontWeight: 'bold', fontSize: '20px'}}>RentHub</span>
           </Link>
 
           {/* Acciones de usuario móvil */}

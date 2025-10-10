@@ -108,10 +108,10 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 280px;
+  width: 240px;
   height: 100vh;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border-right: 1px solid var(--gray-200);
+  background: #242526;
+  border-right: 1px solid var(--border);
   box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
@@ -135,11 +135,17 @@ body {
 
 /* ===== HEADER DEL SIDEBAR ===== */
 .sidebar-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid var(--gray-200);
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  background: #242526;
   position: relative;
+}
+
+.sidebar-title {
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin: 0;
 }
 
 .user-block {
@@ -239,7 +245,7 @@ body {
 }
 
 .menu-item {
-  margin-bottom: 0.25rem;
+  margin-bottom: 8px;
   border-radius: var(--radius-lg);
   transition: all var(--transition-fast);
   position: relative;
@@ -398,11 +404,58 @@ body {
   color: var(--gray-300);
 }
 
-/* ===== FOOTER DEL SIDEBAR ===== */
-.sidebar-footer {
-  padding: 1.5rem;
-  border-top: 1px solid var(--gray-200);
-  background: rgba(255, 255, 255, 0.8);
+/* ===== ACCESOS DIRECTOS ===== */
+.sidebar-shortcuts {
+  padding: 1rem;
+  border-top: 1px solid var(--border);
+  background: #242526;
+  margin-top: auto;
+}
+
+.shortcuts-title {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.shortcuts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.shortcut-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.shortcut-item:hover {
+  background-color: #373737;
+}
+
+.shortcut-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.shortcut-name {
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sidebar-stats {

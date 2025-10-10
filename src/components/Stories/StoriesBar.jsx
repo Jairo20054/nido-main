@@ -8,6 +8,7 @@ const StoriesBar = ({ onStoryClick, onCreateStory }) => {
   const [stories] = useState(mockStories);
   const [selectedStory, setSelectedStory] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [showCreationSidebar, setShowCreationSidebar] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleStoryClick = (story) => {
@@ -16,8 +17,16 @@ const StoriesBar = ({ onStoryClick, onCreateStory }) => {
   };
 
   const handleCreateClick = () => {
+    setShowCreationSidebar(true);
+  };
+
+  const handleCreationOption = (type) => {
+    setShowCreationSidebar(false);
     setIsCreating(true);
-    fileInputRef.current?.click();
+    if (type === 'photo' || type === 'file') {
+      fileInputRef.current?.click();
+    }
+    // Handle text creation differently
   };
 
   const handleFileSelect = (e) => {
@@ -34,6 +43,67 @@ const StoriesBar = ({ onStoryClick, onCreateStory }) => {
 
   return (
     <>
+      {/* Creation Sidebar */}
+      {showCreationSidebar && (
+        <div className="stories-creation-sidebar">
+          <div className="creation-sidebar-header">
+            <h3>Historias</h3>
+            <button
+              className="creation-sidebar-close"
+              onClick={() => setShowCreationSidebar(false)}
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          <div className="creation-sidebar-content">
+            <div className="user-story-item">
+              <img src="/api/placeholder/56/56" alt="Tu avatar" className="user-story-avatar" />
+              <span>Tu historia</span>
+              <button className="user-story-more">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/>
+                </svg>
+              </button>
+            </div>
+
+            <div className="creation-options">
+              <button
+                className="creation-option photo-option"
+                onClick={() => handleCreationOption('photo')}
+              >
+                <div className="option-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                  </svg>
+                </div>
+                <span>Crear con foto</span>
+              </button>
+
+              <button
+                className="creation-option text-option"
+                onClick={() => handleCreationOption('text')}
+              >
+                <div className="option-icon text-icon">Aa</div>
+                <span>Crear con texto</span>
+              </button>
+
+              <button
+                className="creation-option file-option"
+                onClick={() => handleCreationOption('file')}
+              >
+                <div className="option-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/>
+                  </svg>
+                </div>
+                <span>Archivo</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="stories-bar">
         <div className="stories-container">
           {/* Botón crear story */}
