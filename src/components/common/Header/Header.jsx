@@ -6,14 +6,18 @@ import {
   BellIcon,
   MagnifyingGlassIcon,
   Bars3Icon,
-  XMarkIcon
+  XMarkIcon,
+  ChatBubbleLeftRightIcon,
+  ShoppingBagIcon,
+  UsersIcon,
+  VideoCameraIcon,
+  EllipsisVerticalIcon
 } from '@heroicons/react/24/outline';
 import SearchBar from './SearchBar';
-import UserMenu from './UserMenu';
 import './Header.css';
 
-// Función throttle optimizada
-function throttle(func, limit) {
+// Función throttle optimizada (mantenida para rendimiento en scroll)
+const throttle = useCallback((func, limit) => {
   let lastFunc;
   let lastRan;
   return function() {
@@ -32,7 +36,7 @@ function throttle(func, limit) {
       }, limit - (Date.now() - lastRan));
     }
   }
-}
+}, []);
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -40,78 +44,96 @@ const Header = () => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [showMobileHeader, setShowMobileHeader] = useState(true);
+  const [notificationCount] = useState(5); // Mock para badge de notificaciones
   const headerRef = useRef(null);
 
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth(); // Asumiendo que useAuth provee user para avatar
   const navigate = useNavigate();
   const location = useLocation();
 
-  const navigationItems = useMemo(
+  // Íconos de navegación derecha (adaptados a tema RentHub, como Facebook)
+  const rightNavIcons = useMemo(
     () => [
       {
-        id: "remodelaciones",
-        label: "Remodelaciones",
-        shortLabel: "Remodelaciones",
-        path: "/remodelaciones",
+        id: "home",
+        path: "/home",
         icon: HomeIcon,
-        hasNovedad: false,
+        label: "Inicio",
+        ariaLabel: "Ir al feed principal"
+      },
+      {
+        id: "watch",
+        path: "/live",
+        icon: VideoCameraIcon,
+        label: "Live",
+        ariaLabel: "Tours en vivo de propiedades"
       },
       {
         id: "marketplace",
-        label: "Marketplace",
-        shortLabel: "Marketplace",
         path: "/marketplace",
-        icon: BellIcon,
-        hasNovedad: false,
+        icon: ShoppingBagIcon,
+        label: "Marketplace",
+        ariaLabel: "Comprar/vender artículos relacionados con vivienda"
       },
       {
-        id: "services",
-        label: "Servicios",
-        shortLabel: "Servicios",
-        path: "/services",
-        icon: BellIcon,
-        hasNovedad: false,
+        id: "groups",
+        path: "/groups",
+        icon: UsersIcon,
+        label: "Grupos",
+        ariaLabel: "Unirse a grupos de arrendamiento"
       },
+      {
+        id: "notifications",
+        path: "/notifications",
+        icon: BellIcon,
+        label: "Notificaciones",
+        ariaLabel: "Ver notificaciones",
+        badge: notificationCount > 0 ? notificationCount : null
+      },
+      {
+        id: "messages",
+        path: "/messages",
+        icon: ChatBubbleLeftRightIcon,
+        label: "Mensajes",
+        ariaLabel: "Mensajes con inquilinos/propietarios"
+      }
     ],
-    []
+    [notificationCount]
   );
 
-
-  // Manejo del scroll para ocultar/mostrar header móvil y efecto de reducción
+  // Manejo del scroll (mejorado: reduce altura sutilmente en scroll, como Facebook)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleScroll = useCallback(
     throttle(() => {
       const currentScrollY = window.scrollY;
-
-      // Efecto de reducción (isScrolled)
       setIsScrolled(currentScrollY > 10);
 
-      // Comportamiento de ocultar/mostrar header móvil
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Scroll hacia abajo: ocultar header
-        setShowMobileHeader(false);
-      } else {
-        // Scroll hacia arriba: mostrar header
-        setShowMobileHeader(true);
+      // Ocultar/mostrar header móvil en scroll down/up (optimizado para UX fluida)
+      if (window.innerWidth < 769) { // Solo en móvil
+        if (currentScrollY > lastScrollY && currentScrollY > 100) {
+          setShowMobileHeader(false);
+        } else {
+          setShowMobileHeader(true);
+        }
       }
 
       setLastScrollY(currentScrollY);
-    }, 100),
+    }, 16), // 60fps throttle para smoothness
     [lastScrollY]
   );
 
   useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true }); // Passive para perf
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
-  // Reset al cambiar de ruta
+  // Reset estados en cambio de ruta (mejorado: incluye search expanded)
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsSearchExpanded(false);
   }, [location.pathname]);
 
-  // Control de tecla Escape y overflow - usar useLayoutEffect para manipulación de layout
+  // Manejo de Escape y overflow (usar useLayoutEffect para sync con DOM)
   useLayoutEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape") {
@@ -120,7 +142,7 @@ const Header = () => {
       }
     };
 
-    if (isMobileMenuOpen) {
+    if (isMobileMenuOpen || isSearchExpanded) {
       document.addEventListener("keydown", handleEscape);
       document.body.style.overflow = "hidden";
     } else {
@@ -131,10 +153,10 @@ const Header = () => {
       document.removeEventListener("keydown", handleEscape);
       document.body.style.overflow = "";
     };
-  }, [isMobileMenuOpen]);
+  }, [isMobileMenuOpen, isSearchExpanded]);
 
   const handleAuthAction = useCallback(() => {
-    navigate(isAuthenticated ? "/dashboard" : "/login");
+    navigate(isAuthenticated ? "/profile" : "/login"); // Adaptado a RentHub
   }, [isAuthenticated, navigate]);
 
   const toggleMobileMenu = useCallback(() => {
@@ -149,218 +171,216 @@ const Header = () => {
     setIsSearchExpanded(prev => !prev);
   }, []);
 
-  // Verificar ruta activa
+  // Verificar ruta activa (optimizado para paths con query)
   const isActiveNavItem = useCallback(
-    (itemPath) => {
-      if (itemPath.includes("?")) {
-        const [path, query] = itemPath.split("?");
-        return (
-          location.pathname === path &&
-          location.search.includes(query.split("=")[1])
-        );
-      }
-      return location.pathname === itemPath;
-    },
+    (itemPath) => location.pathname === itemPath,
     [location]
   );
 
-
+  // Render de ícono con badge opcional (nuevo helper para clean JSX)
+  const renderIconWithBadge = (IconComponent, hasBadge, badgeCount) => (
+    <>
+      <IconComponent className="header-icon" aria-hidden="true" />
+      {hasBadge && (
+        <span className="header-badge" aria-label={`${badgeCount} notificaciones pendientes`}>
+          {badgeCount > 99 ? '99+' : badgeCount}
+        </span>
+      )}
+    </>
+  );
 
   return (
     <>
-      {/* Header superior para desktop */}
+      {/* Header Desktop - Imitando Facebook Dark Mode */}
       <header 
         ref={headerRef}
-        className={`desktop-header hide-mobile ${isScrolled ? "desktop-header--scrolled" : ""}`} 
+        className={`desktop-header ${isScrolled ? "desktop-header--scrolled" : ""}`} 
         role="banner"
+        style={{ height: isScrolled ? '52px' : '56px' }} // Reducción sutil en scroll
       >
         <div className="desktop-header__container">
-          {/* Logo */}
+          {/* Logo Izquierda - Logo simple como Facebook */}
           <Link to="/" className="desktop-header__logo" aria-label="Nido - Inicio">
             <div className="desktop-header__logo-icon">
-              <svg
-                viewBox="0 0 32 32"
-                className="desktop-header__logo-svg"
-                aria-hidden="true"
-              >
-                <defs>
-                  <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#FF385C" />
-                    <stop offset="100%" stopColor="#FF385C" />
-                  </linearGradient>
-                </defs>
-                <path
-                  d="M16 2L3 9v14c0 5.55 3.84 11 13 11s13-5.45 13-11V9L16 2z"
-                  fill="url(#logoGradient)"
-                />
-                <path
-                  d="M16 8L8 12v8c0 3.31 2.69 6 8 6s8-2.69 8-6v-8L16 8z"
-                  fill="#a06666ff"
-                  opacity="0.9"
-                />
-                <circle cx="16" cy="16" r="3" fill="url(#logoGradient)" />
+              {/* SVG simple circular como 'f' de Facebook, adaptado a RH */}
+              <svg viewBox="0 0 24 24" className="desktop-header__logo-svg" aria-hidden="true">
+                <circle cx="12" cy="12" r="12" fill="#0084ff" />
+                <text x="12" y="16" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">RH</text>
               </svg>
             </div>
-            <span className="desktop-header__logo-text" style={{color: 'var(--accent)', fontWeight: 'bold', fontSize: '20px'}}>RentHub</span>
+            <span className="desktop-header__logo-text">RentHub</span>
           </Link>
 
-          {/* Navegación central */}
-          <nav className="desktop-header__nav" aria-label="Navegación principal">
-            {navigationItems.map((item) => {
+          {/* Barra de Búsqueda Central - Exacto como Facebook */}
+          <div className="desktop-header__search">
+            <div className="desktop-header__search-container">
+              <MagnifyingGlassIcon className="desktop-header__search-icon" aria-hidden="true" />
+              <input
+                type="text"
+                placeholder="Buscar propiedades, inquilinos o grupos..."
+                className="desktop-header__search-input"
+                aria-label="Buscar en RentHub"
+                onFocus={() => navigate('/search')} // Navega a página de búsqueda en focus
+              />
+            </div>
+          </div>
+
+          {/* Íconos Derecha - Fila horizontal compacta como Facebook */}
+          <nav className="desktop-header__nav-right" aria-label="Navegación rápida">
+            {rightNavIcons.map((item) => {
               const isActive = isActiveNavItem(item.path);
               const Icon = item.icon;
+              const hasBadge = item.id === 'notifications' && item.badge;
 
               return (
                 <Link
                   key={item.id}
                   to={item.path}
-                  className={`desktop-header__nav-item ${
-                    isActive ? "desktop-header__nav-item--active" : ""
-                  }`}
+                  className={`desktop-header__nav-item ${isActive ? "desktop-header__nav-item--active" : ""}`}
+                  aria-label={item.ariaLabel}
                   aria-current={isActive ? "page" : undefined}
                 >
                   <div className="desktop-header__nav-icon-wrapper">
-                    <Icon className="desktop-header__nav-icon-desktop" aria-hidden="true" />
-                    {item.hasNovedad && <span className="desktop-header__novedad-badge">NOVEDAD</span>}
+                    {renderIconWithBadge(Icon, hasBadge, item.badge)}
                   </div>
-                  <span>{item.label}</span>
                 </Link>
               );
             })}
-          </nav>
-
-          {/* Acciones de usuario */}
-          <div className="desktop-header__actions">
-            {/* Botón para ser anfitrión */}
-            <Link
-              to="/become-host"
-              className="desktop-header__host-btn"
-              aria-label="Conviértete en anfitrión"
-            >
-              <span>Conviértete en anfitrión</span>
-            </Link>
-
-            {/* Menú de usuario - solo si está autenticado */}
-            {isAuthenticated && <UserMenu />}
-
-            {/* Botón de login/registro - solo si no está autenticado */}
-            {!isAuthenticated && (
-              <button
-                className="desktop-header__auth-btn"
-                onClick={handleAuthAction}
-                aria-label="Iniciar sesión o registrarse"
-              >
-                <span>Iniciar sesión</span>
+            {/* Menú de Usuario (tres puntos + avatar) */}
+            <div className="desktop-header__user-section">
+              <button className="desktop-header__nav-item" aria-label="Más opciones">
+                <EllipsisVerticalIcon className="header-icon" aria-hidden="true" />
               </button>
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* Header superior para móviles */}
-      <header 
-        ref={headerRef}
-        className={`mobile-header hide-desktop ${isScrolled ? "mobile-header--scrolled" : ""} ${showMobileHeader ? "" : "mobile-header--hidden"}`} 
-        role="banner"
-      >
-        <div className="mobile-header__container">
-          {/* Logo */}
-          <Link to="/" className="mobile-header__logo" aria-label="Nido - Inicio">
-            <div className="mobile-header__logo-icon">
-              <svg
-                viewBox="0 0 32 32"
-                className="mobile-header__logo-svg"
-                aria-hidden="true"
-              >
-                <defs>
-                  <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#FF385C" />
-                    <stop offset="100%" stopColor="#FF385C" />
-                  </linearGradient>
-                </defs>
-                <path
-                  d="M16 2L3 9v14c0 5.55 3.84 11 13 11s13-5.45 13-11V9L16 2z"
-                  fill="url(#logoGradient)"
-                />
-                <path
-                  d="M16 8L8 12v8c0 3.31 2.69 6 8 6s8-2.69 8-6v-8L16 8z"
-                  fill="#a06666ff"
-                  opacity="0.9"
-                />
-                <circle cx="16" cy="16" r="3" fill="url(#logoGradient)" />
-              </svg>
-            </div>
-            <span className="mobile-header__logo-text" style={{color: 'var(--accent)', fontWeight: 'bold', fontSize: '20px'}}>RentHub</span>
-          </Link>
-
-          {/* Acciones de usuario móvil */}
-          <div className="mobile-header__actions">
-            {/* Barra de búsqueda móvil */}
-            <div className="mobile-header__search-container">
-              {isSearchExpanded ? (
-                <SearchBar 
-                  onSearch={(params) => {
-                    console.log(params);
-                    setIsSearchExpanded(false);
-                  }} 
-                  onClose={() => setIsSearchExpanded(false)}
-                  autoFocus={true}
-                />
+              {isAuthenticated ? (
+                <button className="desktop-header__avatar-btn" onClick={() => navigate('/profile')} aria-label="Perfil">
+                  <img 
+                    src={user?.avatar || '/default-avatar.png'} 
+                    alt="Avatar" 
+                    className="desktop-header__avatar-img" 
+                  />
+                </button>
               ) : (
-                <button 
-                  className="mobile-header__search-toggle"
-                  onClick={toggleSearchExpanded}
-                  aria-label="Buscar"
-                >
-                  <MagnifyingGlassIcon className="mobile-header__search-toggle-icon" />
-                  <div className="mobile-header__search-text">
-                    <span className="mobile-header__search-label">¿A dónde vas?</span>
-                    <span className="mobile-header__search-filters">Cualquier semana · Cualquier huésped</span>
-                  </div>
+                <button className="desktop-header__auth-btn" onClick={handleAuthAction}>
+                  Iniciar sesión
                 </button>
               )}
             </div>
+          </nav>
+        </div>
+      </header>
 
-            
-
-            {/* Menú de usuario móvil - solo si está autenticado */}
-            {isAuthenticated && <UserMenu />}
-
-            {/* Toggle para menú móvil */}
-              <button
-                className="mobile-header__menu-toggle"
-                onClick={toggleMobileMenu}
-                aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
-                aria-expanded={isMobileMenuOpen}
-                aria-controls="mobile-menu"
-              >
-                {isMobileMenuOpen ? (
-                  <XMarkIcon className="mobile-header__menu-icon" aria-hidden="true" />
-                ) : (
-                  <Bars3Icon className="mobile-header__menu-icon" aria-hidden="true" />
-                )}
-              </button>
-            </div>
+      {/* Header Móvil - Adaptado: Colapsa a hamburger left, search+icons right */}
+      <header 
+        className={`mobile-header ${isScrolled ? "mobile-header--scrolled" : ""} ${showMobileHeader ? "" : "mobile-header--hidden"}`} 
+        role="banner"
+      >
+        <div className="mobile-header__container">
+          {/* Logo + Hamburger Left */}
+          <div className="mobile-header__left">
+            <Link to="/" className="mobile-header__logo" aria-label="RentHub - Inicio">
+              <div className="mobile-header__logo-icon">
+                <svg viewBox="0 0 24 24" className="mobile-header__logo-svg" aria-hidden="true">
+                  <circle cx="12" cy="12" r="12" fill="#0084ff" />
+                  <text x="12" y="16" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">RH</text>
+                </svg>
+              </div>
+              <span className="mobile-header__logo-text">RentHub</span>
+            </Link>
+            <button 
+              className="mobile-header__menu-toggle" 
+              onClick={toggleMobileMenu}
+              aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
+              aria-expanded={isMobileMenuOpen}
+            >
+              {isMobileMenuOpen ? (
+                <XMarkIcon className="mobile-header__menu-icon" aria-hidden="true" />
+              ) : (
+                <Bars3Icon className="mobile-header__menu-icon" aria-hidden="true" />
+              )}
+            </button>
           </div>
 
-        {/* Menú móvil */}
+          {/* Search + Íconos Right (compacto en móvil) */}
+          <div className="mobile-header__right">
+            {isSearchExpanded ? (
+              <SearchBar 
+                onSearch={(params) => {
+                  console.log(params);
+                  setIsSearchExpanded(false);
+                  navigate('/search', { state: params });
+                }} 
+                onClose={() => setIsSearchExpanded(false)}
+                autoFocus={true}
+                className="mobile-search-full"
+              />
+            ) : (
+              <button 
+                className="mobile-header__search-toggle" 
+                onClick={toggleSearchExpanded}
+                aria-label="Buscar propiedades"
+              >
+                <MagnifyingGlassIcon className="mobile-header__search-icon" aria-hidden="true" />
+                <span>Buscar</span>
+              </button>
+            )}
+            {/* Íconos compactos right en móvil */}
+            <div className="mobile-header__icons">
+              {rightNavIcons.slice(0, 3).map((item) => { // Solo primeros 3 en móvil para espacio
+                const Icon = item.icon;
+                const hasBadge = item.id === 'notifications' && item.badge;
+                return (
+                  <Link key={item.id} to={item.path} className="mobile-header__icon-link" aria-label={item.ariaLabel}>
+                    <div className="mobile-header__icon-wrapper">
+                      {renderIconWithBadge(Icon, hasBadge, item.badge)}
+                    </div>
+                  </Link>
+                );
+              })}
+              {/* Avatar/User */}
+              {isAuthenticated ? (
+                <button className="mobile-header__avatar-btn" onClick={() => navigate('/profile')} aria-label="Perfil">
+                  <img 
+                    src={user?.avatar || '/default-avatar.png'} 
+                    alt="Avatar" 
+                    className="mobile-header__avatar-img" 
+                  />
+                </button>
+              ) : (
+                <button className="mobile-header__auth-btn" onClick={handleAuthAction}>
+                  Iniciar sesión
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Menú Móvil Lateral (como sidebar Facebook en móvil) */}
         {isMobileMenuOpen && (
-          <div
-            id="mobile-menu"
-            className="mobile-header__menu"
-            role="navigation"
-            aria-label="Menú móvil"
-          >
+          <div className="mobile-header__menu" role="navigation" aria-label="Menú móvil">
+            <nav className="mobile-header__nav">
+              {rightNavIcons.map((item) => (
+                <Link 
+                  key={item.id} 
+                  to={item.path} 
+                  className="mobile-header__nav-item" 
+                  onClick={closeMobileMenu}
+                >
+                  <item.icon className="mobile-header__nav-icon" aria-hidden="true" />
+                  <span>{item.label}</span>
+                </Link>
+              ))}
+              {!isAuthenticated && (
+                <button className="mobile-header__auth-btn-full" onClick={handleAuthAction}>
+                  Iniciar sesión
+                </button>
+              )}
+            </nav>
           </div>
         )}
 
-        {/* Fondo difuminado para menú móvil */}
+        {/* Backdrop para menú móvil */}
         {isMobileMenuOpen && (
-          <div
-            className="mobile-header__backdrop"
-            onClick={closeMobileMenu}
-            aria-hidden="true"
-          />
+          <div className="mobile-header__backdrop" onClick={closeMobileMenu} aria-hidden="true" />
         )}
       </header>
     </>

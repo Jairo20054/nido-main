@@ -1,0 +1,173 @@
+/* RightSidebar.css - FB Light Mode Profesional */
+.right-sidebar {
+  width: 300px;
+  height: 100vh;
+  background: #ffffff;
+  border-left: 1px solid #dadde1;
+  overflow-y: auto;
+  padding: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: #dadde1 transparent;
+}
+
+.right-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.right-sidebar::-webkit-scrollbar-track { background: transparent; }
+.right-sidebar::-webkit-scrollbar-thumb { background: #dadde1; border-radius: 2px; }
+
+.rs-section {
+  margin-bottom: 32px;
+}
+
+.rs-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1c1e21;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e4e6ea;
+}
+
+.contacts-list,
+.pages-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contact-item,
+.page-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.contact-item:hover,
+.page-item:hover {
+  background: #f0f2f5;
+}
+
+.contact-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.contact-name,
+.page-name {
+  font-size: 14px;
+  color: #1c1e21;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-follow-btn {
+  background: #e4e6ea;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #65676b;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+}
+
+.page-follow-btn:hover {
+  background: #dadde1;
+}
+
+.ad-item {
+  border: 1px solid #e4e6ea;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  transition: box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.ad-item:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.ad-image {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+}
+
+.ad-details {
+  padding: 12px;
+}
+
+.ad-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1c1e21;
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.ad-desc {
+  font-size: 12px;
+  color: #65676b;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.ad-price {
+  font-size: 14px;
+  color: #42b883;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.ad-cta {
+  background: #1877f2;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  width: 100%;
+  text-align: center;
+}
+
+.ad-cta:hover {
+  background: #166fe5;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .right-sidebar {
+    display: none;
+  }
+}
+
+/* Accesibilidad */
+.contact-item:focus-within,
+.page-item:focus-within,
+.ad-cta:focus-visible {
+  outline: 2px solid #1877f2;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ad-item, .contact-item, .page-item, .ad-cta { transition: none; }
+}

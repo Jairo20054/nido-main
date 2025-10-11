@@ -1,12 +1,12 @@
 /* === ESTILOS GLOBALES MEJORADOS === */
 
-/* === VARIABLES PARA MODO OSCURO FACEBOOK-LIKE === */
+/* === VARIABLES PARA MODO CLARO === */
 :root {
-   --bg-primary: #18191a;
-   --bg-secondary: #242526;
-   --text-primary: #e4e5e9;
+   --bg-primary: #ffffff;
+   --bg-secondary: #f9fafb;
+   --text-primary: #111827;
    --accent: #0084ff;
-   --border: #373737;
+   --border: #e5e7eb;
    --spacing-xs: 4px;
    --spacing-sm: 8px;
    --spacing-md: 16px;
@@ -368,22 +368,7 @@ hr {
   }
 }
 
-/* === MODO OSCURO AUTOMÁTICO === */
-@media (prefers-color-scheme: dark) {
-  /* Los colores ya están definidos en variables.css */
-  
-  /* Ajustar imágenes en modo oscuro */
-  img:not([src*=".svg"]) {
-    opacity: 0.9;
-  }
-  
-  /* Mejorar contraste de formularios */
-  input,
-  textarea,
-  select {
-    background-color: var(--bg-secondary);
-  }
-}
+
 
 /* === MODO DE ALTO CONTRASTE === */
 @media (prefers-contrast: high) {
