@@ -22,27 +22,27 @@
   flex-direction: column;
   min-height: 100vh;
   position: relative;
-  background: #ffffff;
+  background: #18191a;
 }
 
 .content-wrapper {
   display: flex;
   flex: 1;
-  padding-top: 56px;
-  background: #ffffff;
+  padding-top: 64px;
+  background: #18191a;
 }
 
 .sidebar-left {
-  background: #f9fafb;
+  background: #242526;
 }
 
 .main-content-layout {
-  background: #ffffff;
+  background: #18191a;
   min-height: calc(100vh - 56px);
 }
 
 .sidebar-right {
-  background: #f9fafb;
+  background: #242526;
 }
 
 /* Responsive design */
@@ -122,7 +122,16 @@
   }
 }
 
-
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #111827;
+    --card-background: #1f2937;
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+    --border-color: #374151;
+  }
+}
 
 /* Estados de accesibilidad */
 .layout:focus-within {

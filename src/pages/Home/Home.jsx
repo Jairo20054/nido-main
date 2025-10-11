@@ -2,12 +2,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import PostCard from '../components/PostCard/PostCard';
-import StoriesBar from '../components/Stories/StoriesBar';
-import CreatePost from '../components/CreatePost/CreatePost';
-import LeftSidebar from '../components/LeftSidebar/LeftSidebar';
-import RightSidebar from '../components/RightSidebar/RightSidebar';
-import BottomNav from '../components/social/BottomNav';
+import PostCard from '../../components/PostCard/PostCard';
+import StoriesBar from '../../components/Stories/StoriesBar';
+import CreatePost from '../../components/social/Composer';
+import LeftSidebar from '../../components/LeftSidebar/LeftSidebar';
+import RightSidebar from '../../components/RightSidebar/RightSidebar';
+import BottomNav from '../../components/social/BottomNav';
 import { mockPosts, mockStories } from '../../utils/socialMocks';
 import './Home.css';
 
@@ -99,7 +99,7 @@ const Home = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.3 }}
         >
-          <CreatePost />
+          <CreatePost onPublish={() => {}} onClose={() => {}} />
         </motion.section>
 
         {/* Feed */}

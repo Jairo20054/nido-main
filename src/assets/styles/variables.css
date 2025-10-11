@@ -1,8 +1,8 @@
 /* Variables CSS */
 /* Variables CSS - Sistema de diseño mejorado */
 :root {
-  /* === SISTEMA DE COLORES === - Light Mode Default */
-
+  /* === SISTEMA DE COLORES === - Light Mode Default (Facebook-like for Nido) */
+  
   /* Colores primarios (preserved for accents) */
   --primary-50: #ECFDF5;
   --primary-100: #D1FAE5;
@@ -14,7 +14,7 @@
   --primary-700: #047857;
   --primary-800: #065F46;
   --primary-900: #064E3B;
-
+  
   /* Colores secundarios */
   --secondary-50: #F0F9FF;
   --secondary-100: #E0F2FE;
@@ -26,7 +26,7 @@
   --secondary-700: #0369A1;
   --secondary-800: #075985;
   --secondary-900: #0C4A6E;
-
+  
   /* Colores de acento */
   --accent-50: #FFFBEB;
   --accent-100: #FEF3C7;
@@ -38,24 +38,24 @@
   --accent-700: #B45309;
   --accent-800: #92400E;
   --accent-900: #78350F;
-
+  
   /* Estados */
   --success-50: #ECFDF5;
   --success-500: #10B981;
   --success-700: #047857;
-
+  
   --error-50: #FEF2F2;
   --error-500: #EF4444;
   --error-700: #B91C1C;
-
+  
   --warning-50: #FFFBEB;
   --warning-500: #F59E0B;
   --warning-700: #B45309;
-
+  
   --info-50: #EFF6FF;
   --info-500: #3B82F6;
   --info-700: #1D4ED8;
-
+  
   /* Escala de grises */
   --gray-50: #F9FAFB;
   --gray-100: #F3F4F6;
@@ -67,58 +67,59 @@
   --gray-700: #374151;
   --gray-800: #1F2937;
   --gray-900: #111827;
-
-  /* Light Mode Colors */
+  
+  /* Light Mode Facebook-like Colors (Default) */
   --bg-primary: #ffffff;
-  --bg-secondary: #f9fafb;
-  --text-primary: #111827;
-  --accent: #0084ff;
-  --border: #e5e7eb;
-
-  /* Additional for RentHub (prices, icons) */
+  --bg-secondary: #f0f2f5;
+  --text-primary: #050505;
+  --fb-blue: #1877f2;
+  --accent: #1877f2;
+  --border: #dddfe2;
+  
+  /* Additional for Nido (prices, icons) */
   --price-green: #00c851;
   --sentiment-yellow: #f7b928;
   --checkin-blue: #0084ff;
-
+  
   /* === ALIASES SEMÁNTICOS === */
-
+  
   /* Colores principales */
   --primary: var(--primary-500);
   --primary-light: var(--primary-100);
   --primary-dark: var(--primary-700);
-
+  
   --secondary: var(--secondary-500);
   --secondary-light: var(--secondary-100);
   --secondary-dark: var(--secondary-700);
-
-  --accent: var(--accent); /* Facebook blue */
-  --accent-light: var(--accent-100);
-  --accent-dark: var(--accent-700);
-
+  
+  --accent: var(--fb-blue);
+  --accent-light: #4b9aff;
+  --accent-dark: #166fe5;
+  
   /* Estados */
   --success: var(--success-500);
   --error: var(--error-500);
   --warning: var(--warning-500);
   --info: var(--info-500);
-
+  
   /* Texto (light default) */
   --text-primary: var(--text-primary);
-  --text-secondary: var(--gray-600);
+  --text-secondary: var(--gray-700);
   --text-tertiary: var(--gray-500);
   --text-quaternary: var(--gray-400);
   --text-disabled: var(--gray-300);
-  --text-inverse: #111827;
-
+  --text-inverse: #FFFFFF;
+  
   /* Fondos (light default) */
   --bg-primary: var(--bg-primary);
   --bg-secondary: var(--bg-secondary);
-  --bg-tertiary: #f3f4f6;
-  --bg-overlay: rgba(255, 255, 255, 0.5);
-  --bg-backdrop: rgba(255, 255, 255, 0.8);
-
+  --bg-tertiary: #f7f7f7;
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+  --bg-backdrop: rgba(0, 0, 0, 0.8);
+  
   /* Bordes (light default) */
   --border-primary: var(--border);
-  --border-secondary: var(--gray-300);
+  --border-secondary: var(--gray-200);
   --border-focus: var(--accent);
   --border-error: var(--error-500);
   
@@ -321,7 +322,35 @@
   --z-tooltip: 1800;
 }
 
-
+/* Dark Mode Toggle (User Config - Facebook-like) */
+.dark {
+  /* Exact dark mode colors */
+  --bg-primary: #18191a;
+  --bg-secondary: #242526;
+  --text-primary: #e4e6ea;
+  --fb-blue: #1877f2;
+  --accent: #1877f2;
+  --border: #303338;
+  
+  /* Colores de texto */
+  --text-primary: #e4e6ea;
+  --text-secondary: #b0b3b8;
+  --text-tertiary: #8e9297;
+  --text-quaternary: #65676b;
+  --text-disabled: #4b4f54;
+  --text-inverse: #FFFFFF;
+  
+  /* Fondos */
+  --bg-primary: #18191a;
+  --bg-secondary: #242526;
+  --bg-tertiary: #303338;
+  --bg-overlay: rgba(24, 25, 26, 0.5);
+  --bg-backdrop: rgba(24, 25, 26, 0.8);
+  
+  /* Bordes */
+  --border-primary: #303338;
+  --border-secondary: #4b4f54;
+}
 
 /* === VARIABLES DE COMPONENTES === */
 :root {

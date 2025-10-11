@@ -1,3 +1,4 @@
+// src/components/Header/Header.jsx
 import { useState, useEffect, useCallback, useMemo, useRef, useLayoutEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
@@ -7,17 +8,21 @@ import {
   MagnifyingGlassIcon,
   Bars3Icon,
   XMarkIcon,
-  ChatBubbleLeftRightIcon,
+  EnvelopeIcon,
+  UserCircleIcon,
+  PlusIcon,
+  BuildingOffice2Icon,
+  WrenchScrewdriverIcon,
   ShoppingBagIcon,
   UsersIcon,
-  VideoCameraIcon,
-  EllipsisVerticalIcon
+  UserPlusIcon
 } from '@heroicons/react/24/outline';
 import SearchBar from './SearchBar';
+import UserMenu from './UserMenu';
 import './Header.css';
 
-// Función throttle optimizada (mantenida para rendimiento en scroll)
-const throttle = useCallback((func, limit) => {
+// Función throttle optimizada
+function throttle(func, limit) {
   let lastFunc;
   let lastRan;
   return function() {
@@ -36,7 +41,7 @@ const throttle = useCallback((func, limit) => {
       }, limit - (Date.now() - lastRan));
     }
   }
-}, []);
+}
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -44,96 +49,90 @@ const Header = () => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [showMobileHeader, setShowMobileHeader] = useState(true);
-  const [notificationCount] = useState(5); // Mock para badge de notificaciones
   const headerRef = useRef(null);
 
-  const { isAuthenticated, user } = useAuth(); // Asumiendo que useAuth provee user para avatar
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Íconos de navegación derecha (adaptados a tema RentHub, como Facebook)
-  const rightNavIcons = useMemo(
+  const navigationItems = useMemo(
     () => [
       {
         id: "home",
-        path: "/home",
-        icon: HomeIcon,
         label: "Inicio",
-        ariaLabel: "Ir al feed principal"
+        path: "/",
+        icon: HomeIcon,
       },
       {
-        id: "watch",
-        path: "/live",
-        icon: VideoCameraIcon,
-        label: "Live",
-        ariaLabel: "Tours en vivo de propiedades"
+        id: "properties",
+        label: "Propiedades",
+        path: "/properties",
+        icon: BuildingOffice2Icon,
+      },
+      {
+        id: "services",
+        label: "Servicios",
+        path: "/services",
+        icon: WrenchScrewdriverIcon,
       },
       {
         id: "marketplace",
+        label: "Marketplace",
         path: "/marketplace",
         icon: ShoppingBagIcon,
-        label: "Marketplace",
-        ariaLabel: "Comprar/vender artículos relacionados con vivienda"
       },
       {
         id: "groups",
+        label: "Grupos",
         path: "/groups",
         icon: UsersIcon,
-        label: "Grupos",
-        ariaLabel: "Unirse a grupos de arrendamiento"
       },
       {
-        id: "notifications",
-        path: "/notifications",
-        icon: BellIcon,
-        label: "Notificaciones",
-        ariaLabel: "Ver notificaciones",
-        badge: notificationCount > 0 ? notificationCount : null
+        id: "profile",
+        label: "Perfil",
+        path: "/profile",
+        icon: UserCircleIcon,
       },
-      {
-        id: "messages",
-        path: "/messages",
-        icon: ChatBubbleLeftRightIcon,
-        label: "Mensajes",
-        ariaLabel: "Mensajes con inquilinos/propietarios"
-      }
     ],
-    [notificationCount]
+    []
   );
 
-  // Manejo del scroll (mejorado: reduce altura sutilmente en scroll, como Facebook)
+
+  // Manejo del scroll para ocultar/mostrar header móvil y efecto de reducción
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleScroll = useCallback(
     throttle(() => {
       const currentScrollY = window.scrollY;
+
+      // Efecto de reducción (isScrolled)
       setIsScrolled(currentScrollY > 10);
 
-      // Ocultar/mostrar header móvil en scroll down/up (optimizado para UX fluida)
-      if (window.innerWidth < 769) { // Solo en móvil
-        if (currentScrollY > lastScrollY && currentScrollY > 100) {
-          setShowMobileHeader(false);
-        } else {
-          setShowMobileHeader(true);
-        }
+      // Comportamiento de ocultar/mostrar header móvil
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scroll hacia abajo: ocultar header
+        setShowMobileHeader(false);
+      } else {
+        // Scroll hacia arriba: mostrar header
+        setShowMobileHeader(true);
       }
 
       setLastScrollY(currentScrollY);
-    }, 16), // 60fps throttle para smoothness
+    }, 100),
     [lastScrollY]
   );
 
   useEffect(() => {
-    window.addEventListener("scroll", handleScroll, { passive: true }); // Passive para perf
+    window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
-  // Reset estados en cambio de ruta (mejorado: incluye search expanded)
+  // Reset al cambiar de ruta
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsSearchExpanded(false);
   }, [location.pathname]);
 
-  // Manejo de Escape y overflow (usar useLayoutEffect para sync con DOM)
+  // Control de tecla Escape y overflow - usar useLayoutEffect para manipulación de layout
   useLayoutEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape") {
@@ -142,7 +141,7 @@ const Header = () => {
       }
     };
 
-    if (isMobileMenuOpen || isSearchExpanded) {
+    if (isMobileMenuOpen) {
       document.addEventListener("keydown", handleEscape);
       document.body.style.overflow = "hidden";
     } else {
@@ -153,10 +152,10 @@ const Header = () => {
       document.removeEventListener("keydown", handleEscape);
       document.body.style.overflow = "";
     };
-  }, [isMobileMenuOpen, isSearchExpanded]);
+  }, [isMobileMenuOpen]);
 
   const handleAuthAction = useCallback(() => {
-    navigate(isAuthenticated ? "/profile" : "/login"); // Adaptado a RentHub
+    navigate(isAuthenticated ? "/dashboard" : "/login");
   }, [isAuthenticated, navigate]);
 
   const toggleMobileMenu = useCallback(() => {
@@ -171,220 +170,190 @@ const Header = () => {
     setIsSearchExpanded(prev => !prev);
   }, []);
 
-  // Verificar ruta activa (optimizado para paths con query)
+  // Verificar ruta activa
   const isActiveNavItem = useCallback(
-    (itemPath) => location.pathname === itemPath,
+    (itemPath) => {
+      if (itemPath.includes("?")) {
+        const [path, query] = itemPath.split("?");
+        return (
+          location.pathname === path &&
+          location.search.includes(query.split("=")[1])
+        );
+      }
+      return location.pathname === itemPath;
+    },
     [location]
   );
 
-  // Render de ícono con badge opcional (nuevo helper para clean JSX)
-  const renderIconWithBadge = (IconComponent, hasBadge, badgeCount) => (
-    <>
-      <IconComponent className="header-icon" aria-hidden="true" />
-      {hasBadge && (
-        <span className="header-badge" aria-label={`${badgeCount} notificaciones pendientes`}>
-          {badgeCount > 99 ? '99+' : badgeCount}
-        </span>
-      )}
-    </>
-  );
+
 
   return (
     <>
-      {/* Header Desktop - Imitando Facebook Dark Mode */}
-      <header 
+      <header
         ref={headerRef}
-        className={`desktop-header ${isScrolled ? "desktop-header--scrolled" : ""}`} 
+        className={`fixed top-0 left-0 right-0 z-40 bg-[var(--bg-secondary)] border-b border-[var(--border-primary)] transition-all duration-200 ${isScrolled ? "py-1" : "py-2"} ${showMobileHeader ? "" : "transform -translate-y-full"}`}
         role="banner"
-        style={{ height: isScrolled ? '52px' : '56px' }} // Reducción sutil en scroll
       >
-        <div className="desktop-header__container">
-          {/* Logo Izquierda - Logo simple como Facebook */}
-          <Link to="/" className="desktop-header__logo" aria-label="Nido - Inicio">
-            <div className="desktop-header__logo-icon">
-              {/* SVG simple circular como 'f' de Facebook, adaptado a RH */}
-              <svg viewBox="0 0 24 24" className="desktop-header__logo-svg" aria-hidden="true">
-                <circle cx="12" cy="12" r="12" fill="#0084ff" />
-                <text x="12" y="16" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">RH</text>
-              </svg>
+        <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
+          {/* Logo Left */}
+          <Link to="/" className="flex items-center space-x-2 flex-shrink-0" aria-label="RentHub - Inicio">
+            <div className="w-8 h-8 bg-[var(--fb-blue)] rounded-full flex items-center justify-center">
+              <span className="text-[var(--text-inverse)] font-bold text-sm">RH</span>
             </div>
-            <span className="desktop-header__logo-text">RentHub</span>
+            <span className="text-[var(--text-primary)] font-bold text-xl">RentHub</span>
           </Link>
 
-          {/* Barra de Búsqueda Central - Exacto como Facebook */}
-          <div className="desktop-header__search">
-            <div className="desktop-header__search-container">
-              <MagnifyingGlassIcon className="desktop-header__search-icon" aria-hidden="true" />
-              <input
-                type="text"
-                placeholder="Buscar propiedades, inquilinos o grupos..."
-                className="desktop-header__search-input"
-                aria-label="Buscar en RentHub"
-                onFocus={() => navigate('/search')} // Navega a página de búsqueda en focus
-              />
-            </div>
+          {/* Search Center */}
+          <div className="flex-1 max-w-md mx-4 hidden md:block">
+            <SearchBar
+              onSearch={(params) => {
+                console.log(params);
+              }}
+              className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] placeholder-[var(--text-quaternary)] border border-[var(--border-primary)] rounded-full px-4 py-2"
+            />
           </div>
 
-          {/* Íconos Derecha - Fila horizontal compacta como Facebook */}
-          <nav className="desktop-header__nav-right" aria-label="Navegación rápida">
-            {rightNavIcons.map((item) => {
-              const isActive = isActiveNavItem(item.path);
-              const Icon = item.icon;
-              const hasBadge = item.id === 'notifications' && item.badge;
-
-              return (
-                <Link
-                  key={item.id}
-                  to={item.path}
-                  className={`desktop-header__nav-item ${isActive ? "desktop-header__nav-item--active" : ""}`}
-                  aria-label={item.ariaLabel}
-                  aria-current={isActive ? "page" : undefined}
-                >
-                  <div className="desktop-header__nav-icon-wrapper">
-                    {renderIconWithBadge(Icon, hasBadge, item.badge)}
-                  </div>
-                </Link>
-              );
-            })}
-            {/* Menú de Usuario (tres puntos + avatar) */}
-            <div className="desktop-header__user-section">
-              <button className="desktop-header__nav-item" aria-label="Más opciones">
-                <EllipsisVerticalIcon className="header-icon" aria-hidden="true" />
-              </button>
-              {isAuthenticated ? (
-                <button className="desktop-header__avatar-btn" onClick={() => navigate('/profile')} aria-label="Perfil">
-                  <img 
-                    src={user?.avatar || '/default-avatar.png'} 
-                    alt="Avatar" 
-                    className="desktop-header__avatar-img" 
-                  />
-                </button>
-              ) : (
-                <button className="desktop-header__auth-btn" onClick={handleAuthAction}>
-                  Iniciar sesión
-                </button>
-              )}
-            </div>
-          </nav>
-        </div>
-      </header>
-
-      {/* Header Móvil - Adaptado: Colapsa a hamburger left, search+icons right */}
-      <header 
-        className={`mobile-header ${isScrolled ? "mobile-header--scrolled" : ""} ${showMobileHeader ? "" : "mobile-header--hidden"}`} 
-        role="banner"
-      >
-        <div className="mobile-header__container">
-          {/* Logo + Hamburger Left */}
-          <div className="mobile-header__left">
-            <Link to="/" className="mobile-header__logo" aria-label="RentHub - Inicio">
-              <div className="mobile-header__logo-icon">
-                <svg viewBox="0 0 24 24" className="mobile-header__logo-svg" aria-hidden="true">
-                  <circle cx="12" cy="12" r="12" fill="#0084ff" />
-                  <text x="12" y="16" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">RH</text>
-                </svg>
+          {/* Mobile Search Toggle */}
+          <div className="flex-1 max-w-md mx-4 md:hidden">
+            <button
+              className="w-full text-left p-2 rounded-full bg-[var(--bg-primary)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] border border-[var(--border-primary)] transition-colors"
+              onClick={toggleSearchExpanded}
+              aria-label="Buscar"
+            >
+              <div className="flex items-center space-x-2">
+                <MagnifyingGlassIcon className="w-5 h-5 flex-shrink-0" />
+                <div>
+                  <span className="block text-sm font-medium">¿A dónde vas?</span>
+                  <span className="block text-xs text-gray-500">Cualquier semana · Cualquier huésped</span>
+                </div>
               </div>
-              <span className="mobile-header__logo-text">RentHub</span>
-            </Link>
-            <button 
-              className="mobile-header__menu-toggle" 
+            </button>
+          </div>
+
+          {/* Right Actions */}
+          <div className="flex items-center space-x-2 flex-shrink-0">
+            {/* Become Host - Desktop */}
+            {!isAuthenticated && (
+              <Link
+                to="/become-host"
+                className="hidden md:block px-4 py-2 bg-[var(--fb-blue)] text-[var(--text-inverse)] rounded-full text-sm font-medium hover:bg-[var(--accent-dark)] transition-colors"
+                aria-label="Conviértete en anfitrión"
+              >
+                Anfitrión
+              </Link>
+            )}
+
+            {/* Icons - Desktop */}
+            <div className="hidden md:flex items-center space-x-2">
+              <Link to="/" className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full transition-colors" aria-label="Inicio">
+                <HomeIcon className="w-6 h-6" />
+              </Link>
+              <button className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full transition-colors relative" aria-label="Notificaciones">
+                <BellIcon className="w-6 h-6" />
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-[var(--error-500)] rounded-full"></span>
+              </button>
+              <Link to="/messages" className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full transition-colors" aria-label="Mensajes">
+                <EnvelopeIcon className="w-6 h-6" />
+              </Link>
+              <Link to="/post/new" className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full transition-colors bg-[var(--fb-blue)] text-[var(--text-inverse)] hover:bg-[var(--accent-dark)]" aria-label="Crear publicación">
+                <PlusIcon className="w-6 h-6" />
+              </Link>
+            </div>
+
+            {/* Icons - Mobile */}
+            <div className="flex items-center space-x-2 md:hidden">
+              <button className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full" aria-label="Notificaciones">
+                <BellIcon className="w-6 h-6" />
+              </button>
+              <Link to="/messages" className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full" aria-label="Mensajes">
+                <EnvelopeIcon className="w-6 h-6" />
+              </Link>
+              <Link to="/post/new" className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full bg-[var(--fb-blue)] text-[var(--text-inverse)]" aria-label="Crear publicación">
+                <PlusIcon className="w-6 h-6" />
+              </Link>
+            </div>
+
+            {/* User Menu or Auth Button */}
+            {isAuthenticated ? (
+              <UserMenu />
+            ) : (
+              <button
+                className="px-4 py-2 bg-[var(--fb-blue)] text-[var(--text-inverse)] rounded-full text-sm font-medium hover:bg-[var(--accent-dark)] transition-colors ml-2"
+                onClick={handleAuthAction}
+                aria-label="Iniciar sesión"
+              >
+                Iniciar sesión
+              </button>
+            )}
+
+            {/* Mobile Menu Toggle */}
+            <button
+              className="md:hidden p-2 ml-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full"
               onClick={toggleMobileMenu}
               aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
               aria-expanded={isMobileMenuOpen}
             >
-              {isMobileMenuOpen ? (
-                <XMarkIcon className="mobile-header__menu-icon" aria-hidden="true" />
-              ) : (
-                <Bars3Icon className="mobile-header__menu-icon" aria-hidden="true" />
-              )}
+              {isMobileMenuOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6" />}
             </button>
           </div>
+        </div>
+      </header>
 
-          {/* Search + Íconos Right (compacto en móvil) */}
-          <div className="mobile-header__right">
-            {isSearchExpanded ? (
-              <SearchBar 
-                onSearch={(params) => {
-                  console.log(params);
-                  setIsSearchExpanded(false);
-                  navigate('/search', { state: params });
-                }} 
-                onClose={() => setIsSearchExpanded(false)}
-                autoFocus={true}
-                className="mobile-search-full"
-              />
-            ) : (
-              <button 
-                className="mobile-header__search-toggle" 
-                onClick={toggleSearchExpanded}
-                aria-label="Buscar propiedades"
-              >
-                <MagnifyingGlassIcon className="mobile-header__search-icon" aria-hidden="true" />
-                <span>Buscar</span>
-              </button>
-            )}
-            {/* Íconos compactos right en móvil */}
-            <div className="mobile-header__icons">
-              {rightNavIcons.slice(0, 3).map((item) => { // Solo primeros 3 en móvil para espacio
+      {/* Mobile Expanded Search */}
+      {isSearchExpanded && (
+        <div className="md:hidden fixed top-16 left-0 right-0 z-40 bg-[var(--bg-secondary)] border-b border-[var(--border-primary)] p-4 shadow-sm">
+          <SearchBar
+            onSearch={(params) => {
+              console.log(params);
+              setIsSearchExpanded(false);
+            }}
+            onClose={() => setIsSearchExpanded(false)}
+            autoFocus={true}
+            className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] placeholder-[var(--text-quaternary)] border border-[var(--border-primary)] rounded-full px-4 py-2"
+          />
+        </div>
+      )}
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <>
+          <div className="md:hidden fixed top-16 left-0 right-0 z-40 bg-[var(--bg-secondary)] border-b border-[var(--border-primary)] max-h-screen overflow-y-auto py-4">
+            <nav className="px-4 space-y-2">
+              {navigationItems.map((item) => {
                 const Icon = item.icon;
-                const hasBadge = item.id === 'notifications' && item.badge;
                 return (
-                  <Link key={item.id} to={item.path} className="mobile-header__icon-link" aria-label={item.ariaLabel}>
-                    <div className="mobile-header__icon-wrapper">
-                      {renderIconWithBadge(Icon, hasBadge, item.badge)}
-                    </div>
+                  <Link
+                    key={item.id}
+                    to={item.path}
+                    className="flex items-center space-x-4 p-3 rounded-lg hover:bg-[var(--bg-tertiary)] transition-colors text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                    onClick={closeMobileMenu}
+                  >
+                    <Icon className="w-6 h-6 text-[var(--text-quaternary)] flex-shrink-0" />
+                    <span className="font-medium">{item.label}</span>
                   </Link>
                 );
               })}
-              {/* Avatar/User */}
-              {isAuthenticated ? (
-                <button className="mobile-header__avatar-btn" onClick={() => navigate('/profile')} aria-label="Perfil">
-                  <img 
-                    src={user?.avatar || '/default-avatar.png'} 
-                    alt="Avatar" 
-                    className="mobile-header__avatar-img" 
-                  />
-                </button>
-              ) : (
-                <button className="mobile-header__auth-btn" onClick={handleAuthAction}>
-                  Iniciar sesión
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Menú Móvil Lateral (como sidebar Facebook en móvil) */}
-        {isMobileMenuOpen && (
-          <div className="mobile-header__menu" role="navigation" aria-label="Menú móvil">
-            <nav className="mobile-header__nav">
-              {rightNavIcons.map((item) => (
-                <Link 
-                  key={item.id} 
-                  to={item.path} 
-                  className="mobile-header__nav-item" 
+              {!isAuthenticated && (
+                <Link
+                  to="/become-host"
+                  className="flex items-center space-x-4 p-3 rounded-lg bg-[var(--fb-blue)] text-[var(--text-inverse)] transition-colors"
                   onClick={closeMobileMenu}
                 >
-                  <item.icon className="mobile-header__nav-icon" aria-hidden="true" />
-                  <span>{item.label}</span>
+                  <UserPlusIcon className="w-6 h-6 flex-shrink-0" />
+                  <span className="font-medium">Conviértete en anfitrión</span>
                 </Link>
-              ))}
-              {!isAuthenticated && (
-                <button className="mobile-header__auth-btn-full" onClick={handleAuthAction}>
-                  Iniciar sesión
-                </button>
               )}
             </nav>
           </div>
-        )}
-
-        {/* Backdrop para menú móvil */}
-        {isMobileMenuOpen && (
-          <div className="mobile-header__backdrop" onClick={closeMobileMenu} aria-hidden="true" />
-        )}
-      </header>
+          <div
+            className="md:hidden fixed inset-0 bg-[var(--bg-overlay)] z-30"
+            onClick={closeMobileMenu}
+          />
+        </>
+      )}
     </>
   );
+
 };
 
 export default Header;
