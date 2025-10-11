@@ -19,12 +19,6 @@ const Home = () => {
   const [page, setPage] = useState(1);
   const { ref: loadMoreRef, inView } = useInView({ threshold: 0.1 });
 
-  useEffect(() => {
-    if (inView && hasMore && !isLoading) {
-      loadMorePosts();
-    }
-  }, [inView, hasMore, isLoading, loadMorePosts]);
-
   const loadMorePosts = useCallback(async () => {
     setIsLoading(true);
     setTimeout(() => {
@@ -38,6 +32,12 @@ const Home = () => {
       setIsLoading(false);
     }, 800); // Simula delay
   }, [page]);
+
+  useEffect(() => {
+    if (inView && hasMore && !isLoading) {
+      loadMorePosts();
+    }
+  }, [inView, hasMore, isLoading, loadMorePosts]);
 
   const handleImageChange = useCallback((postId, direction) => {
     setCurrentImageIndices(prev => {
