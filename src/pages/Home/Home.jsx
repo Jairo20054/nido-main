@@ -1,5 +1,5 @@
 // src/pages/Home/Home.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Header from '../../components/common/Header/Header';
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar';
@@ -7,68 +7,35 @@ import RightSidebar from '../../components/RightSidebar/RightSidebar';
 import PostCard from '../../components/PostCard/PostCard';
 import StoriesBar from '../../components/Stories/StoriesBar';
 import CreatePost from '../../components/CreatePost/CreatePost';
+import { api } from '../../services/api';
 import './Home.css';
 
-// Mock data para propiedades
-const mockProperties = [
-  {
-    id: 1,
-    user: {
-      name: 'Carlos Rodríguez',
-      avatar: '/api/placeholder/40/40',
-      verified: true
-    },
-    title: 'Apartamento Amoblado en El Poblado',
-    location: 'Medellín, Antioquia',
-    price: 1800000,
-    images: [
-      '/api/placeholder/500/400',
-      '/api/placeholder/500/400',
-      '/api/placeholder/500/400'
-    ],
-    description: 'Hermoso apartamento en conjunto cerrado con amenities. 3 habitaciones, 2 baños, parqueadero privado. Excelente ubicación cerca de centros comerciales y transporte.',
-    specs: {
-      rooms: 3,
-      bathrooms: 2,
-      area: 85,
-      parking: true
-    },
-    likes: 24,
-    comments: 8,
-    isLiked: false,
-    isSaved: false,
-    isFollowing: false,
-    timestamp: 'Hace 2 horas'
+// Transformar datos de API a formato de componente
+const transformPropertyData = (property) => ({
+  id: property._id || property.id,
+  user: {
+    name: property.host?.name || 'Anónimo',
+    avatar: property.host?.avatar || '/api/placeholder/40/40',
+    verified: property.host?.verified || false
   },
-  {
-    id: 2,
-    user: {
-      name: 'Inmobiliaria Premium',
-      avatar: '/api/placeholder/40/40',
-      verified: true
-    },
-    title: 'Casa Campestre con Piscina',
-    location: 'Rionegro, Antioquia',
-    price: 3200000,
-    images: [
-      '/api/placeholder/500/400',
-      '/api/placeholder/500/400'
-    ],
-    description: 'Casa campestre ideal para familia. 4 habitaciones, 3 baños, jardín amplio, piscina y zona de BBQ. Perfecta para disfrutar del clima de la región.',
-    specs: {
-      rooms: 4,
-      bathrooms: 3,
-      area: 180,
-      parking: true
-    },
-    likes: 42,
-    comments: 15,
-    isLiked: true,
-    isSaved: true,
-    isFollowing: true,
-    timestamp: 'Hace 5 horas'
-  }
-];
+  title: property.title,
+  location: property.city || property.location,
+  price: property.price,
+  images: property.images || ['/api/placeholder/500/400'],
+  description: property.description,
+  specs: {
+    rooms: property.bedrooms || property.rooms || 0,
+    bathrooms: property.bathrooms || 0,
+    area: property.area || 0,
+    parking: property.parking || false
+  },
+  likes: property.likes || 0,
+  comments: property.comments || 0,
+  isLiked: false,
+  isSaved: false,
+  isFollowing: false,
+  timestamp: property.createdAt ? new Date(property.createdAt).toLocaleString('es-CO') : 'Reciente'
+});
 
 const mockStories = [
   { id: 1, user: 'Tu historia', avatar: '/api/placeholder/60/60', isCreate: true },
@@ -83,16 +50,70 @@ const Home = () => {
   const [currentImageIndices, setCurrentImageIndices] = useState({});
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filters, setFilters] = useState({
+    minPrice: '',
+    maxPrice: '',
+    rooms: '',
+    location: ''
+  });
+  const [showFilters, setShowFilters] = useState(false);
 
-  // Cargar datos iniciales
+  // Cargar datos iniciales desde API
   useEffect(() => {
     const loadData = async () => {
-      setLoading(true);
-      // Simular carga de datos
-      setTimeout(() => {
+      try {
+        setLoading(true);
+        const response = await api.get('/properties', {
+          page: 1,
+          limit: 20
+        });
+
+        if (response.success) {
+          const transformedPosts = response.data.map(transformPropertyData);
+          setPosts(transformedPosts);
+        }
+      } catch (error) {
+        console.error('Error cargando propiedades:', error);
+        // Fallback a datos mock si falla la API
+        const mockProperties = [
+          {
+            id: 1,
+            user: {
+              name: 'Carlos Rodríguez',
+              avatar: '/api/placeholder/40/40',
+              verified: true
+            },
+            title: 'Apartamento Amoblado en El Poblado',
+            location: 'Medellín, Antioquia',
+            price: 1800000,
+            images: ['/api/placeholder/500/400', '/api/placeholder/500/400', '/api/placeholder/500/400'],
+            description: 'Hermoso apartamento en conjunto cerrado con amenities. 3 habitaciones, 2 baños, parqueadero privado.',
+            specs: { rooms: 3, bathrooms: 2, area: 85, parking: true },
+            likes: 24, comments: 8, isLiked: false, isSaved: false, isFollowing: false,
+            timestamp: 'Hace 2 horas'
+          },
+          {
+            id: 2,
+            user: {
+              name: 'Inmobiliaria Premium',
+              avatar: '/api/placeholder/40/40',
+              verified: true
+            },
+            title: 'Casa Campestre con Piscina',
+            location: 'Rionegro, Antioquia',
+            price: 3200000,
+            images: ['/api/placeholder/500/400', '/api/placeholder/500/400'],
+            description: 'Casa campestre ideal para familia. 4 habitaciones, 3 baños, jardín amplio, piscina.',
+            specs: { rooms: 4, bathrooms: 3, area: 180, parking: true },
+            likes: 42, comments: 15, isLiked: true, isSaved: true, isFollowing: true,
+            timestamp: 'Hace 5 horas'
+          }
+        ];
         setPosts(mockProperties);
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     };
     loadData();
   }, []);
@@ -144,35 +165,141 @@ const Home = () => {
     ));
   };
 
-  const handleCreatePost = (newPost) => {
-    // Aquí integrarías con tu backend
-    console.log('Nueva publicación:', newPost);
-    setIsCreatePostOpen(false);
+  // Filtrar posts basado en búsqueda y filtros
+  const filteredPosts = useMemo(() => {
+    return posts.filter(post => {
+      const matchesSearch = !searchQuery ||
+        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchesLocation = !filters.location ||
+        post.location.toLowerCase().includes(filters.location.toLowerCase());
+
+      const matchesMinPrice = !filters.minPrice || post.price >= parseInt(filters.minPrice);
+      const matchesMaxPrice = !filters.maxPrice || post.price <= parseInt(filters.maxPrice);
+      const matchesRooms = !filters.rooms || post.specs.rooms >= parseInt(filters.rooms);
+
+      return matchesSearch && matchesLocation && matchesMinPrice && matchesMaxPrice && matchesRooms;
+    });
+  }, [posts, searchQuery, filters]);
+
+  const handleSearch = async () => {
+    try {
+      setLoading(true);
+      const searchParams = {
+        page: 1,
+        limit: 20,
+        ...(searchQuery && { location: searchQuery }),
+        ...(filters.minPrice && { minPrice: filters.minPrice }),
+        ...(filters.maxPrice && { maxPrice: filters.maxPrice }),
+        ...(filters.location && { location: filters.location })
+      };
+
+      const response = await api.get('/properties', searchParams);
+
+      if (response.success) {
+        const transformedPosts = response.data.map(transformPropertyData);
+        setPosts(transformedPosts);
+      }
+    } catch (error) {
+      console.error('Error en búsqueda:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreatePost = async (newPost) => {
+    try {
+      const response = await api.post('/properties', newPost);
+      if (response.success) {
+        const newProperty = transformPropertyData(response.data);
+        setPosts(prev => [newProperty, ...prev]);
+        setIsCreatePostOpen(false);
+      }
+    } catch (error) {
+      console.error('Error creando propiedad:', error);
+    }
   };
 
   return (
     <div className="home-container">
       {/* Header */}
       <Header />
-      
+
       <div className="home-layout">
         {/* Sidebar Izquierdo */}
         <LeftSidebar />
-        
+
         {/* Contenido Principal */}
         <main className="home-main">
           {/* Stories */}
           <StoriesBar stories={mockStories} />
-          
+
+          {/* Barra de búsqueda y filtros */}
+          <div className="search-filters-bar">
+            <div className="search-container">
+              <input
+                type="text"
+                placeholder="Buscar propiedades por ubicación, título..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="search-input"
+              />
+              <button onClick={handleSearch} className="search-btn">🔍 Buscar</button>
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="filters-toggle"
+              >
+                🎛️ Filtros {showFilters ? '▼' : '▶'}
+              </button>
+            </div>
+
+            {showFilters && (
+              <div className="filters-panel">
+                <div className="filter-row">
+                  <input
+                    type="text"
+                    placeholder="Ubicación específica"
+                    value={filters.location}
+                    onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value }))}
+                    className="filter-input"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Precio mínimo"
+                    value={filters.minPrice}
+                    onChange={(e) => setFilters(prev => ({ ...prev, minPrice: e.target.value }))}
+                    className="filter-input"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Precio máximo"
+                    value={filters.maxPrice}
+                    onChange={(e) => setFilters(prev => ({ ...prev, maxPrice: e.target.value }))}
+                    className="filter-input"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Mín. habitaciones"
+                    value={filters.rooms}
+                    onChange={(e) => setFilters(prev => ({ ...prev, rooms: e.target.value }))}
+                    className="filter-input"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Crear Publicación */}
           <div className="create-post-card">
             <div className="create-post-header">
-              <img 
-                src="/api/placeholder/40/40" 
-                alt="Tu perfil" 
-                className="user-avatar" 
+              <img
+                src="/api/placeholder/40/40"
+                alt="Tu perfil"
+                className="user-avatar"
               />
-              <button 
+              <button
                 className="create-post-input"
                 onClick={() => setIsCreatePostOpen(true)}
               >
@@ -202,9 +329,13 @@ const Home = () => {
                 <div className="loading-spinner"></div>
                 <p>Cargando propiedades...</p>
               </div>
+            ) : filteredPosts.length === 0 ? (
+              <div className="no-results">
+                <p>No se encontraron propiedades que coincidan con tu búsqueda.</p>
+              </div>
             ) : (
               <AnimatePresence>
-                {posts.map((post, index) => (
+                {filteredPosts.map((post, index) => (
                   <motion.div
                     key={post.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -226,7 +357,7 @@ const Home = () => {
             )}
           </div>
         </main>
-        
+
         {/* Sidebar Derecho */}
         <RightSidebar />
       </div>
@@ -234,7 +365,7 @@ const Home = () => {
       {/* Modal Crear Publicación */}
       <AnimatePresence>
         {isCreatePostOpen && (
-          <CreatePost 
+          <CreatePost
             onClose={() => setIsCreatePostOpen(false)}
             onSubmit={handleCreatePost}
           />

@@ -9,5 +9,6 @@ router.get('/:id', propertyController.getPropertyById);
 router.post('/', verifyToken, propertyController.createProperty);
 router.put('/:id', verifyToken, propertyController.updateProperty);
 router.delete('/:id', verifyToken, propertyController.deleteProperty);
+router.post('/contact', propertyController.contactProperty);
 
 module.exports = router;

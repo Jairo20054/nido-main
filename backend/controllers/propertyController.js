@@ -400,10 +400,68 @@ const deleteProperty = async (req, res) => {
   }
 };
 
+/**
+ * Manejar formulario de contacto para propiedades
+ * @param {Object} req - Objeto de solicitud
+ * @param {Object} res - Objeto de respuesta
+ */
+const contactProperty = async (req, res) => {
+  try {
+    const { propertyId, name, email, phone, message } = req.body;
+
+    // Validar datos requeridos
+    if (!propertyId || !name || !email || !message) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        success: false,
+        message: 'Faltan campos requeridos: propertyId, name, email, message',
+      });
+    }
+
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        success: false,
+        message: 'Formato de email inválido',
+      });
+    }
+
+    // Verificar que la propiedad existe
+    const property = await Property.findById(propertyId).populate('host', 'name email');
+    if (!property) {
+      return res.status(STATUS_CODES.NOT_FOUND).json({
+        success: false,
+        message: MESSAGES.PROPERTY_NOT_FOUND,
+      });
+    }
+
+    // Aquí podrías enviar email al host de la propiedad
+    // Por ahora solo retornamos éxito
+    console.log('Contacto recibido:', {
+      propertyId,
+      propertyTitle: property.title,
+      hostEmail: property.host.email,
+      contact: { name, email, phone, message }
+    });
+
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: 'Mensaje enviado exitosamente. El propietario se pondrá en contacto contigo pronto.',
+    });
+  } catch (error) {
+    console.error('Error al procesar contacto:', error);
+    res.status(STATUS_CODES.SERVER_ERROR).json({
+      success: false,
+      message: MESSAGES.SERVER_ERROR,
+    });
+  }
+};
+
 module.exports = {
   getAllProperties,
   getPropertyById,
   createProperty,
   updateProperty,
   deleteProperty,
+  contactProperty,
 };
