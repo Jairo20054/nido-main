@@ -3,17 +3,14 @@ import React, { useState, useEffect, useCallback, useMemo, useRef, useLayoutEffe
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
 import {
-  HomeIcon,
-  BellIcon,
   MagnifyingGlassIcon,
   Bars3Icon,
   XMarkIcon,
-  ChatBubbleLeftRightIcon,
-  UserCircleIcon,
-  ShoppingBagIcon,
-  UsersIcon,
-  VideoCameraIcon,
-  EllipsisVerticalIcon
+  HomeModernIcon,
+  WrenchScrewdriverIcon,
+  HeartIcon,
+  UserPlusIcon,
+  UserCircleIcon
 } from '@heroicons/react/24/outline';
 import './Header.css';
 
@@ -45,73 +42,65 @@ const Header = () => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [showMobileHeader, setShowMobileHeader] = useState(true);
-  const [notificationCount, setNotificationCount] = useState(5);
   const headerRef = useRef(null);
 
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Íconos de navegación derecha - Adaptados a Nido
+  // Navegación central - Elementos principales
+  const centerNavItems = useMemo(
+    () => [
+      {
+        id: "alojamientos",
+        path: "/alojamientos",
+        icon: HomeModernIcon,
+        label: "Alojamientos",
+        ariaLabel: "Buscar alojamientos"
+      },
+      {
+        id: "experiencias",
+        path: "/experiencias",
+        icon: UserCircleIcon,
+        label: "Experiencias",
+        ariaLabel: "Experiencias únicas"
+      },
+      {
+        id: "servicios",
+        path: "/servicios",
+        icon: WrenchScrewdriverIcon,
+        label: "Servicios",
+        ariaLabel: "Servicios adicionales"
+      }
+    ],
+    []
+  );
+
+  // Íconos de navegación derecha
   const rightNavIcons = useMemo(
     () => [
       {
-        id: "home",
-        path: "/home",
-        icon: HomeIcon,
-        label: "Inicio",
-        ariaLabel: "Ir al feed principal"
-      },
-      {
-        id: "watch",
-        path: "/live",
-        icon: VideoCameraIcon,
-        label: "Live",
-        ariaLabel: "Tours en vivo de propiedades"
-      },
-      {
-        id: "marketplace",
-        path: "/marketplace",
-        icon: ShoppingBagIcon,
-        label: "Propiedades",
-        ariaLabel: "Buscar propiedades"
-      },
-      {
-        id: "groups",
-        path: "/groups",
-        icon: UsersIcon,
-        label: "Grupos",
-        ariaLabel: "Unirse a grupos"
-      },
-      {
-        id: "notifications",
-        path: "/notifications",
-        icon: BellIcon,
-        label: "Notificaciones",
-        ariaLabel: "Ver notificaciones",
-        badge: notificationCount > 0 ? notificationCount : null
-      },
-      {
-        id: "messages",
-        path: "/messages",
-        icon: ChatBubbleLeftRightIcon,
-        label: "Mensajes",
-        ariaLabel: "Mensajes con inquilinos/propietarios"
+        id: "favorites",
+        path: "/favorites",
+        icon: HeartIcon,
+        label: "Favoritos",
+        ariaLabel: "Tus propiedades favoritas",
+        badge: 3
       }
     ],
-    [notificationCount]
+    []
   );
 
-  // Manejo del scroll
+  // Manejo del scroll optimizado
   const handleScroll = useCallback(
     throttle(() => {
       const currentScrollY = window.scrollY;
-      setIsScrolled(currentScrollY > 10);
+      setIsScrolled(currentScrollY > 20);
 
       if (window.innerWidth < 769) {
         if (currentScrollY > lastScrollY && currentScrollY > 100) {
           setShowMobileHeader(false);
-        } else {
+        } else if (currentScrollY < lastScrollY || currentScrollY <= 100) {
           setShowMobileHeader(true);
         }
       }
@@ -171,15 +160,23 @@ const Header = () => {
   }, []);
 
   const isActiveNavItem = useCallback(
-    (itemPath) => location.pathname === itemPath,
+    (itemPath) => location.pathname.startsWith(itemPath),
     [location]
   );
+
+  const handleSearchSubmit = useCallback((e) => {
+    e.preventDefault();
+    const searchTerm = e.target.search?.value;
+    if (searchTerm) {
+      navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
+    }
+  }, [navigate]);
 
   const renderIconWithBadge = (IconComponent, hasBadge, badgeCount) => (
     <>
       <IconComponent className="header-icon" aria-hidden="true" />
-      {hasBadge && (
-        <span className="header-badge" aria-label={`${badgeCount} notificaciones pendientes`}>
+      {hasBadge && badgeCount > 0 && (
+        <span className="header-badge" aria-label={`${badgeCount} notificaciones`}>
           {badgeCount > 99 ? '99+' : badgeCount}
         </span>
       )}
@@ -188,7 +185,7 @@ const Header = () => {
 
   return (
     <>
-      {/* Header Desktop - Modo Claro */}
+      {/* Header Desktop - Rediseñado */}
       <header 
         ref={headerRef}
         className={`desktop-header ${isScrolled ? "desktop-header--scrolled" : ""}`} 
@@ -199,7 +196,8 @@ const Header = () => {
           <Link to="/" className="desktop-header__logo" aria-label="Nido - Inicio">
             <div className="desktop-header__logo-icon">
               <svg viewBox="0 0 24 24" className="desktop-header__logo-svg" aria-hidden="true">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" 
+                <path 
+                  d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" 
                   stroke="currentColor" 
                   strokeWidth="2" 
                   fill="none"
@@ -209,26 +207,58 @@ const Header = () => {
             <span className="desktop-header__logo-text">Nido</span>
           </Link>
 
-          {/* Barra de Búsqueda Central */}
+          {/* Navegación Central */}
+          <nav className="desktop-header__nav-center" aria-label="Navegación principal">
+            {centerNavItems.map((item) => {
+              const isActive = isActiveNavItem(item.path);
+              const Icon = item.icon;
+              
+              return (
+                <Link
+                  key={item.id}
+                  to={item.path}
+                  className={`desktop-header__nav-item ${isActive ? "desktop-header__nav-item--active" : ""}`}
+                  aria-label={item.ariaLabel}
+                  aria-current={isActive ? "page" : undefined}
+                >
+                  <Icon className="desktop-header__nav-icon" aria-hidden="true" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Barra de Búsqueda */}
           <div className="desktop-header__search">
-            <div className="desktop-header__search-container">
+            <form onSubmit={handleSearchSubmit} className="desktop-header__search-container">
               <MagnifyingGlassIcon className="desktop-header__search-icon" aria-hidden="true" />
               <input
                 type="text"
-                placeholder="Buscar en Nido..."
+                name="search"
+                placeholder="Buscar propiedades, servicios..."
                 className="desktop-header__search-input"
                 aria-label="Buscar en Nido"
-                onFocus={() => navigate('/search')}
               />
-            </div>
+            </form>
           </div>
 
-          {/* Íconos Derecha */}
-          <nav className="desktop-header__nav-right" aria-label="Navegación rápida">
+          {/* Navegación Derecha */}
+          <div className="desktop-header__nav-right">
+            {/* Botón Conviértete en Anfitrión */}
+            <Link
+              to="/become-host"
+              className="desktop-header__become-host-btn"
+              aria-label="Conviértete en anfitrión"
+            >
+              <UserPlusIcon className="desktop-header__become-host-icon" aria-hidden="true" />
+              <span>Conviértete en Anfitrión</span>
+            </Link>
+
+            {/* Íconos de acción */}
             {rightNavIcons.map((item) => {
               const isActive = isActiveNavItem(item.path);
               const Icon = item.icon;
-              const hasBadge = item.id === 'notifications' && item.badge;
+              const hasBadge = item.badge && item.badge > 0;
 
               return (
                 <Link
@@ -244,42 +274,63 @@ const Header = () => {
                 </Link>
               );
             })}
-            
-            {/* Menú de Usuario */}
+
+            {/* Sección de Usuario */}
             <div className="desktop-header__user-section">
-              <button className="desktop-header__nav-item" aria-label="Más opciones">
-                <EllipsisVerticalIcon className="header-icon" aria-hidden="true" />
-              </button>
               {isAuthenticated ? (
-                <button className="desktop-header__avatar-btn" onClick={() => navigate('/profile')} aria-label="Perfil">
-                  <img 
-                    src={user?.avatar || '/default-avatar.png'} 
-                    alt="Avatar" 
-                    className="desktop-header__avatar-img" 
+                <button 
+                  className="desktop-header__avatar-btn" 
+                  onClick={() => navigate('/profile')} 
+                  aria-label="Mi perfil"
+                >
+                  <img
+                    src={user?.avatar || '/default-avatar.png'}
+                    alt={`Avatar de ${user?.name || 'Usuario'}`}
+                    className="desktop-header__avatar-img"
                   />
                 </button>
               ) : (
-                <button className="desktop-header__auth-btn" onClick={handleAuthAction}>
-                  Iniciar sesión
+                <button 
+                  className="desktop-header__auth-btn" 
+                  onClick={handleAuthAction}
+                  aria-label="Iniciar sesión"
+                >
+                  <UserCircleIcon className="w-5 h-5" aria-hidden="true" />
+                  <span>Iniciar sesión</span>
                 </button>
               )}
             </div>
-          </nav>
+          </div>
         </div>
       </header>
 
-      {/* Header Móvil */}
+      {/* Header Móvil - Rediseñado */}
       <header 
         className={`mobile-header ${isScrolled ? "mobile-header--scrolled" : ""} ${showMobileHeader ? "" : "mobile-header--hidden"}`} 
         role="banner"
       >
         <div className="mobile-header__container">
-          {/* Logo + Hamburger Left */}
+          {/* Logo + Menú Hamburguesa */}
           <div className="mobile-header__left">
+            <button 
+              className="mobile-header__menu-toggle" 
+              onClick={toggleMobileMenu}
+              aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-menu"
+            >
+              {isMobileMenuOpen ? (
+                <XMarkIcon className="mobile-header__menu-icon" aria-hidden="true" />
+              ) : (
+                <Bars3Icon className="mobile-header__menu-icon" aria-hidden="true" />
+              )}
+            </button>
+            
             <Link to="/" className="mobile-header__logo" aria-label="Nido - Inicio">
               <div className="mobile-header__logo-icon">
                 <svg viewBox="0 0 24 24" className="mobile-header__logo-svg" aria-hidden="true">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" 
+                  <path 
+                    d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" 
                     stroke="currentColor" 
                     strokeWidth="2" 
                     fill="none"
@@ -288,39 +339,31 @@ const Header = () => {
               </div>
               <span className="mobile-header__logo-text">Nido</span>
             </Link>
-            <button 
-              className="mobile-header__menu-toggle" 
-              onClick={toggleMobileMenu}
-              aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
-              aria-expanded={isMobileMenuOpen}
-            >
-              {isMobileMenuOpen ? (
-                <XMarkIcon className="mobile-header__menu-icon" aria-hidden="true" />
-              ) : (
-                <Bars3Icon className="mobile-header__menu-icon" aria-hidden="true" />
-              )}
-            </button>
           </div>
 
-          {/* Search + Íconos Right */}
+          {/* Búsqueda + Acciones */}
           <div className="mobile-header__right">
             {isSearchExpanded ? (
               <div className="mobile-search-full">
-                <div className="mobile-search-container">
-                  <MagnifyingGlassIcon className="mobile-search-icon" />
+                <form className="mobile-search-container" onSubmit={handleSearchSubmit}>
+                  <MagnifyingGlassIcon className="mobile-search-icon" aria-hidden="true" />
                   <input
                     type="text"
+                    name="search"
                     placeholder="Buscar en Nido..."
                     className="mobile-search-input"
                     autoFocus
+                    aria-label="Buscar propiedades"
                   />
                   <button 
+                    type="button"
                     className="mobile-search-close"
                     onClick={() => setIsSearchExpanded(false)}
+                    aria-label="Cerrar búsqueda"
                   >
-                    <XMarkIcon className="w-5 h-5" />
+                    <XMarkIcon className="w-5 h-5" aria-hidden="true" />
                   </button>
-                </div>
+                </form>
               </div>
             ) : (
               <button 
@@ -333,31 +376,43 @@ const Header = () => {
               </button>
             )}
             
-            {/* Íconos compactos right en móvil */}
-            <div className="mobile-header__icons">
-              {rightNavIcons.slice(0, 3).map((item) => {
+            {/* Acciones rápidas */}
+            <div className="mobile-header__actions">
+              {rightNavIcons.map((item) => {
                 const Icon = item.icon;
-                const hasBadge = item.id === 'notifications' && item.badge;
+                const hasBadge = item.badge && item.badge > 0;
+                
                 return (
-                  <Link key={item.id} to={item.path} className="mobile-header__icon-link" aria-label={item.ariaLabel}>
-                    <div className="mobile-header__icon-wrapper">
-                      {renderIconWithBadge(Icon, hasBadge, item.badge)}
-                    </div>
+                  <Link 
+                    key={item.id} 
+                    to={item.path} 
+                    className="mobile-header__action-btn" 
+                    aria-label={item.ariaLabel}
+                  >
+                    {renderIconWithBadge(Icon, hasBadge, item.badge)}
                   </Link>
                 );
               })}
               
-              {/* Avatar/User */}
+              {/* Avatar/Usuario */}
               {isAuthenticated ? (
-                <button className="mobile-header__avatar-btn" onClick={() => navigate('/profile')} aria-label="Perfil">
+                <button 
+                  className="mobile-header__action-btn" 
+                  onClick={() => navigate('/profile')} 
+                  aria-label="Mi perfil"
+                >
                   <img 
                     src={user?.avatar || '/default-avatar.png'} 
-                    alt="Avatar" 
+                    alt={`Avatar de ${user?.name || 'Usuario'}`} 
                     className="mobile-header__avatar-img" 
                   />
                 </button>
               ) : (
-                <button className="mobile-header__auth-btn" onClick={handleAuthAction}>
+                <button 
+                  className="mobile-header__auth-btn" 
+                  onClick={handleAuthAction}
+                  aria-label="Iniciar sesión"
+                >
                   Iniciar sesión
                 </button>
               )}
@@ -366,39 +421,65 @@ const Header = () => {
         </div>
 
         {/* Menú Móvil Lateral */}
-        {isMobileMenuOpen && (
-          <div className="mobile-header__menu" role="navigation" aria-label="Menú móvil">
-            <nav className="mobile-header__nav">
-              {rightNavIcons.map((item) => (
-                <Link 
-                  key={item.id} 
-                  to={item.path} 
-                  className="mobile-header__nav-item" 
-                  onClick={closeMobileMenu}
-                >
-                  <item.icon className="mobile-header__nav-icon" aria-hidden="true" />
-                  <span>{item.label}</span>
-                  {item.badge && (
-                    <span className="mobile-nav-badge">{item.badge}</span>
-                  )}
-                </Link>
-              ))}
-              {!isAuthenticated && (
-                <button className="mobile-header__auth-btn-full" onClick={handleAuthAction}>
-                  Iniciar sesión
-                </button>
-              )}
-            </nav>
-          </div>
-        )}
+        <div 
+          id="mobile-menu"
+          className="mobile-header__menu" 
+          role="navigation" 
+          aria-label="Menú principal"
+          aria-expanded={isMobileMenuOpen}
+        >
+          <nav className="mobile-header__nav">
+            {centerNavItems.map((item) => (
+              <Link
+                key={item.id}
+                to={item.path}
+                className="mobile-header__nav-item"
+                onClick={closeMobileMenu}
+                aria-label={item.ariaLabel}
+              >
+                <item.icon className="mobile-header__nav-icon" aria-hidden="true" />
+                <span>{item.label}</span>
+              </Link>
+            ))}
+            
+            <Link
+              to="/become-host"
+              className="mobile-header__become-host-mobile"
+              onClick={closeMobileMenu}
+              aria-label="Conviértete en anfitrión"
+            >
+              <UserPlusIcon className="mobile-header__nav-icon" aria-hidden="true" />
+              <span>Conviértete en Anfitrión</span>
+            </Link>
+            
+            {!isAuthenticated && (
+              <button 
+                className="mobile-header__auth-btn-full" 
+                onClick={() => {
+                  handleAuthAction();
+                  closeMobileMenu();
+                }}
+                aria-label="Iniciar sesión"
+              >
+                Iniciar sesión en Nido
+              </button>
+            )}
+          </nav>
+        </div>
 
         {/* Backdrop para menú móvil */}
         {isMobileMenuOpen && (
-          <div className="mobile-header__backdrop" onClick={closeMobileMenu} aria-hidden="true" />
+          <div 
+            className="mobile-header__backdrop" 
+            onClick={closeMobileMenu} 
+            aria-hidden="true" 
+            role="button"
+            tabIndex={-1}
+          />
         )}
       </header>
     </>
   );
 };
 
-export default Header;
+export default React.memo(Header);
