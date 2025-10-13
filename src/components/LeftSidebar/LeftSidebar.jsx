@@ -1,197 +1,88 @@
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useUiHost } from '../../context/UiHostProvider';
+// LeftSidebar.jsx
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './LeftSidebar.css';
 
+const LS_KEY = 'nido_sidebar_collapsed';
 
-/*
-const RenovationIcon = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-  </svg>
-);
-*/
-
-const UserIcon = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-    <circle cx="12" cy="7" r="4"/>
-  </svg>
-);
-
-/*
-const SmartHomeIcon = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-    <polyline points="7.5 4.21 12 6.81 16.5 4.21"/>
-    <polyline points="7.5 19.79 7.5 14.6 3 12"/>
-    <polyline points="21 12 16.5 14.6 16.5 19.79"/>
-    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-    <line x1="12" y1="22.08" x2="12" y2="12"/>
-  </svg>
-);
-*/
-
-const MenuIcon = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="3" y1="12" x2="21" y2="12"/>
-    <line x1="3" y1="6" x2="21" y2="6"/>
-    <line x1="3" y1="18" x2="21" y2="18"/>
-  </svg>
-);
-
-const LeftSidebar = ({
-  user = {
-    name: 'Maria Rodriguez',
-    subtitle: 'Host Verificado',
-    avatar: null
-  },
-  onNavigate,
-  activeItemId = 'busqueda',
-  badgeCounts = {}
-}) => {
-  const { showSearch } = useUiHost();
-  const navigate = useNavigate();
-
-  // ========== ESTADOS Y REFERENCIAS ==========
-  const [isCollapsed, setIsCollapsed] = useState(false);
+const LeftSidebar = () => {
+  const [isCollapsed, setIsCollapsed] = useState(
+    () => localStorage.getItem(LS_KEY) === 'true' || false
+  );
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState(null);
   const sidebarRef = useRef(null);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  // ========== DETECCIÓN DE DISPOSITIVO ==========
   useEffect(() => {
-    const checkDevice = () => {
-      const mobile = window.innerWidth < 768;
+    const onResize = () => {
+      const mobile = window.innerWidth < 900; // umbral más amplio
       setIsMobile(mobile);
-      if (!mobile) {
+      if (!mobile) setIsMobileOpen(false);
+    };
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(LS_KEY, isCollapsed ? 'true' : 'false');
+  }, [isCollapsed]);
+
+  useEffect(() => {
+    const handleOutside = (e) => {
+      if (isMobileOpen && sidebarRef.current && !sidebarRef.current.contains(e.target)) {
         setIsMobileOpen(false);
       }
     };
-
-    checkDevice();
-    window.addEventListener('resize', checkDevice);
-    return () => window.removeEventListener('resize', checkDevice);
-  }, []);
-
-  // ========== MANEJADOR DE CLICK EXTERNO ==========
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
-        if (isMobileOpen) {
-          setIsMobileOpen(false);
-        }
-      }
+    const handleEsc = (e) => {
+      if (e.key === 'Escape' && isMobileOpen) setIsMobileOpen(false);
     };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handleOutside);
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('keydown', handleEsc);
+    };
   }, [isMobileOpen]);
 
-
-  // ========== MANEJADOR DE NAVEGACIÓN ==========
-  const handleItemClick = (id) => {
-    if (id === 'busqueda') {
-      showSearch();
-      return;
+  const toggleSidebar = () => {
+    if (isMobile) {
+      setIsMobileOpen((s) => !s);
+    } else {
+      setIsCollapsed((s) => !s);
     }
+  };
 
-    // Navegación a rutas específicas
-    const routeMap = {
-      'reels': '/reels',
-      'mensajes': '/messages',
-      'perfil': '/dashboard', // Asumiendo que perfil va al dashboard
-      'mapa': '/mapa',
-      'tendencias': '/tendencias'
-    };
-
-    if (routeMap[id]) {
-      navigate(routeMap[id]);
-    } else if (onNavigate) {
-      onNavigate(id);
-    }
-
+  const handleItemClick = (path) => {
+    navigate(path);
     if (isMobile) setIsMobileOpen(false);
   };
 
-  // ========== NAVEGACIÓN POR TECLADO ==========
-  const handleKeyDown = (e, id) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      handleItemClick(id);
-    }
-  };
+  const navigationItems = [
+    { id: 'profile', icon: '👤', label: 'Andres Castillo', path: '/profile' },
+    { id: 'amigos', icon: '👥', label: 'Amigos', path: '/friends', badge: 3 },
+    { id: 'recuerdos', icon: '🕒', label: 'Recuerdos', path: '/memories' },
+    { id: 'guardado', icon: '💾', label: 'Guardado', path: '/saved' },
+    { id: 'grupos', icon: '👪', label: 'Grupos', path: '/groups', badge: 5 },
+    { id: 'reels', icon: '🎬', label: 'Reels', path: '/reels' },
+    { id: 'feeds', icon: '📰', label: 'Feeds', path: '/feeds' },
+    { id: 'ver-mas', icon: '⋮', label: 'Ver más', path: '/more' },
+  ];
 
-  // ========== TOOLTIPS EN MODO COLAPSADO ==========
-  const showTooltip = (id) => setTooltipVisible(id);
-  const hideTooltip = () => setTooltipVisible(null);
+  const shortcuts = [
+    { id: 1, name: 'Apuestas Colombia', icon: '🎰' },
+    { id: 2, name: '8 Ball Pool', icon: '🎱' },
+    { id: 3, name: 'ASMR TOTAL', icon: '🎧' },
+    { id: 4, name: 'Astro Garden', icon: '🌌' },
+    { id: 5, name: 'Baby Adopter', icon: '👶' },
+  ];
 
-  // ========== ITEMS DE NAVEGACIÓN FACEBOOK-LIKE ==========
-   const navigationItems = [
-     {
-       id: 'rent-ai',
-       icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m11-7h-6m-6 0H1m16.24-3.76l-4.24 4.24m-6-6L2.76 6.24"/></svg>,
-       label: 'Rent AI',
-       description: 'Asistente inteligente para alquileres'
-     },
-     {
-       id: 'amigos',
-       icon: <UserIcon />,
-       label: 'Amigos',
-       description: 'Conecta con otros usuarios'
-     },
-     {
-       id: 'ofertas-pasadas',
-       icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>,
-       label: 'Ofertas Pasadas',
-       description: 'Revisa ofertas anteriores'
-     },
-     {
-       id: 'favoritas',
-       icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>,
-       label: 'Favoritas',
-       description: 'Tus propiedades guardadas'
-     },
-     {
-       id: 'grupos',
-       icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
-       label: 'Grupos',
-       description: 'Comunidades de alquiler'
-     },
-     {
-       id: 'paginas',
-       icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>,
-       label: 'Páginas',
-       description: 'Páginas de inmobiliarias'
-     },
-     {
-       id: 'feeds',
-       icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>,
-       label: 'Feeds',
-       description: 'Novedades y actualizaciones'
-     },
-     {
-       id: 'ver-mas',
-       icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>,
-       label: 'Ver más',
-       description: 'Más opciones disponibles'
-     }
-   ];
-
-   // ========== ACCESOS DIRECTOS ==========
-   const shortcuts = [
-     { id: 1, name: 'Apartamentos Bogotá', avatar: '/api/placeholder/32/32' },
-     { id: 2, name: 'Casas Medellín', avatar: '/api/placeholder/32/32' },
-     { id: 3, name: 'Oficinas Cali', avatar: '/api/placeholder/32/32' },
-     { id: 4, name: 'Locales Cartagena', avatar: '/api/placeholder/32/32' },
-     { id: 5, name: 'Habitaciones Barranquilla', avatar: '/api/placeholder/32/32' }
-   ];
-
-  // ========== RENDERIZADO ==========
   return (
     <>
-      {/* Overlay para móvil con animación */}
+      {/* overlay móvil */}
       {isMobile && isMobileOpen && (
         <div
           className="sidebar-overlay"
@@ -200,102 +91,120 @@ const LeftSidebar = ({
         />
       )}
 
-      {/* Botón hamburguesa para móvil */}
-      {isMobile && !isMobileOpen && (
+      {/* botón hamburguesa fijo pero fuera del flujo */}
+      {isMobile && (
         <button
           className="mobile-toggle-button"
           onClick={() => setIsMobileOpen(true)}
-          aria-label="Abrir menú de navegación"
+          aria-label="Abrir menú"
         >
-          <MenuIcon size={24} />
+          ☰
         </button>
       )}
 
-      {/* Sidebar principal */}
       <nav
         ref={sidebarRef}
-        className={`
-          left-sidebar 
-          ${isCollapsed ? 'collapsed' : ''} 
-          ${isMobileOpen ? 'mobile-open' : ''}
-          ${isMobile ? 'mobile' : ''}
-        `}
+        className={[
+          'left-sidebar',
+          isCollapsed ? 'collapsed' : '',
+          isMobile ? 'mobile' : '',
+          isMobileOpen ? 'mobile-open' : '',
+        ].join(' ')}
         role="navigation"
         aria-label="Navegación principal"
       >
-        {/* Header minimal */}
         <div className="sidebar-header">
-          <h2 className="sidebar-title">RentHub</h2>
+          <div className="user-block">
+            <img src="/api/placeholder/40/40" alt="Avatar" className="user-avatar" />
+            {!isCollapsed && (
+              <div className="user-info">
+                <div className="user-name">Andres Castillo</div>
+                <div className="user-subtitle">Ver tu perfil</div>
+              </div>
+            )}
+          </div>
+
+          {!isMobile && (
+            <button
+              className="sidebar-toggle"
+              onClick={toggleSidebar}
+              aria-label={isCollapsed ? 'Expandir menú' : 'Contraer menú'}
+            >
+              {isCollapsed ? '›' : '‹'}
+            </button>
+          )}
         </div>
 
-        {/* Menú de navegación principal */}
         <ul className="sidebar-menu" role="menubar">
-          {navigationItems.map((item) => (
-            <li
-              key={item.id}
-              className={`
-                menu-item 
-                ${activeItemId === item.id ? 'active' : ''}
-                ${item.badge ? 'has-badge' : ''}
-              `}
-              onClick={() => handleItemClick(item.id)}
-              onMouseEnter={() => isCollapsed && showTooltip(item.id)}
-              onMouseLeave={hideTooltip}
-              onFocus={() => isCollapsed && showTooltip(item.id)}
-              onBlur={hideTooltip}
-              role="menuitem"
-              tabIndex={0}
-              aria-current={activeItemId === item.id ? 'page' : undefined}
-              aria-label={item.label}
-              onKeyDown={(e) => handleKeyDown(e, item.id)}
-            >
-              <div className="menu-item-content">
-                <span className="menu-icon">
-                  {item.icon}
-                  {item.badge > 0 && (
-                    <span className="badge" aria-label={`${item.badge} notificaciones`}>
-                      {item.badge > 99 ? '99+' : item.badge}
-                    </span>
+          {navigationItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <li
+                key={item.id}
+                className={`menu-item ${isActive ? 'active' : ''} ${
+                  item.badge ? 'has-badge' : ''
+                }`}
+              >
+                <button
+                  type="button"
+                  className="menu-item-content"
+                  onClick={() => handleItemClick(item.path)}
+                  onMouseEnter={() => isCollapsed && setTooltipVisible(item.id)}
+                  onMouseLeave={() => setTooltipVisible(null)}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  <span className="menu-icon" aria-hidden="true">
+                    {item.icon}
+                    {item.badge && (
+                      <span className="badge" aria-label={`${item.badge} notificaciones`}>
+                        {item.badge}
+                      </span>
+                    )}
+                  </span>
+
+                  {!isCollapsed && (
+                    <div className="menu-text">
+                      <span className="menu-label">{item.label}</span>
+                    </div>
                   )}
-                </span>
-                
-                {(!isCollapsed || isMobile) && (
-                  <div className="menu-text">
-                    <span className="menu-label">{item.label}</span>
-                    <span className="menu-description">{item.description}</span>
+                </button>
+
+                {/* tooltip modo colapsado */}
+                {isCollapsed && tooltipVisible === item.id && (
+                  <div className="menu-tooltip" role="tooltip">
+                    {item.label}
                   </div>
                 )}
-              </div>
-
-              {/* Tooltip para modo colapsado */}
-              {isCollapsed && tooltipVisible === item.id && (
-                <div 
-                  className="menu-tooltip" 
-                  role="tooltip"
-                  aria-hidden="true"
-                >
-                  <span className="tooltip-label">{item.label}</span>
-                  <span className="tooltip-description">{item.description}</span>
-                </div>
-              )}
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
 
-        {/* Accesos directos */}
+        <div className="sidebar-divider" />
+
         {!isCollapsed && (
-          <div className="sidebar-shortcuts">
+          <div className="sidebar-shortcuts" aria-label="Accesos directos">
             <h3 className="shortcuts-title">Tus accesos directos</h3>
             <div className="shortcuts-list">
-              {shortcuts.map((shortcut) => (
-                <div key={shortcut.id} className="shortcut-item">
-                  <img src={shortcut.avatar} alt={shortcut.name} className="shortcut-avatar" />
-                  <span className="shortcut-name">{shortcut.name}</span>
-                </div>
+              {shortcuts.map((s) => (
+                <button
+                  key={s.id}
+                  className="shortcut-item"
+                  onClick={() => console.log('Acceso directo:', s.name)}
+                >
+                  <span className="shortcut-icon" aria-hidden="true">
+                    {s.icon}
+                  </span>
+                  <span className="shortcut-name">{s.name}</span>
+                </button>
               ))}
             </div>
           </div>
         )}
+
+        <div className="sidebar-footer">
+          <div className="sidebar-copyright">Nido © {new Date().getFullYear()}</div>
+        </div>
       </nav>
     </>
   );
