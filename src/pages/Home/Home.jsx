@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import PostCardEnhanced from '../../components/PostCard/PostCardEnhanced';
-import StoriesBar from '../../components/Stories/StoriesBar';
-import ReelsViewer from '../../components/social/ReelsViewer';
-import BottomNav from '../../components/social/BottomNav';
-import Composer from '../../components/social/Composer';
-import { mockPosts, mockStories, mockReels } from '../../utils/socialMocks';
-import './Home.css';
-=======
 // src/pages/Home/Home.jsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -55,19 +44,10 @@ const mockStories = [
   { id: 4, user: 'Miguel Torres', avatar: '/api/placeholder/60/60', hasNew: true },
   { id: 5, user: 'City Apartments', avatar: '/api/placeholder/60/60', hasNew: false }
 ];
->>>>>>> 7d6191872e2e6da6771f24bf058649816f527586
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
   const [currentImageIndices, setCurrentImageIndices] = useState({});
-<<<<<<< HEAD
-  const [isComposerOpen, setIsComposerOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(1);
-  const [likedReels, setLikedReels] = useState({});
-  const [savedReels, setSavedReels] = useState({});
-=======
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -78,7 +58,6 @@ const Home = () => {
     location: ''
   });
   const [showFilters, setShowFilters] = useState(false);
->>>>>>> 7d6191872e2e6da6771f24bf058649816f527586
 
   // Cargar datos iniciales desde API
   useEffect(() => {
@@ -139,66 +118,48 @@ const Home = () => {
     loadData();
   }, []);
 
-
-
   const handleImageChange = (postId, direction) => {
     setCurrentImageIndices(prev => {
       const currentIndex = prev[postId] || 0;
       const post = posts.find(p => p.id === postId);
       if (!post) return prev;
-      
+
       const imagesCount = post.images.length;
       let newIndex = currentIndex;
-      
+
       if (direction === 'next') {
         newIndex = (currentIndex + 1) % imagesCount;
       } else if (direction === 'prev') {
         newIndex = (currentIndex - 1 + imagesCount) % imagesCount;
       }
-      
+
       return { ...prev, [postId]: newIndex };
     });
   };
 
   const handleLike = (postId) => {
-<<<<<<< HEAD
-    setPosts((prev) =>
-      prev.map((post) =>
-        post.id === postId ? { ...post, isLiked: !post.isLiked, likes: post.isLiked ? post.likes - 1 : post.likes + 1 } : post
-      )
-    );
-  };
-
-  const handleSave = (postId) => {
-    setPosts((prev) =>
-      prev.map((post) =>
-        post.id === postId ? { ...post, isSaved: !post.isSaved } : post
-      )
-    );
-=======
-    setPosts(prev => prev.map(post => 
-      post.id === postId 
-        ? { 
-            ...post, 
-            isLiked: !post.isLiked, 
-            likes: post.isLiked ? post.likes - 1 : post.likes + 1 
+    setPosts(prev => prev.map(post =>
+      post.id === postId
+        ? {
+            ...post,
+            isLiked: !post.isLiked,
+            likes: post.isLiked ? post.likes - 1 : post.likes + 1
           }
         : post
     ));
   };
 
   const handleSave = (postId) => {
-    setPosts(prev => prev.map(post => 
-      post.id === postId 
+    setPosts(prev => prev.map(post =>
+      post.id === postId
         ? { ...post, isSaved: !post.isSaved }
         : post
     ));
->>>>>>> 7d6191872e2e6da6771f24bf058649816f527586
   };
 
   const handleFollow = (postId) => {
-    setPosts(prev => prev.map(post => 
-      post.id === postId 
+    setPosts(prev => prev.map(post =>
+      post.id === postId
         ? { ...post, isFollowing: !post.isFollowing }
         : post
     ));
@@ -261,130 +222,7 @@ const Home = () => {
     }
   };
 
-  const handleReelLike = (reelId) => {
-    setLikedReels(prev => ({ ...prev, [reelId]: !prev[reelId] }));
-  };
-
-  const handleReelComment = (reelId) => {
-    // Aquí iría la lógica para abrir modal de comentarios
-    console.log('Abrir comentarios para reel:', reelId);
-  };
-
-  const handleReelShare = (reelId) => {
-    // Aquí iría la lógica para compartir
-    console.log('Compartir reel:', reelId);
-  };
-
-  const handleReelSave = (reelId) => {
-    setSavedReels(prev => ({ ...prev, [reelId]: !prev[reelId] }));
-  };
-
   return (
-<<<<<<< HEAD
-    <motion.div
-      className="home-container"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      {/* Stories Section */}
-      <motion.div
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1, duration: 0.5 }}
-      >
-        <StoriesBar stories={mockStories} />
-      </motion.div>
-
-     
-
-      {/* Feed Section */}
-      <main className="feed-container">
-        <AnimatePresence>
-          {posts.map((post, index) => (
-            <motion.div
-              key={post.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ delay: index * 0.1, duration: 0.5 }}
-            >
-              <PostCardEnhanced
-                property={post}
-                currentImageIndex={currentImageIndices[post.id] || 0}
-                onImageChange={handleImageChange}
-                onLike={handleLike}
-                onSave={handleSave}
-                onFollow={handleFollow}
-              />
-            </motion.div>
-          ))}
-        </AnimatePresence>
-
-         {/* Sección de Reels - Carrusel horizontal como Facebook */}
-      <motion.div
-        className="reels-section"
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.5 }}
-      >
-        <ReelsViewer
-          reels={mockReels}
-          onLike={handleReelLike}
-          onComment={handleReelComment}
-          onShare={handleReelShare}
-          onSave={handleReelSave}
-          horizontal={true}
-        />
-      </motion.div>
-
-        {/* Loading indicator */}
-        {isLoading && (
-          <motion.div
-            className="loading-container"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <div className="loading-spinner"></div>
-            <p className="loading-text">Cargando más publicaciones...</p>
-          </motion.div>
-        )}
-
-        {/* End of feed message */}
-        {!hasMore && posts.length > 0 && (
-          <motion.div
-            className="end-feed"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            <p>¡Has visto todas las publicaciones! 🎉</p>
-          </motion.div>
-        )}
-      </main>
-
-      {/* Floating Action Button */}
-      
-
-      {/* Composer Modal */}
-      <AnimatePresence>
-        {isComposerOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Composer onClose={closeComposer} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Bottom Navigation */}
-      <BottomNav />
-    </motion.div>
-=======
     <div className="home-container">
       {/* Header */}
       <Header />
@@ -534,7 +372,6 @@ const Home = () => {
         )}
       </AnimatePresence>
     </div>
->>>>>>> 7d6191872e2e6da6771f24bf058649816f527586
   );
 };
 

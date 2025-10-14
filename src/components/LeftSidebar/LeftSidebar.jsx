@@ -1,6 +1,7 @@
 // LeftSidebar.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { FiSearch, FiVideo, FiMessageSquare, FiUser, FiMap, FiTrendingUp, FiChevronRight, FiChevronLeft } from 'react-icons/fi';
 import './LeftSidebar.css';
 
 const LS_KEY = 'nido_sidebar_collapsed';
@@ -15,6 +16,10 @@ const LeftSidebar = () => {
   const sidebarRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Mock user and badgeCounts for now
+  const user = { name: 'Andres Castillo', avatar: null, subtitle: 'Ver tu perfil' };
+  const badgeCounts = { reels: 0, mensajes: 0 };
 
   useEffect(() => {
     const onResize = () => {
@@ -61,71 +66,54 @@ const LeftSidebar = () => {
     if (isMobile) setIsMobileOpen(false);
   };
 
-  const navigationItems = [
-    { id: 'profile', icon: '👤', label: 'Andres Castillo', path: '/profile' },
-    { id: 'amigos', icon: '👥', label: 'Amigos', path: '/friends', badge: 3 },
-    { id: 'recuerdos', icon: '🕒', label: 'Recuerdos', path: '/memories' },
-    { id: 'guardado', icon: '💾', label: 'Guardado', path: '/saved' },
-    { id: 'grupos', icon: '👪', label: 'Grupos', path: '/groups', badge: 5 },
-    { id: 'reels', icon: '🎬', label: 'Reels', path: '/reels' },
-    { id: 'feeds', icon: '📰', label: 'Feeds', path: '/feeds' },
-    { id: 'ver-mas', icon: '⋮', label: 'Ver más', path: '/more' },
-  ];
-
-  const shortcuts = [
-    { id: 1, name: 'Apuestas Colombia', icon: '🎰' },
-    { id: 2, name: '8 Ball Pool', icon: '🎱' },
-    { id: 3, name: 'ASMR TOTAL', icon: '🎧' },
-    { id: 4, name: 'Astro Garden', icon: '🌌' },
-    { id: 5, name: 'Baby Adopter', icon: '👶' },
-  ];
-
-<<<<<<< HEAD
   // ========== ITEMS DE NAVEGACIÓN INNOVADORES ==========
   const navigationItems = [
     {
       id: 'busqueda',
-      icon: <SearchIcon />,
+      icon: <FiSearch />,
       label: 'Búscar',
-      description: 'Encuentra propiedades ideales'
+      description: 'Encuentra propiedades ideales',
+      path: '/search'
     },
     {
       id: 'reels',
-      icon: <ReelsIcon />,
+      icon: <FiVideo />,
       label: 'Reels',
       description: 'Recorridos virtuales en video',
-      badge: badgeCounts.reels || 0
+      badge: badgeCounts.reels || 0,
+      path: '/reels'
     },
     {
       id: 'mensajes',
-      icon: <MessageIcon />,
+      icon: <FiMessageSquare />,
       label: 'Mensajes',
       description: 'Conversaciones y chats',
-      badge: badgeCounts.mensajes || 0
+      badge: badgeCounts.mensajes || 0,
+      path: '/messages'
     },
     {
       id: 'perfil',
-      icon: <UserIcon />,
+      icon: <FiUser />,
       label: 'Mi Perfil',
-      description: 'Gestiona tu cuenta'
+      description: 'Gestiona tu cuenta',
+      path: '/profile'
     },
     {
       id: 'mapa',
-      icon: <MapIcon />,
+      icon: <FiMap />,
       label: 'Mapa Interactivo',
-      description: 'Explora propiedades en mapa'
+      description: 'Explora propiedades en mapa',
+      path: '/map'
     },
     {
       id: 'tendencias',
-      icon: <TrendingIcon />,
+      icon: <FiTrendingUp />,
       label: 'Tendencias',
-      description: 'Descubre las últimas tendencias'
+      description: 'Descubre las últimas tendencias',
+      path: '/trends'
     }
   ];
 
-  // ========== RENDERIZADO ==========
-=======
->>>>>>> 7d6191872e2e6da6771f24bf058649816f527586
   return (
     <>
       {/* overlay móvil */}
@@ -159,7 +147,6 @@ const LeftSidebar = () => {
         role="navigation"
         aria-label="Navegación principal"
       >
-<<<<<<< HEAD
         {/* Header con información de usuario y toggle */}
         <div className="sidebar-header">
           <div className="user-block">
@@ -176,37 +163,19 @@ const LeftSidebar = () => {
               <div className="user-info">
                 <h3 className="user-name">{user?.name}</h3>
                 <p className="user-subtitle">{user?.subtitle}</p>
-=======
-        <div className="sidebar-header">
-          <div className="user-block">
-            <img src="/api/placeholder/40/40" alt="Avatar" className="user-avatar" />
-            {!isCollapsed && (
-              <div className="user-info">
-                <div className="user-name">Andres Castillo</div>
-                <div className="user-subtitle">Ver tu perfil</div>
->>>>>>> 7d6191872e2e6da6771f24bf058649816f527586
               </div>
             )}
           </div>
 
-<<<<<<< HEAD
           {/* Botón de toggle para desktop */}
-=======
->>>>>>> 7d6191872e2e6da6771f24bf058649816f527586
           {!isMobile && (
             <button
               className="sidebar-toggle"
               onClick={toggleSidebar}
-<<<<<<< HEAD
               aria-label={isCollapsed ? 'Expandir sidebar' : 'Contraer sidebar'}
               aria-expanded={!isCollapsed}
             >
-              {isCollapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-=======
-              aria-label={isCollapsed ? 'Expandir menú' : 'Contraer menú'}
-            >
-              {isCollapsed ? '›' : '‹'}
->>>>>>> 7d6191872e2e6da6771f24bf058649816f527586
+              {isCollapsed ? <FiChevronRight /> : <FiChevronLeft />}
             </button>
           )}
         </div>
@@ -256,40 +225,13 @@ const LeftSidebar = () => {
           })}
         </ul>
 
-<<<<<<< HEAD
         {/* Footer del sidebar */}
         <div className="sidebar-footer">
           {!isCollapsed && (
             <div className="sidebar-stats">
-              
+
             </div>
           )}
-=======
-        <div className="sidebar-divider" />
-
-        {!isCollapsed && (
-          <div className="sidebar-shortcuts" aria-label="Accesos directos">
-            <h3 className="shortcuts-title">Tus accesos directos</h3>
-            <div className="shortcuts-list">
-              {shortcuts.map((s) => (
-                <button
-                  key={s.id}
-                  className="shortcut-item"
-                  onClick={() => console.log('Acceso directo:', s.name)}
-                >
-                  <span className="shortcut-icon" aria-hidden="true">
-                    {s.icon}
-                  </span>
-                  <span className="shortcut-name">{s.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="sidebar-footer">
-          <div className="sidebar-copyright">Nido © {new Date().getFullYear()}</div>
->>>>>>> 7d6191872e2e6da6771f24bf058649816f527586
         </div>
       </nav>
     </>

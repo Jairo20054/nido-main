@@ -2,10 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiHome, FiList, FiCalendar, FiBarChart2, FiMessageSquare, FiSettings, FiLogOut } from 'react-icons/fi';
-<<<<<<< HEAD
 import { useAuthContext } from '../../context/AuthContext.js';
-=======
->>>>>>> 7d6191872e2e6da6771f24bf058649816f527586
 import './HostRoute.css';
 
 const HostRoute = () => {
@@ -18,7 +15,7 @@ const HostRoute = () => {
   const [loading, setLoading] = useState(true);
   const [properties, setProperties] = useState([]);
   const [reservations, setReservations] = useState([]);
-  
+
   // Simular carga de datos del host
   useEffect(() => {
     const fetchHostData = async () => {
@@ -35,7 +32,7 @@ const HostRoute = () => {
             rating: 4.8,
             earnings: 12500000,
           });
-          
+
           // Datos de propiedades de ejemplo
           setProperties([
             {
@@ -69,7 +66,7 @@ const HostRoute = () => {
               image: '/property3.jpg'
             }
           ]);
-          
+
           // Datos de reservas de ejemplo
           setReservations([
             {
@@ -100,7 +97,7 @@ const HostRoute = () => {
               payment: 'Transferencia'
             }
           ]);
-          
+
           setLoading(false);
         }, 1000);
       } catch (error) {
@@ -108,37 +105,37 @@ const HostRoute = () => {
         setLoading(false);
       }
     };
-    
+
     fetchHostData();
   }, []);
-  
+
   // En tu HostRoute.jsx, actualiza el array navItems:
-const navItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: <FiHome />, path: '/host/dashboard' },
-  { id: 'properties', label: 'Propiedades', icon: <FiList />, path: '/host/properties' },
-  { id: 'bookings', label: 'Reservas', icon: <FiCalendar />, path: '/host/bookings' },
-  { id: 'analytics', label: 'Analytics', icon: <FiBarChart2 />, path: '/host/analytics' },
-  { id: 'messages', label: 'Mensajes', icon: <FiMessageSquare />, path: '/host/messages' },
-  { id: 'settings', label: 'Configuración', icon: <FiSettings />, path: '/host/settings' },
-];
-  
+  const navItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: <FiHome />, path: '/host/dashboard' },
+    { id: 'properties', label: 'Propiedades', icon: <FiList />, path: '/host/properties' },
+    { id: 'bookings', label: 'Reservas', icon: <FiCalendar />, path: '/host/bookings' },
+    { id: 'analytics', label: 'Analytics', icon: <FiBarChart2 />, path: '/host/analytics' },
+    { id: 'messages', label: 'Mensajes', icon: <FiMessageSquare />, path: '/host/messages' },
+    { id: 'settings', label: 'Configuración', icon: <FiSettings />, path: '/host/settings' },
+  ];
+
   const handleLogout = () => {
     // Lógica para cerrar sesión
     navigate('/');
   };
-  
+
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
-  
+
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
-  
+
   const isActive = (path) => {
     return location.pathname === path;
   };
-  
+
   if (loading) {
     return (
       <div className="host-loading">
@@ -147,7 +144,7 @@ const navItems = [
       </div>
     );
   }
-  
+
   return (
     <div className={`host-container ${sidebarOpen ? 'sidebar-open' : 'sidebar-collapsed'}`}>
       {/* Sidebar */}
@@ -176,7 +173,7 @@ const navItems = [
             {sidebarOpen ? '«' : '»'}
           </button>
         </div>
-        
+
         <nav className="sidebar-nav">
           <ul>
             {navItems.map((item) => (
@@ -196,7 +193,7 @@ const navItems = [
             ))}
           </ul>
         </nav>
-        
+
         <div className="sidebar-footer">
           <button className="logout-button" onClick={handleLogout}>
             <FiLogOut />
@@ -204,7 +201,7 @@ const navItems = [
           </button>
         </div>
       </motion.div>
-      
+
       {/* Mobile Menu Button */}
       <button 
         className="mobile-menu-button" 
@@ -216,7 +213,7 @@ const navItems = [
         <span></span>
         <span></span>
       </button>
-      
+
       {/* Mobile Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
@@ -246,7 +243,7 @@ const navItems = [
                 &times;
               </button>
             </div>
-            
+
             <nav className="mobile-nav">
               <ul>
                 {navItems.map((item) => (
@@ -268,7 +265,7 @@ const navItems = [
                 ))}
               </ul>
             </nav>
-            
+
             <div className="mobile-footer">
               <button className="logout-button" onClick={handleLogout}>
                 <FiLogOut />
@@ -278,7 +275,7 @@ const navItems = [
           </motion.div>
         )}
       </AnimatePresence>
-      
+
       {/* Main Content */}
       <main className="host-main">
         {/* Pasar datos al contenido de las rutas */}
