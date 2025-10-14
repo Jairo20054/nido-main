@@ -6,6 +6,7 @@ import LeftSidebar from '../../components/LeftSidebar/LeftSidebar';
 import RightSidebar from '../../components/RightSidebar/RightSidebar';
 import PostCard from '../../components/PostCard/PostCard';
 import StoriesBar from '../../components/Stories/StoriesBar';
+import SearchBar from '../../components/common/Header/SearchBar';
 import CreatePost from '../../components/CreatePost/CreatePost';
 import { api } from '../../services/api';
 import './Home.css';
@@ -50,14 +51,12 @@ const Home = () => {
   const [currentImageIndices, setCurrentImageIndices] = useState({});
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filters, setFilters] = useState({
-    minPrice: '',
-    maxPrice: '',
-    rooms: '',
-    location: ''
+  const [searchForm, setSearchForm] = useState({
+    location: '',
+    checkIn: '',
+    checkOut: '',
+    guests: 1
   });
-  const [showFilters, setShowFilters] = useState(false);
 
   // Cargar datos iniciales desde API
   useEffect(() => {
@@ -168,32 +167,31 @@ const Home = () => {
   // Filtrar posts basado en búsqueda y filtros
   const filteredPosts = useMemo(() => {
     return posts.filter(post => {
-      const matchesSearch = !searchQuery ||
-        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesLocation = !searchForm.location ||
+        post.title.toLowerCase().includes(searchForm.location.toLowerCase()) ||
+        post.location.toLowerCase().includes(searchForm.location.toLowerCase()) ||
+        post.description.toLowerCase().includes(searchForm.location.toLowerCase());
 
-      const matchesLocation = !filters.location ||
-        post.location.toLowerCase().includes(filters.location.toLowerCase());
+      const matchesGuests = searchForm.guests <= (post.specs.rooms * 2); // Assume 2 guests per room
 
-      const matchesMinPrice = !filters.minPrice || post.price >= parseInt(filters.minPrice);
-      const matchesMaxPrice = !filters.maxPrice || post.price <= parseInt(filters.maxPrice);
-      const matchesRooms = !filters.rooms || post.specs.rooms >= parseInt(filters.rooms);
+      // For dates, assume all posts available if no availability data; backend handles
+      const matchesDates = true;
 
-      return matchesSearch && matchesLocation && matchesMinPrice && matchesMaxPrice && matchesRooms;
+      return matchesLocation && matchesGuests && matchesDates;
     });
-  }, [posts, searchQuery, filters]);
+  }, [posts, searchForm]);
 
-  const handleSearch = async () => {
+  const handleHomeSearch = async (formData) => {
+    setSearchForm(formData);
     try {
       setLoading(true);
       const searchParams = {
         page: 1,
         limit: 20,
-        ...(searchQuery && { location: searchQuery }),
-        ...(filters.minPrice && { minPrice: filters.minPrice }),
-        ...(filters.maxPrice && { maxPrice: filters.maxPrice }),
-        ...(filters.location && { location: filters.location })
+        ...(formData.location && { location: formData.location }),
+        ...(formData.checkIn && { checkIn: formData.checkIn }),
+        ...(formData.checkOut && { checkOut: formData.checkOut }),
+        ...(formData.guests && { guests: formData.guests })
       };
 
       const response = await api.get('/properties', searchParams);
@@ -233,63 +231,13 @@ const Home = () => {
 
         {/* Contenido Principal */}
         <main className="home-main">
+          {/* Hero Search Bar (Airbnb-style) */}
+          <div className="home-hero-search">
+            <SearchBar onSearch={handleHomeSearch} />
+          </div>
+
           {/* Stories */}
           <StoriesBar stories={mockStories} />
-
-          {/* Barra de búsqueda y filtros */}
-          <div className="search-filters-bar">
-            <div className="search-container">
-              <input
-                type="text"
-                placeholder="Buscar propiedades por ubicación, título..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="search-input"
-              />
-              <button onClick={handleSearch} className="search-btn">🔍 Buscar</button>
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="filters-toggle"
-              >
-                🎛️ Filtros {showFilters ? '▼' : '▶'}
-              </button>
-            </div>
-
-            {showFilters && (
-              <div className="filters-panel">
-                <div className="filter-row">
-                  <input
-                    type="text"
-                    placeholder="Ubicación específica"
-                    value={filters.location}
-                    onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value }))}
-                    className="filter-input"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Precio mínimo"
-                    value={filters.minPrice}
-                    onChange={(e) => setFilters(prev => ({ ...prev, minPrice: e.target.value }))}
-                    className="filter-input"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Precio máximo"
-                    value={filters.maxPrice}
-                    onChange={(e) => setFilters(prev => ({ ...prev, maxPrice: e.target.value }))}
-                    className="filter-input"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Mín. habitaciones"
-                    value={filters.rooms}
-                    onChange={(e) => setFilters(prev => ({ ...prev, rooms: e.target.value }))}
-                    className="filter-input"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
 
           {/* Crear Publicación */}
           <div className="create-post-card">

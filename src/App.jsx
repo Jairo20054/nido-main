@@ -63,10 +63,10 @@ const Services = lazyLoad(() => import('./components/user/Services/Services'));
 const Marketplace = lazyLoad(() => import('./components/user/Marketplace/Marketplace'));
 const HostDashboard = lazyLoad(() => import('./pages/Host/Dashboard'));
 const PropertyManager = lazyLoad(() => import('./components/Host/HostDashboard/PropertyManager'));
-const AddProperty = lazyLoad(() => import('./components/host/PropertyForm/PropertyForm'));
-const EditProperty = lazyLoad(() => import('./components/host/PropertyForm/PropertyForm'));
-const BookingManager = lazyLoad(() => import('./components/host/HostDashboard/BookingManager'));
-const Analytics = lazyLoad(() => import('./components/host/HostDashboard/Analytics'));
+const AddProperty = lazyLoad(() => import('./components/Host/PropertyForm/PropertyForm'));
+const EditProperty = lazyLoad(() => import('./components/Host/PropertyForm/PropertyForm'));
+const BookingManager = lazyLoad(() => import('./components/Host/HostDashboard/BookingManager'));
+const Analytics = lazyLoad(() => import('./components/Host/HostDashboard/Analytics'));
 const BecomeHost = lazyLoad(() => import('./pages/BecomeHost/BecomeHost'));
 const ErrorState = lazyLoad(() => import('./components/common/ErrorState/ErrorState'));
 

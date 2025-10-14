@@ -3,7 +3,6 @@ import React, { useState, useEffect, useCallback, useMemo, useRef, useLayoutEffe
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
 import {
-  MagnifyingGlassIcon,
   Bars3Icon,
   XMarkIcon,
   HomeModernIcon,
@@ -39,7 +38,6 @@ function throttle(func, limit) {
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [showMobileHeader, setShowMobileHeader] = useState(true);
   const headerRef = useRef(null);
@@ -118,7 +116,6 @@ const Header = () => {
   // Reset estados en cambio de ruta
   useEffect(() => {
     setIsMobileMenuOpen(false);
-    setIsSearchExpanded(false);
   }, [location.pathname]);
 
   // Manejo de Escape y overflow
@@ -126,11 +123,10 @@ const Header = () => {
     const handleEscape = (e) => {
       if (e.key === "Escape") {
         setIsMobileMenuOpen(false);
-        setIsSearchExpanded(false);
       }
     };
 
-    if (isMobileMenuOpen || isSearchExpanded) {
+    if (isMobileMenuOpen) {
       document.addEventListener("keydown", handleEscape);
       document.body.style.overflow = "hidden";
     } else {
@@ -141,7 +137,7 @@ const Header = () => {
       document.removeEventListener("keydown", handleEscape);
       document.body.style.overflow = "";
     };
-  }, [isMobileMenuOpen, isSearchExpanded]);
+  }, [isMobileMenuOpen]);
 
   const handleAuthAction = useCallback(() => {
     navigate(isAuthenticated ? "/profile" : "/login");
@@ -155,22 +151,10 @@ const Header = () => {
     setIsMobileMenuOpen(false);
   }, []);
 
-  const toggleSearchExpanded = useCallback(() => {
-    setIsSearchExpanded(prev => !prev);
-  }, []);
-
   const isActiveNavItem = useCallback(
     (itemPath) => location.pathname.startsWith(itemPath),
     [location]
   );
-
-  const handleSearchSubmit = useCallback((e) => {
-    e.preventDefault();
-    const searchTerm = e.target.search?.value;
-    if (searchTerm) {
-      navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
-    }
-  }, [navigate]);
 
   const renderIconWithBadge = (IconComponent, hasBadge, badgeCount) => (
     <>
@@ -207,8 +191,8 @@ const Header = () => {
             <span className="desktop-header__logo-text">Nido</span>
           </Link>
 
-          {/* Navegación Central */}
-          <nav className="desktop-header__nav-center" aria-label="Navegación principal">
+          {/* Navegación Central - Expandida para llenar espacio */}
+          <nav className="desktop-header__nav-center" aria-label="Navegación principal" style={{ flex: 1 }}>
             {centerNavItems.map((item) => {
               const isActive = isActiveNavItem(item.path);
               const Icon = item.icon;
@@ -227,20 +211,6 @@ const Header = () => {
               );
             })}
           </nav>
-
-          {/* Barra de Búsqueda */}
-          <div className="desktop-header__search">
-            <form onSubmit={handleSearchSubmit} className="desktop-header__search-container">
-              <MagnifyingGlassIcon className="desktop-header__search-icon" aria-hidden="true" />
-              <input
-                type="text"
-                name="search"
-                placeholder="Buscar propiedades, servicios..."
-                className="desktop-header__search-input"
-                aria-label="Buscar en Nido"
-              />
-            </form>
-          </div>
 
           {/* Navegación Derecha */}
           <div className="desktop-header__nav-right">
@@ -341,42 +311,8 @@ const Header = () => {
             </Link>
           </div>
 
-          {/* Búsqueda + Acciones */}
+          {/* Acciones rápidas */}
           <div className="mobile-header__right">
-            {isSearchExpanded ? (
-              <div className="mobile-search-full">
-                <form className="mobile-search-container" onSubmit={handleSearchSubmit}>
-                  <MagnifyingGlassIcon className="mobile-search-icon" aria-hidden="true" />
-                  <input
-                    type="text"
-                    name="search"
-                    placeholder="Buscar en Nido..."
-                    className="mobile-search-input"
-                    autoFocus
-                    aria-label="Buscar propiedades"
-                  />
-                  <button
-                    type="button"
-                    className="mobile-search-close"
-                    onClick={() => setIsSearchExpanded(false)}
-                    aria-label="Cerrar búsqueda"
-                  >
-                    <XMarkIcon className="w-5 h-5" aria-hidden="true" />
-                  </button>
-                </form>
-              </div>
-            ) : (
-              <button
-                className="mobile-header__search-toggle"
-                onClick={toggleSearchExpanded}
-                aria-label="Buscar propiedades"
-              >
-                <MagnifyingGlassIcon className="mobile-header__search-icon" aria-hidden="true" />
-                <span>Buscar</span>
-              </button>
-            )}
-
-            {/* Acciones rápidas */}
             <div className="mobile-header__actions">
               {rightNavIcons.map((item) => {
                 const Icon = item.icon;
