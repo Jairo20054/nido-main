@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiHome, FiList, FiCalendar, FiBarChart2, FiMessageSquare, FiSettings, FiLogOut } from 'react-icons/fi';
+<<<<<<< HEAD
 import { useAuthContext } from '../../context/AuthContext.js';
+=======
+>>>>>>> 7d6191872e2e6da6771f24bf058649816f527586
 import './HostRoute.css';
 
 const HostRoute = () => {

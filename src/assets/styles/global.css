@@ -1,5 +1,21 @@
 /* === ESTILOS GLOBALES MEJORADOS === */
 
+<<<<<<< HEAD
+=======
+/* === VARIABLES PARA MODO CLARO === */
+:root {
+   --bg-primary: #ffffff;
+   --bg-secondary: #f9fafb;
+   --text-primary: #111827;
+   --accent: #0084ff;
+   --border: #e5e7eb;
+   --spacing-xs: 4px;
+   --spacing-sm: 8px;
+   --spacing-md: 16px;
+   --radius: 8px;
+}
+
+>>>>>>> 7d6191872e2e6da6771f24bf058649816f527586
 /* === RESET MODERNO === */
 *,
 *::before,
@@ -355,22 +371,7 @@ hr {
   }
 }
 
-/* === MODO OSCURO AUTOMÁTICO === */
-@media (prefers-color-scheme: dark) {
-  /* Los colores ya están definidos en variables.css */
-  
-  /* Ajustar imágenes en modo oscuro */
-  img:not([src*=".svg"]) {
-    opacity: 0.9;
-  }
-  
-  /* Mejorar contraste de formularios */
-  input,
-  textarea,
-  select {
-    background-color: var(--bg-secondary);
-  }
-}
+
 
 /* === MODO DE ALTO CONTRASTE === */
 @media (prefers-contrast: high) {
