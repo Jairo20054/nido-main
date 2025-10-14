@@ -1,44 +1,281 @@
-/* Home.css - Facebook-like Home Layout */
+/* ===== Home.css - Instagram-like Social Feed ===== */
+:root {
+  --primary-color: #ff3b72;
+  --background-color: #ffffff;
+  --surface-color: #f8fafc;
+  --card-background: #ffffff;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --border-color: #e2e8f0;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --border-radius: 12px;
+  --border-radius-sm: 8px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --max-content-width: 600px;
+  --stories-height: 120px;
+  --fab-size: 56px;
+}
+
+/* ===== Main Container ===== */
 .home-container {
-  background: var(--fb-darker-bg);
-  color: var(--fb-text-primary);
+  width: 100%;
   min-height: 100vh;
+  background: var(--background-color);
+  color: var(--text-primary);
   display: flex;
   flex-direction: column;
+  position: relative;
+  animation: fadeInUp 0.5s ease-out;
 }
 
+/* ===== Feed Container ===== */
 .feed-container {
   flex: 1;
-  max-width: 500px;
+  max-width: var(--max-content-width);
   margin: 0 auto;
-  padding: 16px 0;
-  overflow-y: auto;
-}
-
-.reels-section {
-  margin: 32px 0;
   padding: 0 16px;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding-top: 16px;
+  padding-bottom: 100px; /* Space for bottom nav */
 }
 
-.section-title {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  color: var(--fb-text-primary);
+/* ===== Loading Container ===== */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: var(--card-background);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  margin: 20px 0;
 }
 
-.loading {
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-color);
+  border-top: 3px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  margin-top: 16px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== End of Feed ===== */
+.end-feed {
   text-align: center;
-  color: var(--fb-text-secondary);
-  padding: 20px;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+  font-size: 16px;
+  font-weight: 500;
 }
 
+.end-feed p {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* ===== Floating Action Button ===== */
+.fab-button {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: var(--fab-size);
+  height: var(--fab-size);
+  background: var(--primary-color);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  transition: var(--transition);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fab-button:hover {
+  background: #e6355f;
+  transform: scale(1.1);
+  box-shadow: 0 12px 24px rgba(255, 59, 114, 0.4);
+}
+
+.fab-button:active {
+  transform: scale(0.95);
+}
+
+.fab-button svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2.5;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .feed-container {
+    max-width: 500px;
+    padding: 0 20px;
+  }
+
+  .fab-button {
+    bottom: 100px;
+    right: 24px;
+  }
+}
+
+/* Mobile */
 @media (max-width: 768px) {
   .feed-container {
-    padding: 8px 0;
+    padding: 0 12px;
+    padding-top: 12px;
+    padding-bottom: 80px;
+    gap: 16px;
   }
 
-  .reels-section {
-    padding: 0 8px;
+  .fab-button {
+    bottom: 85px;
+    right: 16px;
+    width: 52px;
+    height: 52px;
   }
+
+  .fab-button svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 480px) {
+  .feed-container {
+    padding: 0 8px;
+    padding-top: 8px;
+    gap: 12px;
+  }
+
+  .fab-button {
+    bottom: 80px;
+    right: 12px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .fab-button svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* ===== DARK MODE ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #0f172a;
+    --surface-color: #1e293b;
+    --card-background: #1e293b;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --border-color: #334155;
+  }
+
+  .home-container {
+    background: var(--background-color);
+    color: var(--text-primary);
+  }
+
+  .loading-container {
+    background: var(--card-background);
+    border-color: var(--border-color);
+  }
+
+  .fab-button {
+    background: var(--primary-color);
+    box-shadow: 0 8px 20px rgba(255, 59, 114, 0.3);
+  }
+
+  .fab-button:hover {
+    background: #e6355f;
+    box-shadow: 0 12px 24px rgba(255, 59, 114, 0.4);
+  }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== ACCESSIBILITY ===== */
+.fab-button:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.loading-container:focus-within {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* ===== Sección de Reels ===== */
+.reels-section {
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 16px;
+  margin-bottom: 24px;
+}
+
+.reels-section .reels-viewer {
+  position: relative;
+  height: 320px; /* Altura por defecto para modo vertical */
+  max-height: none;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.reels-section .reels-viewer.horizontal {
+  height: auto; /* Altura automática para carrusel horizontal */
+  border-radius: 16px;
+  box-shadow: none; /* Sin sombra para carrusel */
+  padding: 0; /* Sin padding extra */
+}
+
+.reels-section .reel-item {
+  height: 320px;
+  max-height: none;
 }

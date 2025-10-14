@@ -1,0 +1,67 @@
+.host-type-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.host-type-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  width: 90%;
+  max-width: 600px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.close-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.host-type-modal h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.options-container {
+  display: flex;
+  justify-content: space-around;
+  gap: 16px;
+}
+
+.option-card {
+  flex: 1;
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 24px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  user-select: none;
+}
+
+.option-card:hover {
+  background-color: #e6e6e6;
+}
+
+.option-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  display: block;
+}

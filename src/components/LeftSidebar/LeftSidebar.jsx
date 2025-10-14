@@ -188,66 +188,47 @@ const LeftSidebar = ({
   const showTooltip = (id) => setTooltipVisible(id);
   const hideTooltip = () => setTooltipVisible(null);
 
-  // ========== ITEMS DE NAVEGACIÓN FACEBOOK-LIKE ==========
-   const navigationItems = [
-     {
-       id: 'rent-ai',
-       icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m11-7h-6m-6 0H1m16.24-3.76l-4.24 4.24m-6-6L2.76 6.24"/></svg>,
-       label: 'Rent AI',
-       description: 'Asistente inteligente para alquileres'
-     },
-     {
-       id: 'amigos',
-       icon: <UserIcon />,
-       label: 'Amigos',
-       description: 'Conecta con otros usuarios'
-     },
-     {
-       id: 'ofertas-pasadas',
-       icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>,
-       label: 'Ofertas Pasadas',
-       description: 'Revisa ofertas anteriores'
-     },
-     {
-       id: 'favoritas',
-       icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>,
-       label: 'Favoritas',
-       description: 'Tus propiedades guardadas'
-     },
-     {
-       id: 'grupos',
-       icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
-       label: 'Grupos',
-       description: 'Comunidades de alquiler'
-     },
-     {
-       id: 'paginas',
-       icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>,
-       label: 'Páginas',
-       description: 'Páginas de inmobiliarias'
-     },
-     {
-       id: 'feeds',
-       icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>,
-       label: 'Feeds',
-       description: 'Novedades y actualizaciones'
-     },
-     {
-       id: 'ver-mas',
-       icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>,
-       label: 'Ver más',
-       description: 'Más opciones disponibles'
-     }
-   ];
-
-   // ========== ACCESOS DIRECTOS ==========
-   const shortcuts = [
-     { id: 1, name: 'Apartamentos Bogotá', avatar: '/api/placeholder/32/32' },
-     { id: 2, name: 'Casas Medellín', avatar: '/api/placeholder/32/32' },
-     { id: 3, name: 'Oficinas Cali', avatar: '/api/placeholder/32/32' },
-     { id: 4, name: 'Locales Cartagena', avatar: '/api/placeholder/32/32' },
-     { id: 5, name: 'Habitaciones Barranquilla', avatar: '/api/placeholder/32/32' }
-   ];
+  // ========== ITEMS DE NAVEGACIÓN INNOVADORES ==========
+  const navigationItems = [
+    {
+      id: 'busqueda',
+      icon: <SearchIcon />,
+      label: 'Búscar',
+      description: 'Encuentra propiedades ideales'
+    },
+    {
+      id: 'reels',
+      icon: <ReelsIcon />,
+      label: 'Reels',
+      description: 'Recorridos virtuales en video',
+      badge: badgeCounts.reels || 0
+    },
+    {
+      id: 'mensajes',
+      icon: <MessageIcon />,
+      label: 'Mensajes',
+      description: 'Conversaciones y chats',
+      badge: badgeCounts.mensajes || 0
+    },
+    {
+      id: 'perfil',
+      icon: <UserIcon />,
+      label: 'Mi Perfil',
+      description: 'Gestiona tu cuenta'
+    },
+    {
+      id: 'mapa',
+      icon: <MapIcon />,
+      label: 'Mapa Interactivo',
+      description: 'Explora propiedades en mapa'
+    },
+    {
+      id: 'tendencias',
+      icon: <TrendingIcon />,
+      label: 'Tendencias',
+      description: 'Descubre las últimas tendencias'
+    }
+  ];
 
   // ========== RENDERIZADO ==========
   return (
@@ -284,9 +265,37 @@ const LeftSidebar = ({
         role="navigation"
         aria-label="Navegación principal"
       >
-        {/* Header minimal */}
+        {/* Header con información de usuario y toggle */}
         <div className="sidebar-header">
-          <h2 className="sidebar-title">RentHub</h2>
+          <div className="user-block">
+            <div className="user-avatar">
+              <img
+                src={user?.avatar || '/api/placeholder/48/48'}
+                alt={`Avatar de ${user?.name}`}
+                onError={(e) => {
+                  e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjQiIGN5PSIyNCIgcj0iMjQiIGZpbGw9IiNGM0Y0RjYiLz4KPHBhdGggZD0iTTI0IDI2QzI3LjMxMzcgMjYgMzAgMjMuMzEzNyAzMCAyMEMzMCAxNi42ODYzIDI3LjMxMzcgMTQgMjQgMTRDMjAuNjg2MyAxNCAxOCAxNi42ODYzIDE4IDIwQzE4IDIzLjMxMzcgMjAuNjg2MyAyNiAyNCAyNlpNMjQgMjhDMTkuNTgyIDI4IDE2IDMxLjU4MiAxNiAzNkgyNEMzMiAzNig0MCAzNiA0MCAzNkM0MCAzMS41ODIgMzYuNDE4IDI4IDMyIDI4SDI0WiIgZmlsbD0iIzlBOUE5QSIvPgo8L3N2Zz4K';
+                }}
+              />
+            </div>
+            {(!isCollapsed || isMobile) && (
+              <div className="user-info">
+                <h3 className="user-name">{user?.name}</h3>
+                <p className="user-subtitle">{user?.subtitle}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Botón de toggle para desktop */}
+          {!isMobile && (
+            <button
+              className="sidebar-toggle"
+              onClick={toggleSidebar}
+              aria-label={isCollapsed ? 'Expandir sidebar' : 'Contraer sidebar'}
+              aria-expanded={!isCollapsed}
+            >
+              {isCollapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+            </button>
+          )}
         </div>
 
         {/* Menú de navegación principal */}
@@ -343,20 +352,14 @@ const LeftSidebar = ({
           ))}
         </ul>
 
-        {/* Accesos directos */}
-        {!isCollapsed && (
-          <div className="sidebar-shortcuts">
-            <h3 className="shortcuts-title">Tus accesos directos</h3>
-            <div className="shortcuts-list">
-              {shortcuts.map((shortcut) => (
-                <div key={shortcut.id} className="shortcut-item">
-                  <img src={shortcut.avatar} alt={shortcut.name} className="shortcut-avatar" />
-                  <span className="shortcut-name">{shortcut.name}</span>
-                </div>
-              ))}
+        {/* Footer del sidebar */}
+        <div className="sidebar-footer">
+          {!isCollapsed && (
+            <div className="sidebar-stats">
+              
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </nav>
     </>
   );

@@ -1,6 +1,5 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider } from './context/ThemeContext';
 
 // Protected Routes
 import PrivateRoute from './components/user/Auth/PrivateRoute';
@@ -63,11 +62,11 @@ const Messages = lazyLoad(() => import('./components/user/Messages/MessageCenter
 const Services = lazyLoad(() => import('./components/user/Services/Services'));
 const Marketplace = lazyLoad(() => import('./components/user/Marketplace/Marketplace'));
 const HostDashboard = lazyLoad(() => import('./pages/Host/Dashboard'));
-const PropertyManager = lazyLoad(() => import('./components/Host/HostDashboard/PropertyManager'));
-const AddProperty = lazyLoad(() => import('./components/Host/PropertyForm/PropertyForm'));
-const EditProperty = lazyLoad(() => import('./components/Host/PropertyForm/PropertyForm'));
-const BookingManager = lazyLoad(() => import('./components/Host/HostDashboard/BookingManager'));
-const Analytics = lazyLoad(() => import('./components/Host/HostDashboard/Analytics'));
+const PropertyManager = lazyLoad(() => import('./components/host/HostDashboard/PropertyManager'));
+const AddProperty = lazyLoad(() => import('./components/host/PropertyForm/PropertyForm'));
+const EditProperty = lazyLoad(() => import('./components/host/PropertyForm/PropertyForm'));
+const BookingManager = lazyLoad(() => import('./components/host/HostDashboard/BookingManager'));
+const Analytics = lazyLoad(() => import('./components/host/HostDashboard/Analytics'));
 const BecomeHost = lazyLoad(() => import('./pages/BecomeHost/BecomeHost'));
 const ErrorState = lazyLoad(() => import('./components/common/ErrorState/ErrorState'));
 
@@ -90,7 +89,6 @@ const Remodelaciones = lazyLoad(() => import('./pages/Remodelaciones/Remodelacio
 function App() {
   return (
     <Router>
-      <ThemeProvider>
         <UiHostProvider>
           <AuthProvider>
             <SearchProvider> {/* SearchProvider debe envolver todo el contenido que use useSearch */}
@@ -170,7 +168,6 @@ function App() {
             </SearchProvider>
           </AuthProvider>
         </UiHostProvider>
-      </ThemeProvider>
       </Router>
   );
 }

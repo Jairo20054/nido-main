@@ -1,9 +1,9 @@
 /* Variables CSS */
 /* Variables CSS - Sistema de diseño mejorado */
 :root {
-  /* === SISTEMA DE COLORES === - Light Mode Default (Facebook-like for Nido) */
+  /* === SISTEMA DE COLORES === */
   
-  /* Colores primarios (preserved for accents) */
+  /* Colores primarios */
   --primary-50: #ECFDF5;
   --primary-100: #D1FAE5;
   --primary-200: #A7F3D0;
@@ -68,19 +68,6 @@
   --gray-800: #1F2937;
   --gray-900: #111827;
   
-  /* Light Mode Facebook-like Colors (Default) */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f0f2f5;
-  --text-primary: #050505;
-  --fb-blue: #1877f2;
-  --accent: #1877f2;
-  --border: #dddfe2;
-  
-  /* Additional for Nido (prices, icons) */
-  --price-green: #00c851;
-  --sentiment-yellow: #f7b928;
-  --checkin-blue: #0084ff;
-  
   /* === ALIASES SEMÁNTICOS === */
   
   /* Colores principales */
@@ -92,9 +79,9 @@
   --secondary-light: var(--secondary-100);
   --secondary-dark: var(--secondary-700);
   
-  --accent: var(--fb-blue);
-  --accent-light: #4b9aff;
-  --accent-dark: #166fe5;
+  --accent: var(--accent-500);
+  --accent-light: var(--accent-100);
+  --accent-dark: var(--accent-700);
   
   /* Estados */
   --success: var(--success-500);
@@ -102,25 +89,25 @@
   --warning: var(--warning-500);
   --info: var(--info-500);
   
-  /* Texto (light default) */
-  --text-primary: var(--text-primary);
+  /* Texto */
+  --text-primary: var(--gray-900);
   --text-secondary: var(--gray-700);
   --text-tertiary: var(--gray-500);
   --text-quaternary: var(--gray-400);
   --text-disabled: var(--gray-300);
   --text-inverse: #FFFFFF;
   
-  /* Fondos (light default) */
-  --bg-primary: var(--bg-primary);
-  --bg-secondary: var(--bg-secondary);
-  --bg-tertiary: #f7f7f7;
-  --bg-overlay: rgba(0, 0, 0, 0.5);
-  --bg-backdrop: rgba(0, 0, 0, 0.8);
+  /* Fondos */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: var(--gray-50);
+  --bg-tertiary: var(--gray-100);
+  --bg-overlay: rgba(17, 24, 39, 0.5);
+  --bg-backdrop: rgba(17, 24, 39, 0.8);
   
-  /* Bordes (light default) */
-  --border-primary: var(--border);
-  --border-secondary: var(--gray-200);
-  --border-focus: var(--accent);
+  /* Bordes */
+  --border-primary: var(--gray-200);
+  --border-secondary: var(--gray-300);
+  --border-focus: var(--primary-500);
   --border-error: var(--error-500);
   
   /* === TIPOGRAFÍA === */
@@ -322,34 +309,28 @@
   --z-tooltip: 1800;
 }
 
-/* Dark Mode Toggle (User Config - Facebook-like) */
-.dark {
-  /* Exact dark mode colors */
-  --bg-primary: #18191a;
-  --bg-secondary: #242526;
-  --text-primary: #e4e6ea;
-  --fb-blue: #1877f2;
-  --accent: #1877f2;
-  --border: #303338;
-  
-  /* Colores de texto */
-  --text-primary: #e4e6ea;
-  --text-secondary: #b0b3b8;
-  --text-tertiary: #8e9297;
-  --text-quaternary: #65676b;
-  --text-disabled: #4b4f54;
-  --text-inverse: #FFFFFF;
-  
-  /* Fondos */
-  --bg-primary: #18191a;
-  --bg-secondary: #242526;
-  --bg-tertiary: #303338;
-  --bg-overlay: rgba(24, 25, 26, 0.5);
-  --bg-backdrop: rgba(24, 25, 26, 0.8);
-  
-  /* Bordes */
-  --border-primary: #303338;
-  --border-secondary: #4b4f54;
+/* === TEMA OSCURO === */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Colores de texto invertidos */
+    --text-primary: #F9FAFB;
+    --text-secondary: #E5E7EB;
+    --text-tertiary: #9CA3AF;
+    --text-quaternary: #6B7280;
+    --text-disabled: #4B5563;
+    --text-inverse: var(--gray-900);
+    
+    /* Fondos oscuros */
+    --bg-primary: #111827;
+    --bg-secondary: #1F2937;
+    --bg-tertiary: #374151;
+    --bg-overlay: rgba(249, 250, 251, 0.1);
+    --bg-backdrop: rgba(17, 24, 39, 0.9);
+    
+    /* Bordes */
+    --border-primary: #374151;
+    --border-secondary: #4B5563;
+  }
 }
 
 /* === VARIABLES DE COMPONENTES === */
