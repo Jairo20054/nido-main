@@ -1,10 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import './HostTypeSelectionModal.css';
-import { AuthContext } from '../../context/AuthContext';
+import { useAuthContext } from '../../context/AuthContext';
 import AuthModal from '../user/Auth/AuthModal';
 
 const HostTypeSelectionModal = ({ isOpen, onClose, onSelect }) => {
-  const { isAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated } = useAuthContext();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
 

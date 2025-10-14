@@ -62,7 +62,7 @@ const Messages = lazyLoad(() => import('./components/user/Messages/MessageCenter
 const Services = lazyLoad(() => import('./components/user/Services/Services'));
 const Marketplace = lazyLoad(() => import('./components/user/Marketplace/Marketplace'));
 const HostDashboard = lazyLoad(() => import('./pages/Host/Dashboard'));
-const PropertyManager = lazyLoad(() => import('./components/host/HostDashboard/PropertyManager'));
+const PropertyManager = lazyLoad(() => import('./components/Host/HostDashboard/PropertyManager'));
 const AddProperty = lazyLoad(() => import('./components/host/PropertyForm/PropertyForm'));
 const EditProperty = lazyLoad(() => import('./components/host/PropertyForm/PropertyForm'));
 const BookingManager = lazyLoad(() => import('./components/host/HostDashboard/BookingManager'));
