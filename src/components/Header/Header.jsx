@@ -12,35 +12,25 @@ const Header = () => {
   // Items del centro: icono arriba, label abajo
   const centerItems = [
     {
-      id: 'alojamientos',
-      path: '/alojamientos',
-      icon: (
-        <svg viewBox="0 0 24 24" className="header-center-icon">
-          <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke="currentColor" strokeWidth="2" fill="none"/>
-        </svg>
-      ),
-      label: 'Alojamientos'
-    },
-    {
-      id: 'experiencias',
-      path: '/experiencias',
-      icon: (
-        <svg viewBox="0 0 24 24" className="header-center-icon">
-          <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" stroke="currentColor" strokeWidth="2" fill="none"/>
-        </svg>
-      ),
-      label: 'Experiencias'
-    },
-    {
-      id: 'servicios',
-      path: '/servicios',
+      id: 'servicios-adicionales',
+      path: '/services',
       icon: (
         <svg viewBox="0 0 24 24" className="header-center-icon">
           <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke="currentColor" strokeWidth="2" fill="none"/>
           <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" strokeWidth="2" fill="none"/>
         </svg>
       ),
-      label: 'Servicios'
+      label: 'Servicios Adicionales'
+    },
+    {
+      id: 'marketplace',
+      path: '/marketplace',
+      icon: (
+        <svg viewBox="0 0 24 24" className="header-center-icon">
+          <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke="currentColor" strokeWidth="2" fill="none"/>
+        </svg>
+      ),
+      label: 'Marketplace'
     }
   ];
 
@@ -150,7 +140,20 @@ const Header = () => {
         </div>
 
         {/* Menú móvil - hamburger */}
-        
+        <button
+          className="header-mobile-toggle"
+          onClick={toggleMobileMenu}
+          aria-label={isMobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+          aria-expanded={isMobileMenuOpen}
+        >
+          <svg viewBox="0 0 24 24" className="header-mobile-icon">
+            {isMobileMenuOpen ? (
+              <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            ) : (
+              <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            )}
+          </svg>
+        </button>
       </div>
 
       {/* Menú móvil desplegado */}

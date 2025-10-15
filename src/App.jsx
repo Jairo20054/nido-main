@@ -61,6 +61,7 @@ const Favorites = lazyLoad(() => import('./components/user/Dashboard/Favorites')
 const Messages = lazyLoad(() => import('./components/user/Messages/MessageCenter'));
 const Services = lazyLoad(() => import('./components/user/Services/Services'));
 const Marketplace = lazyLoad(() => import('./components/user/Marketplace/Marketplace'));
+const Ofertas = lazyLoad(() => import('./pages/Ofertas/Ofertas'));
 const HostDashboard = lazyLoad(() => import('./pages/Host/Dashboard'));
 const PropertyManager = lazyLoad(() => import('./components/Host/HostDashboard/PropertyManager'));
 const AddProperty = lazyLoad(() => import('./components/Host/PropertyForm/PropertyForm'));
@@ -106,6 +107,7 @@ function App() {
                   <Route path="/messages" element={<Messages />} />
                   <Route path="/services" element={<Services />} />
                   <Route path="/marketplace" element={<Marketplace />} />
+                  <Route path="/ofertas" element={<Ofertas />} />
 
                   {/* New Routes - Mapa, Tendencias, Remodelaciones */}
                   <Route path="/mapa" element={<MapaInteractivo />} />

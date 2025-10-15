@@ -69,6 +69,13 @@ const Header = () => {
         icon: WrenchScrewdriverIcon,
         label: "Servicios",
         ariaLabel: "Servicios adicionales"
+      },
+      {
+        id: "marketplace",
+        path: "/marketplace",
+        icon: HeartIcon,
+        label: "Marketplace",
+        ariaLabel: "Marketplace de productos"
       }
     ],
     []
