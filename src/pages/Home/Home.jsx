@@ -1,7 +1,7 @@
 // src/pages/Home/Home.jsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Header from '../../components/common/Header/Header';
+// import Header from '../../components/common/Header/Header';
 import LeftSidebar from '../../components/LeftSidebar/LeftSidebar';
 import RightSidebar from '../../components/RightSidebar/RightSidebar';
 import PostCard from '../../components/PostCard/PostCard';
@@ -223,7 +223,7 @@ const Home = () => {
   return (
     <div className="home-container">
       {/* Header */}
-      <Header />
+      {/* <Header /> */}
 
       <div className="home-layout">
         {/* Sidebar Izquierdo */}

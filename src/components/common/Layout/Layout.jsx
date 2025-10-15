@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import Header from '../Header/Header';
+import Header from '../../Header/Header';
 import LeftSidebar from '../../LeftSidebar/LeftSidebar';
 import BottomNav from '../../social/BottomNav';
 import './Layout.css';
