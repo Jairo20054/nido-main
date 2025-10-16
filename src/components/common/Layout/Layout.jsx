@@ -7,16 +7,14 @@ import './Layout.css';
 
 const Layout = ({ children }) => {
   const location = useLocation();
-  const hideSidebarPaths = ['/host/properties', '/services', '/marketplace'];
-
-  const shouldHideSidebar = hideSidebarPaths.some(path => location.pathname.startsWith(path));
+  const shouldShowSidebar = location.pathname === "/";
 
   return (
     <div className="layout">
       <Header />
       <div className="content-wrapper">
-        {/* Desktop: mostrar sidebar lateral */}
-        {!shouldHideSidebar && (
+        {/* Desktop: mostrar sidebar lateral solo en Home */}
+        {shouldShowSidebar && (
           <div className="desktop-sidebar">
             <LeftSidebar />
           </div>
