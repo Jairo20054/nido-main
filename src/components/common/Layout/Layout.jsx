@@ -7,7 +7,7 @@ import './Layout.css';
 
 const Layout = ({ children }) => {
   const location = useLocation();
-  const hideSidebarPaths = ['/host/properties'];
+  const hideSidebarPaths = ['/host/properties', '/services', '/marketplace'];
 
   const shouldHideSidebar = hideSidebarPaths.some(path => location.pathname.startsWith(path));
 
