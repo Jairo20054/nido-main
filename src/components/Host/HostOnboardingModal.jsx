@@ -94,9 +94,9 @@ const HostOnboardingModal = ({ open, onClose, onComplete }) => {
     },
     {
       id: 'services',
-      title: 'Productos y servicios adicionales',
+      title: 'Servicios adicionales',
       image: '/images/services.jpg',
-      alt: 'Imagen de productos y servicios adicionales'
+      alt: 'Servicios adicionales'
     }
   ];
 
