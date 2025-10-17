@@ -4,7 +4,7 @@ import { useAuthContext } from '../../../context/AuthContext';
 import FacebookLoginButton from './FacebookLoginButton';
 import './LoginForm.css';
 
-const LoginForm = () => {
+const LoginForm = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -64,8 +64,12 @@ const LoginForm = () => {
         setRememberMe(false);
         setErrors({});
 
-        // Redirigir al dashboard o página principal
-        window.location.href = '/dashboard';
+        // Llamar al callback personalizado si existe, sino redirigir por defecto
+        if (onSuccess) {
+          onSuccess(result.user);
+        } else {
+          window.location.href = '/dashboard';
+        }
       } else {
         setErrors({ general: result.error });
       }

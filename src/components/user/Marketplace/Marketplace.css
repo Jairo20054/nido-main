@@ -1,10 +1,11 @@
-/* Marketplace.css - Estilo IKEA */
+/* Marketplace.css - Estilo IKEA - FULL SCREEN RESPONSIVE */
 .marketplace-container {
-  max-width: 1400px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   padding: 0;
   min-height: 100vh;
   background: #f5f5f5;
+  overflow-x: hidden;
 }
 
 /* Header Principal */
@@ -15,6 +16,8 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .header-content h1 {
@@ -34,6 +37,16 @@
 .header-actions {
   display: flex;
   gap: 1rem;
+  align-items: center;
+}
+
+.mobile-menu-button {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
 }
 
 .filter-button,
@@ -62,6 +75,8 @@
   padding: 2rem;
   background: white;
   margin-bottom: 1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .featured-categories h2 {
@@ -75,6 +90,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
+  width: 100%;
 }
 
 .featured-category-card {
@@ -86,6 +102,8 @@
   align-items: center;
   min-height: 150px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .featured-content h3 {
@@ -133,6 +151,7 @@
   grid-template-columns: 280px 1fr;
   gap: 0;
   min-height: calc(100vh - 200px);
+  width: 100%;
 }
 
 /* Sidebar */
@@ -141,8 +160,27 @@
   padding: 1.5rem 0;
   border-right: 1px solid #e5e5e5;
   height: fit-content;
-  position: sticky;
+  position: left;
+  left: -15%;
   top: 0;
+  width: 290px;
+  box-sizing: border-box;
+}
+
+.sidebar-header {
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.close-sidebar {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
 }
 
 .sidebar-nav {
@@ -213,12 +251,16 @@
 .marketplace-main {
   background: white;
   padding: 0;
+  width: 100%;
+  min-height: calc(100vh - 200px);
 }
 
 .quick-filters {
   padding: 1.5rem 2rem;
   border-bottom: 1px solid #e5e5e5;
   background: #fafafa;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .filters-scroll {
@@ -226,6 +268,7 @@
   gap: 0.75rem;
   overflow-x: auto;
   scrollbar-width: none;
+  width: 100%;
 }
 
 .filters-scroll::-webkit-scrollbar {
@@ -266,6 +309,8 @@
 /* Sección de Productos */
 .products-section {
   padding: 2rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .section-header {
@@ -273,6 +318,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  width: 100%;
 }
 
 .section-header h2 {
@@ -291,6 +337,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 2rem;
+  width: 100%;
 }
 
 /* Tarjetas de Producto */
@@ -301,6 +348,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   border: 1px solid #f0f0f0;
+  width: 100%;
 }
 
 .product-card:hover {
@@ -315,6 +363,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
 }
 
 .discount-badge {
@@ -373,6 +422,8 @@
 
 .product-info {
   padding: 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .product-title {
@@ -443,18 +494,68 @@
   background: #004080;
 }
 
-/* Responsive */
+/* Mobile Overlay */
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 1200px) {
+  .featured-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+  
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
 @media (max-width: 1024px) {
   .marketplace-layout {
     grid-template-columns: 1fr;
   }
   
   .categories-sidebar {
-    display: none;
+    position: fixed;
+    top: 0;
+    left: -100%;
+    height: 100vh;
+    z-index: 999;
+    transition: left 0.3s ease;
+    width: 300px;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .categories-sidebar.mobile-open {
+    left: 0;
+  }
+  
+  .sidebar-header {
+    display: flex;
+  }
+  
+  .mobile-menu-button {
+    display: block;
+  }
+  
+  .mobile-overlay {
+    display: block;
   }
   
   .featured-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .products-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   }
 }
 
@@ -480,33 +581,99 @@
   }
   
   .products-grid {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
   }
   
   .quick-filters {
     padding: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .products-grid {
-    grid-template-columns: 1fr;
   }
   
   .featured-category-card {
     flex-direction: column;
     text-align: center;
     gap: 1rem;
+    padding: 1.5rem;
   }
   
+  .featured-image {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+@media (max-width: 640px) {
   .header-actions {
-    flex-direction: column;
-    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .mobile-menu-button {
+    order: -1;
   }
   
   .filter-button,
   .sort-button {
+    flex: 1;
+    min-width: 140px;
     justify-content: space-between;
   }
+  
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .featured-categories h2,
+  .section-header h2 {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .marketplace-header {
+    padding: 1rem;
+  }
+  
+  .header-content h1 {
+    font-size: 1.75rem;
+  }
+  
+  .header-content p {
+    font-size: 1rem;
+  }
+  
+  .featured-categories,
+  .products-section {
+    padding: 1rem;
+  }
+  
+  .featured-category-card {
+    padding: 1rem;
+  }
+  
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .filter-chip {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+  
+  .product-info {
+    padding: 1rem;
+  }
+}
+
+/* Asegurar que todo ocupe el 100% del viewport */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
 }

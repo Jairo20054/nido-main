@@ -5,6 +5,7 @@ import './Marketplace.css';
 const Marketplace = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [expandedSections, setExpandedSections] = useState({});
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   const toggleSection = (sectionId) => {
     setExpandedSections(prev => ({
@@ -220,6 +221,9 @@ const Marketplace = () => {
           <p>Encuentra muebles, decoración e inspiración para tu hogar</p>
         </div>
         <div className="header-actions">
+          <button className="mobile-menu-button" onClick={() => setShowMobileMenu(!showMobileMenu)}>
+            <span>☰</span>
+          </button>
           <button className="filter-button">
             <span>Filtros</span>
             <span>▼</span>
@@ -257,7 +261,11 @@ const Marketplace = () => {
 
       <div className="marketplace-layout">
         {/* Sidebar de Categorías */}
-        <aside className="categories-sidebar">
+        <aside className={`categories-sidebar ${showMobileMenu ? 'mobile-open' : ''}`}>
+          <div className="sidebar-header">
+            <h3>Categorías</h3>
+            <button className="close-sidebar" onClick={() => setShowMobileMenu(false)}>×</button>
+          </div>
           <nav className="sidebar-nav">
             <div className="nav-section">
               <h3>Productos</h3>
@@ -300,6 +308,11 @@ const Marketplace = () => {
             ))}
           </nav>
         </aside>
+
+        {/* Overlay para móvil */}
+        {showMobileMenu && (
+          <div className="mobile-overlay" onClick={() => setShowMobileMenu(false)}></div>
+        )}
 
         {/* Contenido Principal */}
         <main className="marketplace-main">
