@@ -393,7 +393,22 @@ const Services = () => {
               </button>
             )}
           </div>
-          
+
+          {/* Botón Filtros Avanzados - POSICIONADO CORRECTAMENTE */}
+          <div className="filters-trigger-wrapper" ref={filtersMenuRef}>
+            <motion.button
+              className={`filters-trigger-btn ${showAdvancedFilters ? 'active' : ''}`}
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <FiSliders />
+              <span>Filtros</span>
+              {activeFiltersCount > 0 && (
+                <span className="filters-badge">{activeFiltersCount}</span>
+              )}
+            </motion.button>
+          </div>
         </div>
 
         {/* Filtros Rápidos Horizontales */}
@@ -414,23 +429,21 @@ const Services = () => {
                 )}
               </motion.button>
             ))}
-<div className="filters-trigger-wrapper" ref={filtersMenuRef}>
-            <motion.button
-              className={`filters-trigger-btn ${showAdvancedFilters ? 'active' : ''}`}
-              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <FiSliders />
-              <span>Filtros</span>
-              {activeFiltersCount > 0 && (
-                <span className="filters-badge">{activeFiltersCount}</span>
-              )}
-            </motion.button>
-          </div>
-            {/* Botón "Más" */}
+
+            {/* Botón "Más" - COMPLETO Y FUNCIONAL */}
             <div className="more-categories-wrapper-advanced" ref={moreMenuRef}>
-              
+              <motion.button
+                className={`filter-tab-advanced more-categories-btn ${showMoreCategories ? 'active' : ''}`}
+                onClick={() => setShowMoreCategories(!showMoreCategories)}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <span className="filter-icon-advanced">
+                  <FiMoreHorizontal />
+                </span>
+                <span className="filter-name-advanced">Más</span>
+                <FiChevronDown className={`more-chevron ${showMoreCategories ? 'rotated' : ''}`} />
+              </motion.button>
 
               <AnimatePresence>
                 {showMoreCategories && (

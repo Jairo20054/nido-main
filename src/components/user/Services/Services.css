@@ -1,4 +1,4 @@
-/* Services.css - Versión Avanzada con Filtros Personalizados */
+/* Services.css - Versión Mejorada y 100% Responsiva */
 
 .services-container-advanced {
   max-width: 1400px;
@@ -8,32 +8,35 @@
   background: #ffffff;
 }
 
-/* Header Avanzado */
+/* Header Avanzado - POSICIÓN CORREGIDA */
 .filters-header-advanced {
   background: white;
   margin-bottom: 1.5rem;
   position: sticky;
-  top: 72px;
-  z-index: 1000;
-  padding: 1rem 0;
+  top: 80px; /* Aumentado para evitar superposición con header */
+  z-index: 100;
+  padding: 1.5rem 0 1rem 0; /* Más padding superior */
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid #f1f5f9;
 }
 
-/* Sección de Búsqueda Mejorada */
+/* Sección de Búsqueda Mejorada - CENTRADA Y MÁS ARRIBA */
 .search-section-advanced {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   max-width: 100%;
+  justify-content: center; /* Centrado horizontal */
+  padding: 0 1rem;
 }
 
 .search-input-advanced {
   position: relative;
   flex: 1;
   max-width: 600px;
+  margin: 0 auto;
 }
 
 .search-icon-advanced {
@@ -43,18 +46,21 @@
   transform: translateY(-50%);
   color: #64748b;
   font-size: 1.1rem;
+  z-index: 2;
 }
 
 .search-field-advanced {
   width: 100%;
   padding: 0.875rem 1rem 0.875rem 2.75rem;
   border: 1px solid #e2e8f0;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 0.95rem;
   font-weight: 500;
   background: #f8fafc;
-  transform: translateY(-50px);
   transition: all 0.2s ease;
+  /* ELIMINADO: transform: translateY(-50px); */
+  position: relative;
+  margin: 0;
 }
 
 .search-field-advanced:focus {
@@ -77,6 +83,7 @@
   border-radius: 50%;
   transition: all 0.2s ease;
   font-size: 0.875rem;
+  z-index: 2;
 }
 
 .clear-search-advanced:hover {
@@ -84,7 +91,7 @@
   color: #475569;
 }
 
-/* Botón Filtros Avanzados */
+/* Botón Filtros Avanzados - MEJOR POSICIONADO */
 .filters-trigger-wrapper {
   position: relative;
 }
@@ -102,6 +109,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  height: fit-content;
 }
 
 .filters-trigger-btn:hover {
@@ -127,19 +135,31 @@
 /* Filtros Rápidos Mejorados */
 .quick-filters-section {
   border-bottom: none;
+  width: 100%;
 }
 
 .filters-scroll-advanced {
   display: flex;
   gap: 0.5rem;
-  padding-bottom: 0.25rem;
+  padding: 0.5rem 0;
   overflow-x: auto;
-  scrollbar-width: none;
+  scrollbar-width: thin;
   -ms-overflow-style: none;
+  align-items: center;
 }
 
 .filters-scroll-advanced::-webkit-scrollbar {
-  display: none;
+  height: 4px;
+}
+
+.filters-scroll-advanced::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 2px;
+}
+
+.filters-scroll-advanced::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
 }
 
 .filter-tab-advanced {
@@ -202,11 +222,15 @@
 
 .more-categories-btn {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .more-chevron {
   font-size: 0.8rem;
   transition: transform 0.2s ease;
+  margin-left: 0.25rem;
 }
 
 .more-chevron.rotated {
@@ -255,12 +279,38 @@
   color: white;
 }
 
+.more-category-icon {
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  color: inherit;
+}
+
+.more-category-name {
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.more-category-count {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.125rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.more-category-item-advanced:not(.active) .more-category-count {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
 /* Panel de Filtros Avanzados */
 .advanced-filters-panel {
   background: white;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
-  margin-bottom: 1.5rem;
+  margin: 0 1rem 1.5rem 1rem;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -458,7 +508,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
-  padding: 0 0.25rem;
+  padding: 0 1rem;
   flex-wrap: wrap;
   gap: 1rem;
 }
@@ -524,6 +574,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.5rem;
+  padding: 0 1rem;
 }
 
 .service-card-advanced {
@@ -786,10 +837,14 @@
   box-shadow: 0 6px 20px rgba(15, 23, 42, 0.15);
 }
 
-/* Responsive Design Avanzado */
+/* ============================ */
+/* RESPONSIVE DESIGN MEJORADO */
+/* ============================ */
+
+/* Tablets */
 @media (max-width: 1024px) {
   .services-grid-advanced {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.25rem;
   }
 
@@ -797,31 +852,46 @@
     grid-template-columns: 1fr;
     gap: 1rem;
   }
+
+  .filters-header-advanced {
+    top: 70px;
+  }
 }
 
+/* Móviles Grandes */
 @media (max-width: 768px) {
   .services-container-advanced {
-    padding: 0.75rem 1rem 1.5rem;
+    padding: 0.5rem 0.75rem 1.5rem;
   }
 
   .filters-header-advanced {
-    padding: 0.75rem 0;
+    padding: 1rem 0 0.75rem 0;
     margin-bottom: 1rem;
-    top: 64px;
+    top: 65px; /* Ajustado para móviles */
+    position: relative; /* En móviles puede ser relativo para evitar problemas */
   }
 
   .search-section-advanced {
     flex-direction: column;
     gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
   }
 
   .search-input-advanced {
     max-width: none;
+    width: 100%;
+  }
+
+  .filters-trigger-btn {
+    width: 100%;
+    justify-content: center;
   }
 
   .services-grid-advanced {
     grid-template-columns: 1fr;
     gap: 1rem;
+    padding: 0 0.5rem;
   }
 
   .service-image-advanced {
@@ -836,6 +906,7 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 0.75rem;
+    padding: 0 0.5rem;
   }
 
   .results-info-advanced {
@@ -852,9 +923,18 @@
     flex-direction: column;
     gap: 0.75rem;
   }
+
+  .advanced-filters-panel {
+    margin: 0 0.5rem 1rem 0.5rem;
+  }
 }
 
+/* Móviles Pequeños */
 @media (max-width: 480px) {
+  .services-container-advanced {
+    padding: 0.25rem 0.5rem 1rem;
+  }
+
   .filter-tab-advanced {
     padding: 0.5rem 0.875rem;
     font-size: 0.8rem;
@@ -877,6 +957,60 @@
     padding: 0.625rem 1rem;
     font-size: 0.85rem;
   }
+
+  .services-grid-advanced {
+    gap: 0.875rem;
+  }
+
+  /* Menú Más en móviles pequeños */
+  .more-categories-menu-advanced {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    top: auto;
+    width: 90%;
+    max-width: 300px;
+    border-radius: 12px 12px 0 0;
+    animation: slideUp 0.3s ease-out;
+  }
+
+  .filters-header-advanced {
+    position: relative;
+    top: 0;
+  }
+}
+
+/* Muy pequeños (360px o menos) */
+@media (max-width: 360px) {
+  .services-container-advanced {
+    padding: 0.25rem 0.25rem 0.75rem;
+  }
+
+  .filter-tab-advanced {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .search-field-advanced {
+    padding: 0.625rem 0.875rem 0.625rem 2.25rem;
+    font-size: 0.85rem;
+  }
+
+  .service-content-advanced {
+    padding: 0.75rem;
+  }
+
+  .service-footer-advanced {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .service-action-btn {
+    width: 100%;
+    text-align: center;
+  }
 }
 
 /* Animaciones y Transiciones Mejoradas */
@@ -895,23 +1029,15 @@
   animation: fadeInUpAdvanced 0.4s ease forwards;
 }
 
-/* Scrollbar personalizado */
-.filters-scroll-advanced::-webkit-scrollbar {
-  height: 4px;
-}
-
-.filters-scroll-advanced::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 2px;
-}
-
-.filters-scroll-advanced::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 2px;
-}
-
-.filters-scroll-advanced::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 /* Mejoras de accesibilidad */
@@ -964,4 +1090,14 @@
     background: #1e293b;
     border-color: #334155;
   }
+}
+
+/* Asegurar que el scroll sea suave */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Prevenir desbordamientos horizontales */
+body {
+  overflow-x: hidden;
 }
