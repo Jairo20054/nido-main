@@ -140,20 +140,7 @@ const Header = () => {
         </div>
 
         {/* Menú móvil - hamburger */}
-        <button
-          className="header-mobile-toggle"
-          onClick={toggleMobileMenu}
-          aria-label={isMobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
-          aria-expanded={isMobileMenuOpen}
-        >
-          <svg viewBox="0 0 24 24" className="header-mobile-icon">
-            {isMobileMenuOpen ? (
-              <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            ) : (
-              <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            )}
-          </svg>
-        </button>
+        
       </div>
 
       {/* Menú móvil desplegado */}
