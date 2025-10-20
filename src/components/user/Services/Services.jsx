@@ -393,8 +393,6 @@ const Services = () => {
               </button>
             )}
           </div>
-
-          {/* Botón Filtros Avanzados */}
           
         </div>
 
