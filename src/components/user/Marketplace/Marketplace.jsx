@@ -342,8 +342,7 @@ const Marketplace = () => {
         <div className="header-container">
           <div className="header-left">
             <div className="logo">
-              <span className="logo-icon">🏠</span>
-              <span className="logo-text">HogarExpress</span>
+        
             </div>
           </div>
 
