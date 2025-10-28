@@ -2,46 +2,34 @@ import React, { useState, useEffect, useRef } from 'react';
 import './Marketplace.css';
 
 const Marketplace = () => {
-  const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [isScrolled, setIsScrolled] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [cartItems, setCartItems] = useState([]);
   const [showCart, setShowCart] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showProductModal, setShowProductModal] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const headerRef = useRef(null);
-  const touchStartX = useRef(null);
   const autoTimer = useRef(null);
-
-  // Función para manejar búsqueda
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      console.log('Buscando:', searchQuery);
-    }
-  };
-
-  // Efecto para header con scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const touchStartX = useRef(null);
 
   // Categorías principales
   const categories = [
-    { id: 'all', label: 'Todos', icon: '🏠' },
+    { id: 'all', label: 'Inicio', icon: '🏠' },
     { id: 'furniture', label: 'Muebles', icon: '🛋️' },
-    { id: 'decor', label: 'Decoración', icon: '🖼️' },
+    { id: 'decor', label: 'Decoración', icon: '🎨' },
     { id: 'kitchen', label: 'Cocina', icon: '🍳' },
     { id: 'bedroom', label: 'Dormitorio', icon: '🛏️' },
     { id: 'bathroom', label: 'Baño', icon: '🚿' },
     { id: 'lighting', label: 'Iluminación', icon: '💡' },
-    { id: 'storage', label: 'Almacenamiento', icon: '📦' },
+    { id: 'storage', label: 'Organización', icon: '📦' },
     { id: 'garden', label: 'Jardín', icon: '🌿' },
-    { id: 'cleaning', label: 'Limpieza', icon: '🧹' }
+    { id: 'cleaning', label: 'Limpieza', icon: '🧹' },
+    { id: 'electronics', label: 'Electro', icon: '📱' },
+    { id: 'tools', label: 'Herramientas', icon: '🛠️' }
   ];
 
   // Slides del carrusel
@@ -49,78 +37,37 @@ const Marketplace = () => {
     {
       id: 'hot-sale',
       title: 'LIQUIDACIÓN HOTSALE',
-      highlights: ['🎯 HASTA 50% OFF', '💳 HASTA 12 CUOTAS SIN INTERÉS', '🚚 ENVÍO GRATIS'],
+      subtitle: 'Hasta 50% OFF + 12 Cuotas',
+      highlights: ['🔥 Ofertas exclusivas', '🚚 Envío gratis', '💳 Hasta 12 cuotas'],
       description: 'Aprovecha los mejores descuentos en muebles y decoración para tu hogar. Stock limitado.',
       ctaText: 'Ver ofertas',
-      ctaHref: '#',
       image: '🛋️',
-      imageBadge: 'Oferta Especial',
+      badge: '-50%',
       bgGradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
     },
     {
-      id: 'furniture-sale',
-      title: 'MUEBLES EN OFERTA',
-      highlights: ['🛏️ 30% OFF EN COLCHONES', '⭐ HASTA 18 CUOTAS', '🎁 BASE CAMA DE REGALO'],
-      description: 'Dormí mejor con nuestra promoción exclusiva en dormitorio. Calidad premium garantizada.',
+      id: 'furniture-week',
+      title: 'SEMANA DE MUEBLES',
+      subtitle: '30% OFF + Cuotas sin interés',
+      highlights: ['🛏️ Dormitorio completo', '🛋️ Sofás y sillones', '📦 Envío en 48h'],
+      description: 'Renueva tu hogar con los mejores muebles a precios increíbles. Calidad premium garantizada.',
       ctaText: 'Comprar ahora',
-      ctaHref: '#',
       image: '🛏️',
-      imageBadge: '-30%',
+      badge: '-30%',
       bgGradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
     },
     {
       id: 'home-decor',
-      title: 'DECORACIÓN PARA TU HOGAR',
-      highlights: ['🍳 40% EN UTENSILIOS', '⚡ ENVÍO EN 24H', '🔧 INSTALACIÓN GRATIS'],
-      description: 'Equipa tu cocina con los mejores productos a precios increíbles. Calidad profesional.',
-      ctaText: 'Explorar',
-      ctaHref: '#',
-      image: '🍳',
-      imageBadge: '-40%',
+      title: 'DECORACIÓN PREMIUM',
+      subtitle: 'Hasta 40% OFF',
+      highlights: ['🎨 Diseño exclusivo', '⚡ Envío express', '🎁 Instalación gratis'],
+      description: 'Transforma tus espacios con nuestra colección premium de decoración para el hogar.',
+      ctaText: 'Descubrir',
+      image: '🏺',
+      badge: '-40%',
       bgGradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
     }
   ];
-
-  // Funcionalidad del carrusel
-  const totalSlides = carouselSlides.length;
-
-  const goToSlide = (index) => {
-    setCurrentSlide(((index % totalSlides) + totalSlides) % totalSlides);
-  };
-
-  const nextSlide = () => {
-    goToSlide(currentSlide + 1);
-  };
-
-  const prevSlide = () => {
-    goToSlide(currentSlide - 1);
-  };
-
-  // Auto-play del carrusel
-  useEffect(() => {
-    if (isPaused) return;
-    
-    autoTimer.current = setInterval(() => {
-      nextSlide();
-    }, 5000);
-
-    return () => clearInterval(autoTimer.current);
-  }, [currentSlide, isPaused]);
-
-  // Eventos táctiles para el carrusel
-  const onPointerDown = (e) => {
-    touchStartX.current = e.clientX ?? e.touches?.[0]?.clientX;
-  };
-
-  const onPointerUp = (e) => {
-    if (touchStartX.current == null) return;
-    const endX = e.clientX ?? e.changedTouches?.[0]?.clientX;
-    const dx = endX - touchStartX.current;
-    const threshold = 60;
-    if (dx > threshold) prevSlide();
-    else if (dx < -threshold) nextSlide();
-    touchStartX.current = null;
-  };
 
   // Productos del marketplace
   const products = [
@@ -137,11 +84,12 @@ const Marketplace = () => {
       installments: 12,
       freeShipping: true,
       tags: ['Nuevo', 'Envío gratis'],
-      featured: true
+      featured: true,
+      stock: 15
     },
     {
       id: 2,
-      title: 'Set de Ollas Antiadherentes 5 Piezas',
+      title: 'Set Ollas Antiadherentes 5 Piezas',
       price: 199900,
       originalPrice: 249900,
       discount: 20,
@@ -151,11 +99,12 @@ const Marketplace = () => {
       reviews: 156,
       installments: 6,
       freeShipping: true,
-      tags: ['Oferta', 'Premium']
+      tags: ['Oferta', 'Premium'],
+      stock: 8
     },
     {
       id: 3,
-      title: 'Lámpara de Techo LED Moderna',
+      title: 'Lámpara Techo LED Moderna',
       price: 89900,
       category: 'lighting',
       image: '💡',
@@ -163,11 +112,12 @@ const Marketplace = () => {
       reviews: 64,
       installments: 3,
       freeShipping: false,
-      tags: ['LED', 'Moderno']
+      tags: ['LED', 'Moderno'],
+      stock: 12
     },
     {
       id: 4,
-      title: 'Juego de Sábanas King Size Algodón',
+      title: 'Sábanas King Size Algodón Premium',
       price: 75900,
       category: 'bedroom',
       image: '🛏️',
@@ -175,7 +125,8 @@ const Marketplace = () => {
       reviews: 89,
       installments: 3,
       freeShipping: true,
-      tags: ['Algodón', 'Suave']
+      tags: ['Algodón', 'Suave'],
+      stock: 25
     },
     {
       id: 5,
@@ -188,7 +139,8 @@ const Marketplace = () => {
       installments: 12,
       freeShipping: true,
       tags: ['Modular', 'Madera'],
-      featured: true
+      featured: true,
+      stock: 7
     },
     {
       id: 6,
@@ -200,11 +152,12 @@ const Marketplace = () => {
       reviews: 92,
       installments: 3,
       freeShipping: false,
-      tags: ['Oscurecimiento', 'Térmicas']
+      tags: ['Oscurecimiento', 'Térmicas'],
+      stock: 18
     },
     {
       id: 7,
-      title: 'Mesa de Centro Vidrio Templado',
+      title: 'Mesa Centro Vidrio Templado',
       price: 129900,
       category: 'furniture',
       image: '🪑',
@@ -212,11 +165,12 @@ const Marketplace = () => {
       reviews: 215,
       installments: 6,
       freeShipping: true,
-      tags: ['Moderno', 'Resistente']
+      tags: ['Moderno', 'Resistente'],
+      stock: 10
     },
     {
       id: 8,
-      title: 'Organizador de Baño Multiusos',
+      title: 'Organizador Baño Multiusos',
       price: 34900,
       category: 'bathroom',
       image: '🚿',
@@ -224,11 +178,12 @@ const Marketplace = () => {
       reviews: 178,
       installments: 3,
       freeShipping: false,
-      tags: ['Práctico', 'Ajustable']
+      tags: ['Práctico', 'Ajustable'],
+      stock: 22
     },
     {
       id: 9,
-      title: 'Silla de Oficina Ergonómica',
+      title: 'Silla Oficina Ergonómica',
       price: 189900,
       originalPrice: 229900,
       discount: 17,
@@ -239,11 +194,12 @@ const Marketplace = () => {
       installments: 12,
       freeShipping: true,
       tags: ['Ergonómica', 'Confort'],
-      featured: true
+      featured: true,
+      stock: 5
     },
     {
       id: 10,
-      title: 'Set de Jardín 3 Piezas Exterior',
+      title: 'Set Jardín 3 Piezas Exterior',
       price: 459900,
       category: 'garden',
       image: '🌿',
@@ -251,7 +207,8 @@ const Marketplace = () => {
       reviews: 67,
       installments: 12,
       freeShipping: true,
-      tags: ['Exterior', 'Resistente']
+      tags: ['Exterior', 'Resistente'],
+      stock: 9
     },
     {
       id: 11,
@@ -259,18 +216,19 @@ const Marketplace = () => {
       price: 399900,
       originalPrice: 499900,
       discount: 20,
-      category: 'cleaning',
+      category: 'electronics',
       image: '🤖',
       rating: 4.6,
       reviews: 234,
       installments: 12,
       freeShipping: true,
       tags: ['Robot', 'Automática'],
-      featured: true
+      featured: true,
+      stock: 11
     },
     {
       id: 12,
-      title: 'Set de Utensilios de Cocina 15 Piezas',
+      title: 'Set Utensilios Cocina 15 Piezas',
       price: 89900,
       category: 'kitchen',
       image: '🔪',
@@ -278,28 +236,28 @@ const Marketplace = () => {
       reviews: 156,
       installments: 3,
       freeShipping: true,
-      tags: ['Completo', 'Acero']
+      tags: ['Completo', 'Acero'],
+      stock: 30
     }
   ];
+
+
 
   // Filtrado de productos
   useEffect(() => {
     let result = products;
-    
-    if (selectedCategory !== 'all') {
-      result = result.filter(product => product.category === selectedCategory);
-    }
-    
+
+    // Filtrar por búsqueda
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      result = result.filter(product => 
+      result = result.filter(product =>
         product.title.toLowerCase().includes(query) ||
         product.tags.some(tag => tag.toLowerCase().includes(query))
       );
     }
-    
+
     setFilteredProducts(result);
-  }, [selectedCategory, searchQuery]);
+  }, [searchQuery]);
 
   // Agregar al carrito
   const addToCart = (product) => {
@@ -307,13 +265,15 @@ const Marketplace = () => {
       const existingItem = prev.find(item => item.id === product.id);
       if (existingItem) {
         return prev.map(item =>
-          item.id === product.id 
+          item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       }
       return [...prev, { ...product, quantity: 1 }];
     });
+    // Mostrar feedback visual
+    console.log(`Producto "${product.title}" agregado al carrito`);
   };
 
   // Formatear precio
@@ -329,28 +289,94 @@ const Marketplace = () => {
   const renderStars = (rating) => {
     return (
       <div className="stars">
-        {'★'.repeat(Math.floor(rating))}
-        {'☆'.repeat(5 - Math.floor(rating))}
+        {[...Array(5)].map((_, index) => (
+          <span 
+            key={index} 
+            className={index < Math.floor(rating) ? 'star filled' : 'star'}
+          >
+            {index < Math.floor(rating) ? '★' : '☆'}
+          </span>
+        ))}
+        <span className="rating-value">{rating.toFixed(1)}</span>
       </div>
     );
+  };
+
+  // Manejar búsqueda
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      setIsLoading(true);
+      console.log('Buscando:', searchQuery);
+      // Simular búsqueda asíncrona
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
+    }
+  };
+
+  // Efecto para header con scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Funciones del carrusel
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length);
+  };
+
+  const goToSlide = (index) => {
+    setCurrentSlide(index);
+  };
+
+  // Auto-play del carrusel
+  useEffect(() => {
+    if (!isPaused) {
+      autoTimer.current = setInterval(nextSlide, 6000);
+    } else {
+      clearInterval(autoTimer.current);
+    }
+    return () => clearInterval(autoTimer.current);
+  }, [isPaused, currentSlide]);
+
+  // Funciones de touch/drag
+  const onPointerDown = (e) => {
+    touchStartX.current = e.clientX;
+  };
+
+  const onPointerUp = (e) => {
+    if (!touchStartX.current) return;
+
+    const touchEndX = e.clientX || e.changedTouches[0].clientX;
+    const diff = touchStartX.current - touchEndX;
+
+    if (Math.abs(diff) > 50) { // Umbral mínimo para swipe
+      if (diff > 0) {
+        nextSlide();
+      } else {
+        prevSlide();
+      }
+    }
+
+    touchStartX.current = null;
   };
 
   return (
     <div className="marketplace">
       {/* Header */}
       <header className={`marketplace-header ${isScrolled ? 'scrolled' : ''}`} ref={headerRef}>
-        <div className="header-container">
-          <div className="header-left">
-            <div className="logo">
-        
-            </div>
-          </div>
-
-          {/* Barra de búsqueda premium */}
-          <div className="header-center">
-            <div className="search-container">
-              <div className="search-bar">
-                <div className="search-input-container">
+        <div className="header-top">
+          <div className="header-container">
+            <div className="header-center">
+              <div className="search-container">
+                <div className="search-bar">
                   <input
                     type="text"
                     placeholder="Buscar productos, marcas y más..."
@@ -359,98 +385,39 @@ const Marketplace = () => {
                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                     className="search-input"
                   />
-                  {searchQuery && (
-                    <button 
-                      className="clear-search"
-                      onClick={() => setSearchQuery('')}
-                    >
-                      ×
-                    </button>
-                  )}
+                  <button className="search-button" onClick={handleSearch}>
+                    <span className="search-icon">🔍</span>
+                  </button>
                 </div>
-                <button 
-                  className="search-button"
-                  onClick={handleSearch}
-                >
-                  <span className="search-icon">🔍</span>
-                </button>
               </div>
-              
-              {/* Sugerencias de búsqueda */}
-              {searchQuery && (
-                <div className="search-suggestions">
-                  <div className="suggestion-category">
-                    <span className="category-title">Sugerencias</span>
-                    <div className="suggestion-list">
-                      <button className="suggestion-item">
-                        <span className="suggestion-icon">🔍</span>
-                        {searchQuery} en muebles
-                      </button>
-                      <button className="suggestion-item">
-                        <span className="suggestion-icon">🔍</span>
-                        {searchQuery} en decoración
-                      </button>
-                      <button className="suggestion-item">
-                        <span className="suggestion-icon">🔍</span>
-                        {searchQuery} en cocina
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div className="suggestion-category">
-                    <span className="category-title">Búsquedas populares</span>
-                    <div className="suggestion-list">
-                      <button className="suggestion-item">
-                        <span className="suggestion-icon">🔥</span>
-                        Sofá moderno
-                      </button>
-                      <button className="suggestion-item">
-                        <span className="suggestion-icon">🔥</span>
-                        Mesa de centro
-                      </button>
-                      <button className="suggestion-item">
-                        <span className="suggestion-icon">🔥</span>
-                        Lámpara LED
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
-          </div>
 
-          <div className="header-right">
-            <button 
-              className="cart-button"
-              onClick={() => setShowCart(!showCart)}
-            >
-              <span className="cart-icon">🛒</span>
-              {cartItems.length > 0 && (
-                <span className="cart-count">{cartItems.reduce((sum, item) => sum + item.quantity, 0)}</span>
-              )}
-              <span className="cart-text">Carrito</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Barra de categorías */}
-        <div className="categories-bar">
-          <div className="categories-scroll">
-            {categories.map(category => (
+            <div className="header-right">
               <button
-                key={category.id}
-                className={`category-btn ${selectedCategory === category.id ? 'active' : ''}`}
-                onClick={() => setSelectedCategory(category.id)}
+                className="cart-button"
+                onClick={() => setShowCart(!showCart)}
               >
-                <span className="category-icon">{category.icon}</span>
-                <span className="category-label">{category.label}</span>
+                <span className="cart-icon">🛒</span>
+                {cartItems.length > 0 && (
+                  <span className="cart-count">
+                    {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+                  </span>
+                )}
+                <span className="cart-text">Carrito</span>
               </button>
-            ))}
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Carrusel de Ofertas Mejorado */}
+      {/* Banner de envío gratis */}
+      <div className="shipping-banner">
+        <div className="shipping-container">
+          <span className="shipping-text">🚚 ¡Envío gratis en compras superiores a $100.000!</span>
+        </div>
+      </div>
+
+      {/* Carrusel de Ofertas */}
       <section 
         className="offers-carousel"
         onMouseEnter={() => setIsPaused(true)}
@@ -459,6 +426,7 @@ const Marketplace = () => {
         <div className="carousel-container">
           <div 
             className="carousel-track"
+            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
             onMouseDown={onPointerDown}
             onMouseUp={onPointerUp}
             onTouchStart={(e) => (touchStartX.current = e.touches[0].clientX)}
@@ -467,14 +435,19 @@ const Marketplace = () => {
             {carouselSlides.map((slide, index) => (
               <div 
                 key={slide.id}
-                className={`carousel-slide ${index === currentSlide ? 'active' : ''}`}
+                className="carousel-slide"
+                style={{ background: slide.bgGradient }}
               >
-                <div className="slide-content" style={{ background: slide.bgGradient }}>
+                <div className="slide-content">
                   <div className="slide-text">
+                    <span className="slide-badge">{slide.badge}</span>
                     <h2>{slide.title}</h2>
+                    <h3>{slide.subtitle}</h3>
                     <div className="slide-highlights">
                       {slide.highlights.map((highlight, i) => (
-                        <span key={i} className="highlight-item">{highlight}</span>
+                        <span key={i} className="highlight-item">
+                          {highlight}
+                        </span>
                       ))}
                     </div>
                     <p className="slide-description">{slide.description}</p>
@@ -482,7 +455,6 @@ const Marketplace = () => {
                   </div>
                   <div className="slide-image">
                     <div className="image-placeholder">{slide.image}</div>
-                    <div className="image-badge">{slide.imageBadge}</div>
                   </div>
                 </div>
               </div>
@@ -504,291 +476,350 @@ const Marketplace = () => {
                 key={index}
                 className={`indicator ${currentSlide === index ? 'active' : ''}`}
                 onClick={() => goToSlide(index)}
-              ></button>
+              />
             ))}
           </div>
         </div>
       </section>
 
-      {/* Sección de medios de pago */}
-      <section className="payment-methods">
-        <div className="payment-container">
-          <h3>Medios de pago</h3>
-          <p>Paga tus compras de forma rápida y segura</p>
-          <div className="payment-icons">
-            <span>💳</span>
-            <span>📱</span>
-            <span>💰</span>
-            <span>🏦</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Contenido principal */}
+      {/* Sección de productos destacados */}
       <main className="marketplace-content">
-        {/* Sección de productos baratos */}
-        <section className="products-section">
+        {/* Ofertas flash */}
+        <section className="products-section flash-sales">
           <div className="section-header">
-            <h3>Menos de $40.000</h3>
-            <p>Descubre productos con nuevos precios</p>
+            <div className="section-title">
+              <span className="title-icon">⚡</span>
+              <h2>Ofertas Flash</h2>
+              <span className="time-remaining">Termina en 02:15:30</span>
+            </div>
+            <button className="see-all-btn">Ver todas</button>
           </div>
           <div className="products-grid">
-            {products.filter(product => product.price < 40000).map(product => (
-              <div key={product.id} className="product-card">
-                <div className="card-image">
-                  <div className="image-placeholder">{product.image}</div>
-                  {product.discount && (
-                    <div className="discount-badge">-{product.discount}%</div>
-                  )}
-                  {product.freeShipping && (
-                    <div className="shipping-badge">Envío gratis</div>
-                  )}
-                </div>
-                
-                <div className="card-content">
-                  <h4 className="card-title">{product.title}</h4>
-                  
-                  <div className="card-price">
-                    <span className="current-price">{formatPrice(product.price)}</span>
-                    {product.originalPrice && (
-                      <span className="original-price">{formatPrice(product.originalPrice)}</span>
-                    )}
-                  </div>
-                  
-                  <div className="card-installments">
-                    en {product.installments} cuotas de {formatPrice(product.price / product.installments)}
-                  </div>
-                  
-                  <div className="card-rating">
-                    {renderStars(product.rating)}
-                    <span>({product.reviews})</span>
-                  </div>
-
-                  <button 
-                    className="add-to-cart-btn"
-                    onClick={() => addToCart(product)}
-                  >
-                    Agregar al carrito
-                  </button>
-                </div>
-              </div>
+            {products.filter(p => p.discount >= 15).slice(0, 6).map(product => (
+              <ProductCard 
+                key={product.id} 
+                product={product} 
+                onAddToCart={addToCart}
+                formatPrice={formatPrice}
+                renderStars={renderStars}
+              />
             ))}
           </div>
         </section>
 
-        {/* Sección de más vendidos */}
+        {/* Productos baratos */}
         <section className="products-section">
           <div className="section-header">
-            <h3>Más vendidos</h3>
-            <p>Explora los productos que son tendencia</p>
+            <h3>Menos de $100.000</h3>
+            <p>Perfectos para renovar tu hogar</p>
           </div>
           <div className="products-grid">
-            {products.sort((a, b) => b.reviews - a.reviews).slice(0, 6).map(product => (
-              <div key={product.id} className="product-card">
-                <div className="card-image">
-                  <div className="image-placeholder">{product.image}</div>
-                  {product.discount && (
-                    <div className="discount-badge">-{product.discount}%</div>
-                  )}
-                  {product.freeShipping && (
-                    <div className="shipping-badge">Envío gratis</div>
-                  )}
-                </div>
-                
-                <div className="card-content">
-                  <h4 className="card-title">{product.title}</h4>
-                  
-                  <div className="card-price">
-                    <span className="current-price">{formatPrice(product.price)}</span>
-                    {product.originalPrice && (
-                      <span className="original-price">{formatPrice(product.originalPrice)}</span>
-                    )}
-                  </div>
-                  
-                  <div className="card-installments">
-                    en {product.installments} cuotas de {formatPrice(product.price / product.installments)}
-                  </div>
-                  
-                  <div className="card-rating">
-                    {renderStars(product.rating)}
-                    <span>({product.reviews})</span>
-                  </div>
-
-                  <button 
-                    className="add-to-cart-btn"
-                    onClick={() => addToCart(product)}
-                  >
-                    Agregar al carrito
-                  </button>
-                </div>
-              </div>
+            {products.filter(product => product.price < 100000).map(product => (
+              <ProductCard 
+                key={product.id} 
+                product={product} 
+                onAddToCart={addToCart}
+                formatPrice={formatPrice}
+                renderStars={renderStars}
+              />
             ))}
           </div>
         </section>
 
-        {/* Sección de todos los productos */}
+        {/* Más vendidos */}
         <section className="products-section">
           <div className="section-header">
-            <h3>Todos los productos</h3>
+            <h3>Los más vendidos</h3>
+            <p>Productos favoritos de nuestra comunidad</p>
+          </div>
+          <div className="products-grid">
+            {products.sort((a, b) => b.reviews - a.reviews).slice(0, 8).map(product => (
+              <ProductCard 
+                key={product.id} 
+                product={product} 
+                onAddToCart={addToCart}
+                formatPrice={formatPrice}
+                renderStars={renderStars}
+              />
+            ))}
+          </div>
+        </section>
+
+        {/* Todos los productos */}
+        <section className="products-section">
+          <div className="section-header">
+            <h3>Explorar productos</h3>
             <p>{filteredProducts.length} productos encontrados</p>
           </div>
-          <div className="products-grid">
-            {filteredProducts.map(product => (
-              <div key={product.id} className="product-card">
-                <div className="card-image">
-                  <div className="image-placeholder">{product.image}</div>
-                  {product.discount && (
-                    <div className="discount-badge">-{product.discount}%</div>
-                  )}
-                  {product.freeShipping && (
-                    <div className="shipping-badge">Envío gratis</div>
-                  )}
+          {isLoading ? (
+            <div className="loading-state">
+              <div className="loading-spinner"></div>
+              <p>Buscando productos...</p>
+            </div>
+          ) : (
+            <div className="products-grid">
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map(product => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onAddToCart={addToCart}
+                    formatPrice={formatPrice}
+                    renderStars={renderStars}
+                  />
+                ))
+              ) : (
+                <div className="no-results">
+                  <div className="no-results-icon">🔍</div>
+                  <h4>No se encontraron productos</h4>
+                  <p>Intenta con otros términos de búsqueda</p>
                 </div>
-                
-                <div className="card-content">
-                  <h4 className="card-title">{product.title}</h4>
-                  
-                  <div className="card-price">
-                    <span className="current-price">{formatPrice(product.price)}</span>
-                    {product.originalPrice && (
-                      <span className="original-price">{formatPrice(product.originalPrice)}</span>
-                    )}
-                  </div>
-                  
-                  <div className="card-installments">
-                    en {product.installments} cuotas de {formatPrice(product.price / product.installments)}
-                  </div>
-                  
-                  <div className="card-rating">
-                    {renderStars(product.rating)}
-                    <span>({product.reviews})</span>
-                  </div>
-
-                  <button 
-                    className="add-to-cart-btn"
-                    onClick={() => addToCart(product)}
-                  >
-                    Agregar al carrito
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              )}
+            </div>
+          )}
         </section>
       </main>
 
       {/* Carrito de compras */}
-      {showCart && (
-        <div className="cart-overlay" onClick={() => setShowCart(false)}>
-          <div className="cart-container" onClick={(e) => e.stopPropagation()}>
-            <div className="cart-header">
-              <h2>Tu Carrito</h2>
-              <button 
-                className="close-cart"
-                onClick={() => setShowCart(false)}
-              >
-                ×
-              </button>
-            </div>
-            
-            <div className="cart-content">
-              {cartItems.length === 0 ? (
-                <div className="empty-cart">
-                  <div className="empty-cart-icon">🛒</div>
-                  <h3>Tu carrito está vacío</h3>
-                  <p>Agrega algunos productos para comenzar</p>
-                </div>
-              ) : (
-                <>
-                  <div className="cart-items">
-                    {cartItems.map(item => (
-                      <div key={item.id} className="cart-item">
-                        <div className="cart-item-image">
-                          <div className="item-emoji">{item.image}</div>
-                        </div>
-                        <div className="cart-item-details">
-                          <h4>{item.title}</h4>
-                          <p className="item-price">{formatPrice(item.price)}</p>
-                          <div className="quantity-controls">
-                            <button 
-                              className="quantity-btn"
-                              onClick={() => {
-                                if (item.quantity > 1) {
-                                  setCartItems(prev => 
-                                    prev.map(cartItem =>
-                                      cartItem.id === item.id 
-                                        ? { ...cartItem, quantity: cartItem.quantity - 1 }
-                                        : cartItem
-                                    )
-                                  );
-                                } else {
-                                  setCartItems(prev => prev.filter(cartItem => cartItem.id !== item.id));
-                                }
-                              }}
-                            >
-                              −
-                            </button>
-                            <span className="quantity">{item.quantity}</span>
-                            <button 
-                              className="quantity-btn"
-                              onClick={() => setCartItems(prev => 
-                                prev.map(cartItem =>
-                                  cartItem.id === item.id 
-                                    ? { ...cartItem, quantity: cartItem.quantity + 1 }
-                                    : cartItem
-                                )
-                              )}
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-                        <button 
-                          className="remove-item"
-                          onClick={() => setCartItems(prev => prev.filter(cartItem => cartItem.id !== item.id))}
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="cart-footer">
-                    <div className="cart-summary">
-                      <div className="summary-row total">
-                        <span>Total:</span>
-                        <span>{formatPrice(cartItems.reduce((total, item) => total + (item.price * item.quantity), 0))}</span>
-                      </div>
-                    </div>
-                    
-                    <button className="checkout-button">
-                      Finalizar Compra
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <Cart 
+        showCart={showCart}
+        setShowCart={setShowCart}
+        cartItems={cartItems}
+        setCartItems={setCartItems}
+        formatPrice={formatPrice}
+      />
 
       {/* Footer */}
-      <footer className="marketplace-footer">
-        <div className="footer-container">
+      <Footer />
+    </div>
+  );
+};
+
+// Componente de tarjeta de producto
+const ProductCard = ({ product, onAddToCart, formatPrice, renderStars }) => {
+  const [imageLoaded, setImageLoaded] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div
+      className="product-card"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="card-image">
+        <div className="image-container">
+          {imageLoaded ? (
+            <div className="image-placeholder">{product.image}</div>
+          ) : (
+            <div className="image-loading">Cargando...</div>
+          )}
+        </div>
+
+        {product.discount && (
+          <div className="discount-badge">-{product.discount}%</div>
+        )}
+
+        {product.freeShipping && (
+          <div className="shipping-badge">Envío gratis</div>
+        )}
+
+        {product.featured && (
+          <div className="featured-badge">Destacado</div>
+        )}
+
+        <button
+          className="quick-view-btn"
+          onClick={() => console.log('Vista rápida:', product.id)}
+          style={{
+            opacity: isHovered ? 1 : 0,
+            transform: isHovered ? 'translateY(0)' : 'translateY(10px)'
+          }}
+        >
+          👁️
+        </button>
+      </div>
+
+      <div className="card-content">
+        <h4 className="card-title" title={product.title}>{product.title}</h4>
+
+        <div className="card-price">
+          <span className="current-price">{formatPrice(product.price)}</span>
+          {product.originalPrice && (
+            <span className="original-price">{formatPrice(product.originalPrice)}</span>
+          )}
+        </div>
+
+        <div className="card-installments">
+          {product.installments > 1 ? (
+            <>en {product.installments}x {formatPrice(product.price / product.installments)}</>
+          ) : (
+            <span className="single-payment">Pago único</span>
+          )}
+        </div>
+
+        <div className="card-rating">
+          {renderStars(product.rating)}
+          <span className="reviews-count">({product.reviews})</span>
+        </div>
+
+        <div className="card-stock">
+          {product.stock > 10 ? (
+            <span className="stock-available">✓ Stock disponible</span>
+          ) : product.stock > 0 ? (
+            <span className="stock-low">⚠️ Últimas {product.stock} unidades</span>
+          ) : (
+            <span className="stock-out">✗ Sin stock</span>
+          )}
+        </div>
+
+        <button
+          className={`add-to-cart-btn ${product.stock === 0 ? 'disabled' : ''}`}
+          onClick={() => product.stock > 0 && onAddToCart(product)}
+          disabled={product.stock === 0}
+        >
+          {product.stock > 0 ? 'Agregar al carrito' : 'Sin stock'}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// Componente del carrito
+const Cart = ({ showCart, setShowCart, cartItems, setCartItems, formatPrice }) => {
+  const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const itemsCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  const updateQuantity = (id, newQuantity) => {
+    if (newQuantity < 1) {
+      setCartItems(prev => prev.filter(item => item.id !== id));
+    } else {
+      setCartItems(prev =>
+        prev.map(item =>
+          item.id === id ? { ...item, quantity: newQuantity } : item
+        )
+      );
+    }
+  };
+
+  if (!showCart) return null;
+
+  return (
+    <div className="cart-overlay" onClick={() => setShowCart(false)}>
+      <div className="cart-container" onClick={(e) => e.stopPropagation()}>
+        <div className="cart-header">
+          <h2>
+            Tu Carrito 
+            {itemsCount > 0 && <span className="cart-items-count">({itemsCount})</span>}
+          </h2>
+          <button className="close-cart" onClick={() => setShowCart(false)}>
+            ×
+          </button>
+        </div>
+        
+        <div className="cart-content">
+          {cartItems.length === 0 ? (
+            <div className="empty-cart">
+              <div className="empty-cart-icon">🛒</div>
+              <h3>Tu carrito está vacío</h3>
+              <p>Agrega algunos productos para comenzar</p>
+              <button 
+                className="continue-shopping"
+                onClick={() => setShowCart(false)}
+              >
+                Seguir comprando
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="cart-items">
+                {cartItems.map(item => (
+                  <div key={item.id} className="cart-item">
+                    <div className="cart-item-image">
+                      <div className="item-emoji">{item.image}</div>
+                    </div>
+                    <div className="cart-item-details">
+                      <h4>{item.title}</h4>
+                      <p className="item-price">{formatPrice(item.price)}</p>
+                      <div className="quantity-controls">
+                        <button 
+                          className="quantity-btn"
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        >
+                          −
+                        </button>
+                        <span className="quantity">{item.quantity}</span>
+                        <button 
+                          className="quantity-btn"
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                    <div className="cart-item-total">
+                      {formatPrice(item.price * item.quantity)}
+                    </div>
+                    <button 
+                      className="remove-item"
+                      onClick={() => updateQuantity(item.id, 0)}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="cart-footer">
+                <div className="cart-summary">
+                  <div className="summary-row">
+                    <span>Subtotal:</span>
+                    <span>{formatPrice(total)}</span>
+                  </div>
+                  <div className="summary-row">
+                    <span>Envío:</span>
+                    <span className="free-shipping">Gratis</span>
+                  </div>
+                  <div className="summary-row total">
+                    <span>Total:</span>
+                    <span>{formatPrice(total)}</span>
+                  </div>
+                </div>
+                
+                <button className="checkout-button" onClick={() => console.log('Procediendo al checkout')}>
+                  Finalizar Compra
+                </button>
+                
+                <div className="payment-methods">
+                  <span>💳 Aceptamos todas las tarjetas</span>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Componente del footer
+const Footer = () => {
+  return (
+    <footer className="marketplace-footer">
+      <div className="footer-container">
+        <div className="footer-main">
           <div className="footer-section">
-            <h4>HogarExpress</h4>
-            <p>Tu marketplace de confianza para productos del hogar</p>
+            <div className="footer-logo">
+              <span className="logo-icon">🏠</span>
+              <span className="logo-text">HogarExpress</span>
+            </div>
+            <p>Tu marketplace de confianza para productos del hogar. Calidad, precio y servicio en un solo lugar.</p>
+            <div className="social-links">
+              <a href="#" className="social-link">📘</a>
+              <a href="#" className="social-link">📷</a>
+              <a href="#" className="social-link">🐦</a>
+            </div>
           </div>
-          
-          <div className="footer-section">
-            <h4>Categorías</h4>
-            <ul>
-              {categories.slice(1).map(category => (
-                <li key={category.id}><a href="#">{category.label}</a></li>
-              ))}
-            </ul>
-          </div>
-          
+
           <div className="footer-section">
             <h4>Ayuda</h4>
             <ul>
@@ -798,22 +829,40 @@ const Marketplace = () => {
               <li><a href="#">Preguntas frecuentes</a></li>
             </ul>
           </div>
-          
+
+          <div className="footer-section">
+            <h4>Mi cuenta</h4>
+            <ul>
+              <li><a href="#">Mis pedidos</a></li>
+              <li><a href="#">Mis favoritos</a></li>
+              <li><a href="#">Direcciones</a></li>
+              <li><a href="#">Cupones</a></li>
+            </ul>
+          </div>
+
           <div className="footer-section">
             <h4>Contacto</h4>
             <ul>
               <li><a href="#">Atención al cliente</a></li>
               <li><a href="#">Vender en HogarExpress</a></li>
               <li><a href="#">Trabaja con nosotros</a></li>
+              <li><a href="#">WhatsApp: +57 300 123 4567</a></li>
             </ul>
           </div>
         </div>
-        
+
         <div className="footer-bottom">
-          <p>© 2024 HogarExpress. Todos los derechos reservados.</p>
+          <div className="footer-bottom-content">
+            <p>© 2024 HogarExpress. Todos los derechos reservados.</p>
+            <div className="footer-links">
+              <a href="#">Términos y condiciones</a>
+              <a href="#">Política de privacidad</a>
+              <a href="#">Defensa del consumidor</a>
+            </div>
+          </div>
         </div>
-      </footer>
-    </div>
+      </div>
+    </footer>
   );
 };
 
