@@ -1,58 +1,111 @@
-# TODO: Corrección de Responsividad y Layout Shifts en Nido App
+# TODO - Marketplace de Productos del Hogar Profesional
 
-## Información Recopilada
-- **Componentes principales revisados**: Header, Layout, PropertyCard, Home, Property, BookingWidget, modales
-- **Problemas identificados**:
-  - PropertyCard.css: width: 200% incorrecto (debe ser 100%)
-  - Carousel de imágenes con position absolute/opacity toggle sin reserva de espacio
-  - Manipulación de body.style.overflow en Header sin cleanup adecuado en navegación
-  - Falta useLayoutEffect en manipulación de layout
-  - Z-index inconsistente en modales
-  - Dimensiones fijas en imágenes sin aspect-ratio
-  - Animaciones framer-motion potencialmente causando shifts
-  - IntersectionObserver sin cleanup en Property
+## ✅ Completado
+- [x] Análisis del código existente
+- [x] Planificación de la transformación completa
+- [x] Crear TODO.md para seguimiento
+- [x] Crear nuevo componente HomeMarket.jsx desde cero
+- [x] Implementar barra de búsqueda prominente
+- [x] Implementar icono de carrito con contador
+- [x] Layout que ocupa toda la pantalla
+- [x] Diseño responsive mobile-first
 
-## Plan de Corrección
+## 🔄 En Progreso
+- [ ] Mejorar tarjetas de producto
+- [ ] Optimizar página de detalle de producto
+- [ ] Añadir elementos profesionales adicionales
+- [ ] Testing y optimización
 
-### 1. Correcciones CSS/HTML
-- [ ] src/components/PropertyCard/PropertyCard.css: Corregir width: 200% → 100%
-- [ ] src/components/PropertyCard/PropertyCard.css: Implementar aspect-ratio para imágenes
-- [ ] src/components/PropertyCard/PropertyCard.css: Mejorar carousel con transform en lugar de opacity
-- [ ] src/components/common/Header/Header.css: Verificar z-index escala
-- [ ] src/assets/styles/global.css: Confirmar box-sizing global
-- [ ] Crear src/assets/styles/layout.css con utilidades (.container, .row, .col)
+## 📋 Pendiente
 
-### 2. Correcciones React/JS
-- [ ] src/components/common/Header/Header.jsx: Mejorar cleanup de body overflow con useLayoutEffect
-- [ ] src/pages/Property/Property.jsx: Cleanup de IntersectionObserver
-- [ ] src/components/PropertyCard/PropertyCard.jsx: Optimizar carousel con useLayoutEffect
-- [ ] Verificar keys estables en listas de propiedades
-- [ ] Añadir ResizeObserver donde sea necesario
+### 1. Componente Principal Marketplace ✅
+- [x] Crear `src/components/marketplace/HomeMarket.jsx` desde cero
+- [x] Implementar layout que ocupe toda la pantalla
+- [x] Diseño responsive mobile-first como Facebook Marketplace
+- [x] Integrar solo barra de búsqueda y carrito (sin header completo)
 
-### 3. Responsive
-- [ ] Definir breakpoints consistentes: 320, 375, 425, 768, 1024, 1280, 1440
-- [ ] Ajustar media queries en todos los componentes
-- [ ] Verificar comportamiento hamburger menu
-- [ ] Prevenir horizontal overflow en mobile
+### 2. Barra de Búsqueda y Carrito ✅
+- [x] Barra de búsqueda prominente en la parte superior
+- [x] Icono de carrito con contador de items
+- [x] Funcionalidad de búsqueda con autocompletado
+- [x] Integración con el sistema de carrito existente
 
-### 4. Pruebas/Validación
-- [ ] Crear tests Playwright/Cypress para navegación home → detail → back
-- [ ] Tests de viewport resize
-- [ ] Verificar CLS con Lighthouse
-- [ ] Snapshots visuales
+### 3. Sistema de Categorías ✅
+- [x] Sección de categorías destacadas:
+  - [x] Muebles y Decoración
+  - [x] Electrodomésticos
+  - [x] Cocina y Utensilios
+  - [x] Jardín y Exteriores
+  - [x] Iluminación
+  - [x] Textiles del Hogar
+  - [x] Organización y Almacenamiento
+  - [x] Bricolaje y Herramientas
+- [x] Diseño visual atractivo con iconos
 
-### 5. Extras
-- [ ] Implementar CSS reset mejorado
-- [ ] Añadir will-change con moderación
-- [ ] Optimizar performance de animaciones
+### 4. Sistema de Búsqueda Avanzada ✅
+- [x] Filtros por precio (rango)
+- [x] Filtros por condición (nuevo/usado)
+- [x] Filtros por ubicación
+- [x] Filtros por calificación del vendedor
+- [x] Ordenamiento por relevancia, precio, rating, fecha
 
-## Dependencias
-- PropertyCard.css depende de PropertyCard.jsx
-- Header.jsx depende de Layout.jsx
-- Tests dependen de todas las correcciones
+### 5. Tarjetas de Producto Mejoradas
+- [ ] Imagen principal de alta calidad
+- [ ] Precio destacado
+- [ ] Título del producto
+- [ ] Calificación con estrellas (1-5)
+- [ ] Nombre del proveedor verificado
+- [ ] Ubicación aproximada
+- [ ] Badge de condición
+- [ ] Botón "Agregar al carrito"
+- [ ] Icono de favorito
 
-## Followup Steps
-- [ ] Ejecutar tests después de correcciones
-- [ ] Verificar en DevTools layout shifts
-- [ ] Medir CLS con Lighthouse
-- [ ] Pruebas manuales en diferentes viewports
+### 6. Página de Detalle de Producto
+- [ ] Galería deslizante con múltiples imágenes
+- [ ] Vista ampliada al hacer hover
+- [ ] Miniaturas navegables
+- [ ] Información completa del producto
+- [ ] Información del proveedor verificado
+- [ ] Sistema de reviews y calificaciones
+- [ ] Acciones del usuario (cantidad, agregar, comprar)
+- [ ] Productos similares
+
+### 7. Sistema de Carrito Profesional
+- [ ] Sidebar/modal del carrito
+- [ ] Lista de productos agregados
+- [ ] Resumen de compra completo
+- [ ] Cupón de descuento
+- [ ] Productos recomendados
+
+### 8. Elementos Profesionales Adicionales
+- [ ] Sistema de reviews y calificaciones
+- [ ] Wishlist/favoritos del usuario
+- [ ] Historial de búsquedas
+- [ ] Recomendaciones personalizadas
+- [ ] Banner de ofertas y promociones
+- [ ] Filtros guardados
+- [ ] Comparador de productos
+- [ ] Modo oscuro/claro
+
+### 9. Diseño y UX
+- [ ] Estética limpia, moderna, profesional
+- [ ] Paleta neutra con acentos verdes/azules
+- [ ] Tipografía sans-serif moderna (Inter, Poppins)
+- [ ] Iconografía cohesiva
+- [ ] Micro-interacciones sutiles
+- [ ] Accesibilidad WCAG 2.1 AA
+- [ ] Performance optimizada
+
+### 10. Limpieza y Optimización
+- [ ] Eliminar componentes antiguos del marketplace
+- [ ] Actualizar rutas y navegación
+- [ ] Testing completo
+- [ ] Optimización de carga
+
+## 🎯 Metas de Éxito
+- Marketplace que ocupe toda la pantalla profesionalmente
+- Experiencia similar a Facebook Marketplace
+- Especialización completa en productos del hogar
+- Diseño 100% responsive
+- Performance óptima
+- UX intuitiva y moderna

@@ -8,6 +8,7 @@ import HostRoute from './components/user/Auth/HostRoute';
 // Context Providers
 import { AuthProvider } from './context/AuthContext';
 import { BookingProvider } from './context/BookingContext';
+import { CartProvider } from './context/CartContext';
 import { SearchProvider } from './context/SearchContext';
 import { UiHostProvider } from './context/UiHostProvider';
 
@@ -60,7 +61,7 @@ const MyBookings = lazyLoad(() => import('./components/user/Dashboard/MyBookings
 const Favorites = lazyLoad(() => import('./components/user/Dashboard/Favorites'));
 const Messages = lazyLoad(() => import('./components/user/Messages/MessageCenter'));
 const Services = lazyLoad(() => import('./components/user/Services/Services'));
-const Marketplace = lazyLoad(() => import('./components/user/Marketplace/Marketplace'));
+const Marketplace = lazyLoad(() => import('./components/marketplace/HomeMarket'));
 const Ofertas = lazyLoad(() => import('./pages/Ofertas/Ofertas'));
 const HostDashboard = lazyLoad(() => import('./pages/Host/Dashboard'));
 const PropertyManager = lazyLoad(() => import('./components/Host/HostDashboard/PropertyManager'));
@@ -93,8 +94,9 @@ function App() {
         <UiHostProvider>
           <AuthProvider>
             <SearchProvider> {/* SearchProvider debe envolver todo el contenido que use useSearch */}
-              <BookingProvider>
-                <Layout>
+              <CartProvider>
+                <BookingProvider>
+                  <Layout>
                   <Suspense fallback={<LoadingSpinner />}>
                     <Routes>
                   {/* Public Routes */}
@@ -167,6 +169,7 @@ function App() {
                   </Suspense>
                 </Layout>
               </BookingProvider>
+            </CartProvider>
             </SearchProvider>
           </AuthProvider>
         </UiHostProvider>

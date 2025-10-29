@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { marketplaceApi } from '../../../services/marketplaceApi';
-import { useCart } from '../../../context/CartContext';
+import { marketplaceApi } from '../../services/marketplaceApi';
+import { useCart } from '../../context/CartContext';
 
 // Import components
-import ProductCard from '../../marketplace/ProductCard';
-import SearchBar from '../../marketplace/SearchBar';
-import CategoryList from '../../marketplace/CategoryList';
-import CartDrawer from '../../marketplace/CartDrawer';
-import FilterPanel from '../../marketplace/FilterPanel';
-import InfiniteScroll from '../../marketplace/InfiniteScroll';
-import ProductGallery from '../../marketplace/ProductGallery';
-import SellerCard from '../../marketplace/SellerCard';
+import ProductCard from './ProductCard';
+import SearchBar from './SearchBar';
+import CategoryList from './CategoryList';
+import CartDrawer from './CartDrawer';
+import FilterPanel from './FilterPanel';
+import InfiniteScroll from './InfiniteScroll';
+import ProductGallery from './ProductGallery';
+import SellerCard from './SellerCard';
 
-const Marketplace = () => {
+const HomeMarket = () => {
   // State management
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -127,10 +127,10 @@ const Marketplace = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="home-market">
+      {/* Top Bar - Solo búsqueda y carrito */}
+      <div className="market-header">
+        <div className="market-header-content">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center">
@@ -145,78 +145,74 @@ const Marketplace = () => {
               />
             </div>
 
-            {/* Navigation */}
-            <nav className="flex items-center space-x-4">
-              <button className="p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
-                <span className="sr-only">Inicio</span>
-                🏠
-              </button>
-              <button className="p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
-                <span className="sr-only">Favoritos</span>
-                ❤️
-              </button>
+            {/* Cart Button */}
+            <div className="flex items-center">
               <button
                 onClick={() => setIsCartOpen(true)}
-                className="relative p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200"
+                className="relative p-3 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-full transition-all duration-200 group"
+                aria-label={`Carrito de compras (${totalItems} items)`}
               >
-                <span className="sr-only">Carrito</span>
-                🛒
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                  />
+                </svg>
                 {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {totalItems}
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center min-w-[24px]">
+                    {totalItems > 99 ? '99+' : totalItems}
                   </span>
                 )}
               </button>
-              <button className="p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200">
-                <span className="sr-only">Perfil</span>
-                👤
-              </button>
-            </nav>
+            </div>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex gap-8">
-          {/* Sidebar */}
-          <aside className="w-64 flex-shrink-0">
-            {/* Categories */}
-            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Categorías</h2>
-              <CategoryList
-                selectedCategory={selectedCategory}
-                onCategorySelect={handleCategorySelect}
-              />
+      <div className="market-content">
+        {/* Sidebar */}
+        <aside className="market-sidebar">
+          {/* Categories */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Categorías</h2>
+            <CategoryList
+              selectedCategory={selectedCategory}
+              onCategorySelect={handleCategorySelect}
+            />
+          </div>
+
+          {/* Filters */}
+          <FilterPanel
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+            isOpen={showFilters}
+            onToggle={() => setShowFilters(!showFilters)}
+          />
+        </aside>
+
+        {/* Main Content Area */}
+        <main className="market-main">
+          {/* Results Header */}
+          <div className="market-results">
+            <div className="results-count">
+              {products.length} productos
             </div>
 
-            {/* Filters */}
-            <FilterPanel
-              filters={filters}
-              onFiltersChange={handleFiltersChange}
-              isOpen={showFilters}
-              onToggle={() => setShowFilters(!showFilters)}
-            />
-          </aside>
-
-          {/* Main Content Area */}
-          <main className="flex-1">
-            {/* Results Header */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-4">
-                <h2 className="text-xl font-semibold text-gray-900">
-                  {searchQuery ? `Resultados para "${searchQuery}"` : 'Productos destacados'}
-                </h2>
-                <span className="text-sm text-gray-600">
-                  {products.length} productos encontrados
-                </span>
-              </div>
-
-              {/* Sort Dropdown */}
+            {/* Sort Dropdown */}
+            <div className="results-sort">
+              <span className="sort-label">Ordenar por:</span>
               <select
                 value={filters.sortBy}
                 onChange={(e) => handleFiltersChange({ ...filters, sortBy: e.target.value })}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="sort-select"
               >
                 <option value="relevance">Relevancia</option>
                 <option value="price_asc">Precio: menor a mayor</option>
@@ -225,68 +221,69 @@ const Marketplace = () => {
                 <option value="newest">Más recientes</option>
               </select>
             </div>
+          </div>
 
-            {/* Products Grid */}
-            {error ? (
-              <div className="text-center py-12">
-                <div className="text-red-600 mb-4">
-                  <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                  </svg>
-                </div>
-                <p className="text-gray-600 mb-4">{error}</p>
-                <button
-                  onClick={() => loadProducts(1, false)}
-                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                >
-                  Reintentar
-                </button>
+          {/* Products Grid */}
+          {error ? (
+            <div className="market-error">
+              <div className="error-icon">
+                <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
               </div>
-            ) : (
-              <InfiniteScroll
-                hasNextPage={hasNextPage}
-                isLoading={loading}
-                onLoadMore={handleLoadMore}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+              <h3 className="error-title">Error al cargar productos</h3>
+              <p className="error-text">{error}</p>
+              <button
+                onClick={() => loadProducts(1, false)}
+                className="btn-retry"
               >
-                {products.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    onClick={() => handleProductClick(product)}
-                  />
-                ))}
+                Reintentar
+              </button>
+            </div>
+          ) : (
+            <InfiniteScroll
+              hasNextPage={hasNextPage}
+              isLoading={loading}
+              onLoadMore={handleLoadMore}
+              className="market-products"
+            >
+              {products.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onClick={() => handleProductClick(product)}
+                />
+              ))}
 
-                {/* Loading skeletons */}
-                {loading && page === 1 && (
-                  <>
-                    {[...Array(8)].map((_, i) => (
-                      <div key={i} className="animate-pulse">
-                        <div className="bg-gray-200 aspect-square rounded-lg mb-4"></div>
-                        <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                        <div className="h-6 bg-gray-200 rounded w-1/2"></div>
-                      </div>
-                    ))}
-                  </>
-                )}
-              </InfiniteScroll>
-            )}
+              {/* Loading skeletons */}
+              {loading && page === 1 && (
+                <>
+                  {[...Array(12)].map((_, i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="bg-gray-200 aspect-square rounded-xl mb-4"></div>
+                      <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                      <div className="h-5 bg-gray-200 rounded w-1/2"></div>
+                    </div>
+                  ))}
+                </>
+              )}
+            </InfiniteScroll>
+          )}
 
-            {/* No results */}
-            {!loading && !error && products.length === 0 && (
-              <div className="text-center py-12">
-                <div className="text-gray-400 mb-4">
-                  <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No se encontraron productos</h3>
-                <p className="text-gray-600">Intenta con otros términos de búsqueda o filtros diferentes.</p>
+          {/* No results */}
+          {!loading && !error && products.length === 0 && (
+            <div className="market-empty">
+              <div className="empty-icon">
+                <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
               </div>
-            )}
-          </main>
-        </div>
+              <h3 className="empty-title">No se encontraron productos</h3>
+              <p className="empty-text">Intenta con otros términos de búsqueda o filtros diferentes.</p>
+            </div>
+          )}
+        </main>
       </div>
 
       {/* Product Detail Modal */}
@@ -303,13 +300,13 @@ const Marketplace = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto"
+              className="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="p-6">
+              <div className="p-8">
                 {/* Modal Header */}
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">{selectedProduct.title}</h2>
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-3xl font-bold text-gray-900">{selectedProduct.title}</h2>
                   <button
                     onClick={() => setSelectedProduct(null)}
                     className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
@@ -321,7 +318,7 @@ const Marketplace = () => {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                   {/* Product Gallery */}
                   <div>
                     <ProductGallery
@@ -331,56 +328,58 @@ const Marketplace = () => {
                   </div>
 
                   {/* Product Details */}
-                  <div className="space-y-6">
+                  <div className="space-y-8">
                     {/* Price */}
                     <div>
-                      <div className="flex items-baseline gap-3 mb-2">
-                        <span className="text-3xl font-bold text-blue-600">
+                      <div className="flex items-baseline gap-4 mb-3">
+                        <span className="text-4xl font-bold text-blue-600">
                           {formatPrice(selectedProduct.price)}
                         </span>
                         {selectedProduct.originalPrice && (
-                          <span className="text-xl text-gray-500 line-through">
+                          <span className="text-2xl text-gray-500 line-through">
                             {formatPrice(selectedProduct.originalPrice)}
                           </span>
                         )}
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-600">
-                        <span className={`px-2 py-1 rounded ${
+                        <span className={`px-3 py-1 rounded-full font-medium ${
                           selectedProduct.condition === 'new'
                             ? 'bg-green-100 text-green-800'
                             : 'bg-orange-100 text-orange-800'
                         }`}>
                           {selectedProduct.condition === 'new' ? 'Nuevo' : 'Usado'}
                         </span>
-                        <span>📍 {selectedProduct.location}</span>
+                        <span className="flex items-center gap-1">
+                          📍 {selectedProduct.location}
+                        </span>
                       </div>
                     </div>
 
                     {/* Rating */}
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1">
                         {'★'.repeat(Math.floor(selectedProduct.rating))}
                         {'☆'.repeat(5 - Math.floor(selectedProduct.rating))}
                       </div>
-                      <span className="text-gray-600">
+                      <span className="text-gray-600 font-medium">
                         {selectedProduct.rating} ({selectedProduct.reviewCount} reseñas)
                       </span>
                     </div>
 
                     {/* Description */}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Descripción</h3>
-                      <p className="text-gray-700 leading-relaxed">{selectedProduct.description}</p>
+                      <h3 className="text-xl font-semibold text-gray-900 mb-3">Descripción</h3>
+                      <p className="text-gray-700 leading-relaxed text-base">{selectedProduct.description}</p>
                     </div>
 
                     {/* Features */}
                     {selectedProduct.features && selectedProduct.features.length > 0 && (
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Características</h3>
-                        <ul className="space-y-1">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-3">Características</h3>
+                        <ul className="space-y-2">
                           {selectedProduct.features.map((feature, index) => (
-                            <li key={index} className="flex items-center gap-2 text-gray-700">
-                              <span className="w-1.5 h-1.5 bg-blue-600 rounded-full flex-shrink-0"></span>
+                            <li key={index} className="flex items-center gap-3 text-gray-700">
+                              <span className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0"></span>
                               {feature}
                             </li>
                           ))}
@@ -392,11 +391,11 @@ const Marketplace = () => {
                     <SellerCard seller={selectedProduct.seller} />
 
                     {/* Action Buttons */}
-                    <div className="flex gap-3">
-                      <button className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200">
+                    <div className="flex gap-4 pt-4">
+                      <button className="flex-1 bg-blue-600 text-white py-4 px-6 rounded-xl font-semibold hover:bg-blue-700 transition-colors duration-200 text-lg">
                         Agregar al carrito
                       </button>
-                      <button className="flex-1 bg-gray-100 text-gray-900 py-3 px-6 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-200">
+                      <button className="flex-1 bg-gray-100 text-gray-900 py-4 px-6 rounded-xl font-semibold hover:bg-gray-200 transition-colors duration-200 text-lg">
                         Comprar ahora
                       </button>
                     </div>
@@ -414,4 +413,4 @@ const Marketplace = () => {
   );
 };
 
-export default Marketplace;
+export default HomeMarket;
