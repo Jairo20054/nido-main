@@ -1,11 +1,10 @@
 // src/pages/BecomeHost/BecomeHost.jsx
 import { useState } from 'react';
-import HostTypeSelectionModal from '../../components/Host/HostTypeSelectionModal';
+import HostOnboardingModal from '../../components/Host/HostOnboardingModal';
 import './BecomeHost.css'; // Estilos específicos para la página
 
 const BecomeHost = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedHostType, setSelectedHostType] = useState(null);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -15,11 +14,10 @@ const BecomeHost = () => {
     setIsModalOpen(false);
   };
 
-  const handleHostTypeSelect = (type) => {
-    setSelectedHostType(type);
-    setIsModalOpen(false);
-    // TODO: Show questions based on selection or navigate to appropriate form/page
-    alert(`Has seleccionado: ${type}. Aquí mostraríamos las preguntas correspondientes.`);
+  const handleOnboardingComplete = (data) => {
+    console.log('Onboarding completed:', data);
+    alert(`¡Felicidades! Has completado el proceso para ${data.selectionId}. Tus respuestas han sido guardadas.`);
+    // TODO: Handle completion, e.g., navigate to dashboard or send to backend
   };
 
   return (
@@ -94,10 +92,10 @@ const BecomeHost = () => {
         </p>
       </div>
 
-      <HostTypeSelectionModal
-        isOpen={isModalOpen}
+      <HostOnboardingModal
+        open={isModalOpen}
         onClose={handleCloseModal}
-        onSelect={handleHostTypeSelect}
+        onComplete={handleOnboardingComplete}
       />
     </div>
   );

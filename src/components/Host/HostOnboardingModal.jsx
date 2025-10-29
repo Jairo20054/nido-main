@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import FocusTrap from 'focus-trap-react';
 import questionsMap from './questionsMap';
 import QuestionsForm from './QuestionsForm';
-import { isAuthenticated, login } from './authMock';
+import LoginForm from '../user/Auth/LoginForm';
+import FacebookLoginButton from '../user/Auth/FacebookLoginButton';
+import { useAuthContext } from '../../context/AuthContext';
 import { saveDraft, loadDraft, clearDraft } from '../../utils/localDraft';
 import './HostModal.css';
 
@@ -16,12 +18,10 @@ import './HostModal.css';
  * - onComplete: function({ selectionId, answers }) called on form submit
  */
 const HostOnboardingModal = ({ open, onClose, onComplete }) => {
-  const [step, setStep] = useState('selection'); // 'selection', 'login', 'questions'
+  const { isAuthenticated } = useAuthContext();
+  const [step, setStep] = useState('selection'); // 'selection', 'login', 'howItWorks', 'questions'
   const [selectionId, setSelectionId] = useState(null);
   const [authError, setAuthError] = useState('');
-  const [loginLoading, setLoginLoading] = useState(false);
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
   const modalRef = useRef(null);
   const lastFocusedElement = useRef(null);
 
@@ -32,8 +32,6 @@ const HostOnboardingModal = ({ open, onClose, onComplete }) => {
       setStep('selection');
       setSelectionId(null);
       setAuthError('');
-      setLoginEmail('');
-      setLoginPassword('');
     }
   }, [open]);
 
@@ -45,27 +43,17 @@ const HostOnboardingModal = ({ open, onClose, onComplete }) => {
   }, [open]);
 
   const handleCardSelect = (id) => {
+    console.log('Seleccionado:', id);
+    console.log('isAuthenticated:', isAuthenticated);
     setSelectionId(id);
-    if (!isAuthenticated()) {
+    if (!isAuthenticated) {
       setStep('login');
     } else {
-      setStep('questions');
+      setStep('howItWorks');
     }
   };
 
-  const handleLoginSubmit = async (e) => {
-    e.preventDefault();
-    setLoginLoading(true);
-    setAuthError('');
-    try {
-      await login(loginEmail, loginPassword);
-      setStep('questions');
-    } catch (error) {
-      setAuthError(error.message);
-    } finally {
-      setLoginLoading(false);
-    }
-  };
+
 
   const handleQuestionsComplete = (data) => {
     onComplete(data);
@@ -77,28 +65,62 @@ const HostOnboardingModal = ({ open, onClose, onComplete }) => {
     setSelectionId(null);
   };
 
+  const handleProceedToQuestions = () => {
+    setStep('questions');
+  };
+
   if (!open) return null;
 
   const cards = [
     {
       id: 'rentals',
       title: 'Arrendamiento',
-      image: '/images/rentals.jpg', // Replace with actual image path
-      alt: 'Imagen de arrendamiento de propiedades'
+      icon: '🏠',
+      alt: 'Icono de casa para arrendamiento'
     },
     {
       id: 'marketplace',
       title: 'Marketplace',
-      image: '/images/marketplace.jpg',
-      alt: 'Imagen de marketplace de productos'
+      icon: '🛒',
+      alt: 'Icono de carrito para marketplace'
     },
     {
       id: 'services',
       title: 'Servicios adicionales',
-      image: '/images/services.jpg',
-      alt: 'Servicios adicionales'
+      icon: '🛠️',
+      alt: 'Icono de herramientas para servicios'
     }
   ];
+
+  const howItWorksContent = {
+    rentals: {
+      title: '¿Cómo funciona el arrendamiento?',
+      steps: [
+        'Registra tu propiedad con detalles completos y fotos.',
+        'Establece precios y disponibilidad.',
+        'Recibe solicitudes de huéspedes verificados.',
+        'Gestiona reservas y recibe pagos de forma segura.'
+      ]
+    },
+    marketplace: {
+      title: '¿Cómo funciona el marketplace?',
+      steps: [
+        'Crea tu perfil de vendedor con información básica.',
+        'Publica tus productos o servicios con descripciones detalladas.',
+        'Gestiona pedidos y comunicaciones con compradores.',
+        'Recibe pagos y calificaciones de tus ventas.'
+      ]
+    },
+    services: {
+      title: '¿Cómo funcionan los servicios adicionales?',
+      steps: [
+        'Registra tus servicios con categorías y precios.',
+        'Especifica requisitos y disponibilidad.',
+        'Recibe solicitudes de clientes interesados.',
+        'Proporciona el servicio y recibe feedback.'
+      ]
+    }
+  };
 
   return (
     <FocusTrap>
@@ -139,7 +161,7 @@ const HostOnboardingModal = ({ open, onClose, onComplete }) => {
                       }
                     }}
                   >
-                    <img src={card.image} alt={card.alt} className="card-image" />
+                    <div className="card-icon">{card.icon}</div>
                     <h3>{card.title}</h3>
                   </div>
                 ))}
@@ -150,37 +172,33 @@ const HostOnboardingModal = ({ open, onClose, onComplete }) => {
           {step === 'login' && (
             <>
               <h2 id="modal-title">Necesitamos tu cuenta para gestionar y publicar tu servicio</h2>
-              <form className="login-form" onSubmit={handleLoginSubmit}>
-                <div className="form-group">
-                  <label htmlFor="email">Email</label>
-                  <input
-                    type="email"
-                    id="email"
-                    value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
-                    required
-                    tabIndex="0"
-                  />
+              <LoginForm onSuccess={() => setStep('howItWorks')} />
+              <button type="button" onClick={handleBackToSelection} className="back-button">
+                Volver
+              </button>
+            </>
+          )}
+
+          {step === 'howItWorks' && selectionId && (
+            <>
+              <h2 id="modal-title">{howItWorksContent[selectionId].title}</h2>
+              <div className="how-it-works-content">
+                <ol className="steps-list">
+                  {howItWorksContent[selectionId].steps.map((step, index) => (
+                    <li key={index}>
+                      <strong>Paso {index + 1}:</strong> {step}
+                    </li>
+                  ))}
+                </ol>
+                <div className="how-it-works-footer">
+                  <button type="button" onClick={handleBackToSelection} className="back-button">
+                    Volver
+                  </button>
+                  <button type="button" onClick={handleProceedToQuestions} className="proceed-button">
+                    Continuar
+                  </button>
                 </div>
-                <div className="form-group">
-                  <label htmlFor="password">Contraseña</label>
-                  <input
-                    type="password"
-                    id="password"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    required
-                    tabIndex="0"
-                  />
-                </div>
-                {authError && <div className="error-message">{authError}</div>}
-                <button type="submit" disabled={loginLoading} className="login-button">
-                  {loginLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
-                </button>
-                <button type="button" onClick={handleBackToSelection} className="back-button">
-                  Volver
-                </button>
-              </form>
+              </div>
             </>
           )}
 
@@ -190,7 +208,7 @@ const HostOnboardingModal = ({ open, onClose, onComplete }) => {
               <QuestionsForm
                 selectionId={selectionId}
                 onComplete={handleQuestionsComplete}
-                onCancel={handleBackToSelection}
+                onCancel={() => setStep('howItWorks')}
               />
             </>
           )}

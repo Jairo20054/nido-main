@@ -1,0 +1,260 @@
+/* HostModal.css */
+.host-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.host-modal {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 700px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.close-button:hover {
+  color: #333;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.selection-card {
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.selection-card:hover,
+.selection-card.selected {
+  border-color: #007bff;
+}
+
+.card-icon {
+  font-size: 60px;
+  margin-bottom: 10px;
+}
+
+.selection-card h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.login-form {
+  margin-top: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.login-button,
+.back-button,
+.proceed-button,
+.cancel-button,
+.submit-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+.login-button,
+.proceed-button,
+.submit-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.login-button:hover,
+.proceed-button:hover,
+.submit-button:hover {
+  background-color: #0056b3;
+}
+
+.back-button,
+.cancel-button {
+  background-color: #6c757d;
+  color: white;
+}
+
+.back-button:hover,
+.cancel-button:hover {
+  background-color: #545b62;
+}
+
+.how-it-works-content {
+  margin-top: 20px;
+}
+
+.steps-list {
+  list-style: none;
+  padding: 0;
+}
+
+.steps-list li {
+  margin-bottom: 15px;
+  padding-left: 20px;
+  position: relative;
+}
+
+.steps-list li:before {
+  content: counter(step-counter);
+  counter-increment: step-counter;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: #007bff;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.steps-list {
+  counter-reset: step-counter;
+}
+
+.how-it-works-footer {
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.questions-form {
+  margin-top: 20px;
+}
+
+.form-footer {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.saving-status {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+}
+
+.checkbox-label,
+.radio-label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.checkbox-label input,
+.radio-label input {
+  margin-right: 8px;
+}
+
+/* Social login styles */
+.social-login-separator {
+  margin: 20px 0;
+  text-align: center;
+  position: relative;
+}
+
+.social-login-separator span {
+  background: white;
+  padding: 0 10px;
+  color: #666;
+  font-size: 14px;
+}
+
+.social-login-separator:before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #ddd;
+}
+
+.social-login-buttons {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.facebook-login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background-color: #1877f2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.facebook-login-btn:hover {
+  background-color: #166fe5;
+}
+
+.facebook-login-btn svg {
+  width: 20px;
+  height: 20px;
+}

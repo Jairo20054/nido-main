@@ -11,6 +11,7 @@ import { BookingProvider } from './context/BookingContext';
 import { CartProvider } from './context/CartContext';
 import { SearchProvider } from './context/SearchContext';
 import { UiHostProvider } from './context/UiHostProvider';
+import { CartProvider } from './pages/Marketplace/Cart/CartContext';
 
 // Layout & Loading
 import Layout from './components/common/Layout/Layout';
@@ -61,7 +62,12 @@ const MyBookings = lazyLoad(() => import('./components/user/Dashboard/MyBookings
 const Favorites = lazyLoad(() => import('./components/user/Dashboard/Favorites'));
 const Messages = lazyLoad(() => import('./components/user/Messages/MessageCenter'));
 const Services = lazyLoad(() => import('./components/user/Services/Services'));
+<<<<<<< HEAD
 const Marketplace = lazyLoad(() => import('./components/marketplace/HomeMarket'));
+=======
+const Marketplace = lazyLoad(() => import('./pages/Marketplace'));
+const ProductDetail = lazyLoad(() => import('./pages/ProductDetail/ProductDetail'));
+>>>>>>> a08354c0204be9fd47daf622d5c914f21a1a5eb8
 const Ofertas = lazyLoad(() => import('./pages/Ofertas/Ofertas'));
 const HostDashboard = lazyLoad(() => import('./pages/Host/Dashboard'));
 const PropertyManager = lazyLoad(() => import('./components/Host/HostDashboard/PropertyManager'));
@@ -83,6 +89,9 @@ const HostStats = lazyLoad(() => import('./pages/Host/HostStats'), 'HostStats');
 const HostMessages = lazyLoad(() => import('./pages/Host/HostMessages'), 'HostMessages');
 const HostSettings = lazyLoad(() => import('./pages/Host/HostSettings'), 'HostSettings');
 
+// Cart Page
+const CartPage = lazyLoad(() => import('./pages/Marketplace/Cart/CartPage'));
+
 // New Pages - Mapa Interactivo, Tendencias, Remodelaciones
 const MapaInteractivo = lazyLoad(() => import('./pages/MapaInteractivo/MapaInteractivo'));
 const Tendencias = lazyLoad(() => import('./pages/Tendencias/Tendencias'));
@@ -94,8 +103,13 @@ function App() {
         <UiHostProvider>
           <AuthProvider>
             <SearchProvider> {/* SearchProvider debe envolver todo el contenido que use useSearch */}
+<<<<<<< HEAD
               <CartProvider>
                 <BookingProvider>
+=======
+              <BookingProvider>
+                <CartProvider>
+>>>>>>> a08354c0204be9fd47daf622d5c914f21a1a5eb8
                   <Layout>
                   <Suspense fallback={<LoadingSpinner />}>
                     <Routes>
@@ -109,6 +123,8 @@ function App() {
                   <Route path="/messages" element={<Messages />} />
                   <Route path="/services" element={<Services />} />
                   <Route path="/marketplace" element={<Marketplace />} />
+                  <Route path="/marketplace/product/:id" element={<ProductDetail />} />
+                  <Route path="/marketplace/cart" element={<CartPage />} />
                   <Route path="/ofertas" element={<Ofertas />} />
 
                   {/* New Routes - Mapa, Tendencias, Remodelaciones */}
@@ -167,12 +183,21 @@ function App() {
                   />
                     </Routes>
                   </Suspense>
+<<<<<<< HEAD
                 </Layout>
               </BookingProvider>
             </CartProvider>
             </SearchProvider>
           </AuthProvider>
         </UiHostProvider>
+=======
+                  </Layout>
+                  </CartProvider>
+                </BookingProvider>
+              </SearchProvider>
+            </AuthProvider>
+          </UiHostProvider>
+>>>>>>> a08354c0204be9fd47daf622d5c914f21a1a5eb8
       </Router>
   );
 }
