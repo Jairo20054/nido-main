@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { toast } from 'react-toastify'; // Opcional: para notificaciones
 // Configuración de la API
 const API_CONFIG = {
-  baseURL: process.env.REACT_APP_API_URL || 'https://api.nido.com',
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000',
   timeout: 30000,
   retryAttempts: 3,
   retryDelay: 1000,

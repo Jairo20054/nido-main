@@ -1,221 +1,147 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import './FilterPanel.css';
+import React, { useState } from 'react';
 
-const FilterPanel = ({
-  filters,
-  onFiltersChange,
-  isOpen,
-  onToggle,
-  className = ''
-}) => {
+const FilterPanel = ({ filters, onFiltersChange, isOpen, onToggle }) => {
+  const [localFilters, setLocalFilters] = useState(filters);
+
+  const locations = [
+    'Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Cúcuta', 'Bucaramanga', 'Pereira', 'Santa Marta', 'Ibagué'
+  ];
+
+  const handleFilterChange = (key, value) => {
+    const newFilters = { ...localFilters, [key]: value };
+    setLocalFilters(newFilters);
+    onFiltersChange(newFilters);
+  };
+
   const handlePriceRangeChange = (min, max) => {
-    onFiltersChange({
-      ...filters,
-      priceRange: [Number(min) || 0, Number(max) || 5000000]
-    });
+    const newFilters = { ...localFilters, priceRange: [min, max] };
+    setLocalFilters(newFilters);
+    onFiltersChange(newFilters);
   };
 
-  const handleConditionChange = (condition) => {
-    onFiltersChange({
-      ...filters,
-      condition: condition === filters.condition ? 'all' : condition
-    });
-  };
-
-  const handleLocationChange = (location) => {
-    onFiltersChange({
-      ...filters,
-      location: location === filters.location ? 'all' : location
-    });
-  };
-
-  const handleRatingChange = (rating) => {
-    onFiltersChange({
-      ...filters,
-      rating: rating === filters.rating ? 0 : rating
-    });
-  };
-
-  const clearFilters = () => {
-    onFiltersChange({
+  const resetFilters = () => {
+    const defaultFilters = {
       priceRange: [0, 5000000],
       condition: 'all',
       location: 'all',
       rating: 0,
       sortBy: 'relevance'
-    });
+    };
+    setLocalFilters(defaultFilters);
+    onFiltersChange(defaultFilters);
   };
 
-  const hasActiveFilters =
-    filters.priceRange[0] > 0 ||
-    filters.priceRange[1] < 5000000 ||
-    filters.condition !== 'all' ||
-    filters.location !== 'all' ||
-    filters.rating > 0;
-
   return (
-    <>
-      {/* Mobile Filter Toggle */}
-      <div className="lg:hidden mb-4">
+    <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-gray-900">Filtros</h3>
         <button
           onClick={onToggle}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
+          className="md:hidden p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          <svg className={`w-5 h-5 transform transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
-          <span>Filtros</span>
-          {hasActiveFilters && (
-            <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
-              Activos
-            </span>
-          )}
         </button>
       </div>
 
-      {/* Filter Panel */}
-      <motion.div
-        className={`bg-white border border-gray-200 rounded-xl p-6 shadow-sm ${className} ${
-          !isOpen ? 'hidden lg:block' : ''
-        }`}
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Filtros</h3>
-          {hasActiveFilters && (
-            <button
-              onClick={clearFilters}
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-            >
-              Limpiar filtros
-            </button>
-          )}
-        </div>
-
+      <div className={`space-y-6 ${isOpen || 'hidden md:block'}`}>
         {/* Price Range */}
-        <div className="mb-6">
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-3">
             Rango de precio
           </label>
-          <div className="flex gap-2">
-            <div className="flex-1">
+          <div className="space-y-3">
+            <div className="flex gap-2">
               <input
                 type="number"
                 placeholder="Mínimo"
-                value={filters.priceRange[0] || ''}
-                onChange={(e) => handlePriceRangeChange(e.target.value, filters.priceRange[1])}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                min="0"
+                value={localFilters.priceRange[0] || ''}
+                onChange={(e) => handlePriceRangeChange(Number(e.target.value) || 0, localFilters.priceRange[1])}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
-            </div>
-            <div className="flex-1">
               <input
                 type="number"
                 placeholder="Máximo"
-                value={filters.priceRange[1] === 5000000 ? '' : filters.priceRange[1]}
-                onChange={(e) => handlePriceRangeChange(filters.priceRange[0], e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                min="0"
+                value={localFilters.priceRange[1] || ''}
+                onChange={(e) => handlePriceRangeChange(localFilters.priceRange[0], Number(e.target.value) || 5000000)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
+            </div>
+            <div className="text-xs text-gray-600">
+              Hasta $5.000.000 COP
             </div>
           </div>
         </div>
 
         {/* Condition */}
-        <div className="mb-6">
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-3">
             Condición
           </label>
+          <select
+            value={localFilters.condition}
+            onChange={(e) => handleFilterChange('condition', e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="all">Todas</option>
+            <option value="new">Nuevo</option>
+            <option value="used">Usado</option>
+          </select>
+        </div>
+
+        {/* Location */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            Ubicación
+          </label>
+          <select
+            value={localFilters.location}
+            onChange={(e) => handleFilterChange('location', e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="all">Todas las ubicaciones</option>
+            {locations.map((location) => (
+              <option key={location} value={location}>
+                {location}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Rating */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            Calificación mínima
+          </label>
           <div className="space-y-2">
-            {[
-              { value: 'all', label: 'Todos' },
-              { value: 'new', label: 'Nuevo' },
-              { value: 'used', label: 'Usado' }
-            ].map((option) => (
-              <label key={option.value} className="flex items-center">
+            {[0, 1, 2, 3, 4, 5].map((rating) => (
+              <label key={rating} className="flex items-center">
                 <input
                   type="radio"
-                  name="condition"
-                  value={option.value}
-                  checked={filters.condition === option.value}
-                  onChange={(e) => handleConditionChange(e.target.value)}
-                  className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                  name="rating"
+                  value={rating}
+                  checked={localFilters.rating === rating}
+                  onChange={(e) => handleFilterChange('rating', Number(e.target.value))}
+                  className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                 />
-                <span className="ml-2 text-sm text-gray-700">{option.label}</span>
+                <span className="ml-2 text-sm text-gray-700">
+                  {rating === 0 ? 'Todas' : `${'★'.repeat(rating)}${'☆'.repeat(5 - rating)} o más`}
+                </span>
               </label>
             ))}
           </div>
         </div>
 
-        {/* Location */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-3">
-            Ubicación
-          </label>
-          <select
-            value={filters.location}
-            onChange={(e) => handleLocationChange(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="all">Todas las ubicaciones</option>
-            <option value="Bogotá">Bogotá</option>
-            <option value="Medellín">Medellín</option>
-            <option value="Cali">Cali</option>
-            <option value="Barranquilla">Barranquilla</option>
-            <option value="Cartagena">Cartagena</option>
-            <option value="Bucaramanga">Bucaramanga</option>
-          </select>
-        </div>
-
-        {/* Rating */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-3">
-            Calificación mínima
-          </label>
-          <div className="space-y-2">
-            {[5, 4, 3, 2, 1].map((rating) => (
-              <button
-                key={rating}
-                onClick={() => handleRatingChange(rating)}
-                className={`flex items-center gap-2 w-full text-left px-3 py-2 rounded-lg transition-colors duration-200 ${
-                  filters.rating === rating
-                    ? 'bg-blue-50 border border-blue-200'
-                    : 'hover:bg-gray-50'
-                }`}
-              >
-                <div className="flex items-center">
-                  {'★'.repeat(rating)}
-                  <span className="text-gray-300 ml-1">{'☆'.repeat(5 - rating)}</span>
-                </div>
-                <span className="text-sm text-gray-700">{rating}+ estrellas</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Sort By */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">
-            Ordenar por
-          </label>
-          <select
-            value={filters.sortBy}
-            onChange={(e) => onFiltersChange({ ...filters, sortBy: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="relevance">Relevancia</option>
-            <option value="price_asc">Precio: menor a mayor</option>
-            <option value="price_desc">Precio: mayor a menor</option>
-            <option value="rating">Mejor calificados</option>
-            <option value="newest">Más recientes</option>
-          </select>
-        </div>
-      </motion.div>
-    </>
+        {/* Reset Filters */}
+        <button
+          onClick={resetFilters}
+          className="w-full py-2 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200 text-sm font-medium"
+        >
+          Limpiar filtros
+        </button>
+      </div>
+    </div>
   );
 };
 

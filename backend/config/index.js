@@ -1,5 +1,5 @@
 // config/index.js
-require('dotenv').config();
+require('dotenv').config({ encoding: 'utf16le' });
 const Joi = require('joi');
 
 // 📌 Definir el esquema de validación de las variables de entorno
