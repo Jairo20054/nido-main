@@ -1,5 +1,5 @@
-// Marketplace.jsx
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Marketplace.css';
 
 // Componente principal del Marketplace
@@ -12,6 +12,13 @@ const Marketplace = () => {
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+  const [condition, setCondition] = useState('');
+  const [location, setLocation] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
+  const [sellerRating, setSellerRating] = useState('');
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const navigate = useNavigate();
 
   // Categorías específicas para objetos del hogar
   const categories = [
@@ -26,6 +33,23 @@ const Marketplace = () => {
     'Organización'
   ];
 
+  // Condiciones disponibles
+  const conditions = [
+    { value: '', label: 'Cualquiera' },
+    { value: 'new', label: 'Nuevo' },
+    { value: 'like-new', label: 'Como nuevo' },
+    { value: 'good', label: 'Buen estado' },
+    { value: 'fair', label: 'Estado regular' }
+  ];
+
+  // Filtros de fecha
+  const dateFilters = [
+    { value: '', label: 'Cualquier fecha' },
+    { value: 'today', label: 'Hoy' },
+    { value: 'week', label: 'Esta semana' },
+    { value: 'month', label: 'Este mes' }
+  ];
+
   // Datos de ejemplo para productos del hogar
   const sampleProducts = [
     {
@@ -37,7 +61,10 @@ const Marketplace = () => {
       image: '/images/sofa.jpg',
       description: 'Sofá cama en excelente estado, color gris, poco uso',
       seller: 'Juan Pérez',
-      date: '2023-10-15'
+      date: '2023-10-15',
+      condition: 'good',
+      sellerRating: 4.5,
+      images: ['/images/sofa1.jpg', '/images/sofa2.jpg', '/images/sofa3.jpg']
     },
     {
       id: 2,
@@ -48,7 +75,10 @@ const Marketplace = () => {
       image: '/images/comedor.jpg',
       description: 'Mesa con 6 sillas, madera de roble, perfecto estado',
       seller: 'María García',
-      date: '2023-10-10'
+      date: '2023-10-10',
+      condition: 'new',
+      sellerRating: 4.8,
+      images: ['/images/comedor1.jpg', '/images/comedor2.jpg']
     },
     {
       id: 3,
@@ -59,7 +89,10 @@ const Marketplace = () => {
       image: '/images/lavadora.jpg',
       description: 'Lavadora semi-automática, capacidad 15kg, eficiencia energética A+',
       seller: 'Carlos Rodríguez',
-      date: '2023-10-05'
+      date: '2023-10-05',
+      condition: 'like-new',
+      sellerRating: 4.2,
+      images: ['/images/lavadora1.jpg']
     },
     {
       id: 4,
@@ -70,7 +103,10 @@ const Marketplace = () => {
       image: '/images/lampara.jpg',
       description: 'Lámpara de pie con diseño escandinavo, color negro mate',
       seller: 'Ana López',
-      date: '2023-09-28'
+      date: '2023-09-28',
+      condition: 'new',
+      sellerRating: 4.7,
+      images: ['/images/lampara1.jpg', '/images/lampara2.jpg']
     },
     {
       id: 5,
@@ -81,7 +117,10 @@ const Marketplace = () => {
       image: '/images/ollas.jpg',
       description: 'Set de 7 piezas, marca reconocida, como nuevas',
       seller: 'Roberto Silva',
-      date: '2023-10-12'
+      date: '2023-10-12',
+      condition: 'like-new',
+      sellerRating: 4.6,
+      images: ['/images/ollas1.jpg']
     },
     {
       id: 6,
@@ -92,7 +131,10 @@ const Marketplace = () => {
       image: '/images/cortinas.jpg',
       description: 'Cortinas térmicas y blackout, color beige, medidas 2.5x2m',
       seller: 'Laura Martínez',
-      date: '2023-10-08'
+      date: '2023-10-08',
+      condition: 'new',
+      sellerRating: 4.3,
+      images: ['/images/cortinas1.jpg']
     },
     {
       id: 7,
@@ -103,7 +145,10 @@ const Marketplace = () => {
       image: '/images/mesa-centro.jpg',
       description: 'Mesa de centro moderna con cajones, color nogal',
       seller: 'Diego Fernández',
-      date: '2023-09-30'
+      date: '2023-09-30',
+      condition: 'good',
+      sellerRating: 4.4,
+      images: ['/images/mesa1.jpg', '/images/mesa2.jpg']
     },
     {
       id: 8,
@@ -114,7 +159,10 @@ const Marketplace = () => {
       image: '/images/organizador.jpg',
       description: 'Sistema modular para organizar clóset, fácil de instalar',
       seller: 'Sofía Ramírez',
-      date: '2023-10-03'
+      date: '2023-10-03',
+      condition: 'new',
+      sellerRating: 4.9,
+      images: ['/images/organizador1.jpg']
     }
   ];
 
@@ -133,29 +181,90 @@ const Marketplace = () => {
     loadData();
   }, []);
 
-  // Filtrar productos según búsqueda y categoría
+  // Función para verificar si una fecha cumple con el filtro
+  const isDateInRange = (productDate, filter) => {
+    if (!filter) return true;
+    const date = new Date(productDate);
+    const now = new Date();
+
+    switch (filter) {
+      case 'today':
+        return date.toDateString() === now.toDateString();
+      case 'week':
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return date >= weekAgo;
+      case 'month':
+        const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+        return date >= monthAgo;
+      default:
+        return true;
+    }
+  };
+
+  // Filtrar productos según búsqueda y filtros
   useEffect(() => {
     let filtered = products;
-    
+
     // Filtrar por término de búsqueda
     if (searchTerm) {
-      filtered = filtered.filter(product => 
+      filtered = filtered.filter(product =>
         product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
+
     // Filtrar por categoría
     if (activeCategory !== 'Todos') {
       filtered = filtered.filter(product => product.category === activeCategory);
     }
-    
+
+    // Filtrar por precio
+    if (priceRange.min) {
+      filtered = filtered.filter(product => product.price >= parseInt(priceRange.min));
+    }
+    if (priceRange.max) {
+      filtered = filtered.filter(product => product.price <= parseInt(priceRange.max));
+    }
+
+    // Filtrar por condición
+    if (condition) {
+      filtered = filtered.filter(product => product.condition === condition);
+    }
+
+    // Filtrar por ubicación
+    if (location) {
+      filtered = filtered.filter(product =>
+        product.location.toLowerCase().includes(location.toLowerCase())
+      );
+    }
+
+    // Filtrar por fecha
+    if (dateFilter) {
+      filtered = filtered.filter(product => isDateInRange(product.date, dateFilter));
+    }
+
+    // Filtrar por calificación del vendedor
+    if (sellerRating) {
+      filtered = filtered.filter(product => product.sellerRating >= parseFloat(sellerRating));
+    }
+
     setFilteredProducts(filtered);
-  }, [searchTerm, activeCategory, products]);
+  }, [searchTerm, activeCategory, products, priceRange, condition, location, dateFilter, sellerRating]);
 
   // Manejar búsqueda
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
+  };
+
+  // Limpiar todos los filtros
+  const clearAllFilters = () => {
+    setSearchTerm('');
+    setActiveCategory('Todos');
+    setPriceRange({ min: '', max: '' });
+    setCondition('');
+    setLocation('');
+    setDateFilter('');
+    setSellerRating('');
   };
 
   // Formatear precio en formato colombiano
@@ -170,6 +279,11 @@ const Marketplace = () => {
   // Alternar visibilidad del formulario de creación
   const toggleCreatePost = () => {
     setShowCreatePost(!showCreatePost);
+  };
+
+  // Navegar a detalles del producto
+  const handleProductClick = (productId) => {
+    navigate(`/marketplace/product/${productId}`);
   };
 
   return (
@@ -192,20 +306,26 @@ const Marketplace = () => {
             </button>
           </div>
         </div>
-        
+
         <div className="search-container">
           <div className="search-box">
             <span className="search-icon">🔍</span>
-            <input 
-              type="text" 
-              placeholder="Buscar en Marketplace" 
+            <input
+              type="text"
+              placeholder="Buscar en Marketplace"
               value={searchTerm}
               onChange={handleSearch}
               className="search-input"
             />
+            <button
+              className="advanced-filters-toggle"
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+            >
+              ⚙️
+            </button>
           </div>
         </div>
-        
+
         <nav className="main-nav">
           <button className="nav-btn active">Explorar todo</button>
           <button className="nav-btn">Compra</button>
@@ -227,13 +347,13 @@ const Marketplace = () => {
             <p>Cal: En un radio de 25 km</p>
             <button className="change-location">Cambiar</button>
           </div>
-          
+
           <div className="categories">
             <h3>Categorías</h3>
             <ul>
               {categories.map(category => (
                 <li key={category}>
-                  <button 
+                  <button
                     className={activeCategory === category ? 'active' : ''}
                     onClick={() => setActiveCategory(category)}
                   >
@@ -243,28 +363,78 @@ const Marketplace = () => {
               ))}
             </ul>
           </div>
-          
+
           <div className="filters">
             <h3>Filtros</h3>
-            <div className="filter-group">
-              <label>Precio</label>
-              <div className="price-range">
-                <input type="number" placeholder="Mín" />
-                <span> - </span>
-                <input type="number" placeholder="Máx" />
+
+            {/* Filtros avanzados */}
+            {showAdvancedFilters && (
+              <div className="advanced-filters">
+                <div className="filter-group">
+                  <label>Rango de Precio</label>
+                  <div className="price-range">
+                    <input
+                      type="number"
+                      placeholder="Mín"
+                      value={priceRange.min}
+                      onChange={(e) => setPriceRange({...priceRange, min: e.target.value})}
+                    />
+                    <span> - </span>
+                    <input
+                      type="number"
+                      placeholder="Máx"
+                      value={priceRange.max}
+                      onChange={(e) => setPriceRange({...priceRange, max: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                <div className="filter-group">
+                  <label>Condición</label>
+                  <select value={condition} onChange={(e) => setCondition(e.target.value)}>
+                    {conditions.map(cond => (
+                      <option key={cond.value} value={cond.value}>{cond.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="filter-group">
+                  <label>Ubicación</label>
+                  <input
+                    type="text"
+                    placeholder="Buscar por ubicación"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                  />
+                </div>
+
+                <div className="filter-group">
+                  <label>Fecha de publicación</label>
+                  <select value={dateFilter} onChange={(e) => setDateFilter(e.target.value)}>
+                    {dateFilters.map(filter => (
+                      <option key={filter.value} value={filter.value}>{filter.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="filter-group">
+                  <label>Calificación del vendedor (mínima)</label>
+                  <select value={sellerRating} onChange={(e) => setSellerRating(e.target.value)}>
+                    <option value="">Cualquiera</option>
+                    <option value="4.5">4.5+ estrellas</option>
+                    <option value="4.0">4.0+ estrellas</option>
+                    <option value="3.5">3.5+ estrellas</option>
+                  </select>
+                </div>
               </div>
-            </div>
-            <div className="filter-group">
-              <label>Condición</label>
-              <select>
-                <option value="">Cualquiera</option>
-                <option value="new">Nuevo</option>
-                <option value="like-new">Como nuevo</option>
-                <option value="good">Buen estado</option>
-                <option value="fair">Estado regular</option>
-              </select>
-            </div>
-            <button className="apply-filters">Aplicar filtros</button>
+            )}
+
+            <button className="apply-filters" onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}>
+              {showAdvancedFilters ? 'Ocultar filtros' : 'Mostrar más filtros'}
+            </button>
+            <button className="clear-filters" onClick={clearAllFilters}>
+              Limpiar filtros
+            </button>
           </div>
         </aside>
 
@@ -278,6 +448,7 @@ const Marketplace = () => {
                 <option value="price-low">Precio: menor a mayor</option>
                 <option value="price-high">Precio: mayor a menor</option>
                 <option value="name">Orden alfabético</option>
+                <option value="rating">Mejor calificación</option>
               </select>
             </div>
           </div>
@@ -290,16 +461,18 @@ const Marketplace = () => {
           ) : filteredProducts.length > 0 ? (
             <div className="products-grid">
               {filteredProducts.map(product => (
-                <ProductCard key={product.id} product={product} formatPrice={formatPrice} />
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  formatPrice={formatPrice}
+                  onProductClick={handleProductClick}
+                />
               ))}
             </div>
           ) : (
             <div className="no-results">
               <p>No se encontraron productos que coincidan con tu búsqueda.</p>
-              <button onClick={() => {
-                setSearchTerm('');
-                setActiveCategory('Todos');
-              }}>
+              <button onClick={clearAllFilters}>
                 Ver todos los productos
               </button>
             </div>
@@ -316,12 +489,14 @@ const Marketplace = () => {
 };
 
 // Componente para tarjeta de producto
-const ProductCard = ({ product, formatPrice }) => {
+const ProductCard = ({ product, formatPrice, onProductClick }) => {
   return (
-    <div className="product-card">
+    <div className="product-card" onClick={() => onProductClick(product.id)}>
       <div className="product-image">
         <img src={product.image} alt={product.title} />
         <button className="favorite-btn">❤️</button>
+        {product.condition === 'new' && <span className="condition-badge new">Nuevo</span>}
+        {product.condition === 'like-new' && <span className="condition-badge like-new">Como nuevo</span>}
       </div>
       <div className="product-info">
         <h3 className="product-title">{product.title}</h3>
@@ -331,9 +506,19 @@ const ProductCard = ({ product, formatPrice }) => {
           <span className="product-category">{product.category}</span>
           <span className="product-date">{product.date}</span>
         </div>
+        <div className="seller-rating">
+          <span className="rating-stars">
+            {'★'.repeat(Math.floor(product.sellerRating))}{'☆'.repeat(5 - Math.floor(product.sellerRating))}
+          </span>
+          <span className="rating-value">{product.sellerRating}</span>
+        </div>
         <div className="product-actions">
-          <button className="btn-contact">Contactar</button>
-          <button className="btn-details">Ver detalles</button>
+          <button className="btn-contact" onClick={(e) => { e.stopPropagation(); /* TODO: Contact seller */ }}>
+            Contactar
+          </button>
+          <button className="btn-details" onClick={(e) => { e.stopPropagation(); onProductClick(product.id); }}>
+            Ver detalles
+          </button>
         </div>
       </div>
     </div>
@@ -370,16 +555,16 @@ const CreatePostModal = ({ onClose }) => {
           <h2>Crear publicación</h2>
           <button className="close-btn" onClick={onClose}>✕</button>
         </div>
-        
+
         <div className="post-stats">
           <p><strong>Tus publicaciones</strong> {activePosts} activas</p>
         </div>
-        
+
         <div className="post-type-section">
           <h3>Elegir tipo de publicación</h3>
           <div className="post-type-grid">
             {postTypes.map(type => (
-              <div 
+              <div
                 key={type.id}
                 className={`post-type-card ${postType === type.id ? 'active' : ''}`}
                 onClick={() => setPostType(type.id)}
@@ -390,7 +575,7 @@ const CreatePostModal = ({ onClose }) => {
             ))}
           </div>
         </div>
-        
+
         <div className="modal-actions">
           <button className="btn-cancel" onClick={onClose}>Cancelar</button>
           <button className="btn-continue">Continuar</button>

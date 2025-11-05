@@ -87,30 +87,40 @@
   font-size: 20px;
 }
 
-/* Barra de búsqueda - CORREGIDO */
+/* Barra de búsqueda - MEJORADA */
 .search-container {
   margin-bottom: 16px;
   width: 100%;
+  position: relative;
+  z-index: 10;
 }
 
 .search-box {
   display: flex;
   align-items: center;
-  background-color: var(--background-color);
-  border-radius: 20px;
-  padding: 8px 12px;
-  max-width: 500px;
+  background-color: var(--card-background);
+  border-radius: 24px;
+  padding: 12px 16px;
+  max-width: 600px;
   width: 100%;
-  border: 1px solid transparent; /* Previene bordes rojos */
+  border: 2px solid transparent;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.search-box:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .search-box:focus-within {
-  border-color: var(--primary-color); /* Solo borde azul al focus */
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.1);
 }
 
 .search-icon {
-  margin-right: 8px;
+  margin-right: 12px;
   color: var(--text-secondary);
+  font-size: 18px;
 }
 
 .search-input {
@@ -120,10 +130,27 @@
   outline: none;
   font-size: 16px;
   width: 100%;
+  color: var(--text-primary);
 }
 
-.search-input:focus {
-  outline: none !important; /* Elimina outline rojo */
+.search-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.advanced-filters-toggle {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  margin-left: 8px;
+}
+
+.advanced-filters-toggle:hover {
+  background-color: var(--background-color);
+  color: var(--primary-color);
 }
 
 /* Navegación principal - CORREGIDO */
@@ -300,11 +327,9 @@
   flex: 1;
 }
 
-.apply-filters {
+.apply-filters, .clear-filters {
   width: 100%;
   padding: 12px;
-  background-color: var(--primary-color);
-  color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -314,8 +339,30 @@
   transition: background-color 0.2s;
 }
 
+.apply-filters {
+  background-color: var(--primary-color);
+  color: white;
+}
+
 .apply-filters:hover {
   background-color: #166fe5;
+}
+
+.clear-filters {
+  background-color: var(--background-color);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.clear-filters:hover {
+  background-color: #e4e6e9;
+}
+
+/* Filtros avanzados */
+.advanced-filters {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
 }
 
 /* Sección de productos - CORREGIDO */
