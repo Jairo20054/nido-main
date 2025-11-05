@@ -3,8 +3,8 @@
   --header-height: 70px;
   --bottom-nav-height: 60px;
   --sidebar-width: 240px;
-  --content-padding: 1rem;
-  --max-content-width: 1200px;
+  --content-padding: 0.5rem;
+  --max-content-width: none;
   --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1);
   --transition-fast: all 0.2s ease;
   --primary-color: #ff3b72;
@@ -51,11 +51,12 @@
 .main-content-layout {
   flex: 1;
   width: 100%;
-  max-width: calc(100% - var(--sidebar-width));
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
   padding: 0 var(--content-padding);
   background: var(--background-color);
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* Navegación móvil */

@@ -38,16 +38,17 @@
   min-height: 100vh;
   background-color: var(--bg-primary);
   overflow-x: hidden;
+  padding: 0;
 }
 
 .home-layout {
   display: grid;
-  grid-template-columns: 280px 1fr 300px;
-  gap: 24px;
+  grid-template-columns: 240px 1fr 280px;
+  gap: 16px;
   width: 100%;
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 20px;
+  max-width: none;
+  margin: 0;
+  padding: 8px;
   min-height: 100vh;
   background-color: var(--bg-primary);
 }
@@ -55,10 +56,11 @@
 .home-main {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md);
   width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
+  padding: 0 var(--spacing-sm);
 }
 
 .left-sidebar-container,
@@ -307,17 +309,19 @@ button:focus-visible {
   background: var(--text-muted);
 }
 
-/* Responsive */
+/* Responsive - FULL VIEWPORT */
 @media (max-width: 1200px) {
   .home-layout {
-    grid-template-columns: 250px minmax(500px, 600px) 300px;
+    grid-template-columns: 220px 1fr 260px;
     gap: 12px;
+    padding: 6px;
   }
 }
 
 @media (max-width: 1024px) {
   .home-layout {
-    grid-template-columns: 80px 1fr;
+    grid-template-columns: 70px 1fr;
+    padding: 4px;
   }
 
   .home-layout > :last-child {
@@ -328,7 +332,7 @@ button:focus-visible {
 @media (max-width: 768px) {
   .home-layout {
     grid-template-columns: 1fr;
-    padding: var(--spacing-sm);
+    padding: var(--spacing-xs);
   }
 
   .home-layout > :first-child {
@@ -337,6 +341,7 @@ button:focus-visible {
 
   .home-main {
     max-width: 100%;
+    padding: 0;
   }
 
   .create-post-actions {

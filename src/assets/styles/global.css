@@ -1,14 +1,14 @@
-/* === VARIABLES PARA MODO CLARO === */
+/* === VARIABLES PARA MODO CLARO - OPTIMIZADAS PARA FULL VIEWPORT === */
 :root {
    --bg-primary: #ffffff;
    --bg-secondary: #f9fafb;
    --text-primary: #111827;
    --accent: #0084ff;
    --border: #e5e7eb;
-   --spacing-xs: 4px;
-   --spacing-sm: 8px;
-   --spacing-md: 16px;
-   --radius: 8px;
+   --spacing-xs: 2px;
+   --spacing-sm: 6px;
+   --spacing-md: 12px;
+   --radius: 6px;
 }
 
 /* === RESET GLOBAL AGRESIVO === */

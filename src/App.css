@@ -10,13 +10,13 @@
   --color-surface: #ffffff;
   --color-border: #e0e0e0;
 
-  /* Espaciado (usando rem para mejor escalabilidad) */
-  --spacing-xs: 0.5rem;   /* 8px */
-  --spacing-sm: 0.75rem;  /* 12px */
-  --spacing-md: 1rem;     /* 16px */
-  --spacing-lg: 1.5rem;   /* 24px */
-  --spacing-xl: 2rem;     /* 32px */
-  --spacing-2xl: 3rem;    /* 48px */
+  /* Espaciado optimizado para full viewport */
+  --spacing-xs: 0.25rem;  /* 4px */
+  --spacing-sm: 0.5rem;   /* 8px */
+  --spacing-md: 0.75rem;  /* 12px */
+  --spacing-lg: 1rem;     /* 16px */
+  --spacing-xl: 1.5rem;   /* 24px */
+  --spacing-2xl: 2rem;    /* 32px */
 
   /* Tamaños de header (responsive) */
   --header-height-desktop: 5rem;     /* 80px */
@@ -24,8 +24,8 @@
   --header-height-mobile: 3.5rem;    /* 56px */
 
   /* Dimensiones de contenido */
-  --content-max-width: 75rem;        /* 1200px */
-  --content-padding: var(--spacing-md);
+  --content-max-width: none;         /* Full viewport */
+  --content-padding: var(--spacing-sm);
 
   /* Border radius */
   --border-radius-sm: 0.25rem;       /* 4px */
@@ -62,17 +62,18 @@
   overflow-x: hidden;
 }
 
-/* Contenido principal con espacio reservado para el header */
+/* Contenido principal con espacio reservado para el header - FULL VIEWPORT */
 .main-content {
   flex: 1;
   width: 100%;
-  max-width: var(--content-max-width);
-  margin: 0 auto;
-  padding: var(--header-height-desktop) var(--content-padding) var(--spacing-xl);
+  max-width: none;
+  margin: 0;
+  padding: var(--header-height-desktop) var(--content-padding) var(--spacing-lg);
   transition: padding var(--transition-normal);
   /* Prevenir layout shifts */
   will-change: padding;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* Mejoras para accesibilidad y UX */

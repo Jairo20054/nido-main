@@ -22,13 +22,13 @@
   --container-2xl: 1400px;
   --container-3xl: 1600px;
 
-  /* Espaciados modernos y generosos */
-  --spacing-xs: 1rem;      /* 16px */
-  --spacing-sm: 1.5rem;    /* 24px */
-  --spacing-md: 2rem;      /* 32px */
-  --spacing-lg: 3rem;      /* 48px */
-  --spacing-xl: 4rem;      /* 64px */
-  --spacing-2xl: 6rem;     /* 96px */
+  /* Espaciados optimizados para full viewport */
+  --spacing-xs: 0.5rem;     /* 8px */
+  --spacing-sm: 0.75rem;    /* 12px */
+  --spacing-md: 1rem;       /* 16px */
+  --spacing-lg: 1.5rem;     /* 24px */
+  --spacing-xl: 2rem;       /* 32px */
+  --spacing-2xl: 3rem;      /* 48px */
 
   /* Espaciados para secciones internas */
   --section-spacing-mobile: 2rem;
@@ -36,45 +36,45 @@
   --section-spacing-desktop: 4rem;
 }
 
-/* Container utility - Márgenes más generosos */
+/* Container utility - Márgenes más generosos y full viewport */
 .container {
   width: 100%;
   max-width: var(--container-lg);
   margin: 0 auto;
-  padding-left: var(--spacing-sm);
-  padding-right: var(--spacing-sm);
+  padding-left: var(--spacing-xs);
+  padding-right: var(--spacing-xs);
 }
 
 /* Breakpoints con márgenes progresivamente más generosos */
 @media (min-width: 768px) {
   .container {
     max-width: var(--container-xl);
-    padding-left: var(--spacing-md);
-    padding-right: var(--spacing-md);
+    padding-left: var(--spacing-sm);
+    padding-right: var(--spacing-sm);
   }
 }
 
 @media (min-width: 1024px) {
   .container {
     max-width: var(--container-2xl);
-    padding-left: var(--spacing-lg);
-    padding-right: var(--spacing-lg);
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
   }
 }
 
 @media (min-width: 1280px) {
   .container {
     max-width: var(--container-3xl);
-    padding-left: var(--spacing-xl);
-    padding-right: var(--spacing-xl);
+    padding-left: var(--spacing-lg);
+    padding-right: var(--spacing-lg);
   }
 }
 
 @media (min-width: 1920px) {
   .container {
     max-width: var(--container-3xl);
-    padding-left: var(--spacing-2xl);
-    padding-right: var(--spacing-2xl);
+    padding-left: var(--spacing-xl);
+    padding-right: var(--spacing-xl);
   }
 }
 
@@ -86,24 +86,24 @@
   padding-right: 0;
 }
 
-/* Container fluid para secciones que necesitan más espacio */
+/* Container fluid para secciones que necesitan más espacio - FULL VIEWPORT */
 .container-fluid {
   width: 100%;
-  padding-left: var(--spacing-sm);
-  padding-right: var(--spacing-sm);
+  padding-left: var(--spacing-xs);
+  padding-right: var(--spacing-xs);
 }
 
 @media (min-width: 768px) {
   .container-fluid {
-    padding-left: var(--spacing-md);
-    padding-right: var(--spacing-md);
+    padding-left: var(--spacing-sm);
+    padding-right: var(--spacing-sm);
   }
 }
 
 @media (min-width: 1024px) {
   .container-fluid {
-    padding-left: var(--spacing-lg);
-    padding-right: var(--spacing-lg);
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
   }
 }
 
@@ -180,7 +180,7 @@
 .p-5 { padding: var(--spacing-xl); }
 .p-6 { padding: var(--spacing-2xl); }
 
-/* Utilidades de sección para espaciados verticales generosos */
+/* Utilidades de sección para espaciados verticales generosos - FULL VIEWPORT */
 .section-py {
   padding-top: var(--section-spacing-mobile);
   padding-bottom: var(--section-spacing-mobile);
@@ -199,11 +199,11 @@
     padding-top: var(--section-spacing-tablet);
     padding-bottom: var(--section-spacing-tablet);
   }
-  
+
   .section-pt {
     padding-top: var(--section-spacing-tablet);
   }
-  
+
   .section-pb {
     padding-bottom: var(--section-spacing-tablet);
   }
@@ -214,11 +214,11 @@
     padding-top: var(--section-spacing-desktop);
     padding-bottom: var(--section-spacing-desktop);
   }
-  
+
   .section-pt {
     padding-top: var(--section-spacing-desktop);
   }
-  
+
   .section-pb {
     padding-bottom: var(--section-spacing-desktop);
   }
