@@ -1,4 +1,4 @@
-/* src/pages/Home/Home.css */
+/* src/pages/Home/Home.css - FULL VIEWPORT */
 :root {
   /* Colores modo claro - Facebook Style */
   --bg-primary: #f0f2f5;
@@ -33,24 +33,11 @@
   --spacing-xl: 32px;
 }
 
-/* Reset y base */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  line-height: 1.4;
-}
-
 .home-container {
   width: 100%;
   min-height: 100vh;
   background-color: var(--bg-primary);
+  overflow-x: hidden;
 }
 
 .home-layout {
@@ -58,7 +45,7 @@ body {
   grid-template-columns: 280px 1fr 300px;
   gap: 24px;
   width: 100%;
-  max-width: 1400px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 20px;
   min-height: 100vh;

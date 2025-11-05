@@ -11,13 +11,20 @@
    --radius: 8px;
 }
 
-/* === RESET MODERNO === */
+/* === RESET GLOBAL AGRESIVO === */
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+  outline: none !important;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 /* Mejorar la herencia de fuente */

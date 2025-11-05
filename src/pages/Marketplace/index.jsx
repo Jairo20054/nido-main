@@ -127,10 +127,10 @@ const Marketplace = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 w-full overflow-x-hidden">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="bg-white shadow-sm border-b border-gray-200 w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center">
@@ -177,8 +177,8 @@ const Marketplace = () => {
       </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex gap-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex gap-8 w-full">
           {/* Sidebar */}
           <aside className="w-64 flex-shrink-0">
             {/* Categories */}
@@ -200,9 +200,9 @@ const Marketplace = () => {
           </aside>
 
           {/* Main Content Area */}
-          <main className="flex-1">
+          <main className="flex-1 w-full">
             {/* Results Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-6 w-full">
               <div className="flex items-center gap-4">
                 <h2 className="text-xl font-semibold text-gray-900">
                   {searchQuery ? `Resultados para "${searchQuery}"` : 'Productos destacados'}
@@ -228,7 +228,7 @@ const Marketplace = () => {
 
             {/* Products Grid */}
             {error ? (
-              <div className="text-center py-12">
+              <div className="text-center py-12 w-full">
                 <div className="text-red-600 mb-4">
                   <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
@@ -247,7 +247,7 @@ const Marketplace = () => {
                 hasNextPage={hasNextPage}
                 isLoading={loading}
                 onLoadMore={handleLoadMore}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full"
               >
                 {products.map((product) => (
                   <ProductCard
@@ -275,7 +275,7 @@ const Marketplace = () => {
 
             {/* No results */}
             {!loading && !error && products.length === 0 && (
-              <div className="text-center py-12">
+              <div className="text-center py-12 w-full">
                 <div className="text-gray-400 mb-4">
                   <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

@@ -1,13 +1,4 @@
-/* ===== RESET MEJORADO Y CONFIGURACIÓN BASE ===== */
-/* Reset más completo para evitar inconsistencias entre navegadores */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
+/* ===== RESET AGRESIVO Y CONFIGURACIÓN FULL VIEWPORT ===== */
 /* Variables CSS organizadas por categorías */
 :root {
   /* Colores */
@@ -18,7 +9,7 @@
   --color-background: #fafafa;
   --color-surface: #ffffff;
   --color-border: #e0e0e0;
-  
+
   /* Espaciado (usando rem para mejor escalabilidad) */
   --spacing-xs: 0.5rem;   /* 8px */
   --spacing-sm: 0.75rem;  /* 12px */
@@ -26,42 +17,43 @@
   --spacing-lg: 1.5rem;   /* 24px */
   --spacing-xl: 2rem;     /* 32px */
   --spacing-2xl: 3rem;    /* 48px */
-  
+
   /* Tamaños de header (responsive) */
   --header-height-desktop: 5rem;     /* 80px */
   --header-height-tablet: 4rem;      /* 64px */
   --header-height-mobile: 3.5rem;    /* 56px */
-  
+
   /* Dimensiones de contenido */
   --content-max-width: 75rem;        /* 1200px */
   --content-padding: var(--spacing-md);
-  
+
   /* Border radius */
   --border-radius-sm: 0.25rem;       /* 4px */
   --border-radius-md: 0.5rem;        /* 8px */
   --border-radius-lg: 0.75rem;       /* 12px */
-  
+
   /* Sombras */
   --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.08);
   --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.12);
   --shadow-heavy: 0 8px 24px rgba(0, 0, 0, 0.16);
-  
+
   /* Transiciones */
   --transition-fast: 0.15s ease;
   --transition-normal: 0.3s ease;
   --transition-slow: 0.5s ease;
-  
+
   /* Tipografía */
-  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
                 'Oxygen', 'Ubuntu', 'Cantarell', 'Open Sans', sans-serif;
   --line-height: 1.6;
 }
 
-/* ===== ESTRUCTURA PRINCIPAL ===== */
+/* ===== ESTRUCTURA PRINCIPAL FULL VIEWPORT ===== */
 .app-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
   font-family: var(--font-family);
   line-height: var(--line-height);
   color: var(--color-text);
@@ -80,6 +72,7 @@
   transition: padding var(--transition-normal);
   /* Prevenir layout shifts */
   will-change: padding;
+  min-height: 100vh;
 }
 
 /* Mejoras para accesibilidad y UX */
@@ -88,7 +81,7 @@
   outline-offset: 0.25rem;
 }
 
-/* ===== SECCIONES DE CONTENIDO ===== */
+/* ===== SECCIONES DE CONTENIDO FULL VIEWPORT ===== */
 .content-section {
   margin-bottom: var(--spacing-xl);
   padding: var(--spacing-lg);
@@ -98,6 +91,8 @@
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   /* Prevenir layout shifts */
   min-height: 1px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .content-section:hover {
@@ -110,19 +105,19 @@
   min-height: calc(100vh - var(--header-height-desktop));
 }
 
-/* ===== DISEÑO RESPONSIVO ===== */
+/* ===== DISEÑO RESPONSIVO FULL VIEWPORT ===== */
 
 /* Tabletas */
 @media (max-width: 768px) {
   .main-content {
     padding: var(--header-height-tablet) var(--spacing-sm) var(--spacing-lg);
   }
-  
+
   .content-section {
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
   }
-  
+
   .main-content--min-height {
     min-height: calc(100vh - var(--header-height-tablet));
   }
@@ -133,13 +128,13 @@
   .main-content {
     padding: var(--header-height-mobile) var(--spacing-xs) var(--spacing-md);
   }
-  
+
   .content-section {
     padding: var(--spacing-sm);
     margin-bottom: var(--spacing-md);
     border-radius: var(--border-radius-sm);
   }
-  
+
   .main-content--min-height {
     min-height: calc(100vh - var(--header-height-mobile));
   }
@@ -150,11 +145,11 @@
   :root {
     --content-padding: var(--spacing-xs);
   }
-  
+
   .main-content {
     padding: var(--header-height-mobile) var(--spacing-xs) var(--spacing-md);
   }
-  
+
   .content-section {
     padding: var(--spacing-sm);
     margin-bottom: var(--spacing-md);
@@ -169,11 +164,11 @@
   .content-section {
     transition: none;
   }
-  
+
   .content-section:hover {
     transform: none;
   }
-  
+
   html {
     scroll-behavior: auto;
   }
@@ -195,11 +190,11 @@
     --color-surface: #1e1e1e;
     --color-border: #3a3a3a;
   }
-  
+
   .content-section {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   }
-  
+
   .content-section:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   }

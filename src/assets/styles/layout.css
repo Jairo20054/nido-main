@@ -1,26 +1,6 @@
 /* ===========================================
-   UTILIDADES DE LAYOUT RESPONSIVO - MODERNIZADO
+   UTILIDADES DE LAYOUT RESPONSIVO - FULL VIEWPORT
    =========================================== */
-
-/* Reset global mejorado */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-html,
-body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  overflow-x: hidden;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.6;
-}
 
 /* Variables de breakpoints y espaciados modernos */
 :root {

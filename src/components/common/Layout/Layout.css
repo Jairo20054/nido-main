@@ -1,4 +1,4 @@
-/* Variables para consistencia - Mobile First */
+/* Variables para consistencia - Full Viewport */
 :root {
   --header-height: 70px;
   --bottom-nav-height: 60px;
@@ -15,13 +15,15 @@
   --border-color: #e5e7eb;
 }
 
-/* Estructura principal - Mobile First */
+/* Estructura principal - Full Viewport */
 .layout {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   position: relative;
   background: var(--background-color);
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .content-wrapper {
@@ -29,6 +31,7 @@
   flex: 1;
   padding-top: var(--header-height);
   padding-bottom: var(--bottom-nav-height);
+  width: 100%;
 }
 
 /* Sidebar - Oculto en móvil por defecto */
@@ -44,7 +47,7 @@
   }
 }
 
-/* Contenido principal */
+/* Contenido principal - Full Viewport */
 .main-content-layout {
   flex: 1;
   width: 100%;
@@ -52,6 +55,7 @@
   margin: 0 auto;
   padding: 0 var(--content-padding);
   background: var(--background-color);
+  min-height: 100vh;
 }
 
 /* Navegación móvil */
@@ -65,7 +69,7 @@
   }
 }
 
-/* Responsive design */
+/* Responsive design - Full Viewport */
 @media (min-width: 768px) {
   :root {
     --header-height: 80px;
