@@ -1,0 +1,158 @@
+/* CreatePostModal.css */
+
+/* Modal overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: var(--border-radius);
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--border-color);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h2 {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none !important;
+}
+
+.close-btn:hover {
+  background-color: var(--background-color);
+}
+
+.post-stats {
+  padding: 0 20px;
+  margin: 16px 0;
+}
+
+.post-type-section {
+  padding: 0 20px;
+  margin-bottom: 24px;
+}
+
+.post-type-section h3 {
+  margin-bottom: 16px;
+  font-size: 18px;
+}
+
+.post-type-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.post-type-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+  outline: none !important;
+}
+
+.post-type-card:hover {
+  background-color: var(--background-color);
+}
+
+.post-type-card.active {
+  border-color: var(--primary-color);
+  background-color: #f0f8ff;
+}
+
+.post-type-card h4 {
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.post-type-card p {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.btn-cancel, .btn-continue {
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  outline: none !important;
+}
+
+.btn-cancel {
+  background: none;
+  border: 1px solid var(--border-color);
+}
+
+.btn-cancel:hover {
+  background-color: var(--background-color);
+}
+
+.btn-continue {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+}
+
+.btn-continue:hover {
+  background-color: #166fe5;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .modal-content {
+    margin: 0;
+    border-radius: 0;
+    max-height: 100vh;
+    width: 100%;
+  }
+
+  .modal-overlay {
+    padding: 0;
+  }
+}

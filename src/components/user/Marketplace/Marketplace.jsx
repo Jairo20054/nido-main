@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ProductCard from './ProductCard';
+import CreatePostModal from './CreatePostModal';
 import './Marketplace.css';
 
 // Componente principal del Marketplace
@@ -292,19 +294,7 @@ const Marketplace = () => {
       <header className="marketplace-header">
         <div className="header-top">
           <h1 className="marketplace-title">Marketplace</h1>
-          <div className="user-actions">
-            <button className="notification-btn">
-              <span className="icon">🔔</span>
-              <span className="count">3</span>
-            </button>
-            <button className="inbox-btn">
-              <span className="icon">📥</span>
-              <span className="count">5</span>
-            </button>
-            <button className="profile-btn">
-              <span className="avatar">👤</span>
-            </button>
-          </div>
+    
         </div>
 
         <div className="search-container">
@@ -488,101 +478,6 @@ const Marketplace = () => {
   );
 };
 
-// Componente para tarjeta de producto
-const ProductCard = ({ product, formatPrice, onProductClick }) => {
-  return (
-    <div className="product-card" onClick={() => onProductClick(product.id)}>
-      <div className="product-image">
-        <img src={product.image} alt={product.title} />
-        <button className="favorite-btn">❤️</button>
-        {product.condition === 'new' && <span className="condition-badge new">Nuevo</span>}
-        {product.condition === 'like-new' && <span className="condition-badge like-new">Como nuevo</span>}
-      </div>
-      <div className="product-info">
-        <h3 className="product-title">{product.title}</h3>
-        <p className="product-price">{formatPrice(product.price)}</p>
-        <p className="product-location">{product.location}</p>
-        <div className="product-meta">
-          <span className="product-category">{product.category}</span>
-          <span className="product-date">{product.date}</span>
-        </div>
-        <div className="seller-rating">
-          <span className="rating-stars">
-            {'★'.repeat(Math.floor(product.sellerRating))}{'☆'.repeat(5 - Math.floor(product.sellerRating))}
-          </span>
-          <span className="rating-value">{product.sellerRating}</span>
-        </div>
-        <div className="product-actions">
-          <button className="btn-contact" onClick={(e) => { e.stopPropagation(); /* TODO: Contact seller */ }}>
-            Contactar
-          </button>
-          <button className="btn-details" onClick={(e) => { e.stopPropagation(); onProductClick(product.id); }}>
-            Ver detalles
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
-// Componente modal para crear publicación
-const CreatePostModal = ({ onClose }) => {
-  const [postType, setPostType] = useState('item');
-  const [activePosts, setActivePosts] = useState(3);
-
-  const postTypes = [
-    {
-      id: 'item',
-      title: 'Artículo en venta',
-      description: 'Crea una sola publicación para vender uno o más artículos.'
-    },
-    {
-      id: 'vehicle',
-      title: 'Vehículos en venta',
-      description: 'Vende cualquier tipo de vehículo: autos, motos, bicicletas, etc.'
-    },
-    {
-      id: 'property',
-      title: 'Propiedad en venta o alquiler',
-      description: 'Publica una casa o departamento para vender o alquilar.'
-    }
-  ];
-
-  return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <div className="modal-header">
-          <h2>Crear publicación</h2>
-          <button className="close-btn" onClick={onClose}>✕</button>
-        </div>
-
-        <div className="post-stats">
-          <p><strong>Tus publicaciones</strong> {activePosts} activas</p>
-        </div>
-
-        <div className="post-type-section">
-          <h3>Elegir tipo de publicación</h3>
-          <div className="post-type-grid">
-            {postTypes.map(type => (
-              <div
-                key={type.id}
-                className={`post-type-card ${postType === type.id ? 'active' : ''}`}
-                onClick={() => setPostType(type.id)}
-              >
-                <h4>{type.title}</h4>
-                <p>{type.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="modal-actions">
-          <button className="btn-cancel" onClick={onClose}>Cancelar</button>
-          <button className="btn-continue">Continuar</button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export default Marketplace;
