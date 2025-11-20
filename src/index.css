@@ -1,3 +1,24 @@
+/* Tailwind CSS directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Root variables */
+:root {
+  --color-primary: #ec4899;
+  --color-accent: #ff4757;
+  --color-text: #111827;
+  --color-text-light: #6b7280;
+  --color-border: #e5e7eb;
+  --color-bg: #ffffff;
+  --transition-fast: all 0.2s ease;
+}
+
+/* Global styles */
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -10,4 +31,138 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Smooth transitions */
+* {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Remove default button styles */
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Ensure images are responsive */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Custom components */
+@layer components {
+  /* Cards */
+  .card {
+    @apply bg-white rounded-lg shadow-card hover:shadow-card-hover transition-shadow;
+  }
+
+  .card-lg {
+    @apply card p-6;
+  }
+
+  /* Buttons */
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+  }
+
+  .btn-primary {
+    @apply btn bg-accent text-white hover:bg-red-500 active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply btn bg-gray-100 text-gray-900 hover:bg-gray-200;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-gray-900 hover:bg-gray-50;
+  }
+
+  /* Badges */
+  .badge {
+    @apply inline-block px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .badge-primary {
+    @apply badge bg-primary-50 text-primary-600;
+  }
+
+  /* Input fields */
+  .input {
+    @apply w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent;
+  }
+
+  /* Skeleton loaders */
+  .skeleton {
+    @apply bg-gray-200 animate-pulse rounded;
+  }
+
+  .skeleton-text {
+    @apply skeleton h-4 w-3/4;
+  }
+
+  .skeleton-image {
+    @apply skeleton aspect-square;
+  }
+}
+
+/* Loading animation */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer {
+  animation: shimmer 2s infinite;
+  background: linear-gradient(
+    to right,
+    #f3f4f6 0%,
+    #e5e7eb 20%,
+    #f3f4f6 40%,
+    #f3f4f6 100%
+  );
+  background-size: 1000px 100%;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  body {
+    background: white;
+  }
+
+  .no-print {
+    display: none;
+  }
 }

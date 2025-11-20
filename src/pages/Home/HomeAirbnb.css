@@ -1,0 +1,292 @@
+/* HomeAirbnb.css - Estilo Airbnb 2025 */
+
+* {
+  box-sizing: border-box;
+}
+
+.home-airbnb {
+  width: 100%;
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+/* Hero Section */
+.hero-section {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+
+.hero-background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  z-index: 0;
+}
+
+.hero-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.hero-title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 48px;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+  z-index: 2;
+  width: 100%;
+  padding: 0 2rem;
+  line-height: 1.2;
+}
+
+/* SearchBar posicionamiento */
+.hero-section > div:last-child {
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 1200px;
+  z-index: 3;
+}
+
+/* Content */
+.home-content {
+  max-width: 1200px;
+  margin: 80px auto 0;
+  padding: 0 1rem;
+  width: 100%;
+}
+
+.content-header {
+  margin-bottom: 2rem;
+  padding-top: 1rem;
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #222;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Grid de propiedades */
+.properties-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 4rem;
+}
+
+/* Loading State */
+.loading-container {
+  margin-bottom: 4rem;
+}
+
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.skeleton-card {
+  border-radius: 12px;
+  overflow: hidden;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-image {
+  width: 100%;
+  height: 240px;
+  background: #e0e0e0;
+}
+
+.skeleton-content {
+  padding: 16px;
+  background: #f5f5f5;
+}
+
+.skeleton-line {
+  height: 12px;
+  background: #d0d0d0;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.skeleton-line.short {
+  width: 60%;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Error State */
+.error-container {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: #fff3cd;
+  border-radius: 12px;
+  margin-bottom: 4rem;
+}
+
+.error-message {
+  font-size: 18px;
+  color: #856404;
+  margin: 0 0 1rem 0;
+  font-weight: 600;
+}
+
+.retry-button {
+  background: #ff4757;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.retry-button:hover {
+  background: #ff3838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+}
+
+/* Empty State */
+.empty-container {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: #f5f5f5;
+  border-radius: 12px;
+  margin-bottom: 4rem;
+}
+
+.empty-message {
+  font-size: 24px;
+  font-weight: 700;
+  color: #222;
+  margin: 0 0 0.5rem 0;
+}
+
+.empty-submessage {
+  font-size: 16px;
+  color: #717171;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .hero-section {
+    height: 350px;
+  }
+
+  .hero-title {
+    font-size: 40px;
+  }
+
+  .properties-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
+
+  .home-content {
+    margin: 70px auto 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    height: 300px;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-title {
+    font-size: 32px;
+  }
+
+  .home-content {
+    margin: 60px auto 0;
+    padding: 0 0.75rem;
+  }
+
+  .section-title {
+    font-size: 24px;
+    margin-bottom: 1.5rem;
+  }
+
+  .properties-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 3rem;
+  }
+
+  .skeleton-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .skeleton-image {
+    height: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    height: 250px;
+    margin-bottom: 1rem;
+  }
+
+  .hero-title {
+    font-size: 24px;
+    padding: 0 1rem;
+  }
+
+  .home-content {
+    margin: 50px auto 0;
+    padding: 0 0.5rem;
+  }
+
+  .section-title {
+    font-size: 20px;
+    margin-bottom: 1rem;
+  }
+
+  .properties-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 2rem;
+  }
+
+  .skeleton-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .skeleton-image {
+    height: 200px;
+  }
+
+  .content-header {
+    margin-bottom: 1rem;
+  }
+}

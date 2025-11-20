@@ -1,8 +1,8 @@
-# Marketplace Component Restructure & Aesthetics Improvements
+# Refactor Plan
 
-## Current Status
-- ✅ Analyzed existing Marketplace components
-- ✅ Identified two versions: pages/Marketplace (basic) and components/user/Marketplace (advanced)
+1. Create new PropertyCard component like Airbnb
+
+2. Modify SearchBar to be large hero style
 - 🔄 Planning restructure of main Marketplace component
 
 ## Planned Improvements

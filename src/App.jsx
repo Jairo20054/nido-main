@@ -49,7 +49,7 @@ const lazyLoad = (importFunc, exportName = null) => {
 };
 
 // Lazy Loaded Pages
-const Home = lazyLoad(() => import('./pages/Home/Home'));
+const Home = lazyLoad(() => import('./pages/Home/HomeAirbnb'));
 const Search = lazyLoad(() => import('./pages/Search/Search'));
 const Property = lazyLoad(() => import('./pages/Property/Property'));
 const BookingPage = lazyLoad(() => import('./components/common/booking/Booking'));
@@ -95,12 +95,12 @@ const Remodelaciones = lazyLoad(() => import('./pages/Remodelaciones/Remodelacio
 function App() {
   return (
     <Router>
-        <UiHostProvider>
-          <AuthProvider>
-            <SearchProvider> {/* SearchProvider debe envolver todo el contenido que use useSearch */}
-              <BookingProvider>
-                <CartProvider>
-                  <Layout>
+      <AuthProvider>
+        <CartProvider>
+          <SearchProvider>
+            <BookingProvider>
+              <UiHostProvider>
+                <Layout>
                   <Suspense fallback={<LoadingSpinner />}>
                     <Routes>
                   {/* Public Routes */}
@@ -174,12 +174,12 @@ function App() {
                     </Routes>
                   </Suspense>
                 </Layout>
-                </CartProvider>
-              </BookingProvider>
-            </SearchProvider>
-          </AuthProvider>
-        </UiHostProvider>
-      </Router>
+              </UiHostProvider>
+            </BookingProvider>
+          </SearchProvider>
+        </CartProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 
