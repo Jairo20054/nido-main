@@ -34,29 +34,26 @@
   width: 100%;
 }
 
-/* Sidebar - Oculto en móvil por defecto */
+/* Sidebar - Removido para layout limpio */
 .desktop-sidebar {
-  display: none;
+  display: none !important;
 }
 
-@media (min-width: 768px) {
-  .desktop-sidebar {
-    display: block;
-    width: var(--sidebar-width);
-    flex-shrink: 0;
-  }
-}
-
-/* Contenido principal - Full Viewport */
+/* Contenido principal - Full Width (SIN Sidebar) */
 .main-content-layout {
   flex: 1;
   width: 100%;
   max-width: none;
   margin: 0;
-  padding: 0 var(--content-padding);
+  padding: 0;
   background: var(--background-color);
   min-height: 100vh;
   overflow-x: hidden;
+}
+
+.main-content-layout.full-width {
+  width: 100%;
+  padding: 0;
 }
 
 /* Navegación móvil */

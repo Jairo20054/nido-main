@@ -7,20 +7,13 @@ import './Layout.css';
 
 const Layout = ({ children }) => {
   const location = useLocation();
-  const shouldShowSidebar = location.pathname === "/";
 
   return (
     <div className="layout">
       <Header />
       <div className="content-wrapper">
-        {/* Desktop: mostrar sidebar lateral solo en Home */}
-        {shouldShowSidebar && (
-          <div className="desktop-sidebar">
-            <LeftSidebar />
-          </div>
-        )}
-
-        <main className="main-content-layout">
+        {/* LeftSidebar removido - solo contenido principal */}
+        <main className="main-content-layout full-width">
           {children}
         </main>
       </div>

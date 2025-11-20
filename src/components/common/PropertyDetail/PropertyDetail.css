@@ -1,0 +1,461 @@
+/* PropertyDetail.css - Modal elegante para detalles de propiedades */
+
+/* Overlay oscuro */
+.property-detail-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Modal principal */
+.property-detail-modal {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Header con controles */
+.property-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+}
+
+.header-controls {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.control-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  color: #6b7280;
+}
+
+.control-btn:hover {
+  background: #f3f4f6;
+  color: #ff3b72;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  color: #111827;
+}
+
+.close-btn:hover {
+  background: #f3f4f6;
+}
+
+/* Galería de imágenes */
+.property-detail-gallery {
+  width: 100%;
+  max-height: 500px;
+  background: #111827;
+  position: relative;
+  overflow: hidden;
+}
+
+.gallery-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gallery-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Navegación de galería */
+.gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  cursor: pointer;
+  padding: 0.75rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: #111827;
+  z-index: 5;
+}
+
+.gallery-nav:hover {
+  background: white;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.gallery-nav-prev {
+  left: 1rem;
+}
+
+.gallery-nav-next {
+  right: 1rem;
+}
+
+/* Indicadores de imagen */
+.gallery-indicators {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  z-index: 5;
+}
+
+.indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.indicator.active {
+  background: white;
+  width: 28px;
+  border-radius: 5px;
+}
+
+/* Contador de imágenes */
+.image-counter {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  z-index: 5;
+}
+
+/* Contenido */
+.property-detail-content {
+  padding: 2rem;
+}
+
+/* Header del contenido */
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  gap: 2rem;
+}
+
+.property-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.2;
+}
+
+.property-location {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.rating-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f3f4f6;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  min-width: 120px;
+  text-align: right;
+}
+
+.rating {
+  font-weight: 700;
+  color: #111827;
+  font-size: 1rem;
+}
+
+.reviews {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+/* Sección de precio */
+.price-section {
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.price {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #ff3b72;
+}
+
+.price-label {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+/* Grid de características */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.feature-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.feature-card:hover {
+  background: #f3f4f6;
+  transform: translateY(-2px);
+}
+
+.feature-card svg {
+  color: #ff3b72;
+  flex-shrink: 0;
+}
+
+.feature-label {
+  font-size: 0.85rem;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.feature-value {
+  font-size: 1.1rem;
+  color: #111827;
+  font-weight: 700;
+}
+
+/* Sección de descripción */
+.description-section {
+  margin-bottom: 2rem;
+}
+
+.description-section h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.75rem 0;
+}
+
+.description-section p {
+  color: #6b7280;
+  line-height: 1.6;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* Sección de amenidades */
+.amenities-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.amenities-section h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 1rem 0;
+}
+
+.amenities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.amenity {
+  color: #111827;
+  font-size: 0.95rem;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.amenity:hover {
+  border-color: #ff3b72;
+  background: rgba(255, 59, 114, 0.05);
+}
+
+/* Botones de acción */
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn-primary,
+.btn-secondary {
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn-secondary {
+  background: white;
+  color: #111827;
+  border: 2px solid #e5e7eb;
+}
+
+.btn-secondary:hover {
+  background: #f3f4f6;
+  border-color: #111827;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .property-detail-modal {
+    width: 95%;
+    max-height: 95vh;
+    border-radius: 12px;
+  }
+
+  .property-title {
+    font-size: 1.5rem;
+  }
+
+  .price {
+    font-size: 1.75rem;
+  }
+
+  .content-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .property-detail-gallery {
+    max-height: 300px;
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .amenities-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+}
+
+/* Scrollbar personalizado */
+.property-detail-modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.property-detail-modal::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.property-detail-modal::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.property-detail-modal::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
