@@ -14,6 +14,7 @@ import { CartProvider } from './context/CartContext';
 
 // Layout & Loading
 import Layout from './components/common/Layout/Layout';
+import HomeLayout from './components/common/Layout/HomeLayout';
 import LoadingSpinner from './components/common/LoadingSpinner/LoadingSpinner';
 
 // Global Styles
@@ -49,7 +50,7 @@ const lazyLoad = (importFunc, exportName = null) => {
 };
 
 // Lazy Loaded Pages
-const Home = lazyLoad(() => import('./pages/Home/HomeAirbnb'));
+const Home = lazyLoad(() => import('./pages/Home/Home'));
 const Search = lazyLoad(() => import('./pages/Search/Search'));
 const Property = lazyLoad(() => import('./pages/Property/Property'));
 const BookingPage = lazyLoad(() => import('./components/common/booking/Booking'));
@@ -103,8 +104,10 @@ function App() {
                 <Layout>
                   <Suspense fallback={<LoadingSpinner />}>
                     <Routes>
-                  {/* Public Routes */}
-                  <Route path="/" element={<Home />} />
+                  {/* Home - Optimizado sin Layout pesado */}
+                  <Route path="/" element={<HomeLayout><Home /></HomeLayout>} />
+                  
+                  {/* Otras rutas con Layout estándar */}
                   <Route path="/search" element={<Search />} />
                   <Route path="/property/:id" element={<Property />} />
                   <Route path="/login" element={<Login />} />
