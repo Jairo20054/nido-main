@@ -388,9 +388,15 @@
   color: white;
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #ccc 0%, #999 100%);
 }
 
 .btn-secondary {
@@ -402,6 +408,92 @@
 .btn-secondary:hover {
   background: #f3f4f6;
   border-color: #111827;
+}
+
+/* Sección de Reserva */
+.booking-section {
+  padding: 2rem 1.5rem;
+  background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  margin: 1.5rem 0;
+}
+
+.booking-section h3 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.booking-fields {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.booking-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.booking-field label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.booking-field input,
+.booking-field select {
+  padding: 0.875rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.booking-field input:focus,
+.booking-field select:focus {
+  outline: none;
+  border-color: #ff3b72;
+  box-shadow: 0 0 0 3px rgba(255, 59, 114, 0.1);
+}
+
+.booking-field select {
+  cursor: pointer;
+}
+
+/* Responsive - Sección de reserva */
+@media (max-width: 768px) {
+  .booking-fields {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .booking-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .booking-section h3 {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .booking-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-field input,
+  .booking-field select {
+    padding: 0.75rem;
+    font-size: 0.95rem;
+  }
 }
 
 /* Responsive */

@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
 import { X, ChevronLeft, ChevronRight, Heart, Share2, MapPin, Users, Home, Maximize2, Star } from 'lucide-react';
+import PaymentGateway from '../PaymentGateway/PaymentGateway';
 import './PropertyDetail.css';
 
 const PropertyDetail = ({ property, onClose }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [bookingData, setBookingData] = useState({
+    checkIn: '',
+    checkOut: '',
+    guests: '1'
+  });
 
   if (!property) return null;
 
@@ -160,16 +167,74 @@ const PropertyDetail = ({ property, onClose }) => {
             </div>
           </div>
 
+          {/* Sección de Reserva */}
+          <div className="booking-section">
+            <h3>Selecciona tus fechas</h3>
+            <div className="booking-fields">
+              <div className="booking-field">
+                <label htmlFor="checkIn">Check-in</label>
+                <input
+                  type="date"
+                  id="checkIn"
+                  value={bookingData.checkIn}
+                  onChange={(e) => setBookingData({...bookingData, checkIn: e.target.value})}
+                />
+              </div>
+              <div className="booking-field">
+                <label htmlFor="checkOut">Check-out</label>
+                <input
+                  type="date"
+                  id="checkOut"
+                  value={bookingData.checkOut}
+                  onChange={(e) => setBookingData({...bookingData, checkOut: e.target.value})}
+                />
+              </div>
+              <div className="booking-field">
+                <label htmlFor="guests">Huéspedes</label>
+                <select
+                  id="guests"
+                  value={bookingData.guests}
+                  onChange={(e) => setBookingData({...bookingData, guests: e.target.value})}
+                >
+                  <option value="1">1 huésped</option>
+                  <option value="2">2 huéspedes</option>
+                  <option value="3">3 huéspedes</option>
+                  <option value="4">4 huéspedes</option>
+                  <option value="5">5 huéspedes</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
           {/* Botones de acción */}
           <div className="action-buttons">
             <button className="btn-secondary" onClick={onClose}>
               Volver
             </button>
-            <button className="btn-primary">
-              Reservar Ahora
+            <button 
+              className="btn-primary"
+              onClick={() => setShowPayment(true)}
+              disabled={!bookingData.checkIn || !bookingData.checkOut}
+            >
+              Proceder al Pago
             </button>
           </div>
         </div>
+
+        {/* Payment Gateway Modal */}
+        {showPayment && (
+          <PaymentGateway
+            property={property}
+            checkInDate={bookingData.checkIn}
+            checkOutDate={bookingData.checkOut}
+            guests={bookingData.guests}
+            onClose={() => setShowPayment(false)}
+            onPaymentComplete={(data) => {
+              console.log('Reserva completada:', data);
+              onClose();
+            }}
+          />
+        )}
       </div>
     </div>
   );
