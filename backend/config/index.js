@@ -11,6 +11,7 @@ const envSchema = Joi.object({
 
   DB_TYPE: Joi.string().valid('mongodb').default('mongodb'),
   MONGODB_URI: Joi.string().uri().required(),
+  POSTGRES_URI: Joi.string().uri().default('postgresql://postgres:postgres@localhost:5432/nido'),
 
   JWT_SECRET: Joi.string().min(12).required(),
   JWT_ACCESS_EXPIRY: Joi.string().default('15m'),
@@ -76,6 +77,9 @@ const config = Object.freeze({
         useNewUrlParser: true,
         useUnifiedTopology: true,
       },
+    },
+    postgres: {
+      uri: env.POSTGRES_URI,
     },
   },
 
