@@ -1,6 +1,6 @@
 import React from 'react';
-import PropertyCard from '../PropertyCard/PropertyCardOptimized';
-import styles from './PropertyGrid.module.css';
+import PropertyCardOptimized from '../PropertyCard/PropertyCardOptimized';
+import styles from './PropertyGridOptimized.module.css';
 
 /**
  * PropertyGrid - GRID PERFECTO SIN LAYOUT SHIFTS
@@ -24,7 +24,7 @@ const PropertyGrid = ({
     return (
       <div className={styles.propertyGrid}>
         {Array.from({ length: 8 }).map((_, i) => (
-          <PropertyCard key={`skeleton-${i}`} isLoading={true} />
+          <PropertyCardOptimized key={`skeleton-${i}`} isLoading={true} />
         ))}
       </div>
     );
@@ -42,7 +42,7 @@ const PropertyGrid = ({
   return (
     <div className={styles.propertyGrid}>
       {properties.map((property) => (
-        <PropertyCard
+        <PropertyCardOptimized
           key={property.id}
           property={property}
           onClick={() => onCardClick?.(property)}

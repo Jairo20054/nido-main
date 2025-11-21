@@ -12,7 +12,6 @@ import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import LoadingSpinner from '../../components/common/LoadingSpinner/LoadingSpinner';
 import ErrorState from '../../components/common/ErrorState/ErrorState';
-import { api } from '../../utils/api';
 import styles from './PropertyDetailPremium.module.css';
 
 // Amenities mapping con iconos
@@ -50,8 +49,10 @@ const PropertyDetailPremium = () => {
     const fetchProperty = async () => {
       try {
         setLoading(true);
-        const response = await api.get(`/properties/${id}`);
-        setProperty(response.data.data || response.data);
+        const response = await fetch(`/api/properties/${id}`);
+        if (!response.ok) throw new Error('Property not found');
+        const data = await response.json();
+        setProperty(data.data || data);
         
         // Generar reseñas mock (en producción, vendrían del API)
         generateMockReviews(6);

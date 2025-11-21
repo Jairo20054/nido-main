@@ -23,10 +23,10 @@
   border-radius: 8px;
   transition: all 0.2s;
   color: #111;
+}
 
-  &:hover {
-    background: #f0f0f0;
-  }
+.backButton:hover {
+  background: #f0f0f0;
 }
 
 .actions {

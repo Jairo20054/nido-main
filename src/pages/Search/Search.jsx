@@ -147,7 +147,7 @@ const Search = () => {
 
   // Reintentar búsqueda
   const handleRetry = useCallback(() => {
-    if (searchParams.location) {
+    if (searchParams.city) {
       executeSearch(searchParams);
     }
   }, [searchParams, executeSearch]);
@@ -155,7 +155,7 @@ const Search = () => {
   // Limpiar filtros
   const handleClearFilters = useCallback(() => {
     const basicParams = {
-      location: searchParams.location,
+      city: searchParams.city,
       checkIn: searchParams.checkIn,
       checkOut: searchParams.checkOut,
       guests: searchParams.guests || 1
@@ -250,8 +250,8 @@ const Search = () => {
           <h1 className="search-title">{pageTitle}</h1>
           <ResultsCounter 
             count={properties.length} 
-            loading={loading || isLoading}
-            location={searchParams.location}
+            loading={loading}
+            location={searchParams.city}
           />
         </div>
         

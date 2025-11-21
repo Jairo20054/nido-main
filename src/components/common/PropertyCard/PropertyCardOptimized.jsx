@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Heart } from 'lucide-react';
-import './PropertyCard.module.css';
+import styles from './PropertyCardOptimized.module.css';
 
 /**
  * PropertyCard Optimizado - SIN LAYOUT SHIFTS
@@ -11,14 +11,14 @@ import './PropertyCard.module.css';
  */
 
 const PropertyCardSkeleton = () => (
-  <div className="property-card skeleton">
-    <div className="property-image-container">
-      <div className="skeleton-loader"></div>
+  <div className={styles.card}>
+    <div className={styles.imageContainer}>
+      <div className={styles.skeletonImage} />
     </div>
-    <div className="property-content">
-      <div className="skeleton-text skeleton-title"></div>
-      <div className="skeleton-text skeleton-location"></div>
-      <div className="skeleton-text skeleton-price"></div>
+    <div className={styles.content}>
+      <div className={styles.skeletonLine} />
+      <div className={styles.skeletonLine} />
+      <div className={styles.skeletonLine} />
     </div>
   </div>
 );
@@ -30,26 +30,19 @@ const PropertyCard = ({
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [imageError, setImageError] = useState(false);
 
-  if (isLoading) return <PropertyCardSkeleton />;
-
-  const images = property?.images || [];
-  const hasImages = images.length > 0 && !imageError;
-  const currentImage = hasImages ? images[currentImageIndex] : null;
+  // Define hooks BEFORE any early returns
+  const images = property?.images || ['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500&h=500&fit=crop'];
+  const currentImage = images[currentImageIndex] || images[0];
 
   const handlePrevImage = useCallback((e) => {
     e.stopPropagation();
-    setCurrentImageIndex((prev) => 
-      prev === 0 ? images.length - 1 : prev - 1
-    );
+    setCurrentImageIndex((prev) => prev === 0 ? images.length - 1 : prev - 1);
   }, [images.length]);
 
   const handleNextImage = useCallback((e) => {
     e.stopPropagation();
-    setCurrentImageIndex((prev) => 
-      (prev + 1) % images.length
-    );
+    setCurrentImageIndex((prev) => (prev + 1) % images.length);
   }, [images.length]);
 
   const handleFavorite = useCallback((e) => {
@@ -57,133 +50,105 @@ const PropertyCard = ({
     setIsFavorite(!isFavorite);
   }, [isFavorite]);
 
-  const handleImageError = () => {
-    setImageError(true);
-  };
-
-  const handleImageLoad = () => {
-    setImageError(false);
-  };
+  // NOW we can have early returns
+  if (isLoading) return <PropertyCardSkeleton />;
+  if (!property) return null;
 
   return (
-    <article 
-      className="property-card"
+    <div 
+      className={styles.card}
       onClick={onClick}
-      role="article"
-      aria-label={`Propiedad: ${property?.title}`}
+      role="button"
+      tabIndex={0}
+      onKeyPress={(e) => e.key === 'Enter' && onClick?.()}
     >
-      {/* IMAGE CONTAINER - FIXED ASPECT RATIO */}
-      <div className="property-image-container">
-        {hasImages ? (
-          <>
-            <img
-              src={currentImage}
-              alt={`${property?.title} - Imagen ${currentImageIndex + 1}`}
-              className="property-image"
-              loading="lazy"
-              onError={handleImageError}
-              onLoad={handleImageLoad}
-            />
-            
-            {/* IMAGE NAVIGATION */}
-            {images.length > 1 && (
-              <>
-                <button
-                  className="image-nav-btn prev"
-                  onClick={handlePrevImage}
-                  aria-label="Imagen anterior"
-                  type="button"
-                >
-                  <ChevronLeft size={20} />
-                </button>
-                <button
-                  className="image-nav-btn next"
-                  onClick={handleNextImage}
-                  aria-label="Siguiente imagen"
-                  type="button"
-                >
-                  <ChevronRight size={20} />
-                </button>
-
-                {/* IMAGE INDICATORS */}
-                <div className="image-indicators">
-                  {images.map((_, index) => (
-                    <button
-                      key={index}
-                      className={`indicator ${index === currentImageIndex ? 'active' : ''}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setCurrentImageIndex(index);
-                      }}
-                      aria-label={`Ir a imagen ${index + 1}`}
-                      type="button"
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-
-            {/* FAVORITE BUTTON */}
-            <button
-              className={`favorite-btn ${isFavorite ? 'active' : ''}`}
-              onClick={handleFavorite}
-              aria-label={isFavorite ? 'Remover de favoritos' : 'Agregar a favoritos'}
-              type="button"
-            >
-              <Heart size={20} fill={isFavorite ? 'currentColor' : 'none'} />
-            </button>
-
-            {/* SUPERHOST BADGE */}
-            {property?.superhost && (
-              <div className="badge superhost">
-                ⭐ Superanfitrión
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="image-placeholder">
-            <span>Sin imágenes disponibles</span>
+      {/* IMAGE CONTAINER - FIXED ASPECT RATIO 4/5 */}
+      <div className={styles.imageContainer}>
+        <img
+          src={currentImage}
+          alt={`${property?.title || 'Property'} - Image ${currentImageIndex + 1}`}
+          className={styles.image}
+          loading="lazy"
+        />
+        
+        {/* SUPERHOST BADGE */}
+        {property?.superhost && (
+          <div className={styles.superhostBadge}>
+            ⭐ Superhost
           </div>
         )}
+        
+        {/* IMAGE NAVIGATION */}
+        {images.length > 1 && (
+          <>
+            <button
+              className={`${styles.navBtn} ${styles.prev}`}
+              onClick={handlePrevImage}
+              aria-label="Previous image"
+              type="button"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button
+              className={`${styles.navBtn} ${styles.next}`}
+              onClick={handleNextImage}
+              aria-label="Next image"
+              type="button"
+            >
+              <ChevronRight size={18} />
+            </button>
+
+            {/* IMAGE INDICATORS */}
+            <div className={styles.indicators}>
+              {images.map((_, index) => (
+                <button
+                  key={index}
+                  className={`${styles.indicator} ${index === currentImageIndex ? styles.active : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentImageIndex(index);
+                  }}
+                  type="button"
+                  aria-label={`Go to image ${index + 1}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* FAVORITE BUTTON */}
+        <button
+          className={`${styles.favoriteBtn} ${isFavorite ? styles.favorited : ''}`}
+          onClick={handleFavorite}
+          aria-label="Add to favorites"
+          type="button"
+        >
+          <Heart size={20} fill={isFavorite ? 'currentColor' : 'none'} />
+        </button>
       </div>
 
       {/* CONTENT */}
-      <div className="property-content">
-        {/* TITLE & RATING */}
-        <div className="property-header">
-          <h3 className="property-title">{property?.title}</h3>
+      <div className={styles.content}>
+        <h3 className={styles.title}>{property?.title || 'Property'}</h3>
+        
+        <div className={styles.location}>
+          📍 {property?.location || 'Location'}
+        </div>
+
+        <div className={styles.footer}>
+          <div className={styles.price}>
+            ${(property?.price || 0).toLocaleString('es-CO')}
+            <span className={styles.period}>/noche</span>
+          </div>
+          
           {property?.rating && (
-            <div className="property-rating" aria-label={`Calificación: ${property.rating}`}>
-              <span className="star">⭐</span>
-              <span className="rating-value">{property.rating.toFixed(1)}</span>
+            <div className={styles.rating}>
+              ⭐ {property.rating.toFixed(1)}
             </div>
           )}
         </div>
-
-        {/* LOCATION */}
-        {property?.city && (
-          <p className="property-location">📍 {property.city}</p>
-        )}
-
-        {/* FEATURES */}
-        {(property?.bedrooms || property?.bathrooms) && (
-          <div className="property-features">
-            {property?.bedrooms && <span>{property.bedrooms} hab</span>}
-            {property?.bathrooms && <span>{property.bathrooms} baños</span>}
-          </div>
-        )}
-
-        {/* PRICE */}
-        <div className="property-price">
-          <span className="price-amount">
-            ${property?.price?.toLocaleString('es-CO')}
-          </span>
-          <span className="price-unit">
-            {property?.pricePeriod || '/noche'}
-          </span>
-        </div>
       </div>
-    </article>
+    </div>
   );
 };
 
