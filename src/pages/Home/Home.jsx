@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SearchBar from '../../components/common/SearchBar/SearchBar';
-import PropertyCard from '../../components/common/PropertyCard/PropertyCard';
-import PropertyDetail from '../../components/common/PropertyDetail/PropertyDetail';
+import PropertyGridOptimized from '../../components/common/PropertyGrid/PropertyGridOptimized';
 import './Home.css';
 
 const MOCK_PROPERTIES = [
@@ -14,16 +14,16 @@ const MOCK_PROPERTIES = [
 ];
 
 export default function Home() {
-  const [searchParams, setSearchParams] = useState({ location: '', checkIn: '', checkOut: '', guests: '' });
-  const [selectedProperty, setSelectedProperty] = useState(null);
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useState({ city: '', checkIn: '', checkOut: '', guests: '' });
 
   const filteredProperties = useMemo(() => {
-    if (!searchParams.location) return MOCK_PROPERTIES;
+    if (!searchParams.city) return MOCK_PROPERTIES;
     return MOCK_PROPERTIES.filter(p => 
-      p.title.toLowerCase().includes(searchParams.location.toLowerCase()) ||
-      p.location.toLowerCase().includes(searchParams.location.toLowerCase())
+      p.title.toLowerCase().includes(searchParams.city.toLowerCase()) ||
+      p.location.toLowerCase().includes(searchParams.city.toLowerCase())
     );
-  }, [searchParams.location]);
+  }, [searchParams.city]);
 
   return (
     <div className="home">
@@ -39,24 +39,13 @@ export default function Home() {
       {/* Properties Section */}
       <section className="home-properties">
         <div className="properties-container">
-          {filteredProperties.length > 0 ? (
-            <div className="properties-grid">
-              {filteredProperties.map(p => (
-                <div key={p.id} onClick={() => setSelectedProperty(p)} className="property-card-wrapper">
-                  <PropertyCard property={p} onFavoriteToggle={() => {}} />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="empty-state">No se encontraron propiedades</div>
-          )}
+          <PropertyGridOptimized 
+            properties={filteredProperties}
+            isLoading={false}
+            onCardClick={(property) => navigate(`/property/${property._id || property.id}`)}
+          />
         </div>
       </section>
-
-      {/* Property Detail Modal */}
-      {selectedProperty && (
-        <PropertyDetail property={selectedProperty} onClose={() => setSelectedProperty(null)} />
-      )}
     </div>
   );
 }

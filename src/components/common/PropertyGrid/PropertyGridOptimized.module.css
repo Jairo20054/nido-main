@@ -1,0 +1,61 @@
+/* PropertyGrid Optimizado - SIN LAYOUT SHIFTS */
+
+.propertyGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+.emptyState {
+  grid-column: 1 / -1;
+  padding: 60px 20px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 1rem;
+}
+
+/* DESKTOP - 4 COLUMNAS */
+@media (min-width: 1400px) {
+  .propertyGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+}
+
+/* LAPTOP - 3 COLUMNAS */
+@media (min-width: 1024px) and (max-width: 1399px) {
+  .propertyGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+}
+
+/* TABLET - 2 COLUMNAS */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .propertyGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+/* MOBILE - 1 COLUMNA */
+@media (max-width: 767px) {
+  .propertyGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* SMALL MOBILE */
+@media (max-width: 480px) {
+  .propertyGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+/* UTILITARIOS PARA POSICIONAMIENTO DE GRID */
+.propertyGrid > * {
+  min-height: 0;
+}

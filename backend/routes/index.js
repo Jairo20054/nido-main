@@ -4,6 +4,7 @@ const router = express.Router();
 // Importar las rutas individuales
 const authRoutes = require('./authRoutes');
 const propertyRoutes = require('./propertyRoutes');
+const propertySearchRoutes = require('./propertySearchRoutes');
 const userRoutes = require('./userRoutes');
 const bookingRoutes = require('./bookingRoutes');
 
@@ -22,6 +23,7 @@ router.get('/placeholder/:width/:height', (req, res) => {
 
 // Usar las rutas individuales
 router.use('/auth', authRoutes);
+router.use('/properties', propertySearchRoutes);
 router.use('/properties', propertyRoutes);
 router.use('/users', userRoutes);
 router.use('/bookings', bookingRoutes);

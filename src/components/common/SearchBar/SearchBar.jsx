@@ -1,16 +1,32 @@
 import React, { useState } from 'react';
 import { MapPin, Calendar, Users, Search } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import './SearchBar.css';
 
 const SearchBar = ({ onSearch, minimal = false }) => {
-  const [location, setLocation] = useState('');
-  const [checkIn, setCheckIn] = useState('');
-  const [checkOut, setCheckOut] = useState('');
-  const [guests, setGuests] = useState(1);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  
+  const [location, setLocation] = useState(searchParams.get('city') || '');
+  const [checkIn, setCheckIn] = useState(searchParams.get('checkIn') || '');
+  const [checkOut, setCheckOut] = useState(searchParams.get('checkOut') || '');
+  const [guests, setGuests] = useState(searchParams.get('guests') || 1);
   const [focusedField, setFocusedField] = useState(null);
 
   const handleSearch = (e) => {
     e.preventDefault();
+    
+    // Build query string for URL
+    const queryParams = new URLSearchParams();
+    if (location) queryParams.append('city', location);
+    if (checkIn) queryParams.append('checkIn', checkIn);
+    if (checkOut) queryParams.append('checkOut', checkOut);
+    if (guests) queryParams.append('guests', guests);
+    
+    // Navigate to search page with query params
+    navigate(`/search?${queryParams.toString()}`);
+    
+    // Also call onSearch callback if provided
     if (onSearch) {
       onSearch({ location, checkIn, checkOut, guests });
     }

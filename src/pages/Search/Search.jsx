@@ -1,9 +1,8 @@
 // src/pages/Search/Search.jsx (Modified minimally for integration; added responsiveness notes in CSS if needed, but assuming existing CSS handles it)
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import useSearch from '../../hooks/useSearch';
 import SearchFilters from '../../components/Search/SearchFilters';
-import PropertyGrid from '../../components/property/PropertyGrid/PropertyGrid';
+import PropertyGridOptimized from '../../components/common/PropertyGrid/PropertyGridOptimized';
 import MapView from '../../components/Search/MapView/MapView';
 import ViewToggle from '../../components/Search/ViewToggle/ViewToggle';
 import LoadingSpinner from '../../components/common/LoadingSpinner/LoadingSpinner';
@@ -11,7 +10,7 @@ import EmptyState from '../../components/common/EmptyState/EmptyState';
 import ErrorMessage from '../../components/common/ErrorMessage/ErrorMessage';
 import SortDropdown from '../../components/Search/SortDropdown/SortDropdown';
 import ResultsCounter from '../../components/Search/ResultsCounter/ResultsCounter';
-import SearchBar from '../../components/common/Header/SearchBar'; // Componente existente
+import SearchBar from '../../components/common/SearchBar/SearchBar';
 import './Search.css';
 
 const Search = () => {
@@ -28,25 +27,19 @@ const Search = () => {
   });
   const [sortBy, setSortBy] = useState('relevance');
   const [filtersVisible, setFiltersVisible] = useState(false);
-  
-  // Usar el hook useSearch correctamente
-  const { results, isLoading, searchProperties } = useSearch();
 
-  // Parsear parámetros de URL inicial
+  // Parsear parámetros de URL
   const parseUrlParams = useCallback(() => {
     const params = Object.fromEntries(urlParams.entries());
     return {
-      location: params.location || '',
+      city: params.city || '',
       checkIn: params.checkIn || '',
       checkOut: params.checkOut || '',
       guests: parseInt(params.guests) || 1,
-      minPrice: params.minPrice ? parseInt(params.minPrice) : null,
-      maxPrice: params.maxPrice ? parseInt(params.maxPrice) : null,
+      priceMin: params.priceMin ? parseInt(params.priceMin) : null,
+      priceMax: params.priceMax ? parseInt(params.priceMax) : null,
       propertyType: params.propertyType || '',
       amenities: params.amenities ? params.amenities.split(',') : [],
-      accessibility: params.accessibility === 'true',
-      rating: params.rating ? parseFloat(params.rating) : null,
-      instantBook: params.instantBook === 'true'
     };
   }, [urlParams]);
 
@@ -58,7 +51,7 @@ const Search = () => {
       if (value !== null && value !== undefined && value !== '' && value !== false) {
         if (Array.isArray(value) && value.length > 0) {
           params.set(key, value.join(','));
-        } else if (value !== 1 || key !== 'guests') { // No incluir guests=1 por defecto
+        } else if (value !== 1 || key !== 'guests') {
           params.set(key, value.toString());
         }
       }
@@ -67,44 +60,55 @@ const Search = () => {
     setUrlParams(params, { replace: true });
   }, [setUrlParams]);
 
-  // Ejecutar búsqueda
+  // Ejecutar búsqueda en backend
   const executeSearch = useCallback(async (params) => {
     setLoading(true);
     setError(null);
     
     try {
-      // Validaciones básicas
-      if (!params.location?.trim()) {
+      // Validaciones
+      if (!params.city?.trim()) {
         throw new Error('La ubicación es requerida para realizar la búsqueda');
       }
 
-      await searchProperties(params);
+      // Build API query string
+      const queryParams = new URLSearchParams();
+      queryParams.append('city', params.city);
+      if (params.checkIn) queryParams.append('checkIn', params.checkIn);
+      if (params.checkOut) queryParams.append('checkOut', params.checkOut);
+      if (params.guests) queryParams.append('guests', params.guests);
+      if (params.priceMin !== null) queryParams.append('priceMin', params.priceMin);
+      if (params.priceMax !== null) queryParams.append('priceMax', params.priceMax);
+      if (params.propertyType) queryParams.append('propertyType', params.propertyType);
+      if (params.amenities?.length > 0) queryParams.append('amenities', params.amenities.join(','));
+
+      const response = await fetch(`/api/properties/search?${queryParams.toString()}`);
+      
+      if (!response.ok) {
+        throw new Error('Error al realizar la búsqueda');
+      }
+
+      const data = await response.json();
+      setProperties(data.data?.properties || []);
     } catch (err) {
       console.error("Search error:", err);
       setError(err.message || 'Error al realizar la búsqueda. Intenta nuevamente.');
     } finally {
       setLoading(false);
     }
-  }, [searchProperties]);
+  }, []);
 
   // Efecto para inicializar búsqueda desde URL
   useEffect(() => {
     const initialParams = parseUrlParams();
     setSearchParams(initialParams);
     
-    if (initialParams.location) {
+    if (initialParams.city) {
       executeSearch(initialParams);
     } else {
       setLoading(false);
     }
   }, [parseUrlParams, executeSearch]);
-
-  // Efecto para actualizar propiedades cuando cambian los resultados
-  useEffect(() => {
-    if (results) {
-      setProperties(results);
-    }
-  }, [results]);
 
   // Manejar cambios en filtros
   const handleFilterChange = useCallback((newFilters) => {
@@ -163,10 +167,10 @@ const Search = () => {
 
   // Título dinámico mejorado
   const pageTitle = useMemo(() => {
-    if (!searchParams.location) return 'Buscar Alojamientos';
+    if (!searchParams.city) return 'Buscar Alojamientos';
     
-    const { location: loc, checkIn, checkOut, guests } = searchParams;
-    let title = `Alojamientos en ${loc}`;
+    const { city, checkIn, checkOut, guests } = searchParams;
+    let title = `Alojamientos en ${city}`;
     
     if (checkIn && checkOut) {
       const startDate = new Date(checkIn).toLocaleDateString('es-ES', { 
@@ -192,9 +196,9 @@ const Search = () => {
     return [
       { label: 'Inicio', path: '/' },
       { label: 'Búsqueda', path: '/search' },
-      ...(searchParams.location ? [{ label: searchParams.location }] : [])
+      ...(searchParams.city ? [{ label: searchParams.city }] : [])
     ];
-  }, [searchParams.location]);
+  }, [searchParams.city]);
 
   // Mostrar estado de error
   if (error) {
@@ -237,7 +241,6 @@ const Search = () => {
 
       {/* Barra de búsqueda estilo Airbnb */}
       <SearchBar
-        initialData={searchParams}
         onSearch={handleFilterChange}
       />
 
@@ -302,11 +305,11 @@ const Search = () => {
 
         {/* Resultados */}
         <main className="results-container" role="main">
-          {loading || isLoading ? (
+          {loading ? (
             <div className="loading-container">
               <LoadingSpinner />
               <p className="loading-text">
-                Buscando alojamientos en {searchParams.location}...
+                Buscando alojamientos en {searchParams.city}...
               </p>
             </div>
           ) : properties.length === 0 ? (
@@ -319,14 +322,15 @@ const Search = () => {
           ) : (
             <div className="results-content">
               {viewMode === 'grid' ? (
-                <PropertyGrid 
+                <PropertyGridOptimized 
                   properties={properties} 
-                  className="search-results-grid"
+                  isLoading={loading}
+                  onCardClick={(property) => navigate(`/property/${property._id}`)}
                 />
               ) : (
                 <MapView 
                   properties={properties}
-                  center={searchParams.location}
+                  center={searchParams.city}
                   className="search-results-map"
                 />
               )}

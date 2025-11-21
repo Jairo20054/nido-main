@@ -53,6 +53,8 @@ const lazyLoad = (importFunc, exportName = null) => {
 const Home = lazyLoad(() => import('./pages/Home/Home'));
 const Search = lazyLoad(() => import('./pages/Search/Search'));
 const Property = lazyLoad(() => import('./pages/Property/Property'));
+const PropertyDetailPage = lazyLoad(() => import('./pages/PropertyDetailPage/PropertyDetailPage'));
+const PropertyDetailPremium = lazyLoad(() => import('./pages/Property/PropertyDetailPremium'));
 const BookingPage = lazyLoad(() => import('./components/common/booking/Booking'));
 const Login = lazyLoad(() => import('./components/user/Auth/LoginForm'));
 const Register = lazyLoad(() => import('./components/user/Auth/RegisterForm'));
@@ -109,7 +111,7 @@ function App() {
                   
                   {/* Otras rutas con Layout estándar */}
                   <Route path="/search" element={<Search />} />
-                  <Route path="/property/:id" element={<Property />} />
+                  <Route path="/property/:id" element={<PropertyDetailPremium />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="/become-host" element={<BecomeHost />} />
