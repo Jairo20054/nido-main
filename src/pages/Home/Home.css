@@ -1,150 +1,246 @@
-﻿/* Home.css - Airbnb 2025 */
-:root {
-  --primary-color: #ff4757;
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --bg-white: #ffffff;
-  --bg-light: #f8f9fa;
-  --border-color: #e5e7eb;
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
-}
-
-.home {
-  width: 100%;
+.rentals-home {
+  background: #f5f7fb;
+  color: #172033;
   min-height: 100vh;
-  background: var(--bg-light);
-  overflow-x: hidden;
+  padding: 2rem clamp(1rem, 2vw, 2.5rem) 3rem;
+}
+
+.rentals-hero {
+  background: linear-gradient(120deg, #0f1f47 0%, #1d376f 45%, #1f4f8f 100%);
+  color: #fff;
+  border-radius: 24px;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  margin-bottom: 1.5rem;
+}
+
+.hero-pill {
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #aac9ff;
+  margin-bottom: 0.8rem;
+}
+
+.rentals-hero h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+}
+
+.rentals-hero p {
+  max-width: 70ch;
+  opacity: 0.95;
+}
+
+.rentals-metrics {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-bottom: 1.5rem;
+}
+
+.rentals-metrics article {
+  background: #fff;
+  border: 1px solid #dde4f3;
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.rentals-metrics span {
+  color: #65718c;
+  display: block;
+  font-size: 0.86rem;
+  margin-bottom: 0.2rem;
+}
+
+.rentals-main-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 300px) 1fr;
+  gap: 1.25rem;
+}
+
+.filters-panel,
+.catalog-section,
+.comparison-panel,
+.trust-sections article {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #dde4f3;
+  box-shadow: 0 12px 34px rgba(20, 34, 66, 0.04);
+}
+
+.filters-panel {
+  padding: 1rem;
+  align-self: start;
+  position: sticky;
+  top: 1rem;
+}
+
+.filters-panel h2 {
+  margin-top: 0;
+  font-size: 1.05rem;
+}
+
+.filters-panel label {
   display: flex;
   flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.8rem;
+  color: #394763;
+  font-size: 0.9rem;
 }
 
-.home-hero {
-  width: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 3rem 1.5rem 2rem;
-  box-shadow: var(--shadow-md);
+.filters-panel select,
+.filters-panel input {
+  border: 1px solid #c9d5f0;
+  border-radius: 8px;
+  padding: 0.55rem 0.6rem;
 }
 
-.hero-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 1.5rem;
+.catalog-section {
+  padding: 1rem;
 }
 
-.home-properties {
-  flex: 1;
-  width: 100%;
-  padding: 2rem 1rem;
+.catalog-header {
+  margin-bottom: 1rem;
 }
 
-.properties-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
+.catalog-header h2 {
+  margin-bottom: 0.3rem;
 }
 
-.properties-grid {
+.catalog-header p {
+  margin-top: 0;
+  color: #66738f;
+}
+
+.properties-grid-v2 {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
+  gap: 1rem;
+}
+
+.property-card-v2 {
+  border: 1px solid #dfE5f3;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.property-card-v2 img {
   width: 100%;
+  height: 180px;
+  object-fit: cover;
 }
 
-.property-card-wrapper {
+.property-body {
+  padding: 0.9rem;
+}
+
+.property-body h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.property-body p,
+.property-body small {
+  color: #66738f;
+}
+
+.property-body ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.6rem 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.property-body li {
+  background: #eef3ff;
+  color: #2f416a;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.78rem;
+}
+
+.trust-badge {
+  font-size: 0.8rem;
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+  margin-bottom: 0.65rem;
+}
+
+.trust-badge.high { background: #e8f8ee; color: #146037; }
+.trust-badge.medium { background: #fff6df; color: #8a5a0b; }
+.trust-badge.low { background: #fdebed; color: #8b2232; }
+
+.card-actions {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.card-actions button {
+  border: 1px solid #c4d1ef;
+  background: #fff;
+  color: #27375c;
+  border-radius: 8px;
+  padding: 0.55rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
-.property-card-wrapper:hover {
-  transform: translateY(-4px);
+.card-actions .primary {
+  background: #173b78;
+  border-color: #173b78;
+  color: #fff;
 }
 
-.hero-title {
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: white;
+.comparison-panel,
+.trust-sections {
+  margin-top: 1.25rem;
+}
+
+.comparison-panel {
+  padding: 1rem;
+}
+
+.comparison-table {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.8rem;
+}
+
+.comparison-table article {
+  border: 1px solid #dde4f3;
+  border-radius: 12px;
+  padding: 0.75rem;
+}
+
+.trust-sections {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+}
+
+.trust-sections article {
+  padding: 1rem;
+}
+
+.trust-sections ul,
+.trust-sections ol {
   margin: 0;
-  line-height: 1.2;
-  max-width: 800px;
+  padding-left: 1.1rem;
+  color: #4c5773;
+  display: grid;
+  gap: 0.4rem;
 }
 
-.hero-subtitle {
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.95);
-  margin: 0;
-  max-width: 600px;
-  font-weight: 300;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 3rem 1rem;
-  color: var(--text-secondary);
-  font-size: 1.1rem;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .properties-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
-  }
-
-  .hero-title {
-    font-size: 1.8rem;
-  }
-
-  .hero-subtitle {
-    font-size: 0.95rem;
-  }
-
-  .home-properties {
-    padding: 1rem 0.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .properties-grid {
+@media (max-width: 992px) {
+  .rentals-main-grid {
     grid-template-columns: 1fr;
   }
 
-  .hero-content {
-    padding: 0 0.5rem;
+  .filters-panel {
+    position: static;
   }
-}
-
-.home-properties {
-  width: 100%;
-  padding: 3rem 1.5rem;
-}
-
-.properties-container {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.properties-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2rem;
-}
-
-@media (max-width: 768px) {
-  .properties-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
-  }
-  .hero-title { font-size: 1.75rem; }
-  .hero-subtitle { font-size: 0.95rem; }
-}
-
-@media (max-width: 480px) {
-  .properties-grid { grid-template-columns: 1fr; }
-  .hero-title { font-size: 1.5rem; }
 }
