@@ -1,190 +1,55 @@
-import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
-// Protected Routes
-import PrivateRoute from './components/user/Auth/PrivateRoute';
-import HostRoute from './components/user/Auth/HostRoute';
-
-// Context Providers
-import { AuthProvider } from './context/AuthContext';
-import { BookingProvider } from './context/BookingContext';
-import { SearchProvider } from './context/SearchContext';
-import { UiHostProvider } from './context/UiHostProvider';
-import { CartProvider } from './context/CartContext';
-
-// Layout & Loading
-import Layout from './components/common/Layout/Layout';
-import HomeLayout from './components/common/Layout/HomeLayout';
-import LoadingSpinner from './components/common/LoadingSpinner/LoadingSpinner';
-
-// Global Styles
-import './assets/styles/global.css';
-import './assets/styles/variables.css';
-import './assets/styles/utilities.css';
-import './assets/styles/animations.css';
-import './assets/styles/responsive-fixes.css';
-import './App.css';
-
-// Helper function for lazy loading with error handling
-const lazyLoad = (importFunc, exportName = null) => {
-  return lazy(() =>
-    importFunc().then(module => {
-      // Handle both default and named exports
-      const component = exportName ? module[exportName] : module.default;
-      if (!component) {
-        throw new Error(`Component ${exportName || 'default'} not found in module`);
-      }
-      return { default: component };
-    }).catch(error => {
-      console.error('Lazy loading error:', error);
-      return {
-        default: () => (
-          <div style={{ padding: '2rem', textAlign: 'center' }}>
-            <h2>Error de carga</h2>
-            <p>No se pudo cargar este componente.</p>
-          </div>
-        )
-      };
-    })
-  );
-};
-
-// Lazy Loaded Pages
-const Home = lazyLoad(() => import('./pages/Home/Home'));
-const Search = lazyLoad(() => import('./pages/Search/Search'));
-const Property = lazyLoad(() => import('./pages/Property/Property'));
-const PropertyDetailPage = lazyLoad(() => import('./pages/PropertyDetailPage/PropertyDetailPage'));
-const PropertyDetailPremium = lazyLoad(() => import('./pages/Property/PropertyDetailPremium'));
-const BookingPage = lazyLoad(() => import('./components/common/booking/Booking'));
-const Login = lazyLoad(() => import('./components/user/Auth/LoginForm'));
-const Register = lazyLoad(() => import('./components/user/Auth/RegisterForm'));
-const Dashboard = lazyLoad(() => import('./pages/User/Dashboard'));
-const Profile = lazyLoad(() => import('./components/user/Dashboard/Profile'));
-const MyBookings = lazyLoad(() => import('./components/user/Dashboard/MyBookings'));
-const Favorites = lazyLoad(() => import('./components/user/Dashboard/Favorites'));
-const Messages = lazyLoad(() => import('./components/user/Messages/MessageCenter'));
-const Services = lazyLoad(() => import('./components/user/Services/Services'));
-const Marketplace = lazyLoad(() => import('./components/user/Marketplace/Marketplace'));
-const ProductDetail = lazyLoad(() => import('./pages/ProductDetail/ProductDetail'));
-const Ofertas = lazyLoad(() => import('./pages/Ofertas/Ofertas'));
-const HostDashboard = lazyLoad(() => import('./pages/Host/Dashboard'));
-const PropertyManager = lazyLoad(() => import('./components/Host/HostDashboard/PropertyManager'));
-const AddProperty = lazyLoad(() => import('./components/Host/PropertyForm/PropertyForm'));
-const EditProperty = lazyLoad(() => import('./components/Host/PropertyForm/PropertyForm'));
-const BookingManager = lazyLoad(() => import('./components/Host/HostDashboard/BookingManager'));
-const Analytics = lazyLoad(() => import('./components/Host/HostDashboard/Analytics'));
-const BecomeHost = lazyLoad(() => import('./pages/BecomeHost/BecomeHost'));
-const ErrorState = lazyLoad(() => import('./components/common/ErrorState/ErrorState'));
-
-// Social Pages
-const Reels = lazyLoad(() => import('./pages/Reels/Reels'));
-const Composer = lazyLoad(() => import('./components/social/Composer'));
-
-// Host components with explicit export names
-const HostCalendar = lazyLoad(() => import('./pages/Host/HostCalendar'), 'HostCalendar');
-const HostFinances = lazyLoad(() => import('./pages/Host/HostFinances'), 'HostFinances');
-const HostStats = lazyLoad(() => import('./pages/Host/HostStats'), 'HostStats');
-const HostMessages = lazyLoad(() => import('./pages/Host/HostMessages'), 'HostMessages');
-const HostSettings = lazyLoad(() => import('./pages/Host/HostSettings'), 'HostSettings');
-
-// Cart Page
-
-
-// New Pages - Mapa Interactivo, Tendencias, Remodelaciones
-const MapaInteractivo = lazyLoad(() => import('./pages/MapaInteractivo/MapaInteractivo'));
-const Tendencias = lazyLoad(() => import('./pages/Tendencias/Tendencias'));
-const Remodelaciones = lazyLoad(() => import('./pages/Remodelaciones/Remodelaciones'));
+import React from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { AuthProvider } from './app/providers/AuthProvider';
+import { ProtectedRoute } from './app/routes/ProtectedRoute';
+import { SiteLayout } from './components/layout/SiteLayout';
+import { AccountPage } from './features/account/AccountPage';
+import { LoginPage } from './features/auth/LoginPage';
+import { RegisterPage } from './features/auth/RegisterPage';
+import { ManagementPage } from './features/dashboard/ManagementPage';
+import { SavedPropertiesPage } from './features/favorites/SavedPropertiesPage';
+import { HomePage } from './features/home/HomePage';
+import { PropertyDetailPage } from './features/properties/PropertyDetailPage';
+import { SearchPage } from './features/properties/SearchPage';
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <CartProvider>
-          <SearchProvider>
-            <BookingProvider>
-              <UiHostProvider>
-                <Layout>
-                  <Suspense fallback={<LoadingSpinner />}>
-                    <Routes>
-                  {/* Home - Optimizado sin Layout pesado */}
-                  <Route path="/" element={<HomeLayout><Home /></HomeLayout>} />
-                  
-                  {/* Otras rutas con Layout estándar */}
-                  <Route path="/search" element={<Search />} />
-                  <Route path="/property/:id" element={<PropertyDetailPremium />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/become-host" element={<BecomeHost />} />
-                  <Route path="/messages" element={<Messages />} />
-                  <Route path="/services" element={<Services />} />
-                  <Route path="/marketplace" element={<Marketplace />} />
-                  <Route path="/marketplace/product/:id" element={<ProductDetail />} />
-  
-                  <Route path="/ofertas" element={<Ofertas />} />
-
-                  {/* New Routes - Mapa, Tendencias, Remodelaciones */}
-                  <Route path="/mapa" element={<MapaInteractivo />} />
-                  <Route path="/tendencias" element={<Tendencias />} />
-                  <Route path="/remodelaciones" element={<Remodelaciones />} />
-
-                  {/* Social Routes */}
-                  <Route path="/reels" element={<Reels />} />
-                  <Route path="/post/new" element={<Composer />} />
-
-                  {/* User Protected */}
-                  <Route element={<PrivateRoute />}>
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/my-bookings" element={<MyBookings />} />
-                    <Route path="/favorites" element={<Favorites />} />
-
-                    <Route path="/booking" element={<BookingPage />} />
-                    <Route path="/booking/:propertyId" element={<BookingPage />} />
-                  </Route>
-
-                  {/* Host Protected */}
-                  <Route element={<HostRoute />}>
-                    <Route path="/host/dashboard" element={<HostDashboard />} />
-                    <Route path="/host/properties" element={<PropertyManager />} />
-                    <Route path="/host/properties/add" element={<AddProperty />} />
-                    <Route path="/host/properties/edit/:id" element={<EditProperty />} />
-                    <Route path="/host/bookings" element={<BookingManager />} />
-                    <Route path="/host/analytics" element={<Analytics />} />
-                    <Route path="/host/calendar" element={<HostCalendar />} />
-                    <Route path="/host/finances" element={<HostFinances />} />
-                    <Route path="/host/stats" element={<HostStats />} />
-                    <Route path="/host/messages" element={<HostMessages />} />
-                    <Route path="/host/settings" element={<HostSettings />} />
-                  </Route>
-
-                  {/* Error Pages */}
-                  <Route
-                    path="/unauthorized"
-                    element={
-                      <ErrorState
-                        title="Acceso no autorizado"
-                        message="No tienes permiso para acceder a esta página"
-                      />
-                    }
-                  />
-                  <Route
-                    path="*"
-                    element={
-                      <ErrorState
-                        title="Página no encontrada"
-                        message="La página que buscas no existe o ha sido movida"
-                      />
-                    }
-                  />
-                    </Routes>
-                  </Suspense>
-                </Layout>
-              </UiHostProvider>
-            </BookingProvider>
-          </SearchProvider>
-        </CartProvider>
-      </AuthProvider>
-    </Router>
+    <AuthProvider>
+      <Routes>
+        <Route element={<SiteLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/properties" element={<SearchPage />} />
+          <Route path="/properties/:id" element={<PropertyDetailPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route
+            path="/saved"
+            element={
+              <ProtectedRoute>
+                <SavedPropertiesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/account"
+            element={
+              <ProtectedRoute>
+                <AccountPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manage"
+            element={
+              <ProtectedRoute>
+                <ManagementPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </AuthProvider>
   );
 }
 

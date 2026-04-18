@@ -1,105 +1,40 @@
 {
   "name": "nido",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
-  "proxy": "http://localhost:5000",
+  "description": "Plataforma minimalista para arrendamiento de propiedades",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:client": "vite",
+    "dev:server": "nodemon backend/src/server.js",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "node backend/src/server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push",
+    "prisma:seed": "prisma db seed"
+  },
   "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
-    "@fastify/jwt": "^10.0.0",
-    "@fastify/multipart": "^9.2.1",
-    "@heroicons/react": "^2.2.0",
-    "@mui/material": "^7.2.0",
     "@prisma/client": "^6.17.0",
-    "@reduxjs/toolkit": "^2.8.2",
-    "@tanstack/react-query": "^5.81.5",
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/node": "^24.7.0",
-    "@types/uuid": "^11.0.0",
-    "aos": "^2.3.4",
-    "aws-sdk": "^2.1692.0",
-    "axios": "^1.12.2",
     "bcryptjs": "^2.4.3",
-    "bullmq": "^5.61.0",
     "clsx": "^2.1.1",
+    "concurrently": "^8.2.2",
     "cors": "^2.8.5",
-    "date-fns": "^4.1.0",
     "dotenv": "^16.6.1",
     "express": "^4.21.2",
-    "fastify": "^5.6.1",
-    "fluent-ffmpeg": "^2.1.3",
-    "focus-trap-react": "^11.0.4",
-    "framer-motion": "^12.20.1",
-    "ioredis": "^5.8.1",
     "joi": "^18.0.1",
     "jsonwebtoken": "^9.0.2",
-    "jwt-decode": "^4.0.0",
-    "lodash.debounce": "^4.0.8",
-    "lucide-react": "^0.525.0",
-    "mongoose": "^8.18.1",
-    "multer": "^2.0.2",
-    "pino": "^10.0.0",
-    "prisma": "^6.17.0",
-    "rc-slider": "^11.1.9",
     "react": "^19.1.0",
-    "react-date-range": "^2.0.1",
-    "react-datepicker": "^8.4.0",
     "react-dom": "^19.1.0",
-    "react-facebook-login": "^4.1.1",
-    "react-hook-form": "^7.59.0",
-    "react-icons": "^5.5.0",
-    "react-intersection-observer": "^9.16.0",
-    "react-redux": "^9.2.0",
-    "react-router-dom": "^7.9.1",
-    "react-scripts": "5.0.1",
-    "react-select": "^5.10.2",
-    "react-toastify": "^11.0.5",
-    "sharp": "^0.34.4",
-    "socket.io": "^4.8.1",
-    "swiper": "^12.0.3",
-    "uuid": "^13.0.0",
-    "web-vitals": "^2.1.4",
-    "zustand": "^5.0.6"
-  },
-  "scripts": {
-    "start": "cross-env DANGEROUSLY_DISABLE_HOST_CHECK=true react-scripts start --host 0.0.0.0",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "start:backend": "node backend/src/server.js",
-    "dev:backend": "nodemon backend/src/server.js",
-    "dev": "concurrently \"cross-env DANGEROUSLY_DISABLE_HOST_CHECK=true react-scripts start --host 0.0.0.0\" \"npm run dev:backend\""
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "react-router-dom": "^7.9.1"
   },
   "devDependencies": {
-    "@testing-library/react": "^16.3.0",
-    "@types/fluent-ffmpeg": "^2.1.27",
-    "@types/jest": "^30.0.0",
-    "@types/react": "^19.2.2",
-    "@types/react-dom": "^19.2.1",
-    "concurrently": "^8.2.2",
-    "cross-env": "^10.0.0",
-    "jest": "^27.5.1",
-    "nodemon": "^2.0.22",
-    "typescript": "^5.9.3"
+    "@vitejs/plugin-react": "^4.3.3",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.17.0",
+    "vite": "^5.4.8"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   }
 }

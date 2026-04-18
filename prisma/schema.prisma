@@ -7,38 +7,139 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  TENANT
+  LANDLORD
+  ADMIN
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  STUDIO
+  LOFT
+  PENTHOUSE
+  ROOM
+}
+
+enum PropertyStatus {
+  DRAFT
+  PUBLISHED
+  RENTED
+  ARCHIVED
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  WITHDRAWN
+}
+
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  password  String
-  createdAt DateTime  @default(now())
-  properties Property[]
-  media     Media[]
+  id               String          @id @default(cuid())
+  firstName        String
+  lastName         String
+  email            String          @unique
+  passwordHash     String
+  phone            String?
+  bio              String?
+  avatarUrl        String?
+  role             UserRole        @default(TENANT)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  favorites        Favorite[]
+  ownedProperties  Property[]      @relation("PropertyOwner")
+  rentalRequests   RentalRequest[] @relation("TenantRequests")
+  receivedRequests RentalRequest[] @relation("LandlordRequests")
+
+  @@index([role])
 }
 
 model Property {
-  id        String   @id @default(uuid())
-  ownerId   String
-  title     String
-  media     Media[]
-  createdAt DateTime @default(now())
+  id              String          @id @default(cuid())
+  slug            String          @unique
+  ownerId         String
+  title           String
+  summary         String
+  description     String
+  propertyType    PropertyType
+  status          PropertyStatus  @default(PUBLISHED)
+  city            String
+  neighborhood    String?
+  addressLine     String
+  monthlyRent     Int
+  maintenanceFee  Int             @default(0)
+  securityDeposit Int             @default(0)
+  bedrooms        Int
+  bathrooms       Int
+  areaM2          Int
+  parkingSpots    Int             @default(0)
+  maxOccupants    Int
+  furnished       Boolean         @default(false)
+  petsAllowed     Boolean         @default(false)
+  availableFrom   DateTime
+  minLeaseMonths  Int             @default(6)
+  amenities       String[]
+  coverImage      String?
+  latitude        Decimal?        @db.Decimal(9, 6)
+  longitude       Decimal?        @db.Decimal(9, 6)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  owner           User            @relation("PropertyOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  images          PropertyImage[]
+  favorites       Favorite[]
+  rentalRequests  RentalRequest[]
+
+  @@index([city, status])
+  @@index([monthlyRent, bedrooms])
+  @@index([availableFrom, minLeaseMonths])
 }
 
-model Media {
-  id           String   @id @default(uuid())
-  propertyId   String
-  userId       String
-  storageKey   String   @unique
-  originalName String
-  mimeType     String
-  kind         String
-  width        Int?
-  height       Int?
-  duration     Float?
-  status       String
-  thumbnails   Json?
-  variants     Json?
-  size         Int
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+model PropertyImage {
+  id         String   @id @default(cuid())
+  propertyId String
+  url        String
+  alt        String?
+  position   Int      @default(0)
+  createdAt  DateTime @default(now())
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, position])
+}
+
+model Favorite {
+  id         String   @id @default(cuid())
+  userId     String
+  propertyId String
+  createdAt  DateTime @default(now())
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, propertyId])
+  @@index([propertyId])
+}
+
+model RentalRequest {
+  id            String        @id @default(cuid())
+  propertyId    String
+  tenantId      String
+  landlordId    String
+  desiredMoveIn DateTime
+  leaseMonths   Int
+  occupants     Int
+  monthlyIncome Int?
+  hasPets       Boolean       @default(false)
+  phone         String
+  message       String
+  status        RequestStatus @default(PENDING)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  landlord      User          @relation("LandlordRequests", fields: [landlordId], references: [id], onDelete: Cascade)
+  property      Property      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  tenant        User          @relation("TenantRequests", fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status])
+  @@index([landlordId, status])
+  @@index([propertyId, status])
 }
