@@ -24,7 +24,7 @@ const updateRequestSchema = Joi.object({
 
 const reviewRequestSchema = Joi.object({
   status: Joi.string()
-    .valid(RequestStatus.PENDING, RequestStatus.APPROVED, RequestStatus.REJECTED, RequestStatus.WITHDRAWN)
+    .valid(RequestStatus.APPROVED, RequestStatus.REJECTED)
     .required(),
 });
 

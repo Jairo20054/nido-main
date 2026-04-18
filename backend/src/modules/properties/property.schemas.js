@@ -44,7 +44,9 @@ const propertyPayloadSchema = Joi.object({
   longitude: Joi.number().min(-180).max(180).allow(null),
 });
 
-const createPropertySchema = propertyPayloadSchema;
+const createPropertySchema = propertyPayloadSchema.keys({
+  images: Joi.array().items(Joi.string().trim().uri()).min(1).max(12).required(),
+});
 
 const updatePropertySchema = propertyPayloadSchema
   .fork(Object.keys(propertyPayloadSchema.describe().keys), (schema) => schema.optional())

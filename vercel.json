@@ -5,7 +5,7 @@
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "build"
+        "distDir": "dist"
       }
     }
   ],
@@ -16,9 +16,9 @@
     }
   ],
   "env": {
-    "REACT_APP_API_URL": "@react_app_api_url"
+    "VITE_API_BASE_URL": "@vite_api_base_url"
   },
   "functions": {},
   "regions": ["iad1"],
-  "outputDirectory": "build"
+  "outputDirectory": "dist"
 }
