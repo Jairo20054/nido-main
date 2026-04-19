@@ -8,13 +8,15 @@ const requestInclude = (currentUserId) => ({
     include: {
       owner: true,
       images: true,
-      favorites: currentUserId
+      ...(currentUserId
         ? {
-            where: {
-              userId: currentUserId,
+            favorites: {
+              where: {
+                userId: currentUserId,
+              },
             },
           }
-        : false,
+        : {}),
       _count: {
         select: {
           rentalRequests: true,
@@ -74,7 +76,7 @@ const createRequest = async (req, res) => {
       desiredMoveIn: req.body.desiredMoveIn,
       leaseMonths: req.body.leaseMonths,
       occupants: req.body.occupants,
-      monthlyIncome: req.body.monthlyIncome || null,
+      monthlyIncome: req.body.monthlyIncome ?? null,
       hasPets: req.body.hasPets,
       phone: req.body.phone,
       message: req.body.message,

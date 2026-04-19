@@ -12,7 +12,8 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   const payload = {
-    ...req.body,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
     phone: req.body.phone || null,
     bio: req.body.bio || null,
     avatarUrl: req.body.avatarUrl || null,

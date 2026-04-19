@@ -7,7 +7,6 @@ const updateProfileSchema = Joi.object({
   phone: Joi.string().trim().max(24).allow('', null),
   bio: Joi.string().trim().max(300).allow('', null),
   avatarUrl: Joi.string().trim().uri().allow('', null),
-  role: Joi.string().valid(UserRole.TENANT, UserRole.LANDLORD),
 }).min(1);
 
 const deleteProfileSchema = Joi.object({

@@ -1,3 +1,4 @@
+const { randomBytes } = require('crypto');
 const { PropertyStatus } = require('@prisma/client');
 const { prisma } = require('../../shared/prisma');
 const { badRequest, forbidden, notFound } = require('../../shared/errors');
@@ -7,13 +8,15 @@ const { serializeProperty } = require('../../shared/serializers');
 const propertyInclude = (currentUserId) => ({
   owner: true,
   images: true,
-  favorites: currentUserId
+  ...(currentUserId
     ? {
-        where: {
-          userId: currentUserId,
+        favorites: {
+          where: {
+            userId: currentUserId,
+          },
         },
       }
-    : false,
+    : {}),
   _count: {
     select: {
       rentalRequests: true,
@@ -46,12 +49,12 @@ const buildWhere = (query) => {
     where.propertyType = query.propertyType;
   }
 
-  if (query.minRent || query.maxRent) {
+  if (query.minRent !== undefined || query.maxRent !== undefined) {
     where.monthlyRent = {};
-    if (query.minRent) {
+    if (query.minRent !== undefined) {
       where.monthlyRent.gte = query.minRent;
     }
-    if (query.maxRent) {
+    if (query.maxRent !== undefined) {
       where.monthlyRent.lte = query.maxRent;
     }
   }
@@ -72,7 +75,7 @@ const buildWhere = (query) => {
     where.petsAllowed = query.petsAllowed;
   }
 
-  if (query.minLeaseMonths) {
+  if (query.minLeaseMonths !== undefined) {
     where.minLeaseMonths = { lte: query.minLeaseMonths };
   }
 
@@ -106,7 +109,7 @@ const normalizePropertyInput = (payload) => ({
 
 const generateSlug = async (title, city, propertyId = '') => {
   const base = slugify(`${title}-${city}`);
-  const shortId = propertyId ? propertyId.slice(-6) : Date.now().toString(36);
+  const shortId = propertyId ? propertyId.slice(-6) : randomBytes(4).toString('hex');
   return `${base}-${shortId}`;
 };
 

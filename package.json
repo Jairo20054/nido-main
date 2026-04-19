@@ -4,7 +4,10 @@
   "private": true,
   "description": "Plataforma minimalista para arrendamiento de propiedades",
   "scripts": {
-    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "postinstall": "prisma generate",
+    "prestart": "node scripts/prestart.js",
+    "dev": "node scripts/dev.js",
+    "predev": "node scripts/prestart.js",
     "dev:client": "vite",
     "dev:server": "nodemon backend/src/server.js",
     "build": "vite build",
