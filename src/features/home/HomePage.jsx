@@ -1,19 +1,29 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, Building2, ShieldCheck, Sparkles } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { LoadingState } from '../../components/ui/LoadingState';
 import { api } from '../../lib/apiClient';
 import { PropertyCard } from '../properties/PropertyCard';
 
+const FILTER_CHIPS = [
+  { id: 'all', label: 'Todo' },
+  { id: 'apartment', label: 'Apartamento' },
+  { id: 'house', label: 'Casa' },
+  { id: 'studio', label: 'Estudio' },
+  { id: 'furnished', label: 'Amoblado' },
+  { id: 'pets', label: 'Mascotas OK' },
+  { id: 'parking', label: 'Con parqueadero' },
+];
+
 export function HomePage() {
   const navigate = useNavigate();
-  const [featured, setFeatured] = useState([]);
+  const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [searchFilters, setSearchFilters] = useState({
     city: '',
-    propertyType: '',
-    minRent: '',
+    budget: '',
     bedrooms: '',
   });
 
@@ -24,7 +34,12 @@ export function HomePage() {
       .get('/properties/featured', { auth: false })
       .then((response) => {
         if (active) {
-          setFeatured(response.data);
+          setProperties(response.data || []);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setProperties([]);
         }
       })
       .finally(() => {
@@ -38,108 +53,104 @@ export function HomePage() {
     };
   }, []);
 
-  const metrics = useMemo(
-    () => [
-      { label: 'Propiedades curadas', value: 'Solo arriendo' },
-      { label: 'Solicitudes ordenadas', value: 'Seguimiento claro' },
-      { label: 'Interfaz minimalista', value: 'Menos ruido visual' },
-    ],
-    []
-  );
-
-  const handleSearch = (event) => {
-    event.preventDefault();
+  const handleSearch = (e) => {
+    e.preventDefault();
     const params = new URLSearchParams();
-
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value) params.set(key, value);
-    });
+    
+    if (searchFilters.city) params.set('city', searchFilters.city);
+    if (searchFilters.budget) params.set('maxRent', searchFilters.budget);
+    if (searchFilters.bedrooms) params.set('bedrooms', searchFilters.bedrooms);
+    if (activeFilter !== 'all') params.set('filter', activeFilter);
 
     navigate(`/properties?${params.toString()}`);
   };
 
+  const handleFilterClick = (filterId) => {
+    setActiveFilter(filterId);
+  };
+
+  const displayCity = searchFilters.city || 'Colombia';
+  const propertyCount = properties.length;
+
   return (
-    <div className="page">
-      <section className="hero">
-        <div className="hero__content">
-          <div className="hero__eyebrow">
-            <Sparkles size={16} />
-            NIDO, enfocado solo en arrendamiento residencial
-          </div>
-          <h1>Encuentra arriendos bien presentados, sin ruido y con flujo real de solicitud.</h1>
-          <p>
-            Explora propiedades listas para habitar, guarda las opciones que te interesan y envía
-            solicitudes claras desde una experiencia moderna y sobria.
-          </p>
-          <form className="hero-search" onSubmit={handleSearch}>
-            <input
-              value={filters.city}
-              onChange={(event) => setFilters((current) => ({ ...current, city: event.target.value }))}
-              placeholder="Ciudad"
-            />
-            <input
-              value={filters.minRent}
-              onChange={(event) => setFilters((current) => ({ ...current, minRent: event.target.value }))}
-              placeholder="Canon minimo"
-              type="number"
-            />
-            <input
-              value={filters.bedrooms}
-              onChange={(event) => setFilters((current) => ({ ...current, bedrooms: event.target.value }))}
-              placeholder="Habitaciones"
-              type="number"
-            />
-            <button className="button" type="submit">
-              Buscar propiedades
-              <ArrowRight size={16} />
+    <div className="home-page">
+      {/* Hero Section */}
+      <section className="home-hero">
+        <div className="home-hero__content">
+          <h1 className="home-hero__title">Encuentra tu próximo hogar</h1>
+          <p className="home-hero__subtitle">Arriendo residencial · Colombia</p>
+
+          <form className="home-search" onSubmit={handleSearch}>
+            <div className="home-search__field">
+              <input
+                type="text"
+                placeholder="¿Dónde?"
+                value={searchFilters.city}
+                onChange={(e) => setSearchFilters({ ...searchFilters, city: e.target.value })}
+              />
+            </div>
+
+            <div className="home-search__divider"></div>
+
+            <div className="home-search__field">
+              <input
+                type="number"
+                placeholder="Presupuesto"
+                value={searchFilters.budget}
+                onChange={(e) => setSearchFilters({ ...searchFilters, budget: e.target.value })}
+              />
+            </div>
+
+            <div className="home-search__divider"></div>
+
+            <div className="home-search__field">
+              <input
+                type="number"
+                placeholder="Cualquiera"
+                value={searchFilters.bedrooms}
+                onChange={(e) => setSearchFilters({ ...searchFilters, bedrooms: e.target.value })}
+              />
+            </div>
+
+            <button type="submit" className="home-search__button">
+              Buscar <ArrowRight size={18} />
             </button>
           </form>
-          <div className="hero__metrics">
-            {metrics.map((metric) => (
-              <div key={metric.label}>
-                <strong>{metric.value}</strong>
-                <span>{metric.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="hero__panel">
-          <div className="hero__panel-card">
-            <Building2 size={22} />
-            <h3>Busqueda con criterios reales</h3>
-            <p>Canon, ciudad, tipo de inmueble y atributos que sí importan en arriendo local.</p>
-          </div>
-          <div className="hero__panel-card">
-            <ShieldCheck size={22} />
-            <h3>Solicitudes trazables</h3>
-            <p>Todo el flujo de contacto vive dentro de la plataforma: guardados, solicitudes y gestión.</p>
-          </div>
         </div>
       </section>
 
-      <section className="section">
-        <div className="section__heading">
-          <div>
-            <span className="section__eyebrow">Seleccion destacada</span>
-            <h2>Propiedades listas para arrendar</h2>
-          </div>
-          <button className="button button--secondary" type="button" onClick={() => navigate('/properties')}>
-            Ver catalogo completo
+      {/* Filter Chips */}
+      <div className="home-filters">
+        {FILTER_CHIPS.map((chip) => (
+          <button
+            key={chip.id}
+            className={`home-filter-chip ${activeFilter === chip.id ? 'home-filter-chip--active' : ''}`}
+            onClick={() => handleFilterClick(chip.id)}
+          >
+            {chip.label}
           </button>
-        </div>
+        ))}
+      </div>
 
+      {/* Results Counter */}
+      <div className="home-counter">
+        {propertyCount} propiedades en {displayCity}
+      </div>
+
+      {/* Properties Grid */}
+      <section className="home-grid">
         {loading ? (
-          <LoadingState label="Cargando propiedades destacadas..." />
-        ) : featured.length ? (
+          <LoadingState label="Cargando propiedades..." />
+        ) : properties.length > 0 ? (
           <div className="property-grid">
-            {featured.map((property) => (
+            {properties.map((property) => (
               <PropertyCard key={property.id} property={property} />
             ))}
           </div>
         ) : (
           <EmptyState
-            title="Aun no hay propiedades destacadas"
-            description="En cuanto existan publicaciones activas apareceran aqui."
+            title="No hay propiedades disponibles"
+            description="Intenta cambiar tus filtros o búsqueda."
           />
         )}
       </section>
