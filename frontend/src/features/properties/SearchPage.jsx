@@ -40,7 +40,9 @@ export function SearchPage() {
         auth: isAuthenticated,
         query: {
           city: activeFilters.city || undefined,
-          propertyType: activeFilters.propertyType ? activeFilters.propertyType.toUpperCase() : undefined,
+          propertyType: activeFilters.propertyType
+            ? activeFilters.propertyType.toUpperCase()
+            : undefined,
           minRent: activeFilters.minRent,
           maxRent: activeFilters.maxRent,
           bedrooms: activeFilters.bedrooms,
@@ -50,6 +52,7 @@ export function SearchPage() {
           sort: activeFilters.sort,
         },
       });
+
       const refinedProperties = (response.data || []).filter((property) => {
         const amenityText = getAmenityText(property);
 
@@ -79,7 +82,7 @@ export function SearchPage() {
 
   const toggleFavorite = async (property) => {
     if (!isAuthenticated) {
-      setError('Inicia sesión para guardar propiedades.');
+      setError('Explora sin cuenta. Inicia sesion solo si quieres guardar propiedades.');
       return;
     }
 
@@ -107,7 +110,12 @@ export function SearchPage() {
   const activeFilterChips = useMemo(() => {
     const chips = [];
 
-    if (filters.propertyType) chips.push({ key: 'propertyType', label: getPropertyTypeLabel(filters.propertyType.toUpperCase()) });
+    if (filters.propertyType) {
+      chips.push({
+        key: 'propertyType',
+        label: getPropertyTypeLabel(filters.propertyType.toUpperCase()),
+      });
+    }
     if (filters.city) chips.push({ key: 'city', label: filters.city });
     if (filters.minRent !== 1800000 || filters.maxRent !== 4500000) {
       chips.push({
@@ -116,7 +124,7 @@ export function SearchPage() {
       });
     }
     if (filters.bedrooms !== 1) chips.push({ key: 'bedrooms', label: `${filters.bedrooms} hab.` });
-    if (filters.bathrooms !== 1) chips.push({ key: 'bathrooms', label: `${filters.bathrooms} baños` });
+    if (filters.bathrooms !== 1) chips.push({ key: 'bathrooms', label: `${filters.bathrooms} banos` });
     filters.extras.forEach((extra) => chips.push({ key: extra, label: EXTRA_LABELS[extra] }));
 
     return chips;
@@ -154,7 +162,10 @@ export function SearchPage() {
             <div className="search-results__topbar">
               <div>
                 <h1>{properties.length} propiedades en {filters.city || 'Colombia'}</h1>
-                <p>Explora opciones pensadas para renta residencial, con filtros visibles y rápidos.</p>
+                <p>
+                  Explora opciones pensadas para renta residencial, con filtros visibles, fotos
+                  claras y sin necesidad de iniciar sesion para comparar.
+                </p>
               </div>
               <div className="search-results__actions">
                 <label className="sort-select">
@@ -162,7 +173,7 @@ export function SearchPage() {
                   <select value={filters.sort} onChange={(event) => setFilter('sort', event.target.value)}>
                     <option value="recommended">Recomendados</option>
                     <option value="rent-asc">Precio menor</option>
-                    <option value="latest">Más recientes</option>
+                    <option value="latest">Mas recientes</option>
                     <option value="rent-desc">Precio mayor</option>
                   </select>
                 </label>
@@ -187,7 +198,7 @@ export function SearchPage() {
             {mapView ? (
               <div className="map-placeholder">
                 <Map size={20} />
-                <span>Vista de mapa próximamente</span>
+                <span>Vista de mapa proximamente</span>
               </div>
             ) : null}
             {loading ? (

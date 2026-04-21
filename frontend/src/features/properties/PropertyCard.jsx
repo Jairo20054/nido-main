@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Bath, BedDouble, Heart, MapPin, Ruler } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { formatCurrency } from '../../lib/formatters';
-import { getPropertyTypeLabel } from '../../lib/formatters';
+import { formatCurrency, getPropertyTypeLabel } from '../../lib/formatters';
 
 export function PropertyCard({ property, onToggleFavorite, disabledFavorite = false }) {
   const [isFavorite, setIsFavorite] = useState(property.isFavorite || false);
@@ -11,8 +10,8 @@ export function PropertyCard({ property, onToggleFavorite, disabledFavorite = fa
     setIsFavorite(property.isFavorite || false);
   }, [property.isFavorite]);
 
-  const handleToggleFavorite = (e) => {
-    e.preventDefault();
+  const handleToggleFavorite = (event) => {
+    event.preventDefault();
     setIsFavorite(!isFavorite);
     if (onToggleFavorite) {
       onToggleFavorite(property);
@@ -24,6 +23,7 @@ export function PropertyCard({ property, onToggleFavorite, disabledFavorite = fa
     if (property.furnished) features.push('Amoblado');
     if (property.petsAllowed) features.push('Mascotas OK');
     if (property.parkingSpots) features.push('Parqueadero');
+    if (property.maintenanceFee) features.push(`Adm. ${formatCurrency(property.maintenanceFee)}`);
     return features;
   };
 
@@ -51,6 +51,7 @@ export function PropertyCard({ property, onToggleFavorite, disabledFavorite = fa
       <div className="property-card__body">
         <p className="property-card__price">{formatCurrency(property.monthlyRent)} / mes</p>
         <h3 className="property-card__title">{property.title}</h3>
+        <p className="property-card__summary">{property.summary}</p>
         <p className="property-card__location">
           <MapPin size={14} />
           {property.neighborhood || 'Zona residencial'} · {property.city}
@@ -59,12 +60,12 @@ export function PropertyCard({ property, onToggleFavorite, disabledFavorite = fa
         <div className="property-card__stats">
           <span><BedDouble size={14} /> {property.bedrooms}</span>
           <span><Bath size={14} /> {property.bathrooms}</span>
-          <span><Ruler size={14} /> {area}m²</span>
+          <span><Ruler size={14} /> {area}m2</span>
         </div>
 
         {features.length > 0 && (
           <div className="property-card__tags">
-            {features.slice(0, 3).map((feature) => (
+            {features.slice(0, 4).map((feature) => (
               <span key={feature} className="property-card__tag">
                 {feature}
               </span>

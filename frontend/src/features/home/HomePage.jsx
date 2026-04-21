@@ -6,7 +6,7 @@ import { LoadingState } from '../../components/ui/LoadingState';
 import { api } from '../../lib/apiClient';
 import { PropertyCard } from '../properties/PropertyCard';
 
-const POPULAR_CITIES = ['Medellín', 'Bogotá', 'Cali', 'Barranquilla'];
+const POPULAR_CITIES = ['Bogota', 'Medellin', 'Cali', 'Barranquilla'];
 const PROPERTY_TYPES = [
   { value: '', label: 'Tipo' },
   { value: 'apartment', label: 'Apartamento' },
@@ -50,8 +50,8 @@ export function HomePage() {
     };
   }, []);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
+  const handleSearch = (event) => {
+    event.preventDefault();
     const params = new URLSearchParams();
 
     if (searchFilters.city) params.set('ciudad', searchFilters.city);
@@ -73,37 +73,24 @@ export function HomePage() {
         <div className="home-hero__content home-hero__content--split">
           <div className="home-hero__intro">
             <span className="hero-kicker">Arriendos residenciales en Colombia</span>
-            <h1 className="home-hero__title">Encuentra tu próximo hogar</h1>
+            <h1 className="home-hero__title">Encuentra tu proximo hogar</h1>
             <p className="home-hero__subtitle">
-              Arriendos residenciales en Colombia · Sin complicaciones.
+              Explora propiedades, revisa fotos y compara detalles con calma. Solo te pediremos
+              cuenta cuando quieras reservar o avanzar al pago.
             </p>
 
             <form className="home-search" onSubmit={handleSearch}>
               <label className="home-search__field">
                 <span className="home-search__label">
                   <MapPin size={16} />
-                  ¿Dónde?
+                  Donde
                 </span>
                 <input
                   type="text"
                   placeholder="Ciudad o zona"
                   value={searchFilters.city}
-                  onChange={(e) => setSearchFilters({ ...searchFilters, city: e.target.value })}
-                />
-              </label>
-
-              <div className="home-search__divider"></div>
-
-              <label className="home-search__field">
-                <span className="home-search__label">💰 Presupuesto</span>
-                <input
-                  type="number"
-                  min="500000"
-                  step="100000"
-                  placeholder="$4.500.000"
-                  value={searchFilters.budget}
-                  onChange={(e) =>
-                    setSearchFilters({ ...searchFilters, budget: Number(e.target.value || 0) })
+                  onChange={(event) =>
+                    setSearchFilters({ ...searchFilters, city: event.target.value })
                   }
                 />
               </label>
@@ -111,11 +98,27 @@ export function HomePage() {
               <div className="home-search__divider"></div>
 
               <label className="home-search__field">
-                <span className="home-search__label">🏠 Tipo</span>
+                <span className="home-search__label">Presupuesto</span>
+                <input
+                  type="number"
+                  min="500000"
+                  step="100000"
+                  placeholder="$4.500.000"
+                  value={searchFilters.budget}
+                  onChange={(event) =>
+                    setSearchFilters({ ...searchFilters, budget: Number(event.target.value || 0) })
+                  }
+                />
+              </label>
+
+              <div className="home-search__divider"></div>
+
+              <label className="home-search__field">
+                <span className="home-search__label">Tipo</span>
                 <select
                   value={searchFilters.propertyType}
-                  onChange={(e) =>
-                    setSearchFilters({ ...searchFilters, propertyType: e.target.value })
+                  onChange={(event) =>
+                    setSearchFilters({ ...searchFilters, propertyType: event.target.value })
                   }
                 >
                   {PROPERTY_TYPES.map((option) => (
@@ -147,7 +150,7 @@ export function HomePage() {
 
           <div className="home-hero__panel">
             <div className="hero-stat-card">
-              <span>Selección cuidada</span>
+              <span>Seleccion cuidada</span>
               <strong>{properties.length || 34} propiedades listas para visitar</strong>
             </div>
             <div className="hero-trust-list">
@@ -157,11 +160,11 @@ export function HomePage() {
               </div>
               <div>
                 <ShieldCheck size={18} />
-                <span>Señales de confianza y barrios mejor explicados</span>
+                <span>Detalles mas claros, fotos mas utiles y costos visibles</span>
               </div>
               <div>
                 <Building2 size={18} />
-                <span>Experiencia pensada para renta urbana colombiana</span>
+                <span>Login solo cuando quieras reservar o continuar al pago</span>
               </div>
             </div>
           </div>
@@ -171,7 +174,7 @@ export function HomePage() {
       <section className="home-featured">
         <div className="section__heading">
           <div>
-            <span className="section__eyebrow">Selección destacada</span>
+            <span className="section__eyebrow">Seleccion destacada</span>
             <h2>{featuredProperties.length || 0} propiedades en {displayCity}</h2>
           </div>
           <LinkishButton onClick={() => navigate('/properties')}>Ver todas</LinkishButton>
@@ -181,14 +184,14 @@ export function HomePage() {
           <LoadingState label="Cargando propiedades..." />
         ) : featuredProperties.length > 0 ? (
           <div className="property-grid">
-            {featuredProperties.map((property, index) => (
+            {featuredProperties.map((property) => (
               <PropertyCard key={property.id} property={property} />
             ))}
           </div>
         ) : (
           <EmptyState
             title="No hay propiedades disponibles"
-            description="Intenta cambiar tus filtros o búsqueda."
+            description="Intenta cambiar tus filtros o busqueda."
           />
         )}
       </section>
@@ -196,18 +199,18 @@ export function HomePage() {
       <section className="editorial-strip" id="como-funciona">
         <div className="editorial-strip__card">
           <span>1</span>
-          <h3>Busca con intención</h3>
-          <p>Ciudad, canon y tipo en una sola acción, sin formularios eternos.</p>
+          <h3>Busca con intencion</h3>
+          <p>Ciudad, canon y tipo en una sola accion, sin formularios eternos.</p>
         </div>
         <div className="editorial-strip__card">
           <span>2</span>
-          <h3>Afina sin fricción</h3>
-          <p>Rangos, steppers y chips convierten filtros complejos en decisiones rápidas.</p>
+          <h3>Afina sin friccion</h3>
+          <p>Rangos, steppers y chips convierten filtros complejos en decisiones rapidas.</p>
         </div>
         <div className="editorial-strip__card" id="para-propietarios">
           <span>3</span>
-          <h3>Confía en la lectura</h3>
-          <p>Precios claros, barrios visibles y tarjetas limpias para comparar mejor.</p>
+          <h3>Reserva al final</h3>
+          <p>Explora libremente y deja el acceso para el momento en que ya quieres avanzar.</p>
         </div>
       </section>
     </div>

@@ -1,5 +1,19 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Bath, BedDouble, BriefcaseBusiness, Heart, MapPin, Ruler, ShieldCheck } from 'lucide-react';
+import {
+  Bath,
+  BedDouble,
+  BriefcaseBusiness,
+  CalendarDays,
+  Heart,
+  MapPin,
+  PawPrint,
+  Ruler,
+  ShieldCheck,
+  Sparkles,
+  SquareParking,
+  Sofa,
+  Users,
+} from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { InlineMessage } from '../../components/ui/InlineMessage';
@@ -13,6 +27,7 @@ export function PropertyDetailPage() {
   const { isAuthenticated } = useAuth();
   const { id: propertyId } = useParams();
   const [property, setProperty] = useState(null);
+  const [selectedImage, setSelectedImage] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [requestMessage, setRequestMessage] = useState('');
@@ -44,6 +59,25 @@ export function PropertyDetailPage() {
     };
   }, [propertyId, isAuthenticated]);
 
+  useEffect(() => {
+    if (!property) return;
+
+    const firstImage = property.images?.[0]?.url || property.coverImage || '';
+    setSelectedImage(firstImage);
+  }, [property]);
+
+  const galleryImages = useMemo(() => {
+    if (!property) return [];
+
+    const allImages = property.images?.length
+      ? property.images.map((image) => image.url)
+      : property.coverImage
+        ? [property.coverImage]
+        : [];
+
+    return [...new Set(allImages)];
+  }, [property]);
+
   const detailFacts = useMemo(
     () =>
       property
@@ -51,15 +85,81 @@ export function PropertyDetailPage() {
             { icon: BedDouble, label: 'Habitaciones', value: property.bedrooms },
             { icon: Bath, label: 'Banos', value: property.bathrooms },
             { icon: Ruler, label: 'Area', value: `${property.areaM2} m2` },
-            { icon: BriefcaseBusiness, label: 'Contrato minimo', value: `${property.minLeaseMonths} meses` },
+            {
+              icon: BriefcaseBusiness,
+              label: 'Contrato minimo',
+              value: `${property.minLeaseMonths} meses`,
+            },
+            {
+              icon: Users,
+              label: 'Capacidad ideal',
+              value: `${property.maxOccupants || property.bedrooms + 1} personas`,
+            },
+            {
+              icon: CalendarDays,
+              label: 'Disponible',
+              value: formatDate(property.availableFrom),
+            },
           ]
         : [],
     [property]
   );
 
+  const stayHighlights = useMemo(() => {
+    if (!property) return [];
+
+    return [
+      property.furnished
+        ? { icon: Sofa, title: 'Amoblado', description: 'Listo para llegar con menos mudanza.' }
+        : { icon: Sparkles, title: 'Sin amoblar', description: 'Mas libertad para personalizar.' },
+      property.petsAllowed
+        ? { icon: PawPrint, title: 'Mascotas bienvenidas', description: 'Ideal si vives con compania.' }
+        : { icon: ShieldCheck, title: 'Sin mascotas', description: 'Regla definida por el propietario.' },
+      property.parkingSpots
+        ? {
+            icon: SquareParking,
+            title: `${property.parkingSpots} parqueadero${property.parkingSpots > 1 ? 's' : ''}`,
+            description: 'Un punto practico para el dia a dia.',
+          }
+        : {
+            icon: MapPin,
+            title: 'Sin parqueadero',
+            description: 'Buen fit si te mueves caminando o en transporte.',
+          },
+    ];
+  }, [property]);
+
+  const practicalDetails = useMemo(() => {
+    if (!property) return [];
+
+    return [
+      { label: 'Canon mensual', value: formatCurrency(property.monthlyRent) },
+      { label: 'Administracion', value: formatCurrency(property.maintenanceFee) },
+      { label: 'Deposito', value: formatCurrency(property.securityDeposit) },
+      {
+        label: 'Costo mensual estimado',
+        value: formatCurrency((property.monthlyRent || 0) + (property.maintenanceFee || 0)),
+      },
+      { label: 'Direccion', value: property.addressLine || 'Se comparte al reservar' },
+      { label: 'Barrio', value: property.neighborhood || 'Zona residencial' },
+    ];
+  }, [property]);
+
+  const lifestyleNotes = useMemo(() => {
+    if (!property) return [];
+
+    return [
+      `Ubicada en ${property.city}${property.neighborhood ? `, ${property.neighborhood}` : ''}.`,
+      `Disponible desde ${formatDate(property.availableFrom)} con contrato minimo de ${property.minLeaseMonths} meses.`,
+      property.requestCount
+        ? `${property.requestCount} persona${property.requestCount > 1 ? 's' : ''} ya mostraron interes en esta propiedad.`
+        : 'Aun sin solicitudes activas, ideal para decidir con calma.',
+    ];
+  }, [property]);
+
   const toggleFavorite = async () => {
     if (!isAuthenticated) {
-      setRequestMessage('Inicia sesion para guardar esta propiedad.');
+      setRequestMessage('Puedes explorar libremente. Inicia sesion solo cuando quieras guardar o reservar.');
       return;
     }
 
@@ -82,7 +182,9 @@ export function PropertyDetailPage() {
 
     try {
       const response = await api.post('/requests', payload);
-      setRequestMessage(response.message || 'Solicitud enviada');
+      setRequestMessage(
+        response.message || 'Solicitud enviada. Ya puedes continuar con la validacion de reserva.'
+      );
     } catch (requestError) {
       setRequestMessage(requestError.message);
     } finally {
@@ -98,19 +200,34 @@ export function PropertyDetailPage() {
     return (
       <EmptyState
         title="No encontramos esta propiedad"
-        description={error || 'Puede que ya no esté publicada o que el enlace haya cambiado.'}
+        description={error || 'Puede que ya no este publicada o que el enlace haya cambiado.'}
       />
     );
   }
 
   return (
-    <div className="page">
+    <div className="page property-detail-page">
       <section className="property-hero">
-        <div className="property-hero__gallery">
-          <img src={property.coverImage} alt={property.title} className="property-hero__cover" />
-          <div className="property-hero__grid">
-            {property.images.slice(1, 5).map((image) => (
-              <img key={image.id} src={image.url} alt={image.alt || property.title} />
+        <div className="property-hero__gallery property-hero__gallery--enhanced">
+          <div className="property-hero__main">
+            <img src={selectedImage} alt={property.title} className="property-hero__cover" />
+            <div className="property-hero__floating-card">
+              <span className="section__eyebrow">{getPropertyTypeLabel(property.propertyType)}</span>
+              <strong>{formatCurrency(property.monthlyRent)} / mes</strong>
+              <p>{property.city}{property.neighborhood ? `, ${property.neighborhood}` : ''}</p>
+            </div>
+          </div>
+
+          <div className="property-hero__grid property-hero__thumbs">
+            {galleryImages.slice(0, 4).map((image, index) => (
+              <button
+                key={`${image}-${index}`}
+                type="button"
+                className={`property-hero__thumb ${selectedImage === image ? 'property-hero__thumb--active' : ''}`}
+                onClick={() => setSelectedImage(image)}
+              >
+                <img src={image} alt={`${property.title} vista ${index + 1}`} />
+              </button>
             ))}
           </div>
         </div>
@@ -120,7 +237,7 @@ export function PropertyDetailPage() {
         <div className="property-layout__main">
           <div className="property-header">
             <div>
-              <span className="section__eyebrow">{getPropertyTypeLabel(property.propertyType)}</span>
+              <span className="section__eyebrow">Ficha detallada</span>
               <h1>{property.title}</h1>
               <p>{property.summary}</p>
               <div className="property-header__meta">
@@ -135,13 +252,17 @@ export function PropertyDetailPage() {
                 </span>
               </div>
             </div>
-            <button className={`favorite-chip favorite-chip--large ${property.isFavorite ? 'favorite-chip--active' : ''}`} type="button" onClick={toggleFavorite}>
+            <button
+              className={`favorite-chip favorite-chip--large ${property.isFavorite ? 'favorite-chip--active' : ''}`}
+              type="button"
+              onClick={toggleFavorite}
+            >
               <Heart size={16} />
               Guardar
             </button>
           </div>
 
-          <div className="fact-grid">
+          <div className="fact-grid fact-grid--expanded">
             {detailFacts.map((fact) => {
               const Icon = fact.icon;
               return (
@@ -156,18 +277,77 @@ export function PropertyDetailPage() {
             })}
           </div>
 
-          <div className="content-card">
-            <h2>Descripcion</h2>
+          <div className="content-card detail-section">
+            <div className="detail-section__header">
+              <h2>Lo que mas destaca</h2>
+              <p>Un resumen rapido para saber si esta opcion realmente encaja con tu estilo de vida.</p>
+            </div>
+            <div className="highlight-grid">
+              {stayHighlights.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <article key={item.title} className="highlight-card">
+                    <div className="highlight-card__icon">
+                      <Icon size={18} />
+                    </div>
+                    <div>
+                      <strong>{item.title}</strong>
+                      <p>{item.description}</p>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="content-card detail-section">
+            <div className="detail-section__header">
+              <h2>Descripcion</h2>
+              <p>Informacion amplia para que compares sin tener que adivinar detalles importantes.</p>
+            </div>
             <p>{property.description}</p>
           </div>
 
-          <div className="content-card">
-            <h2>Amenidades</h2>
+          <div className="content-card detail-section">
+            <div className="detail-section__header">
+              <h2>Detalles practicos</h2>
+              <p>Transparencia en valores, ubicacion y condiciones desde la misma ficha.</p>
+            </div>
+            <div className="practical-list">
+              {practicalDetails.map((item) => (
+                <div key={item.label} className="practical-list__row">
+                  <span>{item.label}</span>
+                  <strong>{item.value}</strong>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="content-card detail-section">
+            <div className="detail-section__header">
+              <h2>Amenidades</h2>
+              <p>Todo lo que ya viene incluido o mejora la experiencia de vivir aqui.</p>
+            </div>
             <div className="tag-list">
               {property.amenities.map((amenity) => (
                 <span key={amenity} className="tag">
                   {amenity}
                 </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="content-card detail-section">
+            <div className="detail-section__header">
+              <h2>Contexto de la estancia</h2>
+              <p>Notas utiles para decidir con mas seguridad y menos friccion.</p>
+            </div>
+            <div className="insight-list">
+              {lifestyleNotes.map((note) => (
+                <div key={note} className="insight-list__item">
+                  <ShieldCheck size={16} />
+                  <span>{note}</span>
+                </div>
               ))}
             </div>
           </div>
@@ -178,12 +358,14 @@ export function PropertyDetailPage() {
               <h2>{property.owner.fullName}</h2>
               <p>{property.owner.bio || 'Anfitrion enfocado en respuestas claras y seguimiento oportuno.'}</p>
             </div>
-            {property.owner.avatarUrl ? <img src={property.owner.avatarUrl} alt={property.owner.fullName} /> : null}
+            {property.owner.avatarUrl ? (
+              <img src={property.owner.avatarUrl} alt={property.owner.fullName} />
+            ) : null}
           </div>
         </div>
 
         <aside className="property-layout__aside">
-          <div className="price-card">
+          <div className="price-card price-card--booking">
             <div className="price-card__header">
               <strong>{formatCurrency(property.monthlyRent)}</strong>
               <span>canon mensual</span>
@@ -197,10 +379,19 @@ export function PropertyDetailPage() {
                 <span>Deposito</span>
                 <span>{formatCurrency(property.securityDeposit)}</span>
               </div>
+              <div>
+                <span>Total mensual estimado</span>
+                <span>{formatCurrency((property.monthlyRent || 0) + (property.maintenanceFee || 0))}</span>
+              </div>
             </div>
           </div>
-          <InlineMessage tone={requestMessage.includes('enviada') ? 'success' : 'danger'}>{requestMessage}</InlineMessage>
+
+          <InlineMessage tone={requestMessage.includes('Solicitud') ? 'success' : 'danger'}>
+            {requestMessage}
+          </InlineMessage>
+
           <RentalRequestForm
+            property={property}
             propertyId={property.id}
             ownerId={property.owner.id}
             onSubmit={handleCreateRequest}

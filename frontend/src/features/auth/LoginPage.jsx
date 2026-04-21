@@ -10,6 +10,7 @@ export function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const paymentIntent = location.state?.paymentIntent;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -18,7 +19,15 @@ export function LoginPage() {
 
     try {
       await login(form);
-      navigate(location.state?.from || '/account', { replace: true });
+      navigate(location.state?.from || '/account', {
+        replace: true,
+        state: location.state?.checkoutDraft
+          ? {
+              checkoutDraft: location.state.checkoutDraft,
+              openCheckout: true,
+            }
+          : undefined,
+      });
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -31,9 +40,19 @@ export function LoginPage() {
       <div className="auth-card">
         <span className="section__eyebrow">Acceso</span>
         <h1>Ingresa a tu cuenta</h1>
-        <p>Gestiona guardados, solicitudes y propiedades desde una sola experiencia.</p>
+        <p>
+          {paymentIntent
+            ? `Estas a un paso de continuar con la reserva de ${paymentIntent.propertyTitle}.`
+            : 'Gestiona guardados, solicitudes y propiedades desde una sola experiencia.'}
+        </p>
         <form className="auth-form" onSubmit={handleSubmit}>
           <InlineMessage tone="danger">{error}</InlineMessage>
+          {paymentIntent ? (
+            <InlineMessage tone="success">
+              No te pedimos iniciar sesion para explorar. Solo ahora que quieres avanzar con el
+              pago o la reserva.
+            </InlineMessage>
+          ) : null}
           <div className="field-group">
             <label htmlFor="email">Correo</label>
             <input

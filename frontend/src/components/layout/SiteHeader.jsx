@@ -36,11 +36,12 @@ export function SiteHeader() {
 
         <nav className="site-header__nav" aria-label="Principal">
           <Link to="/properties">Buscar</Link>
-          <a href="#como-funciona">Cómo funciona</a>
+          <a href="#como-funciona">Como funciona</a>
           <a href="#para-propietarios">Para propietarios</a>
         </nav>
 
         <div className="site-header__actions">
+          {!isAuthenticated ? <span className="site-header__hint">Explora sin iniciar sesion</span> : null}
           {isAuthenticated ? (
             <>
               <Link to="/account" className="site-header__link">
@@ -58,11 +59,11 @@ export function SiteHeader() {
                 Ingresar
               </Link>
               <Link to="/register" className="site-header__button">
-                Publicar
+                Crear cuenta
               </Link>
             </>
           )}
-          <button type="button" className="site-header__menu" aria-label="Abrir menú">
+          <button type="button" className="site-header__menu" aria-label="Abrir menu">
             <Menu size={18} />
           </button>
         </div>

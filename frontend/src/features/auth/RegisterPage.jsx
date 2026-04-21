@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { useAuth } from '../../app/providers/AuthProvider';
 
 export function RegisterPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { register } = useAuth();
   const [form, setForm] = useState({
     firstName: '',
@@ -16,6 +17,7 @@ export function RegisterPage() {
   });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const paymentIntent = location.state?.paymentIntent;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -24,7 +26,15 @@ export function RegisterPage() {
 
     try {
       await register(form);
-      navigate('/account', { replace: true });
+      navigate(location.state?.from || '/account', {
+        replace: true,
+        state: location.state?.checkoutDraft
+          ? {
+              checkoutDraft: location.state.checkoutDraft,
+              openCheckout: true,
+            }
+          : undefined,
+      });
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -37,9 +47,19 @@ export function RegisterPage() {
       <div className="auth-card auth-card--wide">
         <span className="section__eyebrow">Registro</span>
         <h1>Crea tu cuenta</h1>
-        <p>Empieza a guardar propiedades, enviar solicitudes o publicar tu inventario de arriendos.</p>
+        <p>
+          {paymentIntent
+            ? 'Crea tu cuenta para terminar la reserva cuando ya estes listo para avanzar.'
+            : 'Empieza a guardar propiedades, enviar solicitudes o publicar tu inventario de arriendos.'}
+        </p>
         <form className="auth-form" onSubmit={handleSubmit}>
           <InlineMessage tone="danger">{error}</InlineMessage>
+          {paymentIntent ? (
+            <InlineMessage tone="success">
+              Tu exploracion sigue siendo abierta. La cuenta solo aparece en este punto final del
+              flujo.
+            </InlineMessage>
+          ) : null}
           <div className="field-grid">
             <div className="field-group">
               <label htmlFor="firstName">Nombre</label>
