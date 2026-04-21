@@ -1,27 +1,29 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --font-sans: 'Manrope', 'Segoe UI', sans-serif;
+  --font-sans: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
   --font-display: 'Fraunces', Georgia, serif;
-  --bg: #ffffff;
-  --surface: #ffffff;
-  --surface-strong: #ffffff;
-  --surface-soft: #f5f5f5;
-  --border: rgba(0, 0, 0, 0.08);
-  --text: #1c1a16;
-  --muted: #9a9a9a;
-  --brand: #1a3d2e;
-  --brand-soft: #e8ede9;
-  --accent: #af7f4d;
-  --danger: #ad4d42;
-  --success: #35654a;
-  --warning: #8f6a35;
-  --shadow: none;
+  --color-primary: #1b4332;
+  --color-primary-light: #2d6a4f;
+  --color-accent: #f4a261;
+  --color-accent-soft: #fddcbb;
+  --color-bg: #fafaf7;
+  --color-surface: #ffffff;
+  --color-text: #1a1a1a;
+  --color-text-muted: #6b7280;
+  --color-border: #e5e7eb;
+  --color-success: #2d6a4f;
+  --color-danger: #c65d3b;
+  --color-warning: #b7791f;
+  --color-overlay: rgba(26, 26, 26, 0.08);
+  --shadow-sm: 0 12px 28px rgba(27, 67, 50, 0.08);
+  --shadow-md: 0 18px 48px rgba(27, 67, 50, 0.12);
+  --shadow-lg: 0 24px 72px rgba(27, 67, 50, 0.14);
   --radius-xl: 32px;
   --radius-lg: 24px;
   --radius-md: 18px;
   --radius-sm: 14px;
-  --max-width: 1200px;
+  --max-width: 1240px;
 }
 
 * {
@@ -35,11 +37,23 @@ html {
 body {
   margin: 0;
   font-family: var(--font-sans);
-  color: var(--text);
+  line-height: 1.6;
+  color: var(--color-text);
   background:
-    radial-gradient(circle at top left, rgba(175, 127, 77, 0.12), transparent 35%),
-    radial-gradient(circle at top right, rgba(38, 67, 58, 0.12), transparent 28%),
-    linear-gradient(180deg, #f8f5ef 0%, #f4f1eb 100%);
+    radial-gradient(circle at top right, rgba(232, 245, 233, 0.92), transparent 34%),
+    radial-gradient(circle at top left, rgba(253, 220, 187, 0.26), transparent 28%),
+    linear-gradient(180deg, #fefdf8 0%, var(--color-bg) 46%, #f5f4ec 100%);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
 }
 
 img {
@@ -57,4 +71,16 @@ textarea {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+input,
+select,
+textarea,
+button {
+  border-radius: 0;
+}
+
+:focus-visible {
+  outline: 3px solid rgba(244, 162, 97, 0.45);
+  outline-offset: 2px;
 }

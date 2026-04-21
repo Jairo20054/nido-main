@@ -1,30 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ArrowRight, Building2, CircleCheckBig, MapPin, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { LoadingState } from '../../components/ui/LoadingState';
 import { api } from '../../lib/apiClient';
 import { PropertyCard } from '../properties/PropertyCard';
 
-const FILTER_CHIPS = [
-  { id: 'all', label: 'Todo' },
-  { id: 'apartment', label: 'Apartamento' },
-  { id: 'house', label: 'Casa' },
-  { id: 'studio', label: 'Estudio' },
-  { id: 'furnished', label: 'Amoblado' },
-  { id: 'pets', label: 'Mascotas OK' },
-  { id: 'parking', label: 'Con parqueadero' },
+const POPULAR_CITIES = ['Medellín', 'Bogotá', 'Cali', 'Barranquilla'];
+const PROPERTY_TYPES = [
+  { value: '', label: 'Tipo' },
+  { value: 'apartment', label: 'Apartamento' },
+  { value: 'house', label: 'Casa' },
+  { value: 'studio', label: 'Estudio' },
 ];
 
 export function HomePage() {
   const navigate = useNavigate();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState('all');
   const [searchFilters, setSearchFilters] = useState({
     city: '',
-    budget: '',
-    bedrooms: '',
+    budget: 4500000,
+    propertyType: '',
   });
 
   useEffect(() => {
@@ -56,94 +53,135 @@ export function HomePage() {
   const handleSearch = (e) => {
     e.preventDefault();
     const params = new URLSearchParams();
-    
-    if (searchFilters.city) params.set('city', searchFilters.city);
-    if (searchFilters.budget) params.set('maxRent', searchFilters.budget);
-    if (searchFilters.bedrooms) params.set('bedrooms', searchFilters.bedrooms);
-    if (activeFilter !== 'all') params.set('filter', activeFilter);
+
+    if (searchFilters.city) params.set('ciudad', searchFilters.city);
+    params.set('min', '1800000');
+    params.set('max', String(searchFilters.budget));
+    params.set('hab', '1');
+    params.set('banos', '1');
+    if (searchFilters.propertyType) params.set('tipo', searchFilters.propertyType);
 
     navigate(`/properties?${params.toString()}`);
   };
 
-  const handleFilterClick = (filterId) => {
-    setActiveFilter(filterId);
-  };
-
   const displayCity = searchFilters.city || 'Colombia';
-  const propertyCount = properties.length;
+  const featuredProperties = useMemo(() => properties.slice(0, 6), [properties]);
 
   return (
     <div className="home-page">
-      {/* Hero Section */}
       <section className="home-hero">
-        <div className="home-hero__content">
-          <h1 className="home-hero__title">Encuentra tu próximo hogar</h1>
-          <p className="home-hero__subtitle">Arriendo residencial · Colombia</p>
+        <div className="home-hero__content home-hero__content--split">
+          <div className="home-hero__intro">
+            <span className="hero-kicker">Arriendos residenciales en Colombia</span>
+            <h1 className="home-hero__title">Encuentra tu próximo hogar</h1>
+            <p className="home-hero__subtitle">
+              Arriendos residenciales en Colombia · Sin complicaciones.
+            </p>
 
-          <form className="home-search" onSubmit={handleSearch}>
-            <div className="home-search__field">
-              <input
-                type="text"
-                placeholder="¿Dónde?"
-                value={searchFilters.city}
-                onChange={(e) => setSearchFilters({ ...searchFilters, city: e.target.value })}
-              />
+            <form className="home-search" onSubmit={handleSearch}>
+              <label className="home-search__field">
+                <span className="home-search__label">
+                  <MapPin size={16} />
+                  ¿Dónde?
+                </span>
+                <input
+                  type="text"
+                  placeholder="Ciudad o zona"
+                  value={searchFilters.city}
+                  onChange={(e) => setSearchFilters({ ...searchFilters, city: e.target.value })}
+                />
+              </label>
+
+              <div className="home-search__divider"></div>
+
+              <label className="home-search__field">
+                <span className="home-search__label">💰 Presupuesto</span>
+                <input
+                  type="number"
+                  min="500000"
+                  step="100000"
+                  placeholder="$4.500.000"
+                  value={searchFilters.budget}
+                  onChange={(e) =>
+                    setSearchFilters({ ...searchFilters, budget: Number(e.target.value || 0) })
+                  }
+                />
+              </label>
+
+              <div className="home-search__divider"></div>
+
+              <label className="home-search__field">
+                <span className="home-search__label">🏠 Tipo</span>
+                <select
+                  value={searchFilters.propertyType}
+                  onChange={(e) =>
+                    setSearchFilters({ ...searchFilters, propertyType: e.target.value })
+                  }
+                >
+                  {PROPERTY_TYPES.map((option) => (
+                    <option key={option.label} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <button type="submit" className="home-search__button">
+                Buscar <ArrowRight size={18} />
+              </button>
+            </form>
+
+            <div className="home-city-chips">
+              {POPULAR_CITIES.map((city) => (
+                <button
+                  key={city}
+                  type="button"
+                  className="home-city-chip"
+                  onClick={() => setSearchFilters((current) => ({ ...current, city }))}
+                >
+                  {city}
+                </button>
+              ))}
             </div>
+          </div>
 
-            <div className="home-search__divider"></div>
-
-            <div className="home-search__field">
-              <input
-                type="number"
-                placeholder="Presupuesto"
-                value={searchFilters.budget}
-                onChange={(e) => setSearchFilters({ ...searchFilters, budget: e.target.value })}
-              />
+          <div className="home-hero__panel">
+            <div className="hero-stat-card">
+              <span>Selección cuidada</span>
+              <strong>{properties.length || 34} propiedades listas para visitar</strong>
             </div>
-
-            <div className="home-search__divider"></div>
-
-            <div className="home-search__field">
-              <input
-                type="number"
-                placeholder="Cualquiera"
-                value={searchFilters.bedrooms}
-                onChange={(e) => setSearchFilters({ ...searchFilters, bedrooms: e.target.value })}
-              />
+            <div className="hero-trust-list">
+              <div>
+                <CircleCheckBig size={18} />
+                <span>Filtros claros desde el primer vistazo</span>
+              </div>
+              <div>
+                <ShieldCheck size={18} />
+                <span>Señales de confianza y barrios mejor explicados</span>
+              </div>
+              <div>
+                <Building2 size={18} />
+                <span>Experiencia pensada para renta urbana colombiana</span>
+              </div>
             </div>
-
-            <button type="submit" className="home-search__button">
-              Buscar <ArrowRight size={18} />
-            </button>
-          </form>
+          </div>
         </div>
       </section>
 
-      {/* Filter Chips */}
-      <div className="home-filters">
-        {FILTER_CHIPS.map((chip) => (
-          <button
-            key={chip.id}
-            className={`home-filter-chip ${activeFilter === chip.id ? 'home-filter-chip--active' : ''}`}
-            onClick={() => handleFilterClick(chip.id)}
-          >
-            {chip.label}
-          </button>
-        ))}
-      </div>
+      <section className="home-featured">
+        <div className="section__heading">
+          <div>
+            <span className="section__eyebrow">Selección destacada</span>
+            <h2>{featuredProperties.length || 0} propiedades en {displayCity}</h2>
+          </div>
+          <LinkishButton onClick={() => navigate('/properties')}>Ver todas</LinkishButton>
+        </div>
 
-      {/* Results Counter */}
-      <div className="home-counter">
-        {propertyCount} propiedades en {displayCity}
-      </div>
-
-      {/* Properties Grid */}
-      <section className="home-grid">
         {loading ? (
           <LoadingState label="Cargando propiedades..." />
-        ) : properties.length > 0 ? (
+        ) : featuredProperties.length > 0 ? (
           <div className="property-grid">
-            {properties.map((property) => (
+            {featuredProperties.map((property, index) => (
               <PropertyCard key={property.id} property={property} />
             ))}
           </div>
@@ -154,6 +192,32 @@ export function HomePage() {
           />
         )}
       </section>
+
+      <section className="editorial-strip" id="como-funciona">
+        <div className="editorial-strip__card">
+          <span>1</span>
+          <h3>Busca con intención</h3>
+          <p>Ciudad, canon y tipo en una sola acción, sin formularios eternos.</p>
+        </div>
+        <div className="editorial-strip__card">
+          <span>2</span>
+          <h3>Afina sin fricción</h3>
+          <p>Rangos, steppers y chips convierten filtros complejos en decisiones rápidas.</p>
+        </div>
+        <div className="editorial-strip__card" id="para-propietarios">
+          <span>3</span>
+          <h3>Confía en la lectura</h3>
+          <p>Precios claros, barrios visibles y tarjetas limpias para comparar mejor.</p>
+        </div>
+      </section>
     </div>
+  );
+}
+
+function LinkishButton({ children, onClick }) {
+  return (
+    <button type="button" className="ghost-link" onClick={onClick}>
+      {children}
+    </button>
   );
 }

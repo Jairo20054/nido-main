@@ -1,11 +1,20 @@
-import React from 'react';
-import { LogOut, User } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { House, LogOut, Menu, User } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../app/providers/AuthProvider';
 
 export function SiteHeader() {
   const navigate = useNavigate();
   const { isAuthenticated, logout, user } = useAuth();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 16);
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -13,16 +22,23 @@ export function SiteHeader() {
   };
 
   return (
-    <header className="site-header">
+    <header className={`site-header ${isScrolled ? 'site-header--scrolled' : ''}`}>
       <div className="site-header__container">
         <Link to="/" className="brand">
-          <span className="brand__mark">N</span>
+          <span className="brand__mark" aria-hidden="true">
+            <span className="brand__mark-home">
+              <House size={13} strokeWidth={2.4} />
+            </span>
+            <span className="brand__mark-leaf"></span>
+          </span>
           <span className="brand__text">Nido</span>
         </Link>
 
-        <div className="site-header__search">
-          <input type="text" placeholder="Busca por ciudad..." />
-        </div>
+        <nav className="site-header__nav" aria-label="Principal">
+          <Link to="/properties">Buscar</Link>
+          <a href="#como-funciona">Cómo funciona</a>
+          <a href="#para-propietarios">Para propietarios</a>
+        </nav>
 
         <div className="site-header__actions">
           {isAuthenticated ? (
@@ -46,6 +62,9 @@ export function SiteHeader() {
               </Link>
             </>
           )}
+          <button type="button" className="site-header__menu" aria-label="Abrir menú">
+            <Menu size={18} />
+          </button>
         </div>
       </div>
     </header>
