@@ -10,7 +10,7 @@ export function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const paymentIntent = location.state?.paymentIntent;
+  const flowIntent = location.state?.paymentIntent || location.state?.applicationIntent;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -41,16 +41,16 @@ export function LoginPage() {
         <span className="section__eyebrow">Acceso</span>
         <h1>Ingresa a tu cuenta</h1>
         <p>
-          {paymentIntent
-            ? `Estas a un paso de continuar con la reserva de ${paymentIntent.propertyTitle}.`
+          {flowIntent
+            ? `Estas a un paso de continuar con ${flowIntent.propertyTitle}.`
             : 'Gestiona guardados, solicitudes y propiedades desde una sola experiencia.'}
         </p>
         <form className="auth-form" onSubmit={handleSubmit}>
           <InlineMessage tone="danger">{error}</InlineMessage>
-          {paymentIntent ? (
+          {flowIntent ? (
             <InlineMessage tone="success">
-              No te pedimos iniciar sesion para explorar. Solo ahora que quieres avanzar con el
-              pago o la reserva.
+              No te pedimos iniciar sesion para explorar. Solo ahora que quieres avanzar con una
+              etapa que necesita trazabilidad.
             </InlineMessage>
           ) : null}
           <div className="field-group">

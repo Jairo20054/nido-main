@@ -17,7 +17,7 @@ export function RegisterPage() {
   });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const paymentIntent = location.state?.paymentIntent;
+  const flowIntent = location.state?.paymentIntent || location.state?.applicationIntent;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -48,16 +48,16 @@ export function RegisterPage() {
         <span className="section__eyebrow">Registro</span>
         <h1>Crea tu cuenta</h1>
         <p>
-          {paymentIntent
-            ? 'Crea tu cuenta para terminar la reserva cuando ya estes listo para avanzar.'
+          {flowIntent
+            ? 'Crea tu cuenta para continuar el flujo cuando ya estes listo para avanzar.'
             : 'Empieza a guardar propiedades, enviar solicitudes o publicar tu inventario de arriendos.'}
         </p>
         <form className="auth-form" onSubmit={handleSubmit}>
           <InlineMessage tone="danger">{error}</InlineMessage>
-          {paymentIntent ? (
+          {flowIntent ? (
             <InlineMessage tone="success">
-              Tu exploracion sigue siendo abierta. La cuenta solo aparece en este punto final del
-              flujo.
+              Tu exploracion sigue siendo abierta. La cuenta solo aparece cuando el flujo necesita
+              guardar identidad y progreso.
             </InlineMessage>
           ) : null}
           <div className="field-grid">

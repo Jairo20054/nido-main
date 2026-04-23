@@ -14,6 +14,7 @@ import {
   Sofa,
   Users,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { InlineMessage } from '../../components/ui/InlineMessage';
@@ -21,7 +22,6 @@ import { LoadingState } from '../../components/ui/LoadingState';
 import { useAuth } from '../../app/providers/AuthProvider';
 import { api } from '../../lib/apiClient';
 import { formatCurrency, formatDate, getPropertyTypeLabel } from '../../lib/formatters';
-import { RentalRequestForm } from './RentalRequestForm';
 
 export function PropertyDetailPage() {
   const { isAuthenticated } = useAuth();
@@ -30,8 +30,7 @@ export function PropertyDetailPage() {
   const [selectedImage, setSelectedImage] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [requestMessage, setRequestMessage] = useState('');
-  const [requesting, setRequesting] = useState(false);
+  const [pageMessage, setPageMessage] = useState('');
 
   useEffect(() => {
     let active = true;
@@ -159,7 +158,7 @@ export function PropertyDetailPage() {
 
   const toggleFavorite = async () => {
     if (!isAuthenticated) {
-      setRequestMessage('Puedes explorar libremente. Inicia sesion solo cuando quieras guardar o reservar.');
+      setPageMessage('Puedes explorar libremente. Inicia sesion solo cuando quieras guardar o seguir una solicitud.');
       return;
     }
 
@@ -172,23 +171,7 @@ export function PropertyDetailPage() {
 
       setProperty((current) => ({ ...current, isFavorite: !current.isFavorite }));
     } catch (requestError) {
-      setRequestMessage(requestError.message);
-    }
-  };
-
-  const handleCreateRequest = async (payload) => {
-    setRequesting(true);
-    setRequestMessage('');
-
-    try {
-      const response = await api.post('/requests', payload);
-      setRequestMessage(
-        response.message || 'Solicitud enviada. Ya puedes continuar con la validacion de reserva.'
-      );
-    } catch (requestError) {
-      setRequestMessage(requestError.message);
-    } finally {
-      setRequesting(false);
+      setPageMessage(requestError.message);
     }
   };
 
@@ -386,17 +369,44 @@ export function PropertyDetailPage() {
             </div>
           </div>
 
-          <InlineMessage tone={requestMessage.includes('Solicitud') ? 'success' : 'danger'}>
-            {requestMessage}
+          <InlineMessage tone={pageMessage.includes('explorar') ? 'neutral' : 'danger'}>
+            {pageMessage}
           </InlineMessage>
 
-          <RentalRequestForm
-            property={property}
-            propertyId={property.id}
-            ownerId={property.owner.id}
-            onSubmit={handleCreateRequest}
-            submitting={requesting}
-          />
+          <div className="content-card apply-sidebar-card">
+            <div className="apply-sidebar-card__header">
+              <span className="section__eyebrow">Arrendar con NIDO</span>
+              <h3>Aplica gratis y sigue un proceso claro</h3>
+              <p>
+                Veras requisitos, precalificacion instantanea, checklist documental y estado del caso
+                sin arbitrariedad.
+              </p>
+            </div>
+
+            <div className="application-trust-list">
+              <div>
+                <ShieldCheck size={16} />
+                <span>No cobramos estudio de viabilidad.</span>
+              </div>
+              <div>
+                <ShieldCheck size={16} />
+                <span>Te mostramos por que pedimos cada documento.</span>
+              </div>
+              <div>
+                <ShieldCheck size={16} />
+                <span>El pago inicial se deja para despues y con proteccion.</span>
+              </div>
+            </div>
+
+            <div className="application-actions">
+              <Link className="button" to={`/properties/${property.id}/apply/start`}>
+                Arrendar
+              </Link>
+              <Link className="button button--secondary" to="/properties">
+                Comparar opciones
+              </Link>
+            </div>
+          </div>
         </aside>
       </section>
     </div>
