@@ -180,17 +180,14 @@ const createUserProfile = async (userData) => {
       .upsert([
         {
           id: userData.id,
+          auth_id: userData.id,
           email: userData.email,
           first_name: userData.firstName || userData.first_name || '',
           last_name: userData.lastName || userData.last_name || '',
           phone: userData.phone || null,
           bio: userData.bio || null,
           avatar_url: userData.avatarUrl || userData.avatar_url || null,
-          locale: userData.locale || 'es-CO',
-          country_code: userData.countryCode || userData.country_code || 'CO',
-          timezone: userData.timezone || 'America/Bogota',
-          primary_role: requestedRole,
-          status: userData.status || 'active',
+          role: requestedRole,
         },
       ], { onConflict: 'id' })
       .select()
@@ -202,31 +199,11 @@ const createUserProfile = async (userData) => {
     }
     
     const roleTable = requestedRole === 'landlord' ? 'landlords' : 'tenants';
-    const rolePayload =
-      requestedRole === 'landlord'
-        ? {
-            profile_id: userData.id,
-            country_code: userData.countryCode || userData.country_code || 'CO',
-          }
-        : {
-            profile_id: userData.id,
-            country_code: userData.countryCode || userData.country_code || 'CO',
-          };
+    const rolePayload = {
+      profile_id: userData.id,
+    };
 
     await supabaseAdmin.from(roleTable).upsert([rolePayload], { onConflict: 'profile_id' });
-
-    await supabaseAdmin.from('roles').upsert(
-      [
-        {
-          profile_id: userData.id,
-          role_key: requestedRole,
-          scope_type: 'global',
-          scope_id: null,
-          status: 'active',
-        },
-      ],
-      { onConflict: 'profile_id,role_key,scope_type,scope_id' }
-    );
 
     return normalizeProfileRow(data);
   } catch (error) {

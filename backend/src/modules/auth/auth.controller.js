@@ -81,17 +81,30 @@ const register = async (req, res) => {
   }
 
   // ========================================================================
+  // INICIAR SESIÓN AUTOMÁTICAMENTE DESPUÉS DEL REGISTRO
+  // ========================================================================
+  // Para una mejor UX, iniciamos sesión inmediatamente después del registro
+  const loginResult = await signIn(email, password);
+
+  if (!loginResult.success) {
+    // Si el login falla, aún así retornamos éxito del registro
+    console.error('Auto-login failed after registration:', loginResult.error);
+  }
+
+  // ========================================================================
   // RETORNAR RESPUESTA
   // ========================================================================
   res.status(201).json({
     success: true,
-    message: 'Cuenta creada correctamente. Por favor confirma tu email.',
+    message: 'Cuenta creada correctamente.',
     data: {
+      token: loginResult.success ? loginResult.session.accessToken : null,
       user: {
         id: result.user.id,
         email: result.user.email,
         firstName: result.user.firstName,
         lastName: result.user.lastName,
+        role: result.user.role,
       },
     },
   });
@@ -139,7 +152,7 @@ const login = async (req, res) => {
     success: true,
     message: 'Sesión iniciada correctamente',
     data: {
-      session: result.session,
+      token: result.session.accessToken,
       user: serializeUser(result.user, true),
     },
   });

@@ -40,6 +40,7 @@ const signUp = async (email, password, userData) => {
         data: {
           firstName: userData?.firstName || '',
           lastName: userData?.lastName || '',
+          role: userData?.role || 'tenant',
         },
       },
     });
