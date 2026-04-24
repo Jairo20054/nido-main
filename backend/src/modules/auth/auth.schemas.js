@@ -1,5 +1,6 @@
 const Joi = require('joi');
-const { UserRole } = require('@prisma/client');
+
+const ROLE_VALUES = ['tenant', 'landlord'];
 
 const registerSchema = Joi.object({
   firstName: Joi.string().trim().min(2).max(40).required(),
@@ -8,8 +9,9 @@ const registerSchema = Joi.object({
   password: Joi.string().min(8).max(72).required(),
   phone: Joi.string().trim().max(24).allow('', null),
   role: Joi.string()
-    .valid(UserRole.TENANT, UserRole.LANDLORD)
-    .default(UserRole.TENANT),
+    .lowercase()
+    .valid(...ROLE_VALUES)
+    .default('tenant'),
 });
 
 const loginSchema = Joi.object({

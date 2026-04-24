@@ -1,5 +1,4 @@
-const bcrypt = require('bcryptjs');
-const { prisma } = require('../../shared/prisma');
+const { supabaseAdmin } = require('../../shared/supabase');
 const { badRequest } = require('../../shared/errors');
 const { serializeUser } = require('../../shared/serializers');
 
@@ -12,16 +11,28 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   const payload = {
-    ...req.body,
-    phone: req.body.phone || null,
-    bio: req.body.bio || null,
-    avatarUrl: req.body.avatarUrl || null,
+    id: req.user.id,
+    email: req.user.email,
+    first_name: req.body.firstName ?? req.user.firstName ?? '',
+    last_name: req.body.lastName ?? req.user.lastName ?? '',
+    phone: req.body.phone ?? null,
+    bio: req.body.bio ?? null,
+    avatar_url: req.body.avatarUrl ?? null,
+    primary_role: req.body.role ?? req.user.role ?? 'tenant',
+    locale: req.body.locale ?? req.user.locale ?? 'es-CO',
+    country_code: req.body.countryCode ?? req.user.countryCode ?? 'CO',
+    timezone: req.body.timezone ?? req.user.timezone ?? 'America/Bogota',
   };
 
-  const user = await prisma.user.update({
-    where: { id: req.user.id },
-    data: payload,
-  });
+  const { data: user, error } = await supabaseAdmin
+    .from('profiles')
+    .upsert([payload], { onConflict: 'id' })
+    .select()
+    .single();
+
+  if (error) {
+    throw badRequest(error.message);
+  }
 
   res.json({
     success: true,
@@ -31,15 +42,20 @@ const updateProfile = async (req, res) => {
 };
 
 const deleteProfile = async (req, res) => {
-  const isValidPassword = await bcrypt.compare(req.body.password, req.user.passwordHash);
+  const { error: authError } = await supabaseAdmin.auth.signInWithPassword({
+    email: req.user.email,
+    password: req.body.password,
+  });
 
-  if (!isValidPassword) {
+  if (authError) {
     throw badRequest('La contrasena no coincide');
   }
 
-  await prisma.user.delete({
-    where: { id: req.user.id },
-  });
+  const { error } = await supabaseAdmin.auth.admin.deleteUser(req.user.id);
+
+  if (error) {
+    throw badRequest(error.message);
+  }
 
   res.json({
     success: true,

@@ -1,9 +1,6 @@
 // ============================================================================
 // IMPORTACIONES
 // ============================================================================
-// PropertyStatus: Enum con los estados posibles de una propiedad (DRAFT, PUBLISHED, RENTED, ARCHIVED)
-const { PropertyStatus } = require('@prisma/client');
-
 // prisma: Cliente ORM para interactuar con la base de datos
 const { prisma } = require('../../shared/prisma');
 
@@ -56,7 +53,7 @@ const propertyInclude = (currentUserId) => ({
 const buildWhere = (query) => {
   // Inicializar con el filtro base: solo propiedades publicadas
   const where = {
-    status: PropertyStatus.PUBLISHED,
+    status: 'PUBLISHED',
   };
 
   // FILTRO 1: BÚSQUEDA DE TEXTO
@@ -264,7 +261,7 @@ const getFeaturedProperties = async (req, res) => {
   // Obtener las 4 propiedades publicadas más recientes
   const items = await prisma.property.findMany({
     where: {
-      status: PropertyStatus.PUBLISHED, // Solo propiedades publicadas
+      status: 'PUBLISHED', // Solo propiedades publicadas
     },
     include: propertyInclude(currentUserId), // Incluir relaciones
     orderBy: [{ createdAt: 'desc' }],        // Más recientes primero
@@ -320,7 +317,7 @@ const getPropertyById = async (req, res) => {
   const isOwner = req.user?.id === property.ownerId;
 
   // Si no es el propietario y la propiedad no está publicada, denegar acceso
-  if (!isOwner && property.status !== PropertyStatus.PUBLISHED) {
+  if (!isOwner && property.status !== 'PUBLISHED') {
     throw notFound('La propiedad no esta disponible');
   }
 

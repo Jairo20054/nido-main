@@ -16,11 +16,9 @@
 const {
   signUp,
   signIn,
-  signOut,
   resetPassword,
-  updatePasswordAfterReset,
-  updatePassword,
 } = require('../../shared/supabase-auth');
+const { supabaseAdmin } = require('../../shared/supabase');
 
 // Función para serializar datos del usuario (remover información sensible)
 const { serializeUser } = require('../../shared/serializers');
@@ -216,23 +214,12 @@ const changePassword = async (req, res) => {
     throw badRequest('La nueva contraseña debe tener al menos 8 caracteres');
   }
 
-  // ========================================================================
-  // EXTRAER TOKEN DEL REQUEST
-  // ========================================================================
-  // El token ya fue validado por el middleware requireAuth
-  const token = req.headers.authorization?.slice(7);
+  const { error } = await supabaseAdmin.auth.admin.updateUserById(req.user.id, {
+    password: newPassword,
+  });
 
-  if (!token) {
-    throw unauthorized('Token no proporcionado');
-  }
-
-  // ========================================================================
-  // LLAMAR SERVICIO DE CAMBIO DE CONTRASEÑA
-  // ========================================================================
-  const result = await updatePassword(token, newPassword);
-
-  if (!result.success) {
-    throw badRequest(result.error);
+  if (error) {
+    throw badRequest(error.message);
   }
 
   // ========================================================================
@@ -310,23 +297,24 @@ const resetPasswordConfirm = async (req, res) => {
     throw badRequest('La nueva contraseña debe tener al menos 8 caracteres');
   }
 
-  // ========================================================================
-  // EXTRAER TOKEN DEL REQUEST
-  // ========================================================================
-  // El cliente debe proporcionar el token desde la URL de recuperación
   const token = req.headers.authorization?.slice(7);
 
   if (!token) {
     throw unauthorized('Token no proporcionado');
   }
 
-  // ========================================================================
-  // LLAMAR SERVICIO DE CONFIRMACIÓN
-  // ========================================================================
-  const result = await updatePasswordAfterReset(token, newPassword);
+  const { data, error: userError } = await supabaseAdmin.auth.getUser(token);
 
-  if (!result.success) {
-    throw badRequest(result.error);
+  if (userError || !data.user) {
+    throw unauthorized(userError?.message || 'Token no válido');
+  }
+
+  const { error } = await supabaseAdmin.auth.admin.updateUserById(data.user.id, {
+    password: newPassword,
+  });
+
+  if (error) {
+    throw badRequest(error.message);
   }
 
   // ========================================================================

@@ -55,6 +55,31 @@ const supabase = createClient(
   }
 );
 
+const normalizeProfileRow = (profile) => {
+  if (!profile) {
+    return null;
+  }
+
+  return {
+    id: profile.id,
+    email: profile.email,
+    firstName: profile.firstName ?? profile.first_name ?? '',
+    lastName: profile.lastName ?? profile.last_name ?? '',
+    phone: profile.phone ?? null,
+    bio: profile.bio ?? null,
+    avatarUrl: profile.avatarUrl ?? profile.avatar_url ?? null,
+    locale: profile.locale ?? 'es-CO',
+    countryCode: profile.countryCode ?? profile.country_code ?? 'CO',
+    timezone: profile.timezone ?? 'America/Bogota',
+    role: profile.role ?? profile.primary_role ?? 'tenant',
+    status: profile.status ?? 'active',
+    onboardingCompletedAt:
+      profile.onboardingCompletedAt ?? profile.onboarding_completed_at ?? null,
+    createdAt: profile.createdAt ?? profile.created_at ?? null,
+    updatedAt: profile.updatedAt ?? profile.updated_at ?? null,
+  };
+};
+
 // ============================================================================
 // CREACIÓN DEL CLIENTE SUPABASE ADMIN (Con permisos de servidor)
 // ============================================================================
@@ -116,12 +141,12 @@ const getUserFromToken = async (token) => {
  */
 const getUserData = async (userId) => {
   if (!userId) return null;
-  
+
   try {
     // Usar el cliente admin para obtener datos de la tabla users
     // sin restricciones de RLS
     const { data, error } = await supabaseAdmin
-      .from('users')
+      .from('profiles')
       .select('*')
       .eq('id', userId)
       .single();
@@ -130,7 +155,7 @@ const getUserData = async (userId) => {
       return null;
     }
     
-    return data;
+    return normalizeProfileRow(data);
   } catch (error) {
     console.error('Error getting user data:', error);
     return null;
@@ -145,9 +170,29 @@ const getUserData = async (userId) => {
  */
 const createUserProfile = async (userData) => {
   try {
+    const requestedRole =
+      (userData.role || userData.primary_role || 'tenant').toString().toLowerCase() === 'landlord'
+        ? 'landlord'
+        : 'tenant';
+
     const { data, error } = await supabaseAdmin
-      .from('users')
-      .insert([userData])
+      .from('profiles')
+      .upsert([
+        {
+          id: userData.id,
+          email: userData.email,
+          first_name: userData.firstName || userData.first_name || '',
+          last_name: userData.lastName || userData.last_name || '',
+          phone: userData.phone || null,
+          bio: userData.bio || null,
+          avatar_url: userData.avatarUrl || userData.avatar_url || null,
+          locale: userData.locale || 'es-CO',
+          country_code: userData.countryCode || userData.country_code || 'CO',
+          timezone: userData.timezone || 'America/Bogota',
+          primary_role: requestedRole,
+          status: userData.status || 'active',
+        },
+      ], { onConflict: 'id' })
       .select()
       .single();
     
@@ -156,7 +201,34 @@ const createUserProfile = async (userData) => {
       return null;
     }
     
-    return data;
+    const roleTable = requestedRole === 'landlord' ? 'landlords' : 'tenants';
+    const rolePayload =
+      requestedRole === 'landlord'
+        ? {
+            profile_id: userData.id,
+            country_code: userData.countryCode || userData.country_code || 'CO',
+          }
+        : {
+            profile_id: userData.id,
+            country_code: userData.countryCode || userData.country_code || 'CO',
+          };
+
+    await supabaseAdmin.from(roleTable).upsert([rolePayload], { onConflict: 'profile_id' });
+
+    await supabaseAdmin.from('roles').upsert(
+      [
+        {
+          profile_id: userData.id,
+          role_key: requestedRole,
+          scope_type: 'global',
+          scope_id: null,
+          status: 'active',
+        },
+      ],
+      { onConflict: 'profile_id,role_key,scope_type,scope_id' }
+    );
+
+    return normalizeProfileRow(data);
   } catch (error) {
     console.error('Error in createUserProfile:', error);
     return null;
@@ -172,4 +244,5 @@ module.exports = {
   getUserFromToken,   // Función para obtener usuario desde token
   getUserData,        // Función para obtener datos extendidos del usuario
   createUserProfile,  // Función para crear perfil de usuario
+  normalizeProfileRow,
 };

@@ -1,28 +1,17 @@
 const Joi = require('joi');
-const { PropertyStatus, PropertyType } = require('@prisma/client');
+const PROPERTY_TYPES = ['APARTMENT', 'HOUSE', 'STUDIO', 'LOFT', 'PENTHOUSE', 'ROOM'];
+const PROPERTY_STATUSES = ['DRAFT', 'PUBLISHED', 'RENTED', 'ARCHIVED'];
 
 const propertyPayloadSchema = Joi.object({
   title: Joi.string().trim().min(8).max(100).required(),
   summary: Joi.string().trim().min(20).max(180).required(),
   description: Joi.string().trim().min(80).max(3000).required(),
   propertyType: Joi.string()
-    .valid(
-      PropertyType.APARTMENT,
-      PropertyType.HOUSE,
-      PropertyType.STUDIO,
-      PropertyType.LOFT,
-      PropertyType.PENTHOUSE,
-      PropertyType.ROOM
-    )
+    .valid(...PROPERTY_TYPES)
     .required(),
   status: Joi.string()
-    .valid(
-      PropertyStatus.DRAFT,
-      PropertyStatus.PUBLISHED,
-      PropertyStatus.RENTED,
-      PropertyStatus.ARCHIVED
-    )
-    .default(PropertyStatus.PUBLISHED),
+    .valid(...PROPERTY_STATUSES)
+    .default('PUBLISHED'),
   city: Joi.string().trim().min(2).max(60).required(),
   neighborhood: Joi.string().trim().max(80).allow('', null),
   addressLine: Joi.string().trim().min(4).max(120).required(),
@@ -55,14 +44,7 @@ const updatePropertySchema = propertyPayloadSchema
 const propertyQuerySchema = Joi.object({
   q: Joi.string().trim().allow('', null),
   city: Joi.string().trim().allow('', null),
-  propertyType: Joi.string().valid(
-    PropertyType.APARTMENT,
-    PropertyType.HOUSE,
-    PropertyType.STUDIO,
-    PropertyType.LOFT,
-    PropertyType.PENTHOUSE,
-    PropertyType.ROOM
-  ),
+  propertyType: Joi.string().valid(...PROPERTY_TYPES),
   minRent: Joi.number().integer().min(0),
   maxRent: Joi.number().integer().min(0),
   bedrooms: Joi.number().integer().min(0).max(12),

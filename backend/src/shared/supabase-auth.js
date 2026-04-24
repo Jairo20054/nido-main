@@ -58,6 +58,10 @@ const signUp = async (email, password, userData) => {
     // PASO 2: Crear perfil extendido en tabla 'users'
     // ========================================================================
     // Además del registro en Auth, guardamos datos adicionales en nuestra tabla
+    const requestedRole = (userData?.role || 'tenant').toString().toLowerCase() === 'landlord'
+      ? 'landlord'
+      : 'tenant';
+
     const userProfile = await createUserProfile({
       id: authUser.id, // Usar el mismo ID de Supabase Auth
       email: authUser.email,
@@ -66,9 +70,7 @@ const signUp = async (email, password, userData) => {
       avatarUrl: userData?.avatarUrl || null,
       bio: userData?.bio || null,
       phone: userData?.phone || null,
-      role: userData?.role || 'TENANT', // TENANT, LANDLORD, ADMIN
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      role: requestedRole,
     });
 
     if (!userProfile) {
@@ -88,6 +90,7 @@ const signUp = async (email, password, userData) => {
         email: authUser.email,
         firstName: userData?.firstName || '',
         lastName: userData?.lastName || '',
+        role: requestedRole,
       },
       error: null,
     };
@@ -133,7 +136,7 @@ const signIn = async (email, password) => {
 
     // Obtener datos extendidos del usuario desde nuestra tabla
     const { data: userProfile } = await supabaseAdmin
-      .from('users')
+      .from('profiles')
       .select('*')
       .eq('id', authUser.id)
       .single();

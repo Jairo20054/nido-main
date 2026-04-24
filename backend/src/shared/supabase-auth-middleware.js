@@ -104,7 +104,11 @@ const attachUser = async (req, strict = false) => {
       avatarUrl: userProfile?.avatarUrl || null,
       bio: userProfile?.bio || null,
       phone: userProfile?.phone || null,
-      role: userProfile?.role || 'TENANT',
+      locale: userProfile?.locale || 'es-CO',
+      countryCode: userProfile?.countryCode || 'CO',
+      timezone: userProfile?.timezone || 'America/Bogota',
+      role: userProfile?.role || 'tenant',
+      status: userProfile?.status || 'active',
       
       // Metadata de Supabase Auth
       metadata: authUser.user_metadata || {},
