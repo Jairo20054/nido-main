@@ -1,4 +1,4 @@
-# 🧪 Testing Checklist - PropertyDetailPage
+# 🧪 Checklist de pruebas - PropertyDetailPage
 
 ## ✅ Pre-requisitos
 - [ ] Aplicación ejecutándose en http://localhost:3000
@@ -70,7 +70,7 @@
 - [ ] Número de reseñas visible
 - [ ] Precio destacado con gradient morado
 
-### Características (Features)
+### Características (Funciones)
 - [ ] 4 características visibles en grid 2x2
 - [ ] Característica 1: Tipo (Casa/Apartamento/etc)
 - [ ] Característica 2: Dormitorios (3, 4, 5, etc)
@@ -381,4 +381,5 @@ _________________________________________________________________
 - [ ] Reseñas y calificaciones
 - [ ] Chat con propietario
 - [ ] Otro: ________________________
+
 

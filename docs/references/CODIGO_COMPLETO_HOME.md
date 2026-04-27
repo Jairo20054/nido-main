@@ -487,8 +487,8 @@ import { api } from '../../services/api';
 import './HomeAirbnb.css';
 
 const HomeAirbnb = () => {
-  const [properties, setProperties] = useState([]);
-  const [filteredProperties, setFilteredProperties] = useState([]);
+  const [properties, setPropiedades] = useState([]);
+  const [filteredPropiedades, setFilteredPropiedades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [favorites, setFavorites] = useState(() => {
@@ -498,7 +498,7 @@ const HomeAirbnb = () => {
 
   // Cargar propiedades desde API
   useEffect(() => {
-    const loadProperties = async () => {
+    const loadPropiedades = async () => {
       try {
         setLoading(true);
         const response = await api.get('/properties', {
@@ -524,21 +524,21 @@ const HomeAirbnb = () => {
               parking: prop.parking || false
             }
           }));
-          setProperties(transformed);
-          setFilteredProperties(transformed);
+          setPropiedades(transformed);
+          setFilteredPropiedades(transformed);
         }
       } catch (err) {
         console.error('Error cargando propiedades:', err);
         setError('No se pudieron cargar las propiedades');
         // Mock data como fallback
-        setProperties(getMockProperties());
-        setFilteredProperties(getMockProperties());
+        setPropiedades(getMockPropiedades());
+        setFilteredPropiedades(getMockPropiedades());
       } finally {
         setLoading(false);
       }
     };
 
-    loadProperties();
+    loadPropiedades();
   }, []);
 
   // Guardar favoritos en localStorage
@@ -557,7 +557,7 @@ const HomeAirbnb = () => {
       return matchLocation && matchGuests;
     });
 
-    setFilteredProperties(filtered);
+    setFilteredPropiedades(filtered);
   };
 
   const handleFavorite = (propertyId, isFavorited) => {
@@ -584,8 +584,8 @@ const HomeAirbnb = () => {
         {/* Header con título */}
         <div className="content-header">
           <h2 className="section-title">
-            {filteredProperties.length > 0
-              ? `${filteredProperties.length} lugares disponibles`
+            {filteredPropiedades.length > 0
+              ? `${filteredPropiedades.length} lugares disponibles`
               : 'Lugares disponibles'}
           </h2>
         </div>
@@ -619,7 +619,7 @@ const HomeAirbnb = () => {
         )}
 
         {/* Empty State */}
-        {!loading && filteredProperties.length === 0 && !error && (
+        {!loading && filteredPropiedades.length === 0 && !error && (
           <div className="empty-container">
             <p className="empty-message">No se encontraron propiedades</p>
             <p className="empty-submessage">Prueba con otros criterios de búsqueda</p>
@@ -627,9 +627,9 @@ const HomeAirbnb = () => {
         )}
 
         {/* Grid de propiedades */}
-        {!loading && filteredProperties.length > 0 && (
+        {!loading && filteredPropiedades.length > 0 && (
           <div className="properties-grid">
-            {filteredProperties.map(property => (
+            {filteredPropiedades.map(property => (
               <PropertyCard
                 key={property.id}
                 property={property}
@@ -644,7 +644,7 @@ const HomeAirbnb = () => {
 };
 
 // Mock data como fallback
-const getMockProperties = () => {
+const getMockPropiedades = () => {
   return [
     {
       id: 1,
@@ -703,4 +703,5 @@ Todos los archivos CSS están completos en los documentos anteriores:
 **Archivos nuevos:** 6
 **Archivos modificados:** 1
 **Dependencias nuevas:** 0 (solo usa lo existente)
+
 

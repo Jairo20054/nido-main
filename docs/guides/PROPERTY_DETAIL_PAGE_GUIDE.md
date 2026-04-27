@@ -60,7 +60,7 @@ src/pages/Home/Home.jsx         (Cambiado a navegación en lugar de modal)
 └─────────────────────────────────┘
 ```
 
-### 4. **Características (Features)**
+### 4. **Características (Funciones)**
 Muestra 4 información clave:
 - 🏠 Tipo de propiedad
 - 👥 Dormitorios
@@ -384,3 +384,4 @@ Performance: Optimizado
 **Versión**: 1.0  
 **Estado**: ✅ Completo y Funcional  
 **Autor**: Sistema de Desarrollo NIDO
+

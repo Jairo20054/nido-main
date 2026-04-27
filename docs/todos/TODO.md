@@ -1,50 +1,55 @@
-# Refactor Plan
+# Plan de refactor
 
-1. Create new PropertyCard component like Airbnb
+1. Crear un nuevo componente `PropertyCard` estilo Airbnb.
+2. Modificar `SearchBar` para que tenga formato hero grande.
+- Reestructuracion planificada del componente principal de Marketplace.
 
-2. Modify SearchBar to be large hero style
-- 🔄 Planning restructure of main Marketplace component
+## Mejoras planificadas
 
-## Planned Improvements
+### 1. Arquitectura de componentes
 
-### 1. Component Architecture
-- [ ] Restructure main Marketplace component with better separation of concerns
-- [ ] Implement proper component composition
-- [ ] Add TypeScript support for better type safety
-- [ ] Create reusable sub-components
+- [ ] Reestructurar el componente principal de Marketplace con mejor separacion de responsabilidades
+- [ ] Implementar una composicion de componentes adecuada
+- [ ] Agregar soporte TypeScript para mayor seguridad de tipos
+- [ ] Crear subcomponentes reutilizables
 
-### 2. Visual Design & Aesthetics
-- [ ] Modern gradient header with improved branding
-- [ ] Enhanced ProductCard with better shadows, hover effects, and layout
-- [ ] Redesigned FiltersDrawer with elegant styling
-- [ ] Vibrant color palette with better contrast
-- [ ] Smooth animations and transitions throughout
-- [ ] Improved typography and spacing consistency
+### 2. Diseno visual y estetica
 
-### 3. User Experience
-- [ ] Better loading states with skeleton screens
-- [ ] Improved error handling and empty states
-- [ ] Enhanced mobile responsiveness
-- [ ] Better accessibility features
-- [ ] Optimized performance with lazy loading
+- [ ] Header moderno con gradiente y mejor branding
+- [ ] `ProductCard` mejorado con mejores sombras, hover, layout y presencia visual
+- [ ] `FiltersDrawer` redisenado con estilo mas elegante
+- [ ] Paleta de color mas vibrante y con mejor contraste
+- [ ] Animaciones y transiciones suaves en toda la experiencia
+- [ ] Mejor consistencia tipografica y de espaciado
 
-### 4. Code Quality
-- [ ] Clean up component structure
-- [ ] Implement proper state management
-- [ ] Add comprehensive error boundaries
-- [ ] Improve code reusability
+### 3. Experiencia de usuario
 
-## Implementation Steps
-1. Create new modern Marketplace component structure
-2. Implement aesthetic improvements
-3. Add animations and transitions
-4. Test responsiveness and performance
-5. Code review and optimization
+- [ ] Mejores estados de carga con skeleton screens
+- [ ] Mejor manejo de errores y empty states
+- [ ] Mejor respuesta en mobile
+- [ ] Mejoras de accesibilidad
+- [ ] Rendimiento optimizado con lazy loading
 
-## Files to Modify
-- `src/pages/Marketplace/index.jsx` - Main component restructure
-- `src/pages/Marketplace/index.module.css` - Style improvements
-- `src/pages/Marketplace/MarketplaceHeader.jsx` - Header redesign
-- `src/pages/Marketplace/ProductCard.jsx` - Card redesign
-- `src/pages/Marketplace/ProductGrid.jsx` - Grid improvements
-- `src/pages/Marketplace/FiltersDrawer.jsx` - Drawer redesign
+### 4. Calidad de codigo
+
+- [ ] Limpiar la estructura de componentes
+- [ ] Implementar manejo de estado adecuado
+- [ ] Agregar error boundaries completos
+- [ ] Mejorar la reutilizacion del codigo
+
+## Pasos de implementacion
+
+1. Crear una nueva estructura moderna para Marketplace
+2. Implementar mejoras esteticas
+3. Agregar animaciones y transiciones
+4. Probar responsividad y rendimiento
+5. Hacer revision y optimizacion de codigo
+
+## Archivos a modificar
+
+- `src/pages/Marketplace/index.jsx` - reestructuracion del componente principal
+- `src/pages/Marketplace/index.module.css` - mejoras visuales
+- `src/pages/Marketplace/MarketplaceHeader.jsx` - rediseno del header
+- `src/pages/Marketplace/ProductCard.jsx` - rediseno de la tarjeta
+- `src/pages/Marketplace/ProductGrid.jsx` - mejoras del grid
+- `src/pages/Marketplace/FiltersDrawer.jsx` - rediseno del drawer

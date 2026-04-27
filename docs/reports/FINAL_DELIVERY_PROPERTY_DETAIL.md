@@ -154,8 +154,8 @@ src/pages/PropertyDetailPage/
 ## 📱 Dispositivos Soportados
 
 ```
-✅ Desktop (1920x1080)     → Perfecto
-✅ Laptop (1366x768)       → Perfecto
+✅ Desktop (1920x1080)     → Perfectoo
+✅ Laptop (1366x768)       → Perfectoo
 ✅ Tablet (768x1024)       → Optimizado
 ✅ Mobile (375x812)        → Optimizado
 ✅ Móvil pequeño (320x568) → Optimizado
@@ -370,4 +370,5 @@ Selecciona iPhone 12
 La página está 100% funcional y lista para producción.
 
 Visita: http://localhost:3000 para ver el resultado.
+
 

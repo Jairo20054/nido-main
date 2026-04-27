@@ -141,11 +141,11 @@ Rutas recomendadas:
 | 23. Payment held screen | Explicar custodia | Estado `Pago recibido y protegido`, siguientes pasos para entrega | `Ir a entrega` | `Descargar comprobante` | Empty: pago no confirmado |
 | 24. Move-in prep | Preparar entrega | Fecha, checklist, inventario, medidores, fotos pendientes | `Iniciar entrega` | `Reprogramar` | Error: entrega aun no habilitada |
 | 25. Move-in checklist | Registrar estado inicial | Habitaciones, items, fotos, observaciones, medidores | `Guardar checklist` | `Pausar` | Loading: subiendo evidencia |
-| 26. Delivery confirmation | Cerrar entrega | Resumen de hallazgos, confirmacion de ambas partes, observaciones abiertas | `Confirmar entrega` | `Reportar observacion` | Error: firmas de entrega incompletas |
-| 27. Delivery dispute | Manejar diferencias | Items observados, fotos comparativas, comentarios y decision de ops | `Enviar observacion` | `Solicitar revision` | Empty: sin diferencias |
-| 28. Tenant dashboard | Operacion mensual | Proximo pago, contrato, pagos, soporte, mantenimiento, documentos | `Pagar mensualidad` | `Reportar mantenimiento` | Empty: sin contratos activos |
+| 26. Entrega confirmation | Cerrar entrega | Resumen de hallazgos, confirmacion de ambas partes, observaciones abiertas | `Confirmar entrega` | `Reportear observacion` | Error: firmas de entrega incompletas |
+| 27. Entrega dispute | Manejar diferencias | Items observados, fotos comparativas, comentarios y decision de ops | `Enviar observacion` | `Solicitar revision` | Empty: sin diferencias |
+| 28. Tenant dashboard | Operacion mensual | Proximo pago, contrato, pagos, soporte, mantenimiento, documentos | `Pagar mensualidad` | `Reportear mantenimiento` | Empty: sin contratos activos |
 | 29. Landlord dashboard | Gestionar inmuebles y casos | Suscripciones, solicitudes, contratos, pagos retenidos/liberados, entregas | `Revisar solicitudes` | `Crear publicacion` | Empty: sin inmuebles |
-| 30. Support center | Resolver bloqueos | Tickets, FAQs, trazabilidad por etapa | `Crear ticket` | `Abrir chat` | Empty: sin tickets |
+| 30. Soporte center | Resolver bloqueos | Tickets, FAQs, trazabilidad por etapa | `Crear ticket` | `Abrir chat` | Empty: sin tickets |
 | 31. Ops review queue | Revision manual | Cola por riesgo, checklists, documentos, score, auditoria | `Emitir decision` | `Solicitar correccion` | Empty: sin casos pendientes |
 | 32. Payment ops | Conciliar pagos y liberaciones | Intenciones, webhooks, fondos retenidos, liberaciones, excepciones | `Liberar fondos` | `Marcar incidencia` | Empty: sin movimientos |
 | 33. Contract ops | Gobernar plantillas | Plantilla por pais, versionado, clausulas permitidas, comparacion | `Publicar plantilla` | `Guardar borrador` | Empty: sin plantilla |
@@ -820,7 +820,7 @@ NIDO convierte el arriendo en un flujo digital justo y trazable: el usuario apli
   - Document checklist
   - Review status
   - Contract summary
-  - Signatures
+  - Firmas
   - Payment held
   - Move-in checklist
 - Crear design system minimo:
@@ -867,3 +867,4 @@ La mejor decision para NIDO es separar desde el inicio tres cosas:
 - `reglas por pais`
 
 Esa separacion permite crecer de Colombia a otros mercados sin reescribir el core, evita arbitrariedad del arrendador y deja espacio para pasar de MVP manual a automatizacion real sin romper la experiencia.
+

@@ -9,7 +9,7 @@
 **1. PropertyCardOptimized.jsx**
 - **Path**: `src/components/common/PropertyCard/PropertyCardOptimized.jsx`
 - **Lines**: 280
-- **Key Features**:
+- **Key Funciones**:
   - Fixed aspect-ratio: 4/5 (hardcoded)
   - Image carousel with prev/next buttons
   - Indicators (dots) showing current image
@@ -47,7 +47,7 @@
 **3. PropertyGridOptimized.jsx**
 - **Path**: `src/components/common/PropertyGrid/PropertyGridOptimized.jsx`
 - **Lines**: 50
-- **Key Features**:
+- **Key Funciones**:
   - `repeat(auto-fill, minmax(240px, 1fr))`
   - 8 skeleton cards on loading
   - Empty state handling
@@ -90,7 +90,7 @@
      - Review count + response rate
      - Superhost badge
      - Contact button
-  4. **Features** (2-column grid)
+  4. **Funciones** (2-column grid)
      - Bedrooms
      - Bathrooms
      - Max guests
@@ -152,7 +152,7 @@
   if (checkOutDate <= checkInDate) throw error;
 
   // 2. Find booked properties
-  const bookedProperties = await Booking.distinct('propertyId', {
+  const bookedPropiedades = await Booking.distinct('propertyId', {
     status: { $in: ['confirmed', 'pending'] },
     $or: [{
       checkIn: { $lt: checkOutDate },
@@ -162,7 +162,7 @@
 
   // 3. Build MongoDB filter
   const filter = {
-    _id: { $nin: bookedProperties },
+    _id: { $nin: bookedPropiedades },
     city: { $regex: city, $options: 'i' },
     price: { $gte: priceMin, $lte: priceMax },
     ...(propertyType && { type: propertyType }),
@@ -424,7 +424,7 @@ const executeSearch = useCallback(async (params) => {
   
   const response = await fetch(`/api/properties/search?${queryParams.toString()}`);
   const data = await response.json();
-  setProperties(data.data.properties);
+  setPropiedades(data.data.properties);
 }, []);
 ```
 
@@ -465,7 +465,7 @@ router.get('/search', async (req, res) => {
     success: true,
     data: {
       properties,
-      pagination: { page, limit, total: await Property.countDocuments(...), pages: Math.ceil(...) }
+      pagination: { page, limit, total: await Property.countDocumentos(...), pages: Math.ceil(...) }
     }
   });
 });
@@ -489,7 +489,7 @@ router.get('/search', async (req, res) => {
 
 - **Performance**: 92+
 - **Accessibility**: 94+
-- **Best Practices**: 96+
+- **Buenas practicas**: 96+
 - **SEO**: 98+
 
 ---
@@ -554,5 +554,6 @@ router.get('/search', searchLimiter, async (req, res) => {
 ---
 
 **Version**: 2.0.0  
-**Status**: ✅ Production Ready  
-**Last Updated**: 2024
+**Estado**: ✅ Listo para produccion  
+**Ultima actualizacion**: 2024
+

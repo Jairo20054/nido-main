@@ -7,7 +7,7 @@
 ║                                                            ║
 ║           ✅ PROPERTYDETAILPAGE IMPLEMENTADO              ║
 ║                                                            ║
-║  Status: 🟢 LISTO PARA PRODUCCIÓN                         ║
+║  Estado: 🟢 LISTO PARA PRODUCCIÓN                         ║
 ║                                                            ║
 ╚════════════════════════════════════════════════════════════╝
 ```
@@ -352,7 +352,7 @@ Fácil de agregar:
 
 ---
 
-## 🎯 Status
+## 🎯 Estado
 
 ```
 ╔═════════════════════════════════════╗
@@ -414,7 +414,8 @@ Visita: **http://localhost:3000**
 ---
 
 **Versión**: 1.0
-**Status**: ✅ Completo
+**Estado**: ✅ Completo
 **Listo para**: Producción
 **Fecha**: [Hoy]
+
 

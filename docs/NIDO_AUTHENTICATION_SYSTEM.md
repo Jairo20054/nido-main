@@ -1,22 +1,23 @@
-# NIDO Authentication System Implementation
+# Implementacion del sistema de autenticacion de NIDO
 
-## Overview
+## Resumen general
 
-This document describes the complete authentication system implemented for NIDO, a rental platform. The system uses Supabase Auth with PostgreSQL Row-Level Security (RLS) to provide secure, scalable user management.
+Este documento describe el sistema completo de autenticacion implementado para NIDO, una plataforma de arriendo. El sistema usa Supabase Auth con Row-Level Security (RLS) en PostgreSQL para ofrecer gestion de usuarios segura y escalable.
 
-## Architecture
+## Arquitectura
 
-### Core Components
+### Componentes principales
 
-1. **Supabase Auth**: Handles user registration, login, password reset, and session management
-2. **Profiles Table**: Extended user information linked to auth.users
-3. **Role-Based Access Control**: Admin, landlord, and tenant roles with proper permissions
-4. **Row-Level Security**: Database-level access control policies
-5. **Automatic Profile Creation**: Triggers create profiles and role-specific tables on signup
+1. **Supabase Auth**: maneja registro de usuarios, login, recuperacion de contrasena y sesiones.
+2. **Tabla `profiles`**: informacion extendida del usuario enlazada a `auth.users`.
+3. **Control de acceso basado en roles**: roles de admin, landlord y tenant con permisos adecuados.
+4. **Row-Level Security**: politicas de control de acceso a nivel base de datos.
+5. **Creacion automatica de perfiles**: triggers que crean perfiles y tablas especificas por rol al registrarse.
 
-### Database Schema
+### Esquema de base de datos
 
-#### Profiles Table
+#### Tabla `profiles`
+
 ```sql
 CREATE TABLE profiles (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -40,18 +41,21 @@ CREATE TABLE profiles (
 );
 ```
 
-#### Role-Specific Tables
-- **landlords**: Additional data for property owners
-- **tenants**: Additional data for renters
+#### Tablas especificas por rol
+
+- **`landlords`**: datos adicionales para propietarios.
+- **`tenants`**: datos adicionales para arrendatarios.
 
 #### Enums
-- `user_role_enum`: 'admin', 'landlord', 'tenant'
 
-## Authentication Flows
+- `user_role_enum`: `'admin'`, `'landlord'`, `'tenant'`
 
-### 1. User Registration
+## Flujos de autenticacion
 
-**Frontend Request:**
+### 1. Registro de usuario
+
+**Solicitud desde frontend:**
+
 ```javascript
 POST /auth/register
 {
@@ -64,14 +68,16 @@ POST /auth/register
 }
 ```
 
-**Backend Process:**
-1. Validate input data
-2. Create user in Supabase Auth with metadata
-3. Trigger `handle_new_user()` creates profile automatically
-4. Trigger creates role-specific record (tenant/landlord table)
-5. Auto-login user and return session token
+**Proceso en backend:**
 
-**Response:**
+1. Validar los datos de entrada.
+2. Crear el usuario en Supabase Auth con metadata.
+3. El trigger `handle_new_user()` crea el perfil automaticamente.
+4. El trigger crea el registro especifico por rol (`tenant` o `landlord`).
+5. Se inicia sesion automaticamente y se retorna el token de sesion.
+
+**Respuesta:**
+
 ```javascript
 {
   "success": true,
@@ -89,9 +95,10 @@ POST /auth/register
 }
 ```
 
-### 2. User Login
+### 2. Login de usuario
 
-**Frontend Request:**
+**Solicitud desde frontend:**
+
 ```javascript
 POST /auth/login
 {
@@ -100,14 +107,16 @@ POST /auth/login
 }
 ```
 
-**Backend Process:**
-1. Validate credentials with Supabase Auth
-2. Retrieve extended profile data
-3. Return session token and user info
+**Proceso en backend:**
 
-### 3. Password Reset
+1. Validar credenciales con Supabase Auth.
+2. Recuperar datos extendidos del perfil.
+3. Devolver token de sesion e informacion del usuario.
 
-**Frontend Request:**
+### 3. Recuperacion de contrasena
+
+**Solicitud desde frontend:**
+
 ```javascript
 POST /auth/forgot-password
 {
@@ -115,51 +124,57 @@ POST /auth/forgot-password
 }
 ```
 
-**Backend Process:**
-1. Send reset email via Supabase Auth
-2. User clicks link and resets password
-3. Frontend handles password update
+**Proceso en backend:**
 
-### 4. Session Management
+1. Enviar el correo de reseteo mediante Supabase Auth.
+2. El usuario hace clic en el enlace y cambia su contrasena.
+3. El frontend maneja la actualizacion de la nueva contrasena.
 
-**Frontend Request:**
+### 4. Gestion de sesion
+
+**Solicitud desde frontend:**
+
 ```javascript
 GET /auth/me
 Authorization: Bearer <token>
 ```
 
-**Backend Process:**
-1. Validate JWT token
-2. Return current user profile data
+**Proceso en backend:**
 
-## Security Implementation
+1. Validar el token JWT.
+2. Devolver los datos actuales del perfil del usuario.
 
-### Row-Level Security Policies
+## Implementacion de seguridad
 
-#### Profiles Policies
+### Politicas Row-Level Security
+
+#### Politicas de `profiles`
+
 ```sql
--- Users can view their own profile
+-- Los usuarios pueden ver su propio perfil
 CREATE POLICY profiles_view_own ON profiles
   FOR SELECT USING (auth_id = auth.uid());
 
--- Users can update their own profile
+-- Los usuarios pueden actualizar su propio perfil
 CREATE POLICY profiles_update_own ON profiles
   FOR UPDATE USING (auth_id = auth.uid())
   WITH CHECK (auth_id = auth.uid());
 
--- Admins can view all profiles
+-- Los admins pueden ver todos los perfiles
 CREATE POLICY admin_profiles_all ON profiles
   USING (get_user_role(auth.uid()) = 'admin');
 ```
 
-#### Role-Based Access
-- **Admins**: Full access to all data
-- **Landlords**: Access to their properties, tenants, contracts
-- **Tenants**: Access to their applications, contracts, payments
+#### Acceso basado en roles
 
-### Triggers and Functions
+- **Admins**: acceso completo a todos los datos.
+- **Landlords**: acceso a sus propiedades, arrendatarios y contratos.
+- **Tenants**: acceso a sus postulaciones, contratos y pagos.
 
-#### Profile Creation Trigger
+### Triggers y funciones
+
+#### Trigger de creacion de perfil
+
 ```sql
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
@@ -178,12 +193,13 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 ```
 
-#### Role-Specific Record Creation
-Automatic creation of landlord/tenant records based on role.
+#### Creacion de registros por rol
 
-## Frontend Integration
+Se crean automaticamente registros de `landlord` o `tenant` segun el rol asignado.
 
-### AuthProvider Setup
+## Integracion con frontend
+
+### Configuracion de `AuthProvider`
 
 ```javascript
 // AuthProvider.jsx
@@ -205,11 +221,11 @@ const AuthProvider = ({ children }) => {
     return response.data.user;
   };
 
-  // ... other methods
+  // ... otros metodos
 };
 ```
 
-### API Client Configuration
+### Configuracion del cliente API
 
 ```javascript
 // apiClient.js
@@ -226,13 +242,13 @@ const apiRequest = async (path, options = {}) => {
     body: body ? JSON.stringify(body) : undefined,
   });
 
-  // Handle response...
+  // Manejo de respuesta...
 };
 ```
 
-## TypeScript Types
+## Tipos TypeScript
 
-Auto-generated types from Supabase schema provide type safety:
+Los tipos autogenerados desde el esquema de Supabase aportan seguridad de tipos:
 
 ```typescript
 import { Database } from '../types/database';
@@ -241,30 +257,35 @@ type Profile = Database['public']['Tables']['profiles']['Row'];
 type UserRole = Database['public']['Enums']['user_role_enum'];
 ```
 
-## Security Considerations
+## Consideraciones de seguridad
 
-### Password Requirements
-- Minimum 8 characters
-- Enforced by backend validation
+### Requisitos de contrasena
 
-### Session Security
-- JWT tokens with expiration
-- Automatic token refresh
-- Secure token storage in localStorage
+- minimo 8 caracteres
+- validados por el backend
 
-### Data Protection
-- RLS prevents unauthorized data access
-- Sensitive data encrypted at rest
-- Audit logging for security events
+### Seguridad de sesion
 
-### API Security
-- CORS configured for frontend domain
-- Input validation on all endpoints
-- Rate limiting (recommended for production)
+- tokens JWT con expiracion
+- refresco automatico del token
+- almacenamiento seguro del token en localStorage
 
-## Production Deployment
+### Proteccion de datos
 
-### Environment Variables
+- RLS evita accesos no autorizados
+- datos sensibles cifrados en reposo
+- auditoria de eventos de seguridad
+
+### Seguridad API
+
+- CORS configurado para el dominio del frontend
+- validacion de entrada en todos los endpoints
+- rate limiting recomendado para produccion
+
+## Despliegue a produccion
+
+### Variables de entorno
+
 ```bash
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key
@@ -273,62 +294,65 @@ CLIENT_URL=https://your-frontend-domain.com
 JWT_SECRET=your-secure-jwt-secret
 ```
 
-### Supabase Configuration
-1. Enable email confirmation in Auth settings
-2. Configure SMTP for email delivery
-3. Set up custom domains (optional)
-4. Configure password reset redirect URLs
+### Configuracion de Supabase
 
-### Monitoring
-- Monitor failed login attempts
-- Track user registration metrics
-- Audit security events via audit_logs table
+1. Habilitar confirmacion por correo en Auth settings.
+2. Configurar SMTP para entrega de emails.
+3. Configurar dominios personalizados si aplica.
+4. Configurar URLs de redireccion para reseteo de contrasena.
 
-## Troubleshooting
+### Monitoreo
 
-### Common Issues
+- monitorear intentos fallidos de login
+- seguir metricas de registro de usuarios
+- auditar eventos de seguridad via tabla `audit_logs`
 
-1. **Profile not created on signup**
-   - Check trigger `handle_new_user` is active
-   - Verify user_metadata contains required fields
+## Resolucion de problemas
 
-2. **RLS blocking queries**
-   - Ensure user is authenticated
-   - Check role-based policies
-   - Verify `auth.uid()` returns correct user ID
+### Problemas comunes
 
-3. **Token expiration**
-   - Implement automatic token refresh
-   - Handle 401 responses by redirecting to login
+1. **El perfil no se crea al registrarse**
+   - verificar que el trigger `handle_new_user` este activo
+   - revisar que `user_metadata` tenga los campos requeridos
 
-### Debug Commands
+2. **RLS bloquea consultas**
+   - confirmar que el usuario este autenticado
+   - revisar las politicas basadas en roles
+   - verificar que `auth.uid()` devuelva el ID correcto
+
+3. **Expiracion del token**
+   - implementar refresco automatico
+   - manejar respuestas `401` redirigiendo a login
+
+### Comandos de depuracion
 
 ```sql
--- Check user profiles
+-- Revisar perfiles de usuario
 SELECT * FROM profiles WHERE email = 'user@example.com';
 
--- Check RLS policies
+-- Revisar politicas RLS
 SELECT * FROM pg_policies WHERE tablename = 'profiles';
 
--- Test authentication functions
+-- Probar funciones de autenticacion
 SELECT get_current_user_profile();
 ```
 
-## Future Enhancements
+## Mejoras futuras
 
-- OAuth integration (Google, Facebook)
-- Multi-factor authentication
-- Account verification via documents
-- Session management dashboard
-- Advanced audit logging
+- integracion OAuth (Google, Facebook)
+- autenticacion multifactor
+- verificacion de cuenta mediante documentos
+- dashboard de sesiones
+- auditoria avanzada
 
 ## Conclusion
 
-The authentication system provides a solid foundation for NIDO with:
-- Secure user registration and login
-- Role-based access control
-- Automatic profile management
-- Production-ready security measures
-- Type-safe frontend integration
+El sistema de autenticacion entrega una base solida para NIDO con:
 
-The system is scalable, maintainable, and follows security best practices.
+- registro y login seguros
+- control de acceso por roles
+- gestion automatica de perfiles
+- medidas de seguridad listas para produccion
+- integracion type-safe con frontend
+
+El sistema es escalable, mantenible y sigue buenas practicas de seguridad.

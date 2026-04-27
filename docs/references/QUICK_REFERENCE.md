@@ -1,8 +1,8 @@
-# ⚡ Quick Reference - Home Page Optimization
+# ⚡ Referencia rapida - Optimizacion de la pagina principal
 
-## Current Status: ✅ COMPLETE
+## Estado actual: ✅ COMPLETE
 
-### What Was Done
+### Que se hizo
 - ✅ Home page loads in **~100-200ms** (was 3-5 seconds)
 - ✅ SearchBar visible and functional in hero section
 - ✅ 6 mock properties displaying correctly
@@ -11,68 +11,68 @@
 
 ---
 
-## Files Modified
+## Archivos modificados
 
 ### 1. `/src/pages/Home/Home.jsx` 
-**Purpose**: Landing page component
+**Proposito**: Componente de pagina principal
 - ✅ Uses MOCK_PROPERTIES array (6 properties)
 - ✅ Imports and renders SearchBar
 - ✅ Imports and renders PropertyCard grid
 - ✅ Uses useMemo for fast filtering
 
-**To switch to real backend**:
+**Para cambiar al backend real**:
 ```javascript
 // Replace MOCK_PROPERTIES with:
-const [properties, setProperties] = useState([]);
+const [properties, setPropiedades] = useState([]);
 useEffect(() => {
-  propertyService.getNearbyProperties().then(setProperties);
+  propertyService.getNearbyPropiedades().then(setPropiedades);
 }, []);
 ```
 
 ### 2. `/src/components/common/Layout/HomeLayout.jsx`
-**Purpose**: Lightweight wrapper for Home page
+**Proposito**: Wrapper liviano para la pagina principal
 - ✅ Minimal render overhead
 - ✅ No Header/Sidebar/BottomNav
 
 ### 3. `/src/App.jsx`
-**Purpose**: Route configuration
+**Proposito**: Configuracion de rutas
 - ✅ Home route uses HomeLayout
 - ✅ Other routes use standard Layout
 
 ### 4. `/src/index.css`
-**Purpose**: Global styles
+**Proposito**: Global styles
 - ✅ Removed @tailwind directives
 - ✅ Converted @apply to pure CSS
 - ✅ 13 warnings eliminated
 
 ---
 
-## Performance Metrics
+## Metricas de rendimiento
 
 | Metric | Before | After | Improvement |
 |--------|--------|-------|-------------|
-| Load Time | 3-5s | 100-200ms | **30-50x** ✅ |
+| Tiempo de carga | 3-5s | 100-200ms | **30-50x** ✅ |
 | CSS Warnings | 13 | 0 | **100%** ✅ |
 | Compilation | Error | Success | **Fixed** ✅ |
 
 ---
 
-## How to Use
+## Como usar
 
-### Running Locally
+### Ejecucion local
 ```bash
 npm start
 # Opens on http://localhost:3000
 ```
 
-### Viewing the Page
+### Ver la pagina
 1. Open browser to `http://localhost:3000`
 2. Hero section shows SearchBar (central, prominent)
 3. 6 property cards below with images and ratings
 4. Click SearchBar to filter by location
 5. Click on property card to view details
 
-### Editing Mock Properties
+### Editar propiedades mock
 File: `/src/pages/Home/Home.jsx`
 
 ```javascript
@@ -96,7 +96,7 @@ const MOCK_PROPERTIES = [
 
 ---
 
-## Component Architecture
+## Arquitectura de componentes
 
 ```
 App.jsx
@@ -109,31 +109,31 @@ App.jsx
 
 ---
 
-## Next Steps
+## Siguientes pasos
 
 1. **Testing**: 
    - [ ] Verify page loads fast
    - [ ] Test SearchBar filtering
    - [ ] Test PropertyCard click navigation
 
-2. **Backend Integration**:
+2. **Integracion con backend**:
    - [ ] Replace mock data with propertyService
    - [ ] Add loading spinner during fetch
    - [ ] Handle error states
 
-3. **Additional Features**:
+3. **Funciones adicionales**:
    - [ ] Add pagination/infinite scroll
    - [ ] Add favorites persistence
    - [ ] Add sort/filter options
 
-4. **Production**:
+4. **Produccion**:
    - [ ] Run `npm run build`
    - [ ] Deploy to Vercel/hosting
    - [ ] Monitor performance with Lighthouse
 
 ---
 
-## Troubleshooting
+## Resolucion de problemas
 
 ### Port 3000 Already In Use
 ```powershell
@@ -157,7 +157,7 @@ import Home from './pages/Home/Home';
 
 ---
 
-## Key Configuration Files
+## Archivos de configuracion clave
 
 - `tsconfig.json` - TypeScript config
 - `tailwind.config.js` - Tailwind configuration
@@ -166,7 +166,7 @@ import Home from './pages/Home/Home';
 
 ---
 
-## Performance Tips
+## Consejos de rendimiento
 
 1. **Images**: Already using `lazy` loading attribute
 2. **Components**: Already using `React.memo` and `useMemo`
@@ -175,7 +175,7 @@ import Home from './pages/Home/Home';
 
 ---
 
-## Support
+## Soporte
 
 For issues or questions about:
 - **Home page**: Check `OPTIMIZATION_COMPLETE.md`
@@ -185,5 +185,7 @@ For issues or questions about:
 
 ---
 
-**Last Updated**: November 19, 2025  
-**Status**: 🟢 Production Ready
+**Ultima actualizacion**: November 19, 2025  
+**Estado**: 🟢 Produccion Ready
+
+

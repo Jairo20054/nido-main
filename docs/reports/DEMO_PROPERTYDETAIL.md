@@ -1,6 +1,6 @@
 # 🎬 DEMO VISUAL - Home sin LeftSidebar + PropertyDetail Modal
 
-**Status**: ✅ **LIVE EN LOCALHOST:3000**
+**Estado**: ✅ **LIVE EN LOCALHOST:3000**
 
 ---
 
@@ -69,7 +69,7 @@
 ┃  📝 DESCRIPCIÓN                                                  ┃
 ┃                                                                  ┃
 ┃  Una hermosa apartamento ubicada en Medellin. Con 3            ┃
-┃  dormitorios, 2 baños y 85m² de espacio. Perfecta para         ┃
+┃  dormitorios, 2 baños y 85m² de espacio. Perfectoa para         ┃
 ┃  tu estancia.                                                   ┃
 ┃                                                                  ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
@@ -111,7 +111,7 @@
 
 ---
 
-## 🎨 Diseño Features
+## 🎨 Diseño Funciones
 
 ### Colores
 ```
@@ -213,7 +213,7 @@ Border Radius:      12-16px
 
 ### Metrics
 ```
-Load Time:          100-200ms (sin cambio)
+Tiempo de carga:          100-200ms (sin cambio)
 First Paint:        ~150ms
 Interactive:        ~200ms
 Modal Animation:    300ms (suave)
@@ -255,7 +255,7 @@ Image Navigation:   Instantáneo
 
 ---
 
-## 🎁 Bonus Features
+## 🎁 Bonus Funciones
 
 ### Galería Inteligente
 ```
@@ -320,7 +320,7 @@ Image Navigation:   Instantáneo
 
 ---
 
-## 🔥 Hot Features
+## 🔥 Hot Funciones
 
 1. **Galería Inteligente**
    - Múltiples imágenes por propiedad
@@ -366,7 +366,8 @@ Image Navigation:   Instantáneo
 
 ---
 
-**Status**: 🟢 **READY TO SHOWCASE**
+**Estado**: 🟢 **READY TO SHOWCASE**
 
 Abre `http://localhost:3000` y prueba haciendo click en cualquier propiedad! 🎉
+
 

@@ -128,7 +128,7 @@ Se añadieron comentarios detallados en los siguientes archivos:
 // ============================================================================
 // Retorna las 4 propiedades más recientes publicadas para mostrar en
 // la página de inicio. Este es el endpoint donde ocurría el error original.
-const getFeaturedProperties = async (req, res) => {
+const getFeaturedPropiedades = async (req, res) => {
   // Obtener ID del usuario actual para personalizar favoritos
   const currentUserId = req.user?.id || null;
   
@@ -191,9 +191,9 @@ Sin errores de `DATABASE_URL`.
    - `buildOrderBy()` - Ordenamiento
    - `normalizePropertyInput()` - Normalización de datos
    - `generateSlug()` - Generación de slugs
-   - `listProperties()` - Listar con paginación
-   - `getFeaturedProperties()` - Propiedades destacadas (donde ocurría el error)
-   - `getMyProperties()` - Propiedades del usuario
+   - `listPropiedades()` - Listar con paginación
+   - `getFeaturedPropiedades()` - Propiedades destacadas (donde ocurría el error)
+   - `getMyPropiedades()` - Propiedades del usuario
    - `getPropertyById()` - Detalle individual
    - `createProperty()` - Crear nueva
    - `updateProperty()` - Actualizar
@@ -210,3 +210,4 @@ Sin errores de `DATABASE_URL`.
 ---
 
 **Generado**: 22 de Abril de 2026
+

@@ -98,7 +98,7 @@ const dropdownItems = [
   checkOutDate={checkOutDate}
   guests={guests}
   onClose={() => setShowPayment(false)}
-  onPaymentComplete={(data) => console.log('Reserva:', data)}
+  onPaymentCompleto={(data) => console.log('Reserva:', data)}
 />
 ```
 
@@ -155,7 +155,7 @@ const [bookingData, setBookingData] = useState({
     checkOutDate={bookingData.checkOut}
     guests={bookingData.guests}
     onClose={() => setShowPayment(false)}
-    onPaymentComplete={(data) => {
+    onPaymentCompleto={(data) => {
       console.log('Reserva completada:', data);
       onClose();
     }}
@@ -584,3 +584,4 @@ const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 **Creado por**: GitHub Copilot  
 **Última actualización**: Noviembre 19, 2025  
 **Estado de compilación**: ✅ EXITOSO
+

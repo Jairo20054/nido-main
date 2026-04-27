@@ -97,7 +97,7 @@ Los indicadores se actualizan automáticamente! 🎉
     Una hermosa {property.type.toLowerCase()} ubicada en {property.location}. 
     Con {property.bedrooms} dormitorio{property.bedrooms > 1 ? 's' : ''}, 
     {property.bathrooms} baño{property.bathrooms > 1 ? 's' : ''} y {property.sqft}m² de espacio.
-    Perfecta para tu estancia.
+    Perfectoa para tu estancia.
   </p>
 </div>
 
@@ -507,3 +507,4 @@ Cualquier pregunta sobre personalización, revisa los archivos:
 - `PropertyDetail.jsx` - Lógica
 - `PropertyDetail.css` - Estilos
 - `Home.jsx` - Integración
+

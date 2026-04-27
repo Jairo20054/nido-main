@@ -15,10 +15,10 @@
 
 ### Para Entender el Proyecto (10-20 minutos)
 2. **[RESUMEN_RAPIDO.md](./RESUMEN_RAPIDO.md)**
-   - Overview de los 3 cambios principales
+   - Resumen de los 3 cambios principales
    - Archivos modificados
    - Cálculo de precios
-   - Status actual
+   - Estado actual
 
 3. **[GUIA_VISUAL_HEADER_PAGO.md](./GUIA_VISUAL_HEADER_PAGO.md)**
    - Diagramas ASCII del flujo
@@ -41,7 +41,7 @@
    - Pruebas realizadas
    - Métricas y conclusión
 
-### Para Reporte Final (3-5 minutos)
+### Para Reportee Final (3-5 minutos)
 6. **[REPORTE_FINAL.md](./REPORTE_FINAL.md)**
    - Objetivo cumplido
    - Checklist de entregables
@@ -61,7 +61,7 @@
    - Tabla de contenidos
    - Resumen ejecutivo
    - Links útiles
-   - Status actual
+   - Estado actual
 
 ---
 
@@ -125,7 +125,7 @@ INICIO
 ### 📊 NEGOCIO
 - **REPORTE_FINAL.md** - Objetivo y entregables
 - **RESUMEN_RAPIDO.md** - Métricas y status
-- **ACTUALIZACION_FINAL.md** - Overview general
+- **ACTUALIZACION_FINAL.md** - Resumen general
 
 ### 🚀 GETTING STARTED
 - **GUIA_INICIO_RAPIDO.md** ← AQUÍ
@@ -199,7 +199,7 @@ INICIO
 | Errores/Debug | GUIA_INICIO_RAPIDO |
 | Código | HEADER_PAGO, GUIA_VISUAL |
 | Flujo usuario | GUIA_VISUAL, GUIA_INICIO |
-| Status final | REPORTE_FINAL |
+| Estado final | REPORTE_FINAL |
 
 ---
 
@@ -344,12 +344,12 @@ code GUIA_INICIO_RAPIDO.md
 3. Próxima semana: STRIPE_INTEGRATION_GUIDE.md (30 min) + implementar
 
 ### Para otros desarrolladores
-1. RESUMEN_RAPIDO.md (10 min) - Overview
+1. RESUMEN_RAPIDO.md (10 min) - Resumen
 2. HEADER_PAGO_UPDATE.md (15 min) - Detalles
 3. Código en VS Code - Exploración
 
 ### Para presentación/stakeholders
-1. REPORTE_FINAL.md (5 min) - Status
+1. REPORTE_FINAL.md (5 min) - Estado
 2. GUIA_VISUAL_HEADER_PAGO.md (10 min) - Diagramas
 3. Demo en navegador (10 min) - Vivo
 
@@ -386,7 +386,8 @@ Si tienes preguntas:
 
 **Índice creado**: Noviembre 19, 2025  
 **Versión**: 1.0  
-**Status**: ✅ COMPLETO
+**Estado**: ✅ COMPLETO
 
 🎉 **¡Bienvenido! Comienza tu lectura ahora!**
+
 

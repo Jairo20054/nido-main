@@ -98,7 +98,7 @@ function App() {
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
 import axios from 'axios';
 
-const PaymentGateway = ({ property, checkInDate, checkOutDate, guests, onClose, onPaymentComplete }) => {
+const PaymentGateway = ({ property, checkInDate, checkOutDate, guests, onClose, onPaymentCompleto }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -142,7 +142,7 @@ const PaymentGateway = ({ property, checkInDate, checkOutDate, guests, onClose, 
         setIsProcessing(false);
         
         // Guardar reserva en DB
-        onPaymentComplete({
+        onPaymentCompleto({
           property: property.id,
           checkIn: checkInDate,
           checkOut: checkOutDate,
@@ -338,7 +338,7 @@ const handlePayment = async (e) => {
     } else if (result.paymentIntent.status === 'succeeded') {
       setPaymentSuccess(true);
       setPaymentStep(3);
-      onPaymentComplete({ ...result.paymentIntent });
+      onPaymentCompleto({ ...result.paymentIntent });
     }
   } catch (error) {
     setPaymentError(error.message);
@@ -383,11 +383,11 @@ FALLO:
 
 ### Ver en Stripe Dashboard
 ```
-Dashboard > Payments > Transactions
+Dashboard > Pagos > Transactions
 
 Deberías ver:
 ✓ Pago de $9,900 COP
-✓ Status: Succeeded
+✓ Estado: Succeeded
 ✓ Metadata con property_id, check_in, etc.
 ```
 
@@ -533,4 +533,5 @@ router.post('/create-intent', async (req, res) => {
 ---
 
 **Cuando termines de implementar Stripe, quita el timeout de 2 segundos y tendrás pagos reales ✓**
+
 

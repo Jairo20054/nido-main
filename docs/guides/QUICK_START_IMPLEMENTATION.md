@@ -219,7 +219,7 @@ const debouncedSearch = debounce(executeSearch, 500);
 Browser DevTools → Lighthouse:
 - [ ] Performance: 90+
 - [ ] Accessibility: 90+
-- [ ] Best Practices: 90+
+- [ ] Buenas practicas: 90+
 - [ ] SEO: 90+
 
 ## SUCCESS CRITERIA ✅
@@ -249,6 +249,7 @@ Browser DevTools → Lighthouse:
 
 ---
 
-**Status**: Ready to Deploy ✅  
+**Estado**: Ready to Deploy ✅  
 **Estimated Time to Test**: 30 minutes  
 **Estimated Time to Deploy**: 15 minutes
+

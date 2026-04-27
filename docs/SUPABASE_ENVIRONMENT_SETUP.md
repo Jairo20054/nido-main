@@ -1,6 +1,6 @@
-# NIDO Backend - Environment Setup Guide
+# NIDO Backend - Guia de configuracion del entorno
 
-## 🔧 Configuration Files
+## 🔧 Archivos de configuracion
 
 ### 1. Backend Environment Variables (`.env.local`)
 
@@ -77,7 +77,7 @@ VITE_ENABLE_DEBUG=false
 
 ---
 
-## 🚀 Installation & Setup
+## 🚀 Instalacion y configuracion
 
 ### Step 1: Install Dependencies
 ```bash
@@ -123,7 +123,7 @@ npm run dev:backend   # http://localhost:3000
 
 ---
 
-## 📚 Database Schema Update
+## 📚 Actualizacion del esquema de base de datos
 
 ### To Apply Changes to Supabase
 
@@ -161,7 +161,7 @@ psql postgresql://postgres:password@db.hoqcfprckuozcsnwzgei.supabase.co:5432/pos
 
 ---
 
-## 🔑 Managing Supabase Keys
+## 🔑 Gestion de claves de Supabase
 
 ### Development Keys (SAFE to expose)
 - ✅ `SUPABASE_URL` - Project URL
@@ -229,7 +229,7 @@ SELECT current_user;
 
 ---
 
-## 🧪 Testing Supabase Connection
+## 🧪 Pruebas de conexion con Supabase
 
 ### Test Backend Connection
 ```bash
@@ -266,7 +266,7 @@ console.log('Error:', error)
 
 ## 🔄 Supabase CLI Commands
 
-### Authentication
+### Autenticacion
 ```bash
 # Login to Supabase
 supabase login
@@ -319,7 +319,7 @@ supabase stop
 # View logs
 supabase logs --db
 
-# Status
+# Estado
 supabase status
 ```
 
@@ -349,7 +349,7 @@ Error: PGRST116 - Attempted to read from public.table without permission
 → Verify auth.uid() is set correctly
 ```
 
-### Authentication Issues
+### Autenticacion Issues
 ```
 Error: Invalid API key
 
@@ -431,7 +431,7 @@ ORDER BY idx_scan DESC;
 
 ---
 
-## 🔐 Security Checklist
+## 🔐 Checklist de seguridad
 
 - [ ] All environment secrets in `.env.local` (not committed)
 - [ ] `.env.local` added to `.gitignore`
@@ -448,7 +448,7 @@ ORDER BY idx_scan DESC;
 
 ---
 
-## 📝 Deployment Checklist
+## 📝 Checklist de despliegue
 
 ### Before Production Deploy
 
@@ -467,7 +467,7 @@ ORDER BY idx_scan DESC;
 
 ---
 
-## 🚀 Production Configuration
+## 🚀 Configuracion de produccion
 
 ### Environment Variables (Production)
 ```bash
@@ -501,5 +501,6 @@ certbot certonly --standalone -d nido.com -d www.nido.com
 
 ---
 
-**Last Updated**: 2026-04-24
+**Ultima actualizacion**: 2026-04-24
 **Version**: 1.0.0
+

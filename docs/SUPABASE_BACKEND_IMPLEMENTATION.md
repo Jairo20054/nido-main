@@ -1,10 +1,10 @@
-# NIDO Backend - Complete Supabase Implementation
+# NIDO Backend - Completo Supabase Implementation
 
-## 📋 Overview
+## 📋 Resumen
 
 This document describes the production-ready Supabase backend implementation for NIDO, an intelligent rental platform. The backend supports a complete rental lifecycle from prequalification through post-move operations.
 
-**Status**: ✅ Production-Ready
+**Estado**: ✅ Production-Ready
 **Database**: Supabase PostgreSQL
 **Project URL**: https://hoqcfprckuozcsnwzgei.supabase.co
 
@@ -12,14 +12,14 @@ This document describes the production-ready Supabase backend implementation for
 
 ## 🏗️ Architecture & Design Principles
 
-### Core Design
+### Diseno base
 - **Security First**: Row-Level Security (RLS) enabled on all tables
 - **Scalable**: UUID primary keys, optimized indexes, normalized schema
-- **Auditable**: Complete audit logging for compliance and debugging
+- **Auditable**: Completo audit logging for compliance and debugging
 - **Automated**: Triggers for timestamps, profile creation, notifications
 - **Type-Safe**: Full TypeScript support with auto-generated types
 
-### Role-Based Access
+### Acceso basado en roles
 - **Admin**: Full access to all data, can override approvals
 - **Landlord**: Access to own properties, applications, contracts, and payments
 - **Tenant**: Access to own applications, contracts, and documents
@@ -28,9 +28,9 @@ This document describes the production-ready Supabase backend implementation for
 
 ## 📊 Database Schema
 
-### Core Tables (22 total)
+### Tablas principales (22 total)
 
-#### 1. **Profiles** (User Management)
+#### 1. **Profiles** (Gestion de usuarios)
 Primary user profile table linked to Supabase auth.
 ```
 - id (UUID)
@@ -66,7 +66,7 @@ Extended profile data for tenants.
 - created_at, updated_at (auto)
 ```
 
-#### 4. **Properties** (Property Listings)
+#### 4. **Propiedades** (Property Listings)
 Property inventory for landlords.
 ```
 - id (UUID)
@@ -104,7 +104,7 @@ Tenant favorites for properties.
 
 ---
 
-## 🔄 Rental Lifecycle Tables
+## 🔄 Tablas del ciclo de arriendo
 
 ### Phase 1: Application & Prequalification
 
@@ -190,7 +190,7 @@ Final approval engine output with classification.
 
 ## 📝 Contract & Signature Tables
 
-#### 13. **Contracts** (Rental Agreements)
+#### 13. **Contratos** (Rental Agreements)
 Rental contract records.
 ```
 - id (UUID)
@@ -218,7 +218,7 @@ Track all parties that need to sign a contract.
 - created_at (auto)
 ```
 
-#### 15. **Signatures** (Digital Signatures)
+#### 15. **Firmas** (Digital Firmas)
 Digital signature records.
 ```
 - id (UUID)
@@ -234,9 +234,9 @@ Digital signature records.
 
 ---
 
-## 💰 Payment & Delivery Tables
+## 💰 Tablas de pagos y entrega
 
-#### 16. **Payments** (Escrow-Ready)
+#### 16. **Pagos** (Escrow-Ready)
 Payment tracking for first payment, deposit, and monthly rent.
 ```
 - id (UUID)
@@ -262,7 +262,7 @@ Landlord payout release tracking.
 - created_at, updated_at (auto)
 ```
 
-#### 18. **Delivery Checklists** (Property Handoff)
+#### 18. **Entrega Checklists** (Property Handoff)
 Move-in/move-out checklists.
 ```
 - id (UUID)
@@ -286,7 +286,7 @@ Items tracked in delivery checklists.
 - created_at (auto)
 ```
 
-#### 20. **Delivery Images** (Documentation)
+#### 20. **Entrega Images** (Documentation)
 Photos for delivery checklists.
 ```
 - id (UUID)
@@ -297,9 +297,9 @@ Photos for delivery checklists.
 
 ---
 
-## 📊 Audit & Notification Tables
+## 📊 Tablas de auditoria y notificaciones
 
-#### 21. **Audit Logs** (Complete Activity Trail)
+#### 21. **Audit Logs** (Completo Activity Trail)
 Audit trail for compliance and debugging.
 ```
 - id (UUID)
@@ -310,7 +310,7 @@ Audit trail for compliance and debugging.
 - created_at (auto) + indexed
 ```
 
-#### 22. **Notifications** (User Alerts)
+#### 22. **Notificaciones** (User Alerts)
 User notifications for events.
 ```
 - id (UUID)
@@ -325,7 +325,7 @@ User notifications for events.
 
 ---
 
-## 🔐 Row-Level Security (RLS) Policies
+## 🔐 Politicas de Row-Level Security (RLS)
 
 All tables have RLS enabled with the following policy structure:
 
@@ -393,7 +393,7 @@ CREATE POLICY admin_applications_all ON applications
 
 ---
 
-## ⚙️ Triggers & Functions
+## ⚙️ Triggers y funciones
 
 ### Automatic Triggers
 ```
@@ -486,11 +486,11 @@ notification_type_enum
 
 ---
 
-## 📈 Indexes (Performance)
+## 📈 Indices (rendimiento)
 
 All critical tables have indexes on:
 - Foreign key columns
-- Status/role columns
+- Estado/role columns
 - Timestamps (created_at, updated_at)
 - Frequently-queried columns (email, city, etc.)
 
@@ -498,7 +498,7 @@ All critical tables have indexes on:
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Primeros pasos
 
 ### 1. Configuration
 ```javascript
@@ -554,7 +554,7 @@ const { data: result, error } = await supabase
   })
 ```
 
-#### Get Published Properties
+#### Get Published Propiedades
 ```typescript
 const { data: properties } = await supabase
   .from('properties')
@@ -569,7 +569,7 @@ const { data: properties } = await supabase
 
 ---
 
-## 🔒 Security Best Practices Implemented
+## 🔒 Security Buenas practicas Implemented
 
 ✅ RLS enabled on all tables
 ✅ No user_metadata used for authorization
@@ -584,7 +584,7 @@ const { data: properties } = await supabase
 
 ---
 
-## 📊 Sample Data Queries
+## 📊 Consultas de ejemplo
 
 ### Dashboard: Landlord Analytics
 ```sql
@@ -634,13 +634,13 @@ ORDER BY v.created_at ASC
 
 ---
 
-## 🎯 Future Enhancements
+## 🎯 Mejoras futuras
 
 1. **Machine Learning Scoring**: Replace basic prequalification with ML model
 2. **Stripe Integration**: Implement real escrow payments
-3. **Digital Signatures**: Integrate e-signature provider
-4. **SMS Notifications**: Add Twilio for SMS alerts
-5. **Video Verification**: Support video KYC for identity verification
+3. **Digital Firmas**: Integrate e-signature provider
+4. **SMS Notificaciones**: Add Twilio for SMS alerts
+5. **Video Verification**: Soporte video KYC for identity verification
 6. **Analytics**: Advanced dashboards with BI tools
 7. **Blockchain**: Immutable contract storage on-chain
 8. **API Rate Limiting**: Implement Redis-backed rate limiting
@@ -648,7 +648,7 @@ ORDER BY v.created_at ASC
 
 ---
 
-## 📞 Support
+## 📞 Soporte
 
 **Project URL**: https://hoqcfprckuozcsnwzgei.supabase.co
 **Documentation**: https://supabase.com/docs
@@ -661,7 +661,7 @@ For issues or questions, refer to:
 
 ---
 
-## ✅ Deployment Checklist
+## ✅ Checklist de despliegue
 
 - [x] All tables created with RLS
 - [x] All policies applied
@@ -679,6 +679,7 @@ For issues or questions, refer to:
 
 ---
 
-**Status**: Production-Ready ✅
-**Last Updated**: 2026-04-24
+**Estado**: Production-Ready ✅
+**Ultima actualizacion**: 2026-04-24
 **Version**: 1.0.0
+

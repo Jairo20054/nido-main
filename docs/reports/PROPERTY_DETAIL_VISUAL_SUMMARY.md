@@ -301,7 +301,7 @@ O en botón "Volver al Home"
 
 ---
 
-## 🎁 Bonus Features
+## 🎁 Bonus Funciones
 
 ```
 ✨ Header sticky (sigue al scroll)
@@ -436,4 +436,5 @@ Mobile           Básico         Optimizado     Mejor
 **¡La PropertyDetailPage está lista para usar!** 🚀
 
 Visita http://localhost:3000 y haz clic en cualquier propiedad para ver el resultado.
+
 

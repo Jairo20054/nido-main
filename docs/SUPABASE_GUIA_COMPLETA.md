@@ -338,7 +338,7 @@ router.post('/properties', requireAuth, controller.createProperty);
 
 ```javascript
 // Para rutas que pueden accederse con o sin autenticación
-router.get('/properties', requireAuthOptional, controller.listProperties);
+router.get('/properties', requireAuthOptional, controller.listPropiedades);
 // req.user será null si no está autenticado, o los datos si sí
 ```
 
@@ -450,7 +450,7 @@ const createProperty = async (req, res) => {
 ### Ejemplo 2: Listar Propiedades (Pública con Filtros)
 
 ```javascript
-const listProperties = async (req, res) => {
+const listPropiedades = async (req, res) => {
   const { city, minRent, maxRent, bedrooms } = req.query;
   const userId = req.user?.id || null;
 
@@ -594,3 +594,4 @@ No: http://your-project.supabase.co (❌ HTTP)
 ---
 
 **Última actualización**: 22 de Abril de 2026
+

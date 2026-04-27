@@ -19,7 +19,7 @@
 │                                        │                                  │
 │                                        │  ┌──┬──┬──┬──┐                   │
 │                                        │  │🏠│👥│💧│📏│                   │
-│                                        │  │Ap│3 │ 2│85│  (Features)      │
+│                                        │  │Ap│3 │ 2│85│  (Funciones)      │
 │                                        │  └──┴──┴──┴──┘                   │
 │                                        │                                  │
 │                                        │  ACERCA DE ESTA PROPIEDAD        │
@@ -372,10 +372,11 @@ Una página de detalles profesional, moderna y bien organizada que:
 - ✅ Es fácil de usar
 - ✅ Se ve profesional
 
-**Status**: ✅ **LISTO PARA PRODUCCIÓN**
+**Estado**: ✅ **LISTO PARA PRODUCCIÓN**
 
 ---
 
 **Última actualización**: [Fecha]  
 **Versión**: 1.0  
 **Autor**: Sistema de Desarrollo NIDO
+

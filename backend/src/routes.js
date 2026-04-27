@@ -4,12 +4,14 @@ const propertyRoutes = require('./modules/properties/property.routes');
 const userRoutes = require('./modules/users/user.routes');
 const favoriteRoutes = require('./modules/favorites/favorite.routes');
 const applicationRoutes = require('./modules/applications/application.routes');
+const requestRoutes = require('./modules/requests/request.routes');
 
 const router = express.Router();
 
 router.use('/auth', authRoutes);
 router.use('/properties', propertyRoutes);
 router.use('/applications', applicationRoutes);
+router.use('/requests', requestRoutes);
 router.use('/users', userRoutes);
 router.use('/favorites', favoriteRoutes);
 

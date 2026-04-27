@@ -135,7 +135,7 @@ Rating: Oro (#ffd700)
 
 ---
 
-## ✅ Status
+## ✅ Estado
 
 ```
 ✓ Compilación: 0 errores
@@ -173,4 +173,5 @@ Abre `PROPERTY_DETAIL_TESTING.md`
 **¡Listo para usar!** 🎉
 
 Más información en los archivos MD incluidos.
+
 

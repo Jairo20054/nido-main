@@ -1,4 +1,4 @@
-# NIDO Supabase - Quick Reference Guide
+# NIDO Supabase - Referencia rapida Guia
 
 ## 🚀 Quick Start
 
@@ -15,7 +15,7 @@ export const supabase = createClient<Database>(
 
 ---
 
-## 🔐 Authentication
+## 🔐 Autenticacion
 
 ### Sign Up
 ```typescript
@@ -60,7 +60,7 @@ await supabase.auth.signOut()
 
 ---
 
-## 👥 User Management
+## 👥 Gestion de usuarios
 
 ### Get User Role
 ```typescript
@@ -95,9 +95,9 @@ const { data, error } = await supabase
 
 ---
 
-## 🏠 Properties
+## 🏠 Propiedades
 
-### Get Published Properties
+### Get Published Propiedades
 ```typescript
 const { data: properties } = await supabase
   .from('properties')
@@ -133,7 +133,7 @@ const { data, error } = await supabase
   .select()
 ```
 
-### Get My Properties (Landlord)
+### Get My Propiedades (Landlord)
 ```typescript
 const { data: properties } = await supabase
   .from('properties')
@@ -141,7 +141,7 @@ const { data: properties } = await supabase
   .eq('landlord_id', landlordId)
 ```
 
-### Search Properties
+### Search Propiedades
 ```typescript
 const { data: properties } = await supabase
   .from('properties')
@@ -154,7 +154,7 @@ const { data: properties } = await supabase
 
 ---
 
-## 📱 Applications & Prequalification
+## 📱 Postulaciones y precalificacion
 
 ### Get Prequalification
 ```typescript
@@ -216,7 +216,7 @@ const { data: applications } = await supabase
   .eq('landlord_id', landlordId)
 ```
 
-### Update Application Status
+### Update Application Estado
 ```typescript
 const { data, error } = await supabase
   .from('applications')
@@ -227,7 +227,7 @@ const { data, error } = await supabase
 
 ---
 
-## 📄 Documents
+## 📄 Documentos
 
 ### Get Document Requirements
 ```typescript
@@ -260,7 +260,7 @@ const { data: uploads } = await supabase
   .eq('application_id', applicationId)
 ```
 
-### Update Document Status (Admin)
+### Update Document Estado (Admin)
 ```typescript
 const { data, error } = await supabase
   .from('document_uploads')
@@ -275,7 +275,7 @@ const { data, error } = await supabase
 
 ---
 
-## ✅ Verifications & Approvals
+## ✅ Verificaciones y aprobaciones
 
 ### Create Verification (Admin)
 ```typescript
@@ -290,7 +290,7 @@ const { data, error } = await supabase
   .select()
 ```
 
-### Update Verification Status
+### Update Verification Estado
 ```typescript
 const { data, error } = await supabase
   .from('verifications')
@@ -329,7 +329,7 @@ const { data: approval } = await supabase
 
 ---
 
-## 📋 Contracts
+## 📋 Contratos
 
 ### Create Contract (Admin)
 ```typescript
@@ -377,7 +377,7 @@ const { data: contract } = await supabase
   .single()
 ```
 
-### Get My Contracts (Tenant)
+### Get My Contratos (Tenant)
 ```typescript
 const { data: contracts } = await supabase
   .from('contracts')
@@ -390,7 +390,7 @@ const { data: contracts } = await supabase
 
 ---
 
-## ✍️ Signatures
+## ✍️ Firmas
 
 ### Sign Contract
 ```typescript
@@ -407,7 +407,7 @@ const { data, error } = await supabase
   .select()
 ```
 
-### Get Signature Status
+### Get Signature Estado
 ```typescript
 const { data: signatures } = await supabase
   .from('signatures')
@@ -417,7 +417,7 @@ const { data: signatures } = await supabase
 
 ---
 
-## 💰 Payments
+## 💰 Pagos
 
 ### Record Payment
 ```typescript
@@ -435,7 +435,7 @@ const { data, error } = await supabase
   .select()
 ```
 
-### Update Payment Status
+### Update Payment Estado
 ```typescript
 const { data, error } = await supabase
   .from('payments')
@@ -471,7 +471,7 @@ const { data, error } = await supabase
 
 ---
 
-## 📦 Delivery
+## 📦 Entrega
 
 ### Create Checklist
 ```typescript
@@ -501,7 +501,7 @@ const { data, error } = await supabase
   .select()
 ```
 
-### Upload Delivery Image
+### Upload Entrega Image
 ```typescript
 const { data, error } = await supabase
   .from('delivery_images')
@@ -514,7 +514,7 @@ const { data, error } = await supabase
   .select()
 ```
 
-### Complete Checklist
+### Completo Checklist
 ```typescript
 const { data, error } = await supabase
   .from('delivery_checklists')
@@ -529,7 +529,7 @@ const { data, error } = await supabase
 
 ---
 
-## 🔔 Notifications
+## 🔔 Notificaciones
 
 ### Send Notification
 ```typescript
@@ -543,7 +543,7 @@ const { data, error } = await supabase
   })
 ```
 
-### Get My Notifications
+### Get My Notificaciones
 ```typescript
 const { data: notifications } = await supabase
   .from('notifications')
@@ -567,7 +567,7 @@ const { data, error } = await supabase
 
 ---
 
-## 📊 Admin Features
+## 📊 Funciones de administracion
 
 ### Get Pending Verifications
 ```typescript
@@ -643,7 +643,7 @@ const { data: favorites } = await supabase
 
 ---
 
-## ⚠️ Error Handling
+## ⚠️ Manejo de errores
 
 ```typescript
 const { data, error } = await supabase
@@ -664,7 +664,7 @@ if (error) {
 
 ---
 
-## 🔄 Real-time Subscriptions
+## 🔄 Suscripciones en tiempo real
 
 ```typescript
 // Listen for contract changes
@@ -689,7 +689,7 @@ subscription.unsubscribe()
 
 ---
 
-## 💡 Best Practices
+## 💡 Buenas practicas
 
 ### 1. Always Check Auth
 ```typescript
@@ -743,4 +743,5 @@ const filtered = data.filter(p => p.city === 'Madrid')
 ---
 
 **Version**: 1.0.0
-**Last Updated**: 2026-04-24
+**Ultima actualizacion**: 2026-04-24
+

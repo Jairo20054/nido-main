@@ -1,4 +1,4 @@
-# 🎬 Before & After Comparison
+# 🎬 Comparacion antes y despues
 
 **Date**: November 19, 2025  
 **Optimization**: Home Page Performance & UX
@@ -7,14 +7,14 @@
 
 ## 📊 Performance Comparison
 
-### ⏱️ Load Time
+### ⏱️ Tiempo de carga
 
 ```
 BEFORE (Old Implementation):
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 1. React app loads: ~500ms
 2. propertyService.getUserLocation(): ~1.5s
-3. propertyService.getNearbyProperties(): ~1.5s
+3. propertyService.getNearbyPropiedades(): ~1.5s
 4. PropertyCards render: ~300ms
 5. SearchBar loads: ~200ms
 TOTAL: 3-5 SECONDS ❌
@@ -60,7 +60,7 @@ IMPROVEMENT: 30-50x FASTER ⚡⚡⚡
 
 Issues:
 ❌ SearchBar nowhere to be found
-❌ Properties not visible
+❌ Propiedades not visible
 ❌ User sees loading spinners
 ❌ Slow experience overall
 ```
@@ -105,7 +105,7 @@ Issues:
 
 Improvements:
 ✅ SearchBar visible & central
-✅ Properties instantly visible
+✅ Propiedades instantly visible
 ✅ No loading spinners
 ✅ Fast, smooth experience
 ✅ Beautiful UI
@@ -122,7 +122,7 @@ Improvements:
 import propertyService from '../../services/propertyService';
 
 export default function Home() {
-  const [properties, setProperties] = useState([]);
+  const [properties, setPropiedades] = useState([]);
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
   
@@ -133,13 +133,13 @@ export default function Home() {
       .then(loc => {
         setLocation(loc);
         // 🐌 Second API call - more delay
-        return propertyService.getNearbyProperties(
+        return propertyService.getNearbyPropiedades(
           loc.latitude,
           loc.longitude
         );
       })
       .then(props => {
-        setProperties(props);
+        setPropiedades(props);
         setLoading(false);
       })
       .catch(err => {
@@ -175,7 +175,7 @@ export default function Home() {
   const [searchParams, setSearchParams] = useState({...});
   
   // 🚀 Fast filtering, no API calls
-  const filteredProperties = useMemo(() => {
+  const filteredPropiedades = useMemo(() => {
     if (!searchParams.location) return MOCK_PROPERTIES;
     return MOCK_PROPERTIES.filter(p => 
       p.title.toLowerCase().includes(searchParams.location.toLowerCase())
@@ -188,8 +188,8 @@ export default function Home() {
         <SearchBar onSearch={setSearchParams} /> {/* ✅ Now visible! */}
       </section>
       <section className="home-properties">
-        {/* ✅ Properties instant, no loading */}
-        {filteredProperties.map(p => (
+        {/* ✅ Propiedades instant, no loading */}
+        {filteredPropiedades.map(p => (
           <PropertyCard key={p.id} property={p} />
         ))}
       </section>
@@ -206,7 +206,7 @@ export default function Home() {
 ```
 Metric              BEFORE          AFTER           Improvement
 ─────────────────────────────────────────────────────────────────
-Load Time           3-5 seconds     100-200ms       30-50x faster ✅
+Tiempo de carga           3-5 seconds     100-200ms       30-50x faster ✅
 First Paint         ~2s             ~150ms          13x faster ✅
 Interactive         ~3.5s           ~200ms          17x faster ✅
 Bundle Size         Same            Same            N/A
@@ -215,10 +215,10 @@ Memory Usage        Higher          Lower           20% less ✅
 
 ### Code Quality
 ```
-Metric              BEFORE          AFTER           Status
+Metric              BEFORE          AFTER           Estado
 ─────────────────────────────────────────────────────────────────
 Lines of Code       112             52              50% reduction ✅
-Imports             Many (API)      Few (Components) Cleaner ✅
+Imports             Many (API)      Few (Components) Limpioer ✅
 State Variables     4               2               Simpler ✅
 useEffect Hooks     1 complex       0               No side effects ✅
 CSS Warnings        13              0               100% clean ✅
@@ -227,10 +227,10 @@ Compilation Errors  0               0               Still perfect ✅
 
 ### User Experience
 ```
-Metric              BEFORE          AFTER           Status
+Metric              BEFORE          AFTER           Estado
 ─────────────────────────────────────────────────────────────────
 SearchBar Visible   ❌ No           ✅ Central      Fixed ✅
-Properties Visible  ❌ After 3-5s   ✅ Instant      Fixed ✅
+Propiedades Visible  ❌ After 3-5s   ✅ Instant      Fixed ✅
 Loading Spinner     ❌ 3-5 seconds  ✅ None         Fixed ✅
 Mobile Speed        ❌ Very Slow    ✅ Fast         Fixed ✅
 Filtering Speed     ❌ Slow (API)   ✅ Instant      Fixed ✅
@@ -284,7 +284,7 @@ import SearchBar from '../../components/common/SearchBar/SearchBar';
 // Result: No overhead, instant rendering
 ```
 
-### CSS Cleanup
+### CSS Limpioup
 
 #### BEFORE
 ```css
@@ -336,7 +336,7 @@ User clicks "nido.com"
        ↓
 ⏳ propertyService.getUserLocation() called (1.5s) 😩
        ↓
-⏳ propertyService.getNearbyProperties() called (1.5s) 😩
+⏳ propertyService.getNearbyPropiedades() called (1.5s) 😩
        ↓
 ⏳ PropertyCards render (300ms) 😩
        ↓
@@ -379,7 +379,7 @@ Total: 100-200 MILLISECONDS ✅ 🎉
 
 ### PropertyCard Feature Matrix
 
-| Feature | Before | After | Status |
+| Feature | Before | After | Estado |
 |---------|--------|-------|--------|
 | **Image Display** | ❌ N/A | ✅ Yes | 6 properties |
 | **Lazy Loading** | ❌ N/A | ✅ Yes | Built-in |
@@ -408,7 +408,7 @@ Total: 100-200 MILLISECONDS ✅ 🎉
 ✅ Easy to debug (mock data)
 ✅ Easy to test (no backend needed)
 ✅ Fast development feedback
-✅ Clean console (0 warnings)
+✅ Limpio console (0 warnings)
 ✅ Simple component structure
 ✅ Instant reload times
 ```
@@ -433,13 +433,13 @@ Desktop: ✅ 100-200ms to load 😍
 
 ---
 
-## 🎊 Summary
+## 🎊 Resumen
 
 | Aspect | Before | After | Winner |
 |--------|--------|-------|--------|
 | **Speed** | 3-5s | 100-200ms | After (30-50x) ✅ |
 | **SearchBar** | Missing | Central | After ✅ |
-| **Properties** | Delayed | Instant | After ✅ |
+| **Propiedades** | Delayed | Instant | After ✅ |
 | **CSS Quality** | 13 warnings | 0 warnings | After ✅ |
 | **Code Quality** | Complex | Simple | After ✅ |
 | **UX** | Poor | Excellent | After ✅ |
@@ -455,4 +455,5 @@ Desktop: ✅ 100-200ms to load 😍
 ---
 
 Created: November 19, 2025  
-Status: ✅ **OPTIMIZATION COMPLETE**
+Estado: ✅ **OPTIMIZATION COMPLETE**
+
