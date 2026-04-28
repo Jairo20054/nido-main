@@ -1,166 +1,168 @@
-# Documentacion tecnica de NIDO
+﻿# Backend NIDO
 
 Ultima actualizacion: 2026-04-27
 
-## Que es NIDO
+Este documento describe el backend real de NIDO segun el codigo fuente actual en `backend/src`.
 
-NIDO es un MVP de marketplace de arriendo residencial. El repositorio actual implementa:
+## Vision general
 
-- un frontend en React + Vite para busqueda, autenticacion, propiedades guardadas, gestion de cuenta, gestion de arrendadores y un flujo guiado de postulacion
-- un backend en Express con rutas modulares
-- modelos Prisma para propiedades, favoritos y solicitudes de arriendo
-- autenticacion y almacenamiento de perfiles con Supabase
-- un blueprint SQL en Supabase para un ciclo de vida mas amplio de la aplicacion, aunque solo una parte esta conectada al codigo en ejecucion
+El backend de NIDO expone una API REST para:
 
-## Alcance actual del producto
+- autenticacion de usuarios con Supabase Auth
+- gestion de perfiles
+- catalogo de propiedades
+- favoritos
+- precalificacion de postulaciones
+- solicitudes formales de arriendo
 
-El MVP ejecutable soporta estos recorridos principales:
+Hoy existe una arquitectura hibrida:
 
-- explorar propiedades destacadas y buscables sin iniciar sesion
-- registrarse e iniciar sesion con Supabase Auth
-- guardar propiedades en favoritos
-- ver datos de cuenta y solicitudes de arriendo enviadas
-- crear y administrar propiedades desde el panel de arrendador
-- precalificarse para una propiedad mediante un flujo guiado
-- enviar una solicitud final de arriendo despues del paso documental
+- Supabase para autenticacion y algunos dominios (`profiles`, `applications`, `properties` en flujo de precalificacion)
+- Prisma para catalogo, favoritos y solicitudes formales (`Property`, `Favorite`, `RentalRequest`)
 
-El codigo tambien contiene un flujo mas amplio de "estado futuro" alrededor de postulaciones, contratos, pagos, entrega, firmas y auditoria dentro de `supabase/migrations/20260424020559_nido_rental_backend.sql`, pero la mayor parte de ese ciclo aun no esta expuesta por la API actual del frontend/backend.
+## Proposito de NIDO desde el servidor
 
-## Verificaciones importantes
+Desde backend, NIDO prioriza este objetivo operativo:
 
-- Verdad vista en el codigo: el backend usa Prisma y Supabase al mismo tiempo.
-- Verdad vista en el codigo: el flujo guiado de postulacion se reparte entre localStorage, Supabase y Prisma.
-- Verdad vista en el codigo: las cargas de documentos aun no se persisten en almacenamiento del backend; la UI solo valida archivos del lado del cliente y guarda metadatos del borrador en localStorage.
-- Verdad vista en el codigo: Docker, CI y algunos archivos de seed/bootstrap estan desalineados con la app actual y deben tratarse como pendientes de validacion.
+- permitir exploracion publica de inmuebles
+- exigir autenticacion solo cuando hay acciones con trazabilidad
+- crear un flujo de aplicacion progresivo (precalificacion -> checklist -> solicitud)
+- mantener una API simple para frontend web
 
 ## Stack tecnologico
 
-### Frontend
-
-- React 19
-- React Router DOM 7
-- Vite 5
-- Lucide React
-- CSS plano
-
-### Backend
-
-- Node.js 18+
-- Express 4
+- Node.js + Express 4
 - Joi para validacion
-- cliente Supabase JS para autenticacion y tablas seleccionadas
-- Prisma 6 para lecturas/escrituras relacionales sobre el esquema PostgreSQL de ejecucion definido en `backend/prisma/schema.prisma`
+- Prisma ORM (`@prisma/client`) para parte del modelo relacional
+- Supabase JS (`@supabase/supabase-js`) para Auth y tablas seleccionadas
+- PostgreSQL (via `DATABASE_URL` para Prisma)
 
-### Persistencia
+## Entrypoints backend
 
-- PostgreSQL a traves de Prisma
-- Supabase Postgres + Supabase Auth
-- localStorage para el token de autenticacion y el estado del borrador de postulacion
+- entrada de proceso: `server.js` (raiz) -> `backend/src/server.js`
+- bootstrap de app: `backend/src/app.js`
+- router raiz API: `backend/src/routes.js`
+- endpoint de salud: `GET /health`
+- prefijo de API: `/api`
 
-## Puntos de entrada del repositorio
+## Como correr el backend en local
 
-- Entrada del frontend: `frontend/src/main.jsx`
-- Router del frontend: `frontend/src/App.jsx`
-- Entrada del backend: `backend/src/server.js`
-- Configuracion de la app backend: `backend/src/app.js`
-- Router raiz de la API: `backend/src/routes.js`
-- Esquema Prisma: `backend/prisma/schema.prisma`
-- Migracion blueprint de Supabase: `supabase/migrations/20260424020559_nido_rental_backend.sql`
+1. Instalar dependencias:
 
-## Como ejecutar en local
+```bash
+npm install
+```
 
-### Prerrequisitos
+2. Configurar `.env` en la raiz del repo (ver variables abajo).
 
-- Node.js 18 o superior
-- npm
-- PostgreSQL accesible mediante `DATABASE_URL`
-- Un proyecto Supabase con valores validos para:
-  - `SUPABASE_URL`
-  - `SUPABASE_ANON_KEY`
-  - `SUPABASE_SERVICE_KEY`
+3. Generar cliente Prisma:
 
-### Variables de entorno
+```bash
+npm run prisma:generate
+```
 
-El codigo en ejecucion lee estas variables:
+4. Iniciar backend:
 
+```bash
+npm run dev:backend
+```
+
+Alternativa (frontend + backend):
+
+```bash
+npm run dev
+```
+
+## Variables de entorno del backend
+
+Variables leidas por `backend/src/shared/env.js`:
+
+- `NODE_ENV` (default: `development`)
+- `PORT` (default: `5000`)
+- `CLIENT_URL` (default: `http://localhost:5173`)
+- `JWT_SECRET` (definida pero no usada por el flujo actual)
+- `JWT_EXPIRES_IN` (definida pero no usada por el flujo actual)
 - `SUPABASE_URL`
 - `SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_KEY`
 - `DATABASE_URL`
-- `JWT_SECRET`
-- `JWT_EXPIRES_IN`
-- `PORT`
-- `CLIENT_URL`
-- `VITE_API_BASE_URL`
-- `NODE_ENV`
 
 Notas:
 
-- `.env.example` esta incompleto para el backend actual porque no incluye las variables requeridas de Supabase.
-- `backend/src/shared/env.js` carga el `.env` de la raiz del repositorio.
+- `.env.example` esta incompleto para el backend actual: no incluye variables de Supabase.
+- `SUPABASE_SERVICE_KEY` es necesaria para rutas que usan `supabaseAdmin`.
 
-### Inicio local
+## Scripts principales
 
-```bash
-npm install
-npm run prisma:generate
-npm run dev
-```
+Definidos en `package.json`:
 
-Puertos por defecto:
-
-- frontend: `http://localhost:5173`
-- backend: `http://localhost:5000`
-- proxy del frontend al backend: `/api` mediante `frontend/vite.config.js`
-
-## Scripts npm principales
-
-- `npm run dev`: inicia frontend y backend juntos
-- `npm run dev:frontend`: ejecuta Vite
-- `npm run dev:backend`: ejecuta Express con nodemon
-- `npm run build`: construye el frontend en `dist/`
-- `npm run preview`: previsualiza el build del frontend
-- `npm run start`: inicia solo el backend
+- `npm run dev:backend`: levanta Express con nodemon
+- `npm run start`: levanta Express sin nodemon
 - `npm run prisma:generate`
 - `npm run prisma:push`
 - `npm run prisma:seed`
 
-## Mapa general del repositorio
+Scripts de apoyo:
+
+- `start-backend.cmd`
+- `start-backend.bat`
+
+## Estructura general del backend
 
 ```text
 backend/
   prisma/
+    schema.prisma
+    seed.js
   scripts/
+    setup-admin.js
+    make-admin.js
   src/
+    app.js
+    routes.js
+    server.js
     modules/
+      auth/
+      users/
+      properties/
+      favorites/
+      applications/
+      requests/
     shared/
-frontend/
-  public/
-  src/
-    app/
-    components/
-    features/
-    lib/
-    styles/
-supabase/
-  migrations/
-docs/
+      env.js
+      supabase.js
+      supabase-auth.js
+      supabase-auth-middleware.js
+      prisma.js
+      serializers.js
+      validate.js
+      errors.js
+      errorHandler.js
+      asyncHandler.js
 ```
 
-## Que leer despues
+## Contratos API consumidos por frontend
 
-- `docs/architecture.md`
-- `docs/flows.md`
-- `docs/modules.md`
-- `docs/api.md`
-- `docs/data-model.md`
-- `docs/setup.md`
-- `docs/diagrams/architecture.md`
-- `docs/diagrams/flows.md`
+El frontend en `frontend/src` consume principalmente:
+
+- `GET /api/properties`
+- `GET /api/properties/featured`
+- `GET /api/properties/:id`
+- `POST /api/auth/login`
+- `POST /api/auth/register`
+- `GET /api/auth/me`
+- `PATCH /api/users/me`
+- `GET /api/favorites`
+- `POST /api/favorites/:propertyId`
+- `DELETE /api/favorites/:propertyId`
+- `POST /api/applications/prequalify`
+- `POST /api/requests`
+- `GET /api/requests/mine`
+- `GET /api/requests/received`
+- `PATCH /api/requests/:id/status`
 
 ## Pendiente de validacion
 
-- La configuracion Docker menciona un worker, Redis, MinIO y ClamAV, pero el `package.json` actual no define un script `worker` y el codigo principal no conecta esos servicios.
-- `.github/workflows/ci.yml` ejecuta `npm test`, pero `package.json` no define un script `test`.
-- `backend/prisma/seed.js` parece desactualizado frente al esquema y enums actuales de Prisma.
-- `backend/types/database.ts` no coincide exactamente con la migracion actual de Supabase y debe tratarse como un artefacto generado o heredado hasta que se regenere.
+- Requiere revision del equipo: definir una unica fuente canonica de datos entre Prisma y Supabase para `usuarios`, `propiedades` y `solicitudes/postulaciones`.
+- Supuesto basado en el codigo actual: la arquitectura hibrida es transitoria y parte del blueprint en Supabase aun no esta conectada por API.
+- Requiere revision del equipo: actualizar o retirar artefactos desalineados (`Dockerfile`, `Dockerfile.worker`, `docker-compose.yml`, `backend/prisma/seed.js`, `.github/workflows/ci.yml`).

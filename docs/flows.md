@@ -1,3 +1,32 @@
+**Flujos críticos de UI**
+
+1) Búsqueda de propiedades (Search)
+- Entrada: usuario accede a `/properties`.
+- Estado inicial: filtros inicializados por `useSearchFilters` (lee URL params).
+- Proceso: `SearchPage` usa `api.get('/properties', { query })` para obtener lista.
+- Estados: loading → success (lista) → empty (sin resultados) o error.
+- Interacciones clave: toggle favoritos (`POST`/`DELETE` `/favorites/:id`), alternar vista mapa, abrir filtros móviles.
+- Salidas: detalle al hacer click en tarjeta (`/properties/:id`).
+
+2) Ver detalle de propiedad
+- Entrada: `/properties/:id`.
+- Proceso: `PropertyDetailPage` usa `api.get('/properties/:id')` (hook `usePropertyDetails`).
+- Estados: loading → mostrar gallery, detalles, acciones (guardar, arrendar).
+- Interacción crítica: Guardar favorito (requiere auth), iniciar flujo de aplicación (`/apply/*`).
+
+3) Flujo de aplicación (arrendar)
+- Pasos: `start` → `prequal` → `documents` → `review` → ... (ver `APPLICATION_STEPS` en `features/applications/applicationConfig.js`).
+- Precalificación: `ApplyPrequalificationPage` envía un `POST` a `/applications/prequalify` (puede ser sin auth según código: `{ auth: false }`). Respuesta: `prequalification` + `documentChecklist`.
+- Documentos: `ApplicationDocumentsPage` valida archivos localmente y, al enviar, hace `POST` a `/requests` con payload de la solicitud.
+- Salida: navegación a `review` y trazabilidad en draft local (`applicationDraft.js`).
+
+4) Autenticación y sesiones
+- Login/Register llaman a `/auth/login` y `/auth/register` (ver `AuthProvider.login/register`) — token almacenado en `localStorage`.
+- `AuthProvider` intenta refrescar estado llamando `/auth/me` si existe token.
+- Guardas de rutas usan `ProtectedRoute` y muestran `LoadingState` mientras `AuthProvider.loading` es true.
+
+Notas de validación
+- Contratos exactos de endpoints (campos obligatorios) están documentados parcialmente en `api-integration.md`. Marcar como "Pendiente de validación" si no se cuenta con OpenAPI.
 # Flujos funcionales de NIDO
 
 Ultima actualizacion: 2026-04-27

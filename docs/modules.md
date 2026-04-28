@@ -1,3 +1,41 @@
+**Módulos y responsabilidades**
+
+Resumen por carpeta relevante (frontend/src)
+
+- `app/`
+  - `providers/AuthProvider.jsx`: Context de autenticación, login, register, logout, refreshUser (llama `/auth/me`). Fuente de verdad para sesión.
+  - `routes/ProtectedRoute.jsx`: Guard para rutas privadas.
+
+- `components/`
+  - `layout/`: `SiteLayout`, `SiteHeader`, `SiteFooter` (estructura global y navegación).
+  - `ui/`: componentes de estado (`LoadingState`, `EmptyState`, `InlineMessage`) y patrones visuales.
+
+- `features/properties/`
+  - Páginas: `SearchPage.jsx`, `PropertyDetailPage.jsx`.
+  - Componentes: `PropertyCard.jsx`, `PropertyFilters.jsx`, `PropertyForm.jsx`.
+  - Hooks: `useSearchFilters.js`.
+  - Responsabilidad: buscar, filtrar, mostrar detalle y CRUD ligero desde `dashboard`.
+
+- `features/applications/`
+  - Flujo de arrendamiento: `ApplyStartPage.jsx`, `ApplyPrequalificationPage.jsx`, `ApplicationDocumentsPage.jsx`, `ApplicationReviewPage.jsx`.
+  - Helpers: `applicationConfig.js`, `applicationDraft.js`, `usePropertyDetails.js`.
+  - Responsabilidad: manejo local de draft, validaciones de documentos y pasos del proceso.
+
+- `features/auth/`
+  - `LoginPage.jsx`, `RegisterPage.jsx` — formularios que delegan a `AuthProvider`.
+
+- `features/favorites/` y `features/dashboard/`
+  - Favorites: carga `/favorites`, permite eliminar.
+  - Dashboard/Management: endpoints para `properties/mine`, `requests/received`, y CRUD de propiedades.
+
+- `lib/`
+  - `apiClient.js`: fetch wrapper, `ApiError`, token handling (`localStorage`), construcción de query params.
+  - `formatters.js`: utilidades para moneda, fechas, labels.
+  - `constants.js`: enums y constantes reutilizadas.
+
+Riesgos / notas
+- `AuthProvider` resuelve la sesión a partir de `/auth/me`. Si el token expira y no existe flujo de refresh, la app simplemente limpia token y fuerza re-login.
+- `applicationDraft` guarda datos temporalmente en `localStorage` (revisar límites y limpieza en casos de varios borradores).
 # Modulos y carpetas de NIDO
 
 Ultima actualizacion: 2026-04-27

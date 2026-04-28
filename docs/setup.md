@@ -1,3 +1,35 @@
+**Setup & Run (Frontend)**
+
+Prerequisitos
+- Node.js LTS (16/18+ recomendado).
+- npm o yarn.
+
+Instalación local
+```bash
+cd <repo-root>
+npm install
+```
+
+Run en desarrollo
+```bash
+npm run dev
+```
+
+Build para producción
+```bash
+npm run build
+npm run preview
+```
+
+Variables de entorno
+- `VITE_API_BASE_URL` — URL base del backend. Por defecto la app usa `/api`.
+
+Troubleshooting básico
+- Error CORS: revisar que `VITE_API_BASE_URL` apunte al backend y que el backend permita origen local.
+- 401 en `/auth/me`: borrar `localStorage` key `nido_access_token` y reintentar login.
+
+Notas
+- El proyecto usa Vite; si hay problemas de cache, reiniciar dev server o borrar `node_modules/.vite`.
 # Configuracion y operacion de NIDO
 
 Ultima actualizacion: 2026-04-27

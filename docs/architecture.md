@@ -1,3 +1,51 @@
+**Arquitectura del Frontend**
+
+Resumen general
+- Aplicación SPA en React, empaquetada con Vite.
+- Router: `react-router-dom` (rutas declarativas en `App.jsx`).
+- Estado de autenticación: `AuthProvider` (context + hooks) en `app/providers/AuthProvider.jsx`.
+- Comunicación con backend: `frontend/src/lib/apiClient.js` (fetch wrapper, manejo básico de errores, token en `localStorage`).
+
+Organización por capas
+- UI/Presentación: `components/` (layout, UI primitives: `LoadingState`, `EmptyState`, `InlineMessage`).
+- Features (dominio): `features/*` (properties, applications, auth, dashboard, favorites, account). Cada feature contiene páginas, componentes y hooks propios.
+- Infra/Servicios: `lib/` (API client, formatters, constantes).
+
+Routing y composición
+- `App.jsx` envuelve la app en `AuthProvider` y define rutas con `Routes`/`Route`.
+- `SiteLayout` contiene `SiteHeader`, `Outlet` y `SiteFooter`.
+- Rutas privadas usan `ProtectedRoute` que consulta `useAuth()` y redirige a `/login` si no hay sesión.
+
+State management y composición
+- No hay Redux ni MobX: estado local y Context API (`AuthProvider`).
+- Filtros de búsqueda usan `useSearchFilters` que sincroniza estado con `URLSearchParams`.
+
+Decisiones técnicas observadas
+- Autenticación: token JWT almacenado en `localStorage` (`TOKEN_STORAGE_KEY`). No hay flujo de refresh implementado en `apiClient.js` (nota: pendiente de validación si existe refresh token en backend).
+- API client devuelve `ApiError` con `status` y `details` para un manejo centralizado.
+
+Diagrama (texto / mermaid)
+```mermaid
+graph TD
+  subgraph Browser
+    A[main.jsx] --> B[App.jsx]
+  end
+  B --> C[AuthProvider]
+  C --> D[SiteLayout]
+  D --> E[Routes]
+  E --> F[Pages]
+  F --> G[Features components]
+  F --> H[use hooks]
+  G --> I[apiClient]
+  I --> J[Backend API]
+```
+
+Notas de arquitectura
+- La app privilegia composición por características (feature folders).
+- Recomendación: considerar una capa ligera de contratos/Typescript para endpoints (actualmente hay tipos sueltos en `types/` carpeta raíz que podrían integrarse con el frontend).
+
+Pendiente de validación
+- Confirmar existencia y formato de endpoints de autenticación (refresh token, expiración), y si el backend expone contratos OpenAPI.
 # Arquitectura de NIDO
 
 Ultima actualizacion: 2026-04-27

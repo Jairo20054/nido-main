@@ -1,3 +1,14 @@
+# Changelog (Documentación del frontend)
+
+## 2026-04-27 — Documentación inicial
+- Se crea documentación base en `/docs`:
+  - `README.md`, `architecture.md`, `flows.md`, `modules.md`, `ui-patterns.md`, `api-integration.md`, `auth-flow.md`, `state-management.md`, `setup.md`.
+  - Diagramas mermaid en `docs/diagrams/`.
+- Inventario inicial y mapeo de endpoints detectados en el frontend.
+
+Pendientes
+- Validar contratos exactos de API con backend.
+- Auditoría de accesibilidad y seguridad de tokens.
 # Historial de cambios de NIDO
 
 Ultima actualizacion: 2026-04-27
