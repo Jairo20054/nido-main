@@ -105,7 +105,6 @@ Definidos en `package.json`:
 Scripts de apoyo:
 
 - `start-backend.cmd`
-- `start-backend.bat`
 
 ## Estructura general del backend
 
