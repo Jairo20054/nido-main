@@ -1,0 +1,17 @@
+graph TD
+  main[main.jsx]
+  app[App.jsx]
+  auth[AuthProvider]
+  layout[SiteLayout]
+  routes[Routes]
+  pages[Pages (features/*)]
+  api[apiClient]
+  backend[Backend API]
+
+  main --> app
+  app --> auth
+  auth --> layout
+  layout --> routes
+  routes --> pages
+  pages --> api
+  api --> backend

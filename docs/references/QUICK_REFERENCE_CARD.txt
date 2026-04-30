@@ -1,0 +1,159 @@
+# ⚡ QUICK REFERENCE CARD
+
+**Guía rápida: Header Simplificado + Pasarela de Pago**
+
+---
+
+## 🎯 EN 30 SEGUNDOS
+
+### Lo que cambió
+```
+HEADER: Removidas opciones extras, solo "Conviértete" + Login
+FECHAS: Agregadas en PropertyDetail (Check-in, Check-out, Guests)
+PAGO: Nueva pasarela con 3 pasos (Review → Payment → Confirmation)
+```
+
+---
+
+## 🚀 INICIAR
+
+```bash
+npm start
+# Abre: http://localhost:3000
+```
+
+---
+
+## ✅ VERIFICAR
+
+```
+1. Header → Solo "Conviértete" + Avatar ✓
+2. Click tarjeta → PropertyDetail con fechas ✓
+3. Completa fechas → Botón activo ✓
+4. Click pago → 3 steps funcionando ✓
+```
+
+---
+
+## 💰 CÁLCULO
+
+```
+Tarjeta: 1234 5678 9012 3456
+Fechas: 15 Dic - 20 Dic (5 noches)
+Precio: $1.8M × 5 + 10% = $9.9M TOTAL
+```
+
+---
+
+## 🎨 RESPONSIVO
+
+| Dispositivo | Layout |
+|-------------|--------|
+| Desktop | 3 cols (fecha) |
+| Tablet | 2 cols |
+| Mobile | 1 col (stack) |
+
+---
+
+## 📝 ARCHIVOS CLAVE
+
+```
+src/components/
+├─ Header/Header.jsx (editado)
+├─ common/PropertyDetail/
+│  ├─ PropertyDetail.jsx (editado)
+│  └─ PropertyDetail.css (editado)
+└─ common/PaymentGateway/ (NUEVO)
+   ├─ PaymentGateway.jsx
+   └─ PaymentGateway.css
+```
+
+---
+
+## 🆘 PROBLEMAS RÁPIDOS
+
+| Problema | Solución |
+|----------|----------|
+| Botón gris | Completa fechas |
+| Modal no abre | npm start |
+| No ve cambios | Ctrl+Shift+R |
+| Errores console | npm install |
+
+---
+
+## 📚 DOCUMENTACIÓN RÁPIDA
+
+```
+GUIA_INICIO_RAPIDO.md .......... Start here (5 min)
+RESUMEN_RAPIDO.md ............ Overview (10 min)
+GUIA_VISUAL .................. Diagramas (10 min)
+HEADER_PAGO_UPDATE.md ........ Detalles (15 min)
+STRIPE_INTEGRATION_GUIDE.md ... Pagos reales (30 min)
+```
+
+---
+
+## 💡 TIPS
+
+```
+• Auto-formato tarjeta: 1234 → 1234 5678 9012 3456
+• Auto-formato fecha: 1225 → 12/25
+• Validación: Todos campos requeridos
+• Animaciones: 60fps suave
+• Responsive: 3 breakpoints
+```
+
+---
+
+## 🔗 LINKS
+
+```
+http://localhost:3000 ............ App
+http://localhost:3000?debug ...... Con DevTools
+F12 ............................ Console
+```
+
+---
+
+## ⏱️ TIMELINE
+
+```
+Día 1: Leer docs (1 hora) + Probar (30 min)
+Día 2: Detalles técnicos (1 hora)
+Semana 1: Integrar Stripe (2 horas)
+Semana 2: Backend real (4 horas)
+```
+
+---
+
+## ✨ CHECKLIST
+
+- [x] Header simplificado ✓
+- [x] Fechas en PropertyDetail ✓
+- [x] PaymentGateway 3 steps ✓
+- [x] Cálculos automáticos ✓
+- [x] Responsive ✓
+- [ ] Stripe real (próximo)
+- [ ] Backend (próximo)
+- [ ] Autenticación (próximo)
+
+---
+
+## 🎯 NEXT STEPS
+
+1. Lee GUIA_INICIO_RAPIDO.md (5 min)
+2. Abre http://localhost:3000 (probar)
+3. Personaliza si es necesario (1 hora)
+4. Integra Stripe (2 horas)
+5. Deploy (1 hora)
+
+---
+
+**Status**: ✅ LISTO PARA USAR  
+**Compilación**: ✅ SIN ERRORES  
+**Próximo**: STRIPE
+
+---
+
+📌 Imprime esta card y téala a mano mientras trabajas.
+

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.venv/
+gh/
+gh.zip
+supabase/.temp/
+.env
+.DS_Store
+coverage/
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
+npm-debug.log*

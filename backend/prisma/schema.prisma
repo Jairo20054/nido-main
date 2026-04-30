@@ -1,0 +1,208 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Roles efectivos usados para autorizacion en frontend, backend y panel administrativo.
+enum UserRole {
+  TENANT
+  LANDLORD
+  ADMIN
+}
+
+/// Tipologias visibles en la experiencia de publicacion y busqueda.
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  STUDIO
+  LOFT
+  PENTHOUSE
+  ROOM
+}
+
+/// Modalidad de ocupacion que define como se ofrece el inmueble.
+enum RentalType {
+  FULL_HOME
+  ROOM_ONLY
+  SHARED_HOME
+}
+
+/// Estado editorial y operativo del ciclo de vida de una propiedad.
+enum PropertyStatus {
+  DRAFT
+  PENDING
+  APPROVED
+  REJECTED
+  PUBLISHED
+  RENTED
+  ARCHIVED
+}
+
+/// Tipo de asset multimedia asociado a una propiedad.
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+/// Estado de negocio de una solicitud enviada por un arrendatario.
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  WITHDRAWN
+}
+
+/// Perfil de negocio persistido en `profiles`, sincronizado con Supabase Auth.
+model User {
+  id               String                   @id @default(uuid()) @db.Uuid
+  firstName        String                   @map("first_name")
+  lastName         String                   @map("last_name")
+  email            String                   @unique
+  phone            String?
+  bio              String?
+  avatarUrl        String?                  @map("avatar_url")
+  role             UserRole                 @default(TENANT)
+  createdAt        DateTime                 @default(now()) @map("created_at")
+  updatedAt        DateTime                 @updatedAt @map("updated_at")
+  favorites        Favorite[]
+  ownedProperties  Property[]               @relation("PropertyOwner")
+  rentalRequests   RentalRequest[]          @relation("TenantRequests")
+  receivedRequests RentalRequest[]          @relation("LandlordRequests")
+  approvalActions  PropertyApprovalHistory[]
+
+  @@index([role])
+  @@map("profiles")
+}
+
+/// Entidad principal del marketplace: inmueble publicado o en proceso de moderacion.
+model Property {
+  id                    String                   @id @default(cuid())
+  slug                  String                   @unique
+  ownerId               String                   @db.Uuid
+  title                 String
+  summary               String
+  description           String
+  propertyType          PropertyType
+  rentalType            RentalType               @default(FULL_HOME)
+  status                PropertyStatus           @default(DRAFT)
+  city                  String
+  neighborhood          String?
+  addressLine           String
+  zoneReference         String?
+  monthlyRent           Int
+  maintenanceFee        Int                      @default(0)
+  securityDeposit       Int                      @default(0)
+  availableImmediately  Boolean                  @default(false)
+  availableFrom         DateTime?
+  bedrooms              Int
+  bathrooms             Int
+  areaM2                Int
+  floor                 Int?
+  parkingSpots          Int                      @default(0)
+  strata                Int?
+  maxOccupants          Int                      @default(1)
+  furnished             Boolean                  @default(false)
+  petsAllowed           Boolean                  @default(false)
+  utilitiesIncluded     Boolean                  @default(false)
+  minLeaseMonths        Int                      @default(6)
+  amenities             String[]
+  rules                 String?
+  requirements          String?
+  idealTenantProfile    String?
+  specialConditions     String?
+  contactMethod         String?
+  verificationDetails   String?
+  rejectionReason       String?
+  coverImage            String?
+  latitude              Decimal?                 @db.Decimal(9, 6)
+  longitude             Decimal?                 @db.Decimal(9, 6)
+  approvedAt            DateTime?
+  publishedAt           DateTime?
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @updatedAt
+  owner                 User                     @relation("PropertyOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  media                 PropertyMedia[]
+  approvalHistory       PropertyApprovalHistory[]
+  favorites             Favorite[]
+  rentalRequests        RentalRequest[]
+
+  @@index([city, status])
+  @@index([ownerId, status])
+  @@index([monthlyRent, bedrooms])
+  @@index([propertyType, rentalType])
+  @@index([availableFrom, minLeaseMonths])
+}
+
+/// Coleccion ordenada de imagenes y videos por propiedad.
+model PropertyMedia {
+  id         String    @id @default(cuid())
+  propertyId String
+  type       MediaType @default(IMAGE)
+  url        String
+  alt        String?
+  position   Int       @default(0)
+  mimeType   String?
+  sizeBytes  Int?
+  createdAt  DateTime  @default(now())
+  property   Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, type, position])
+}
+
+/// Bitacora de cambios de estado para auditoria editorial y operativa.
+model PropertyApprovalHistory {
+  id          String         @id @default(cuid())
+  propertyId  String
+  actorId     String         @db.Uuid
+  fromStatus  PropertyStatus?
+  toStatus    PropertyStatus
+  note        String?
+  createdAt   DateTime       @default(now())
+  actor       User           @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  property    Property       @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, createdAt])
+  @@index([actorId, createdAt])
+}
+
+/// Relacion de propiedades guardadas por cada usuario autenticado.
+model Favorite {
+  id         String   @id @default(cuid())
+  userId     String   @db.Uuid
+  propertyId String
+  createdAt  DateTime @default(now())
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, propertyId])
+  @@index([propertyId])
+}
+
+/// Postulacion enviada por un arrendatario para aplicar a una propiedad.
+model RentalRequest {
+  id            String        @id @default(cuid())
+  propertyId    String
+  tenantId      String        @db.Uuid
+  landlordId    String        @db.Uuid
+  desiredMoveIn DateTime
+  leaseMonths   Int
+  occupants     Int
+  monthlyIncome Int?
+  hasPets       Boolean       @default(false)
+  phone         String
+  message       String
+  status        RequestStatus @default(PENDING)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  landlord      User          @relation("LandlordRequests", fields: [landlordId], references: [id], onDelete: Cascade)
+  property      Property      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  tenant        User          @relation("TenantRequests", fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status])
+  @@index([landlordId, status])
+  @@index([propertyId, status])
+}

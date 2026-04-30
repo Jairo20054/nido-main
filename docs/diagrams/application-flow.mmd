@@ -1,0 +1,17 @@
+sequenceDiagram
+  participant U as Usuario
+  participant UI as Frontend
+  participant API as Backend
+
+  U->>UI: Navega a /properties/:id/apply/start
+  UI->>API: GET /properties/:id
+  API-->>UI: property
+  UI->>U: Muestra resumen (start)
+  U->>UI: Click "Ver si califico"
+  UI->>API: POST /applications/prequalify
+  API-->>UI: prequalification + documentChecklist
+  UI->>U: Muestra resultado y checklist
+  U->>UI: Sube documentos y envía
+  UI->>API: POST /requests (payload)
+  API-->>UI: request created
+  UI->>U: Redirige a /apply/review
