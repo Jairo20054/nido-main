@@ -24,13 +24,22 @@ if (
 
 const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const adminAlias = (process.env.ADMIN_LOGIN_ALIAS || process.env.VITE_ADMIN_LOGIN_ALIAS || 'admin').trim().toLowerCase();
+const adminAlias = (
+  process.env.SUPER_ADMIN_LOGIN_ALIAS ||
+  process.env.ADMIN_LOGIN_ALIAS ||
+  process.env.VITE_SUPER_ADMIN_LOGIN_ALIAS ||
+  process.env.VITE_ADMIN_LOGIN_ALIAS ||
+  'superadmin'
+).trim().toLowerCase();
 const adminEmail = (
+  process.env.SUPER_ADMIN_LOGIN_EMAIL ||
   process.env.ADMIN_LOGIN_EMAIL ||
+  process.env.VITE_SUPER_ADMIN_LOGIN_EMAIL ||
   process.env.VITE_ADMIN_LOGIN_EMAIL ||
   'castillojairo2001@gmail.com'
 ).trim().toLowerCase();
-const adminPassword = process.env.ADMIN_LOGIN_PASSWORD || 'Andres2001*';
+const adminPassword =
+  process.env.SUPER_ADMIN_LOGIN_PASSWORD || process.env.ADMIN_LOGIN_PASSWORD || 'Andres2001*';
 
 const hasPlaceholderUrl = /your-project\.supabase\.co/i.test(supabaseUrl);
 const hasPlaceholderKey = /your-(anon|service-role)-key/i.test(serviceRoleKey);
@@ -42,7 +51,7 @@ if (!supabaseUrl || !serviceRoleKey || hasPlaceholderUrl || hasPlaceholderKey) {
 }
 
 if (adminPassword.length < 8) {
-  throw new Error('ADMIN_LOGIN_PASSWORD debe tener al menos 8 caracteres.');
+  throw new Error('SUPER_ADMIN_LOGIN_PASSWORD debe tener al menos 8 caracteres.');
 }
 
 const supabase = createClient(supabaseUrl, serviceRoleKey, {
@@ -190,7 +199,7 @@ const grantPlatformAdmin = async (userId) => {
     {
       auth_user_id: userId,
       profile_id: userId,
-      note: `Bootstrap admin alias=${adminAlias}`,
+      note: `Bootstrap super admin alias=${adminAlias}`,
     },
     {
       onConflict: 'auth_user_id',
@@ -219,7 +228,8 @@ const main = async () => {
         alias: adminAlias,
         email: adminEmail,
         userId: user.id,
-        message: 'Usuario admin listo para iniciar sesion.',
+        role: 'SUPER_ADMIN(platform-admin)',
+        message: 'Usuario super admin listo para iniciar sesion.',
       },
       null,
       2

@@ -37,7 +37,7 @@ const startClient = (port) => {
 
   clientStarted = true;
 
-  clientProcess = spawn(process.execPath, [viteCliPath], {
+  clientProcess = spawn(process.execPath, [viteCliPath, '--config', 'frontend/vite.config.js'], {
     cwd: rootDir,
     env: {
       ...process.env,
