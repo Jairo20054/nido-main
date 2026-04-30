@@ -1,55 +1,280 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { api, clearStoredToken, setStoredToken } from '../../lib/apiClient';
-import { TOKEN_STORAGE_KEY } from '../../lib/constants';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { api } from '../../lib/apiClient';
+import { clearAuthToken, setAuthToken } from '../../lib/authToken';
+import { getPasswordResetUrl, getSupabaseConfigError, resolveAuthEmail, supabase } from '../../lib/supabaseClient';
 
 const AuthContext = createContext(null);
 
+// Sincroniza el token recibido desde Supabase con el cliente HTTP y recupera
+// el perfil enriquecido desde el backend para unificar permisos y datos de usuario.
+const applySessionProfile = async (session, { silent = false } = {}) => {
+  if (!session?.access_token) {
+    clearAuthToken();
+    return { profile: null, session: null };
+  }
+
+  setAuthToken(session.access_token);
+
+  const response = await api.get('/auth/me');
+
+  if (!silent) {
+    // No-op placeholder for future toast integration.
+  }
+
+  return { profile: response.data, session };
+};
+
+const validateRegisterPayload = (payload) => {
+  if (!String(payload.firstName || '').trim()) {
+    throw new Error('Ingresa el nombre.');
+  }
+
+  if (!String(payload.lastName || '').trim()) {
+    throw new Error('Ingresa el apellido.');
+  }
+
+  if (!String(payload.email || '').trim()) {
+    throw new Error('Ingresa el correo.');
+  }
+
+  if (!String(payload.password || '').trim()) {
+    throw new Error('Ingresa la contrasena.');
+  }
+
+  if (String(payload.password || '').length < 8) {
+    throw new Error('La contrasena debe tener al menos 8 caracteres.');
+  }
+};
+
+/**
+ * Componente de uso transversal para autenticacion.
+ * Debe envolver todo el arbol que necesite conocer sesion, usuario, roles o helpers
+ * como login, logout, registro y actualizacion de perfil.
+ */
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState('');
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
 
-  const refreshUser = async () => {
+  // Rehidrata el estado local cada vez que cambia la sesion remota.
+  const hydrateSession = async (nextSession, options = {}) => {
     try {
-      const response = await api.get('/auth/me');
-      setUser(response.data);
-      setAuthError('');
+      if (!nextSession?.access_token) {
+        clearAuthToken();
+        setSession(null);
+        setUser(null);
+        setIsPasswordRecovery(false);
+        if (!options.keepError) {
+          setAuthError('');
+        }
+        return null;
+      }
+
+      const result = await applySessionProfile(nextSession, options);
+      setSession(result.session);
+      setUser(result.profile);
+      if (!options.keepError) {
+        setAuthError('');
+      }
+      return result.profile;
     } catch (error) {
-      clearStoredToken();
+      clearAuthToken();
+      setSession(null);
       setUser(null);
-      setAuthError(error.message);
+      if (!options.keepError) {
+        setAuthError(error.message);
+      }
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
+  const refreshUser = async () => {
+    const {
+      data: { session: currentSession },
+    } = await supabase.auth.getSession();
+
+    return hydrateSession(currentSession, { keepError: true });
+  };
+
   useEffect(() => {
-    if (localStorage.getItem(TOKEN_STORAGE_KEY)) {
-      refreshUser();
-    } else {
-      setLoading(false);
-    }
+    let mounted = true;
+
+    // En el arranque intentamos reutilizar la sesion persistida por Supabase.
+    const bootstrap = async () => {
+      try {
+        const {
+          data: { session: currentSession },
+        } = await supabase.auth.getSession();
+
+        if (!mounted) {
+          return;
+        }
+
+        await hydrateSession(currentSession, { keepError: true });
+      } catch (error) {
+        if (!mounted) {
+          return;
+        }
+
+        clearAuthToken();
+        setSession(null);
+        setUser(null);
+        setAuthError(error.message);
+        setLoading(false);
+      }
+    };
+
+    bootstrap();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      // El callback de Supabase puede ejecutarse durante el render; por eso se
+      // delega a la cola de tareas para evitar estados inconsistentes.
+      setTimeout(() => {
+        if (!mounted) {
+          return;
+        }
+
+        if (event === 'SIGNED_OUT') {
+          clearAuthToken();
+          setSession(null);
+          setUser(null);
+          setIsPasswordRecovery(false);
+          setAuthError('');
+          setLoading(false);
+          return;
+        }
+
+        if (event === 'PASSWORD_RECOVERY') {
+          setIsPasswordRecovery(true);
+        }
+
+        if (nextSession?.access_token) {
+          void hydrateSession(nextSession, { keepError: true });
+        }
+      }, 0);
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const login = async (credentials) => {
-    const response = await api.post('/auth/login', credentials, { auth: false });
-    setStoredToken(response.data.token);
-    setUser(response.data.user);
+  // Acciones de alto nivel consumidas por formularios y rutas protegidas.
+  const login = async ({ email, identifier, password }) => {
+    const resolvedEmail = resolveAuthEmail(identifier || email);
+
+    if (!resolvedEmail) {
+      throw new Error('Ingresa tu correo o usuario.');
+    }
+
+    if (!String(password || '').trim()) {
+      throw new Error('Ingresa la contrasena.');
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: resolvedEmail,
+      password,
+    });
+
+    if (error) {
+      if (error.message === getSupabaseConfigError()) {
+        throw error;
+      }
+
+      throw error;
+    }
+
+    const profile = await hydrateSession(data.session, { keepError: true });
     setAuthError('');
-    return response.data.user;
+    return profile;
   };
 
   const register = async (payload) => {
-    const response = await api.post('/auth/register', payload, { auth: false });
-    setStoredToken(response.data.token);
-    setUser(response.data.user);
+    validateRegisterPayload(payload);
+
+    const role = payload.role === 'LANDLORD' ? 'LANDLORD' : 'TENANT';
+    const { data, error } = await supabase.auth.signUp({
+      email: String(payload.email || '').trim().toLowerCase(),
+      password: payload.password,
+      options: {
+        data: {
+          first_name: String(payload.firstName || '').trim(),
+          last_name: String(payload.lastName || '').trim(),
+          phone: String(payload.phone || '').trim() || null,
+          role,
+        },
+      },
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    if (data.session) {
+      const profile = await hydrateSession(data.session, { keepError: true });
+      setAuthError('');
+      return {
+        profile,
+        requiresEmailConfirmation: false,
+        session: data.session,
+      };
+    }
+
+    clearAuthToken();
+    setSession(null);
+    setUser(null);
     setAuthError('');
-    return response.data.user;
+
+    return {
+      profile: null,
+      requiresEmailConfirmation: true,
+      session: null,
+    };
   };
 
-  const logout = () => {
-    clearStoredToken();
+  const logout = async () => {
+    await supabase.auth.signOut();
+    clearAuthToken();
+    setSession(null);
     setUser(null);
+    setIsPasswordRecovery(false);
+    setAuthError('');
+  };
+
+  const forgotPassword = async (email) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: getPasswordResetUrl(),
+    });
+
+    if (error) {
+      throw error;
+    }
+  };
+
+  const resetPassword = async (password) => {
+    const { data, error } = await supabase.auth.updateUser({
+      password,
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    setIsPasswordRecovery(false);
+
+    if (data.session?.access_token) {
+      await hydrateSession(data.session, { keepError: true });
+    }
+
+    setAuthError('');
+    return true;
   };
 
   const updateProfile = async (payload) => {
@@ -58,21 +283,25 @@ export function AuthProvider({ children }) {
     return response.data;
   };
 
-  const value = useMemo(
-    () => ({
-      authError,
-      isAuthenticated: Boolean(user),
-      isLandlord: user?.role === 'LANDLORD' || user?.role === 'ADMIN',
-      loading,
-      login,
-      logout,
-      refreshUser,
-      register,
-      updateProfile,
-      user,
-    }),
-    [authError, loading, user]
-  );
+  const value = {
+    authError,
+    forgotPassword,
+    hasRole: (...roles) => roles.includes(user?.role),
+    isAdmin: user?.role === 'ADMIN',
+    isAuthenticated: Boolean(user),
+    isLandlord: user?.role === 'LANDLORD' || user?.role === 'ADMIN',
+    isPasswordRecovery,
+    isTenant: user?.role === 'TENANT',
+    loading,
+    login,
+    logout,
+    refreshUser,
+    register,
+    resetPassword,
+    session,
+    updateProfile,
+    user,
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

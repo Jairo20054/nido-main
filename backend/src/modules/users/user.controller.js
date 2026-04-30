@@ -1,8 +1,10 @@
-const bcrypt = require('bcryptjs');
 const { prisma } = require('../../shared/prisma');
-const { badRequest } = require('../../shared/errors');
+const { badRequest, unauthorized } = require('../../shared/errors');
 const { serializeUser } = require('../../shared/serializers');
+const { deleteAuthUser } = require('../../shared/auth');
+const { supabaseAnon } = require('../../shared/supabase');
 
+// Devuelve el perfil autenticado ya serializado para el cliente.
 const getProfile = async (req, res) => {
   res.json({
     success: true,
@@ -10,6 +12,7 @@ const getProfile = async (req, res) => {
   });
 };
 
+// Actualiza solo los campos editables del perfil publico del usuario.
 const updateProfile = async (req, res) => {
   const payload = {
     firstName: req.body.firstName,
@@ -31,13 +34,22 @@ const updateProfile = async (req, res) => {
   });
 };
 
+// Reautentica con contrasena antes de eliminar la cuenta y el usuario de Supabase.
 const deleteProfile = async (req, res) => {
-  const isValidPassword = await bcrypt.compare(req.body.password, req.user.passwordHash);
-
-  if (!isValidPassword) {
-    throw badRequest('La contrasena no coincide');
+  if (!supabaseAnon) {
+    throw badRequest('Supabase no esta configurado en el servidor');
   }
 
+  const { error } = await supabaseAnon.auth.signInWithPassword({
+    email: req.user.email,
+    password: req.body.password,
+  });
+
+  if (error) {
+    throw unauthorized('La contrasena no coincide');
+  }
+
+  await deleteAuthUser(req.user.id);
   await prisma.user.delete({
     where: { id: req.user.id },
   });

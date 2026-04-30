@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { useAuth } from '../../app/providers/AuthProvider';
 
+/**
+ * Componente de uso para el ingreso principal.
+ * Se utiliza en rutas publicas y decide a donde redirigir al usuario despues del login:
+ * la ruta pendiente, su panel operativo o su cuenta segun el rol autenticado.
+ */
 export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({ identifier: '', password: '' });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -17,8 +22,11 @@ export function LoginPage() {
     setError('');
 
     try {
-      await login(form);
-      navigate(location.state?.from || '/account', { replace: true });
+      const user = await login(form);
+      const nextRoute =
+        location.state?.from ||
+        (user.role === 'ADMIN' ? '/admin' : user.role === 'LANDLORD' ? '/manage' : '/account');
+      navigate(nextRoute, { replace: true });
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -35,12 +43,13 @@ export function LoginPage() {
         <form className="auth-form" onSubmit={handleSubmit}>
           <InlineMessage tone="danger">{error}</InlineMessage>
           <div className="field-group">
-            <label htmlFor="email">Correo</label>
+            <label htmlFor="identifier">Correo o usuario</label>
             <input
-              id="email"
-              type="email"
-              value={form.email}
-              onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
+              id="identifier"
+              value={form.identifier}
+              onChange={(event) => setForm((current) => ({ ...current, identifier: event.target.value }))}
+              placeholder="admin o correo@dominio.com"
+              autoComplete="username"
             />
           </div>
           <div className="field-group">
@@ -50,7 +59,13 @@ export function LoginPage() {
               type="password"
               value={form.password}
               onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
+              autoComplete="current-password"
             />
+          </div>
+          <div className="auth-form__footer">
+            <Link to="/forgot-password" className="auth-form__link">
+              ¿Olvidaste tu contraseña?
+            </Link>
           </div>
           <button className="button" type="submit" disabled={submitting}>
             {submitting ? 'Ingresando...' : 'Ingresar'}

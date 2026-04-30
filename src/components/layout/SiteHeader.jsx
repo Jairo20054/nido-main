@@ -1,16 +1,35 @@
 import React, { useState } from 'react';
-import { Heart, Home, LayoutDashboard, LogOut, Menu, Search, User } from 'lucide-react';
+import { Heart, LayoutDashboard, LogOut, Menu, Plus, Search, Shield, User } from 'lucide-react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../app/providers/AuthProvider';
+import { getRoleLabel } from '../../lib/formatters';
 
+/**
+ * Componente de uso para el encabezado global del sitio.
+ * Aparece dentro del layout principal y concentra navegacion, buscador rapido
+ * y accesos condicionados por autenticacion y permisos del usuario actual.
+ */
 export function SiteHeader() {
   const navigate = useNavigate();
-  const { isAuthenticated, logout, user } = useAuth();
+  const { isAdmin, isAuthenticated, isLandlord, logout, user } = useAuth();
   const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const handleLogout = () => {
-    logout();
+  // Cierra la sesion actual y devuelve al usuario al home publico.
+  const handleLogout = async () => {
+    await logout();
     navigate('/');
+  };
+
+  // Reutiliza el buscador del header como acceso rapido a la pagina de listado.
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
+
+    if (searchQuery.trim()) {
+      navigate(`/properties?city=${encodeURIComponent(searchQuery)}`);
+      setSearchQuery('');
+      setOpen(false);
+    }
   };
 
   return (
@@ -20,9 +39,18 @@ export function SiteHeader() {
           <span className="brand__mark">N</span>
           <span className="brand__text">
             <strong>NIDO</strong>
-            <small>Arriendo residencial</small>
           </span>
         </Link>
+
+        <form className="site-header__search" onSubmit={handleSearchSubmit}>
+          <Search size={16} />
+          <input
+            type="text"
+            placeholder="Buscar por ciudad..."
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+          />
+        </form>
 
         <button className="site-header__menu" type="button" onClick={() => setOpen((value) => !value)}>
           <Menu size={18} />
@@ -33,18 +61,24 @@ export function SiteHeader() {
             <Search size={16} />
             Explorar
           </NavLink>
-          {isAuthenticated && (
+          {isAuthenticated ? (
             <NavLink to="/saved" className="site-nav__link" onClick={() => setOpen(false)}>
               <Heart size={16} />
               Guardados
             </NavLink>
-          )}
-          {isAuthenticated && (
+          ) : null}
+          {isLandlord ? (
             <NavLink to="/manage" className="site-nav__link" onClick={() => setOpen(false)}>
               <LayoutDashboard size={16} />
               Gestion
             </NavLink>
-          )}
+          ) : null}
+          {isAdmin ? (
+            <NavLink to="/admin" className="site-nav__link" onClick={() => setOpen(false)}>
+              <Shield size={16} />
+              Admin
+            </NavLink>
+          ) : null}
         </nav>
 
         <div className="site-header__actions">
@@ -52,9 +86,10 @@ export function SiteHeader() {
             <>
               <NavLink to="/account" className="site-header__ghost">
                 <User size={16} />
-                {user?.firstName}
+                <span>{user?.firstName}</span>
               </NavLink>
-              <button className="site-header__button site-header__button--ghost" type="button" onClick={handleLogout}>
+              <span className="site-header__role">{getRoleLabel(user?.role)}</span>
+              <button className="site-header__button" type="button" onClick={handleLogout}>
                 <LogOut size={16} />
                 Salir
               </button>
@@ -65,8 +100,8 @@ export function SiteHeader() {
                 Ingresar
               </Link>
               <Link to="/register" className="site-header__button">
-                <Home size={16} />
-                Crear cuenta
+                <Plus size={16} />
+                Publicar
               </Link>
             </>
           )}

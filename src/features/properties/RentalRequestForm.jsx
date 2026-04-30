@@ -13,6 +13,11 @@ const initialForm = {
   message: '',
 };
 
+/**
+ * Componente de uso para crear una solicitud de arriendo.
+ * Vive dentro del detalle de propiedad y adapta su salida segun el contexto:
+ * usuario anonimo, propietario del inmueble o postulante autenticado.
+ */
 export function RentalRequestForm({ propertyId, ownerId, onSubmit, submitting }) {
   const { isAuthenticated, user } = useAuth();
   const [form, setForm] = useState({
@@ -48,6 +53,7 @@ export function RentalRequestForm({ propertyId, ownerId, onSubmit, submitting })
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    // Se valida lo minimo indispensable antes de llegar al backend para mejorar la experiencia.
     if (!form.desiredMoveIn || !form.phone || form.message.trim().length < 20) {
       setError('Completa la fecha, tu telefono y un mensaje claro de al menos 20 caracteres.');
       return;

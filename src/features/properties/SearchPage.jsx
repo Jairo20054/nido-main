@@ -5,24 +5,33 @@ import { EmptyState } from '../../components/ui/EmptyState';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { LoadingState } from '../../components/ui/LoadingState';
 import { useAuth } from '../../app/providers/AuthProvider';
+import { PROPERTY_STATUS_OPTIONS, PUBLIC_PROPERTY_STATUS_OPTIONS } from '../../lib/constants';
 import { api } from '../../lib/apiClient';
 import { PropertyCard } from './PropertyCard';
 import { PropertyFilters } from './PropertyFilters';
 
+// Traduce los query params de la URL a un estado de filtros usable por la UI.
 const readFilters = (searchParams) => ({
   city: searchParams.get('city') || '',
+  neighborhood: searchParams.get('neighborhood') || '',
   propertyType: searchParams.get('propertyType') || '',
   minRent: searchParams.get('minRent') || '',
   maxRent: searchParams.get('maxRent') || '',
   bedrooms: searchParams.get('bedrooms') || '',
-  bathrooms: searchParams.get('bathrooms') || '',
   furnished: searchParams.get('furnished') === 'true',
   petsAllowed: searchParams.get('petsAllowed') === 'true',
+  utilitiesIncluded: searchParams.get('utilitiesIncluded') === 'true',
+  status: searchParams.get('status') || '',
   sort: searchParams.get('sort') || 'recommended',
 });
 
+/**
+ * Componente de uso para la busqueda avanzada de propiedades.
+ * Coordina filtros, URL, consulta remota y acciones de favoritos para que la pagina
+ * pueda compartirse por enlace y siga siendo navegable con el historial del navegador.
+ */
 export function SearchPage() {
-  const { isAuthenticated } = useAuth();
+  const { isAdmin, isAuthenticated } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState(readFilters(searchParams));
   const [properties, setProperties] = useState([]);
@@ -30,6 +39,8 @@ export function SearchPage() {
   const [error, setError] = useState('');
   const [savingFavorite, setSavingFavorite] = useState('');
 
+  // Ejecuta la consulta remota tomando en cuenta el contexto de autenticacion
+  // porque algunos estados solo son visibles para administradores.
   const fetchProperties = async (activeFilters) => {
     setLoading(true);
     setError('');
@@ -41,6 +52,7 @@ export function SearchPage() {
           ...activeFilters,
           furnished: activeFilters.furnished || undefined,
           petsAllowed: activeFilters.petsAllowed || undefined,
+          utilitiesIncluded: activeFilters.utilitiesIncluded || undefined,
         },
       });
       setProperties(response.data);
@@ -52,11 +64,14 @@ export function SearchPage() {
   };
 
   useEffect(() => {
+    // La URL es la fuente de verdad del listado; por eso cualquier cambio
+    // en searchParams provoca rehidratacion del formulario y recarga de datos.
     const nextFilters = readFilters(searchParams);
     setFilters(nextFilters);
     fetchProperties(nextFilters);
   }, [searchParams.toString()]);
 
+  // Serializa el formulario actual a query params limpios.
   const applyFilters = () => {
     const nextParams = new URLSearchParams();
 
@@ -69,22 +84,26 @@ export function SearchPage() {
     setSearchParams(nextParams, { replace: true });
   };
 
+  // Restablece filtros de UI y URL al estado inicial.
   const clearFilters = () => {
     const reset = {
       city: '',
+      neighborhood: '',
       propertyType: '',
       minRent: '',
       maxRent: '',
       bedrooms: '',
-      bathrooms: '',
       furnished: false,
       petsAllowed: false,
+      utilitiesIncluded: false,
+      status: '',
       sort: 'recommended',
     };
     setFilters(reset);
     setSearchParams({}, { replace: true });
   };
 
+  // Alterna favoritos desde el listado sin salir de la pagina actual.
   const toggleFavorite = async (property) => {
     if (!isAuthenticated) {
       setError('Inicia sesion para guardar propiedades.');
@@ -118,11 +137,11 @@ export function SearchPage() {
         <div className="section__heading">
           <div>
             <span className="section__eyebrow">Busqueda</span>
-            <h1>Explora propiedades de arriendo</h1>
+            <h1>Explora viviendas de arriendo con filtros utiles</h1>
           </div>
           <div className="section__tag">
             <SlidersHorizontal size={16} />
-            Filtros utiles y directos
+            Ciudad, barrio, canon, habitaciones y estado
           </div>
         </div>
 
@@ -133,6 +152,7 @@ export function SearchPage() {
               onChange={(field, value) => setFilters((current) => ({ ...current, [field]: value }))}
               onApply={applyFilters}
               onClear={clearFilters}
+              statusOptions={isAdmin ? PROPERTY_STATUS_OPTIONS : PUBLIC_PROPERTY_STATUS_OPTIONS}
             />
           </aside>
 
@@ -141,20 +161,26 @@ export function SearchPage() {
             {loading ? (
               <LoadingState label="Buscando propiedades..." />
             ) : properties.length ? (
-              <div className="property-grid">
-                {properties.map((property) => (
-                  <PropertyCard
-                    key={property.id}
-                    property={property}
-                    onToggleFavorite={toggleFavorite}
-                    disabledFavorite={savingFavorite === property.id}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="results-toolbar">
+                  <strong>{properties.length} propiedades encontradas</strong>
+                </div>
+                <div className="property-grid">
+                  {properties.map((property) => (
+                    <PropertyCard
+                      key={property.id}
+                      property={property}
+                      onToggleFavorite={toggleFavorite}
+                      disabledFavorite={savingFavorite === property.id}
+                      showStatus
+                    />
+                  ))}
+                </div>
+              </>
             ) : (
               <EmptyState
-                title="No encontramos resultados"
-                description="Prueba con otro rango de canon, una ciudad distinta o menos restricciones."
+                title="No encontramos propiedades con esos filtros"
+                description="Prueba con otra ciudad, menos restricciones o un rango de canon mas amplio."
                 actionLabel="Limpiar filtros"
                 onAction={clearFilters}
               />

@@ -1,5 +1,6 @@
 const { execFileSync } = require('child_process');
 
+// Ejecuta una rutina de limpieza tolerante a fallos para evitar puertos ocupados por instancias previas.
 const killMatchingProcesses = (command) => {
   try {
     execFileSync('powershell', ['-NoProfile', '-Command', command], {
@@ -12,6 +13,7 @@ const killMatchingProcesses = (command) => {
   }
 };
 
+// En Windows inspecciona la linea de comandos completa para cerrar solo procesos de NIDO.
 if (process.platform === 'win32') {
   killMatchingProcesses(`
     $processes = Get-CimInstance Win32_Process | Where-Object {
@@ -29,6 +31,7 @@ if (process.platform === 'win32') {
     }
   `);
 } else {
+  // En Unix basta con matar por patron sobre el comando lanzado.
   try {
     execFileSync('pkill', ['-f', 'backend/src/server.js'], { stdio: 'ignore' });
   } catch (error) {

@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const { UserRole } = require('@prisma/client');
 
+// Esquemas de validacion para actualizacion y eliminacion de perfil.
 const updateProfileSchema = Joi.object({
   firstName: Joi.string().trim().min(2).max(40),
   lastName: Joi.string().trim().min(2).max(40),

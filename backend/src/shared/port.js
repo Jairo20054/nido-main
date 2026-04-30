@@ -1,3 +1,4 @@
+// Espera a que el servidor HTTP confirme escucha o falle antes de continuar el arranque.
 const waitForListening = (server) =>
   new Promise((resolve, reject) => {
     const onListening = () => {
@@ -24,6 +25,7 @@ const listenOnPort = async (app, port) => {
   return waitForListening(server);
 };
 
+// Intenta arrancar el servidor en puertos consecutivos hasta encontrar uno libre.
 const startServerOnAvailablePort = async (app, preferredPort, maxAttempts = 25) => {
   let lastError = null;
 

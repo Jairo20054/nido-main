@@ -1,5 +1,6 @@
 const { badRequest } = require('./errors');
 
+// Middleware generico de validacion con Joi. Limpia y convierte datos antes de llegar al controlador.
 const validate = (schema, source = 'body') => (req, _res, next) => {
   const { value, error } = schema.validate(req[source], {
     abortEarly: false,

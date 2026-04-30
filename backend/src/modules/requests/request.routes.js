@@ -5,6 +5,7 @@ const { validate } = require('../../shared/validate');
 const { createRequestSchema, reviewRequestSchema, updateRequestSchema } = require('./request.schemas');
 const controller = require('./request.controller');
 
+// Rutas privadas del ciclo de vida de solicitudes de arriendo.
 const router = express.Router();
 
 router.use(requireAuth);

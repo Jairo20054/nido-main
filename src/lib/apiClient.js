@@ -1,4 +1,4 @@
-import { TOKEN_STORAGE_KEY } from './constants';
+import { getAuthToken } from './authToken';
 
 export class ApiError extends Error {
   constructor(message, status, details) {
@@ -11,10 +11,7 @@ export class ApiError extends Error {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
-const getStoredToken = () => localStorage.getItem(TOKEN_STORAGE_KEY);
-export const setStoredToken = (token) => localStorage.setItem(TOKEN_STORAGE_KEY, token);
-export const clearStoredToken = () => localStorage.removeItem(TOKEN_STORAGE_KEY);
-
+// Construye URLs relativas al backend y elimina query params vacios para evitar ruido en la API.
 const buildUrl = (path, query) => {
   const url = new URL(`${API_BASE_URL}${path}`, window.location.origin);
 
@@ -27,9 +24,14 @@ const buildUrl = (path, query) => {
   return `${url.pathname}${url.search}`;
 };
 
+/**
+ * Utilidad de uso compartido para llamadas HTTP del frontend.
+ * Cualquier feature que necesite hablar con el backend debe pasar por aqui para reutilizar
+ * autenticacion, serializacion del body, limpieza de query params y manejo consistente de errores.
+ */
 export async function apiRequest(path, options = {}) {
   const { method = 'GET', body, query, auth = true } = options;
-  const token = auth ? getStoredToken() : null;
+  const token = auth ? getAuthToken() : null;
 
   const response = await fetch(buildUrl(path, query), {
     method,
@@ -53,6 +55,7 @@ export async function apiRequest(path, options = {}) {
   return payload;
 }
 
+// Fachada ergonomica para los verbos HTTP usados en la aplicacion.
 export const api = {
   get: (path, options) => apiRequest(path, { ...options, method: 'GET' }),
   post: (path, body, options) => apiRequest(path, { ...options, method: 'POST', body }),

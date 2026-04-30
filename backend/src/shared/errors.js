@@ -1,3 +1,4 @@
+// Errores de dominio centralizados para uniformar respuestas y codigos HTTP.
 class AppError extends Error {
   constructor(statusCode, message, details) {
     super(message);

@@ -2,22 +2,29 @@ const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
 
-dotenv.config();
+const rootDir = path.resolve(__dirname, '..', '..', '..');
+const envPath = path.join(rootDir, '.env');
+const examplePath = path.join(rootDir, '.env.example');
 
-if (process.env.NODE_ENV !== 'production' && !process.env.DATABASE_URL) {
-  const examplePath = path.resolve(process.cwd(), '.env.example');
+// Carga el entorno desde la raiz del proyecto para evitar depender del cwd
+// con el que se levante el backend o se ejecuten scripts auxiliares.
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath, override: false });
+} else {
+  dotenv.config();
+}
 
-  if (fs.existsSync(examplePath)) {
-    dotenv.config({ path: examplePath, override: false });
-  }
+if (process.env.NODE_ENV !== 'production' && !process.env.DATABASE_URL && fs.existsSync(examplePath)) {
+  dotenv.config({ path: examplePath, override: false });
 }
 
 const env = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: Number(process.env.PORT || 5000),
   CLIENT_URL: process.env.CLIENT_URL || process.env.CLIENT_ORIGIN || 'http://localhost:5173',
-  JWT_SECRET: process.env.JWT_SECRET || 'nido-local-secret-change-me',
-  JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
+  SUPABASE_URL: process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '',
+  SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || '',
+  SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
 };
 
 module.exports = { env };

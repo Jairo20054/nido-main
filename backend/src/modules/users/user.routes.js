@@ -5,6 +5,7 @@ const { validate } = require('../../shared/validate');
 const { deleteProfileSchema, updateProfileSchema } = require('./user.schemas');
 const controller = require('./user.controller');
 
+// Endpoints privados relacionados con el perfil del usuario autenticado.
 const router = express.Router();
 
 router.use(requireAuth);

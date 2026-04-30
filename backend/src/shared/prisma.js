@@ -3,6 +3,7 @@ const { PrismaClient } = require('@prisma/client');
 
 const globalForPrisma = global;
 
+// Reutiliza una unica instancia de Prisma en desarrollo para evitar exceso de conexiones.
 const prisma =
   globalForPrisma.__nidoPrisma ||
   new PrismaClient({

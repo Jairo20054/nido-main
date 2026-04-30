@@ -5,6 +5,7 @@ import App from './App';
 import './styles/theme.css';
 import './styles/app.css';
 
+// Punto de entrada del cliente: monta React, el router y las hojas de estilo globales.
 const root = createRoot(document.getElementById('root'));
 
 root.render(

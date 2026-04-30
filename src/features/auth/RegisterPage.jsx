@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { useAuth } from '../../app/providers/AuthProvider';
 
+/**
+ * Componente de uso para el registro publico.
+ * Permite crear cuentas de arrendatario o arrendador y deja la administracion
+ * fuera del flujo abierto para evitar altas accidentales de usuarios privilegiados.
+ */
 export function RegisterPage() {
   const navigate = useNavigate();
   const { register } = useAuth();
@@ -15,16 +20,30 @@ export function RegisterPage() {
     role: 'TENANT',
   });
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  const updateField = (field) => (event) =>
+    setForm((current) => ({
+      ...current,
+      [field]: event.target.value,
+    }));
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setSubmitting(true);
     setError('');
+    setMessage('');
 
     try {
-      await register(form);
-      navigate('/account', { replace: true });
+      const result = await register(form);
+
+      if (result.requiresEmailConfirmation) {
+        setMessage('Revisa tu correo para activar la cuenta y luego inicia sesión.');
+        return;
+      }
+
+      navigate(result.profile?.role === 'LANDLORD' ? '/manage' : '/account', { replace: true });
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -39,14 +58,16 @@ export function RegisterPage() {
         <h1>Crea tu cuenta</h1>
         <p>Empieza a guardar propiedades, enviar solicitudes o publicar tu inventario de arriendos.</p>
         <form className="auth-form" onSubmit={handleSubmit}>
-          <InlineMessage tone="danger">{error}</InlineMessage>
+          <InlineMessage tone={error ? 'danger' : 'success'}>{error || message}</InlineMessage>
           <div className="field-grid">
             <div className="field-group">
               <label htmlFor="firstName">Nombre</label>
               <input
                 id="firstName"
                 value={form.firstName}
-                onChange={(event) => setForm((current) => ({ ...current, firstName: event.target.value }))}
+                onChange={updateField('firstName')}
+                autoComplete="given-name"
+                required
               />
             </div>
             <div className="field-group">
@@ -54,7 +75,9 @@ export function RegisterPage() {
               <input
                 id="lastName"
                 value={form.lastName}
-                onChange={(event) => setForm((current) => ({ ...current, lastName: event.target.value }))}
+                onChange={updateField('lastName')}
+                autoComplete="family-name"
+                required
               />
             </div>
           </div>
@@ -65,7 +88,9 @@ export function RegisterPage() {
                 id="registerEmail"
                 type="email"
                 value={form.email}
-                onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
+                onChange={updateField('email')}
+                autoComplete="email"
+                required
               />
             </div>
             <div className="field-group">
@@ -73,7 +98,8 @@ export function RegisterPage() {
               <input
                 id="phone"
                 value={form.phone}
-                onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))}
+                onChange={updateField('phone')}
+                autoComplete="tel"
               />
             </div>
           </div>
@@ -84,14 +110,17 @@ export function RegisterPage() {
                 id="password"
                 type="password"
                 value={form.password}
-                onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
+                onChange={updateField('password')}
+                autoComplete="new-password"
+                minLength={8}
+                required
               />
             </div>
             <div className="field-group">
               <label htmlFor="role">Perfil</label>
-              <select id="role" value={form.role} onChange={(event) => setForm((current) => ({ ...current, role: event.target.value }))}>
+              <select id="role" value={form.role} onChange={updateField('role')}>
                 <option value="TENANT">Arrendatario</option>
-                <option value="LANDLORD">Propietario</option>
+                <option value="LANDLORD">Arrendador</option>
               </select>
             </div>
           </div>

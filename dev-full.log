@@ -1,0 +1,28 @@
+
+> nido@1.0.0 predev
+> node scripts/prestart.js
+
+Aviso: Prisma schema loaded from prisma\schema.prisma
+Datasource "db": PostgreSQL database "nido_media", schema "public" at "localhost:5433"
+
+
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Environment variables loaded from .env
+Error: Schema engine error:
+El backend continuara arrancando; revisa la conexion a PostgreSQL si necesitas persistencia real.
+
+> nido@1.0.0 dev
+> node scripts/dev.js
+
+[ok] NIDO API corriendo en http://localhost:5000
+[ok] Health check: http://localhost:5000/health
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+Port 5173 is in use, trying another one...
+
+  [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m545[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5174[22m/[39m
+[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m[32m  ➜[39m[22m[2m  press [22m[1mh + enter[22m[2m to show help[22m

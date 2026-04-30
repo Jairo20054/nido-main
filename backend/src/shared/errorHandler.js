@@ -1,6 +1,8 @@
 const { Prisma } = require('@prisma/client');
 const { AppError } = require('./errors');
 
+// Middleware final de errores. Convierte fallos de dominio y Prisma en respuestas HTTP
+// consistentes para el frontend y deja los errores desconocidos como 500.
 const errorHandler = (error, _req, res, _next) => {
   if (error instanceof AppError) {
     return res.status(error.statusCode).json({
@@ -44,7 +46,11 @@ const errorHandler = (error, _req, res, _next) => {
     });
   }
 
-  console.error(error);
+  console.error('Unexpected error:', {
+    message: error?.message || 'Unknown error',
+    stack: error?.stack || 'No stack trace',
+    details: error?.details || null,
+  });
 
   return res.status(500).json({
     success: false,

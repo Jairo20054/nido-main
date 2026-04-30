@@ -2,6 +2,7 @@ const { prisma } = require('../../shared/prisma');
 const { notFound } = require('../../shared/errors');
 const { serializeProperty } = require('../../shared/serializers');
 
+// Devuelve las propiedades guardadas por el usuario actual.
 const listFavorites = async (req, res) => {
   const favorites = await prisma.favorite.findMany({
     where: {
@@ -11,7 +12,7 @@ const listFavorites = async (req, res) => {
       property: {
         include: {
           owner: true,
-          images: true,
+          media: true,
           favorites: {
             where: {
               userId: req.user.id,
@@ -34,6 +35,7 @@ const listFavorites = async (req, res) => {
   });
 };
 
+// Guarda una propiedad como favorita idempotentemente usando upsert.
 const addFavorite = async (req, res) => {
   const property = await prisma.property.findUnique({
     where: { id: req.params.propertyId },
@@ -63,6 +65,7 @@ const addFavorite = async (req, res) => {
   });
 };
 
+// Elimina la relacion de favorito sin fallar si ya no existia.
 const removeFavorite = async (req, res) => {
   await prisma.favorite.deleteMany({
     where: {

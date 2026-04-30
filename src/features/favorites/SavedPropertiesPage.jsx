@@ -5,11 +5,17 @@ import { LoadingState } from '../../components/ui/LoadingState';
 import { api } from '../../lib/apiClient';
 import { PropertyCard } from '../properties/PropertyCard';
 
+/**
+ * Componente de uso para la pagina de favoritos.
+ * Muestra el subconjunto de propiedades guardadas por el usuario autenticado
+ * y permite quitarlas sin salir de la vista.
+ */
 export function SavedPropertiesPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Obtiene la coleccion actual de favoritos del backend.
   const loadFavorites = async () => {
     setLoading(true);
     setError('');
@@ -28,6 +34,7 @@ export function SavedPropertiesPage() {
     loadFavorites();
   }, []);
 
+  // Elimina el guardado y actualiza la grilla local sin refetch completo.
   const handleRemove = async (property) => {
     try {
       await api.delete(`/favorites/${property.id}`);

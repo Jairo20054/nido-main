@@ -3,11 +3,13 @@ const { prisma } = require('../../shared/prisma');
 const { badRequest, forbidden, notFound } = require('../../shared/errors');
 const { serializeRentalRequest } = require('../../shared/serializers');
 
+// Include reutilizable para leer solicitudes con toda la informacion necesaria
+// para panel de arrendador y vista de arrendatario.
 const requestInclude = (currentUserId) => ({
   property: {
     include: {
       owner: true,
-      images: true,
+      media: true,
       ...(currentUserId
         ? {
             favorites: {
@@ -28,6 +30,7 @@ const requestInclude = (currentUserId) => ({
   landlord: true,
 });
 
+// Recupera una solicitud o corta el flujo con 404 de dominio.
 const getRequestOrThrow = async (id, currentUserId) => {
   const request = await prisma.rentalRequest.findUnique({
     where: { id },
@@ -41,6 +44,7 @@ const getRequestOrThrow = async (id, currentUserId) => {
   return request;
 };
 
+// Crea una solicitud validando disponibilidad de la propiedad y evitando duplicados activos.
 const createRequest = async (req, res) => {
   const property = await prisma.property.findUnique({
     where: { id: req.body.propertyId },
@@ -91,6 +95,7 @@ const createRequest = async (req, res) => {
   });
 };
 
+// Solicitudes emitidas por el usuario autenticado en rol de arrendatario.
 const getMyRequests = async (req, res) => {
   const requests = await prisma.rentalRequest.findMany({
     where: {
@@ -106,6 +111,7 @@ const getMyRequests = async (req, res) => {
   });
 };
 
+// Solicitudes recibidas por el propietario de las viviendas.
 const getReceivedRequests = async (req, res) => {
   const requests = await prisma.rentalRequest.findMany({
     where: {
@@ -121,6 +127,7 @@ const getReceivedRequests = async (req, res) => {
   });
 };
 
+// Permite consultar una solicitud solo a las partes involucradas.
 const getRequestById = async (req, res) => {
   const request = await getRequestOrThrow(req.params.id, req.user.id);
 
@@ -134,6 +141,7 @@ const getRequestById = async (req, res) => {
   });
 };
 
+// El arrendatario solo puede editar solicitudes pendientes.
 const updateRequest = async (req, res) => {
   const request = await getRequestOrThrow(req.params.id, req.user.id);
 
@@ -158,6 +166,7 @@ const updateRequest = async (req, res) => {
   });
 };
 
+// Revision simple por parte del arrendador: aprobar o rechazar.
 const reviewRequest = async (req, res) => {
   const request = await getRequestOrThrow(req.params.id, req.user.id);
 
@@ -178,6 +187,7 @@ const reviewRequest = async (req, res) => {
   });
 };
 
+// Permite retirar solicitudes propias salvo las ya aprobadas.
 const deleteRequest = async (req, res) => {
   const request = await prisma.rentalRequest.findUnique({
     where: { id: req.params.id },

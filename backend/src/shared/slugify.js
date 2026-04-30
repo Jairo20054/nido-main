@@ -1,3 +1,4 @@
+// Genera slugs ASCII amigables para URLs publicas.
 const slugify = (value) =>
   value
     .normalize('NFD')

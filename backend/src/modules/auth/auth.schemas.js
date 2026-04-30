@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const { UserRole } = require('@prisma/client');
 
+// Validaciones de entrada para autenticacion publica.
 const registerSchema = Joi.object({
   firstName: Joi.string().trim().min(2).max(40).required(),
   lastName: Joi.string().trim().min(2).max(40).required(),
@@ -17,7 +18,12 @@ const loginSchema = Joi.object({
   password: Joi.string().required(),
 });
 
+const forgotPasswordSchema = Joi.object({
+  email: Joi.string().trim().lowercase().email({ tlds: { allow: false } }).required(),
+});
+
 module.exports = {
+  forgotPasswordSchema,
   loginSchema,
   registerSchema,
 };

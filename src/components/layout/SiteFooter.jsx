@@ -1,17 +1,16 @@
 import React from 'react';
 
+// Pie de pagina minimalista con contexto de marca y cobertura geografica.
 export function SiteFooter() {
   return (
     <footer className="site-footer">
       <div className="site-footer__inner">
-        <div>
-          <strong>NIDO</strong>
-          <p>Una plataforma sobria para descubrir, guardar y gestionar arriendos con claridad.</p>
-        </div>
-        <div className="site-footer__meta">
-          <span>Busqueda clara</span>
-          <span>Solicitudes trazables</span>
-          <span>Gestion sin ruido</span>
+        <p>© 2026 Nido · Arriendo residencial</p>
+        <div className="site-footer__cities">
+          <span>Bogotá</span>
+          <span>Medellín</span>
+          <span>Cali</span>
+          <span>Barranquilla</span>
         </div>
       </div>
     </footer>

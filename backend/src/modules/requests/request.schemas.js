@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const { RequestStatus } = require('@prisma/client');
 
+// Validaciones de entrada para crear, editar y revisar solicitudes de arriendo.
 const createRequestSchema = Joi.object({
   propertyId: Joi.string().required(),
   desiredMoveIn: Joi.date().iso().required(),

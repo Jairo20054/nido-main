@@ -7,6 +7,11 @@ import { useAuth } from '../../app/providers/AuthProvider';
 import { api } from '../../lib/apiClient';
 import { formatCurrency, formatDate } from '../../lib/formatters';
 
+/**
+ * Componente de uso para la pagina "Mi cuenta".
+ * Reune en una sola vista la edicion del perfil autenticado y el historial
+ * de solicitudes que el usuario ha enviado a propiedades publicadas.
+ */
 export function AccountPage() {
   const { user, updateProfile } = useAuth();
   const [profileForm, setProfileForm] = useState({
@@ -22,6 +27,8 @@ export function AccountPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    // El formulario se inicializa desde el usuario autenticado para evitar
+    // duplicar llamadas al backend cuando ya tenemos el perfil en memoria.
     if (user) {
       setProfileForm({
         firstName: user.firstName || '',
@@ -34,6 +41,7 @@ export function AccountPage() {
   }, [user]);
 
   useEffect(() => {
+    // Carga las solicitudes propias una sola vez al entrar a la cuenta.
     api
       .get('/requests/mine')
       .then((response) => setRequests(response.data))
@@ -41,6 +49,7 @@ export function AccountPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Persiste los cambios del perfil usando el helper centralizado del contexto.
   const handleSave = async (event) => {
     event.preventDefault();
     setSaving(true);

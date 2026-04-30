@@ -3,6 +3,7 @@ const { asyncHandler } = require('../../shared/asyncHandler');
 const { requireAuth } = require('../../shared/auth');
 const controller = require('./favorite.controller');
 
+// Rutas privadas de gestion de favoritos.
 const router = express.Router();
 
 router.use(requireAuth);
