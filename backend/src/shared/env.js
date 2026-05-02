@@ -23,8 +23,17 @@ const env = {
   PORT: Number(process.env.PORT || 5000),
   CLIENT_URL: process.env.CLIENT_URL || process.env.CLIENT_ORIGIN || 'http://localhost:5173',
   SUPABASE_URL: process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '',
-  SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || '',
-  SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
+  SUPABASE_ANON_KEY:
+    process.env.SUPABASE_PUBLISHABLE_KEY ||
+    process.env.SUPABASE_ANON_KEY ||
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.VITE_SUPABASE_ANON_KEY ||
+    '',
+  SUPABASE_SERVICE_ROLE_KEY:
+    process.env.SUPABASE_SECRET_KEY ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.SUPABASE_SERVICE_KEY ||
+    '',
 };
 
 module.exports = { env };

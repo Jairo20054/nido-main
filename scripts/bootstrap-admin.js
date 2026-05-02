@@ -23,7 +23,11 @@ if (
 }
 
 const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const serviceRoleKey =
+  process.env.SUPABASE_SECRET_KEY ||
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.SUPABASE_SERVICE_KEY ||
+  '';
 const adminAlias = (
   process.env.SUPER_ADMIN_LOGIN_ALIAS ||
   process.env.ADMIN_LOGIN_ALIAS ||
@@ -46,7 +50,7 @@ const hasPlaceholderKey = /your-(anon|service-role)-key/i.test(serviceRoleKey);
 
 if (!supabaseUrl || !serviceRoleKey || hasPlaceholderUrl || hasPlaceholderKey) {
   throw new Error(
-    'Faltan credenciales reales de Supabase. Define SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY validos en .env antes de crear el admin.'
+    'Faltan credenciales reales de Supabase. Define SUPABASE_URL y SUPABASE_SECRET_KEY/SUPABASE_SERVICE_ROLE_KEY validos en .env antes de crear el admin.'
   );
 }
 
