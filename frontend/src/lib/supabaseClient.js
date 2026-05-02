@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseAnonKey =
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY;
 const adminLoginAlias = (import.meta.env.VITE_ADMIN_LOGIN_ALIAS || 'admin').trim().toLowerCase();
 const adminLoginEmail = (import.meta.env.VITE_ADMIN_LOGIN_EMAIL || 'castillojairo2001@gmail.com')
   .trim()
@@ -9,6 +10,10 @@ const adminLoginEmail = (import.meta.env.VITE_ADMIN_LOGIN_EMAIL || 'castillojair
 
 const missingSupabaseConfigMessage =
   'La autenticacion no esta configurada. Define VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY.';
+const hasPlaceholderConfig =
+  /your-project\.supabase\.co/i.test(String(supabaseUrl || '')) ||
+  /^your-(anon|publishable|secret|service)/i.test(String(supabaseAnonKey || '').trim());
+const hasSupabaseConfig = Boolean(supabaseUrl && supabaseAnonKey && !hasPlaceholderConfig);
 
 // Punto unico de integracion del cliente web con Supabase Auth.
 // Cliente de respaldo para no romper la aplicacion en entornos donde faltan variables
@@ -33,7 +38,7 @@ const createMissingConfigClient = () => {
 
 // Cliente principal usado por el flujo de autenticacion del frontend.
 export const supabase =
-  supabaseUrl && supabaseAnonKey
+  hasSupabaseConfig
     ? createClient(supabaseUrl, supabaseAnonKey, {
         auth: {
           autoRefreshToken: true,

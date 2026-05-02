@@ -9,6 +9,16 @@ const createSupabaseClient = (key, authOptions = {}) => {
     return null;
   }
 
+  try {
+    const parsedUrl = new URL(env.SUPABASE_URL);
+
+    if (!parsedUrl.hostname.endsWith('.supabase.co')) {
+      return null;
+    }
+  } catch (_error) {
+    return null;
+  }
+
   return createClient(env.SUPABASE_URL, key, {
     auth: {
       autoRefreshToken: false,

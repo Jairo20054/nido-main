@@ -1,9 +1,16 @@
 const { spawn } = require('child_process');
+const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
+const dotenv = require('dotenv');
 
 const rootDir = path.resolve(__dirname, '..');
 const viteCliPath = path.join(rootDir, 'node_modules', 'vite', 'bin', 'vite.js');
+const envPath = path.join(rootDir, '.env');
+
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath, override: process.env.NODE_ENV !== 'production' });
+}
 
 let backendProcess = null;
 let clientProcess = null;

@@ -10,10 +10,13 @@ const lastName = process.argv[5] || 'QA';
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
+const supabaseServiceKey =
+  process.env.SUPABASE_SECRET_KEY ||
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.SUPABASE_SERVICE_KEY;
 
 if (!supabaseUrl || !supabaseServiceKey) {
-  console.error('Faltan SUPABASE_URL o SUPABASE_SERVICE_KEY en el entorno.');
+  console.error('Faltan SUPABASE_URL o SUPABASE_SECRET_KEY/SUPABASE_SERVICE_ROLE_KEY en el entorno.');
   console.error('Configura estas variables en el archivo .env de la raiz del proyecto.');
   process.exit(1);
 }

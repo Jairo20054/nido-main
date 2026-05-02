@@ -6,6 +6,7 @@ const userRoutes = require('./modules/users/user.routes');
 const favoriteRoutes = require('./modules/favorites/favorite.routes');
 const applicationRoutes = require('./modules/applications/application.routes');
 const requestRoutes = require('./modules/requests/request.routes');
+const deepsekRoutes = require('./modules/deepsek/deepsek.routes');
 
 // Router raiz que compone los modulos funcionales del backend.
 const router = express.Router();
@@ -17,5 +18,6 @@ router.use('/applications', applicationRoutes);
 router.use('/requests', requestRoutes);
 router.use('/users', userRoutes);
 router.use('/favorites', favoriteRoutes);
+router.use('/deepsek', deepsekRoutes);
 
 module.exports = router;
