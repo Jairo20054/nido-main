@@ -15,6 +15,8 @@ const DEFAULT_FILTERS = {
 const EXTRA_KEYS = ['furnished', 'petsAllowed', 'parking', 'security', 'gatedCommunity'];
 
 const parseNumber = (value, fallback) => {
+  if (value === null || value === undefined || value === '') return fallback;
+
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
 };

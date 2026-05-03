@@ -3,7 +3,12 @@ import { Bath, BedDouble, Heart, MapPin, Ruler } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { formatCurrency, getPropertyTypeLabel } from '../../lib/formatters';
 
-export function PropertyCard({ property, onToggleFavorite, disabledFavorite = false }) {
+export function PropertyCard({
+  property,
+  onToggleFavorite,
+  disabledFavorite = false,
+  variant = 'default',
+}) {
   const [isFavorite, setIsFavorite] = useState(property.isFavorite || false);
 
   useEffect(() => {
@@ -32,7 +37,7 @@ export function PropertyCard({ property, onToggleFavorite, disabledFavorite = fa
   const typeLabel = getPropertyTypeLabel(property.propertyType);
 
   return (
-    <Link to={`/properties/${property.id}`} className="property-card">
+    <Link to={`/properties/${property.id}`} className={`property-card property-card--${variant}`}>
       <div className="property-card__media">
         <img src={property.coverImage} alt={property.title} className="property-card__image" />
 
