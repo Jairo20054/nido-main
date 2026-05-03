@@ -1,5 +1,8 @@
 node_modules/
 dist/
+nido-main/
+.continue/
+skills/
 .venv/
 gh/
 gh.zip
