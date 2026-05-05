@@ -1,25 +1,10 @@
-const { badRequest, unauthorized, forbidden } = require('./errors');
+const { prisma } = require('./prisma');
+const { badRequest, forbidden, unauthorized } = require('./errors');
 const { supabaseAnon, supabaseService } = require('./supabase');
 
-// Capa transversal de autenticacion/autorizacion. Resuelve sesiones de Supabase,
-// materializa perfiles de negocio y expone middlewares de control de acceso.
+// Capa transversal de autenticacion/autorizacion. Supabase valida la identidad
+// y Prisma conserva el perfil operativo que usa el resto del dominio.
 const ALLOWED_SELF_ASSIGNED_ROLES = ['TENANT', 'LANDLORD'];
-const PROFILE_SELECT = [
-  'id',
-  'auth_id',
-  'email',
-  'first_name',
-  'last_name',
-  'phone',
-  'bio',
-  'avatar_url',
-  'role',
-  'created_at',
-  'updated_at',
-  'country_code',
-  'locale',
-  'timezone',
-].join(', ');
 const ADMIN_SELECT = ['auth_user_id', 'profile_id'].join(', ');
 
 // Extrae el bearer token desde el header Authorization si existe.
@@ -46,6 +31,8 @@ const safeRole = (role, fallback = 'TENANT') => {
 const getAuthRole = (authUser, fallback = 'TENANT') =>
   safeRole(authUser?.app_metadata?.role || authUser?.user_metadata?.role, fallback);
 
+const isAuthAdmin = (authUser) => getAuthRole(authUser, 'TENANT') === 'ADMIN';
+
 // Deriva nombre y apellido cuando la metadata de autenticacion llega incompleta.
 const deriveNameParts = (user) => {
   const metadata = user.user_metadata || {};
@@ -61,10 +48,9 @@ const deriveNameParts = (user) => {
   };
 };
 
-// Traduce el usuario de Supabase Auth al formato esperado por la tabla de perfiles.
+// Traduce el usuario autenticado al shape esperado por Prisma.
 const profilePayloadFromAuthUser = (authUser) => {
   const metadata = authUser.user_metadata || {};
-  const appMetadata = authUser.app_metadata || {};
   const { firstName, lastName } = deriveNameParts(authUser);
   const selfAssignedRole = getAuthRole(authUser, 'TENANT');
 
@@ -79,50 +65,82 @@ const profilePayloadFromAuthUser = (authUser) => {
     countryCode: metadata.country_code || metadata.countryCode || null,
     locale: metadata.locale || null,
     timezone: metadata.timezone || null,
-    isPlatformAdmin: safeRole(appMetadata.role, 'TENANT') === 'ADMIN',
   };
 };
 
-const buildFallbackProfile = (authUser) => {
-  const payload = profilePayloadFromAuthUser(authUser);
-  const isPlatformAdmin = safeRole(authUser?.app_metadata?.role, 'TENANT') === 'ADMIN';
-
-  return normalizeProfileRow({
-    id: authUser.id,
-    auth_id: authUser.id,
-    email: authUser.email || payload.email,
-    first_name: payload.firstName,
-    last_name: payload.lastName,
-    phone: payload.phone,
-    bio: payload.bio,
-    avatar_url: payload.avatarUrl,
-    role: isPlatformAdmin ? 'ADMIN' : payload.role,
-    country_code: payload.countryCode,
-    locale: payload.locale,
-    timezone: payload.timezone,
-    isPlatformAdmin,
-  });
-};
-
-// Operaciones auxiliares sobre perfiles y grants administrativos.
-const fetchProfile = async (authUserId) => {
-  if (!supabaseService) {
+// Crea la fila Prisma del usuario si aun no existe y completa datos basicos
+// sin sobrescribir cambios editados desde la app.
+const ensureProfile = async (authUser) => {
+  if (!authUser) {
     return null;
   }
 
-  const { data, error } = await supabaseService
-    .from('profiles')
-    .select(PROFILE_SELECT)
-    .or(`id.eq.${authUserId},auth_id.eq.${authUserId}`)
-    .maybeSingle();
+  const authPayload = profilePayloadFromAuthUser(authUser);
+  const existingProfile = await prisma.user.findUnique({
+    where: {
+      id: authUser.id,
+    },
+  });
 
-  if (error) {
-    throw badRequest(error.message);
+  if (!existingProfile) {
+    return prisma.user.create({
+      data: {
+        id: authUser.id,
+        email: authUser.email || authPayload.email,
+        firstName: authPayload.firstName,
+        lastName: authPayload.lastName,
+        phone: authPayload.phone,
+        bio: authPayload.bio,
+        avatarUrl: authPayload.avatarUrl,
+        role: isAuthAdmin(authUser) ? 'ADMIN' : authPayload.role,
+      },
+    });
   }
 
-  return data || null;
+  const patch = {};
+
+  if (authUser.email && authUser.email !== existingProfile.email) {
+    patch.email = authUser.email;
+  }
+
+  if (!existingProfile.firstName && authPayload.firstName) {
+    patch.firstName = authPayload.firstName;
+  }
+
+  if (!existingProfile.lastName && authPayload.lastName) {
+    patch.lastName = authPayload.lastName;
+  }
+
+  if (!existingProfile.phone && authPayload.phone) {
+    patch.phone = authPayload.phone;
+  }
+
+  if (!existingProfile.bio && authPayload.bio) {
+    patch.bio = authPayload.bio;
+  }
+
+  if (!existingProfile.avatarUrl && authPayload.avatarUrl) {
+    patch.avatarUrl = authPayload.avatarUrl;
+  }
+
+  if (existingProfile.role !== 'ADMIN' && isAuthAdmin(authUser)) {
+    patch.role = 'ADMIN';
+  }
+
+  if (!Object.keys(patch).length) {
+    return existingProfile;
+  }
+
+  return prisma.user.update({
+    where: {
+      id: authUser.id,
+    },
+    data: patch,
+  });
 };
 
+// Lee el grant administrativo desde Supabase sin bloquear el login si la
+// tabla aun no existe en el proyecto conectado.
 const fetchPlatformAdmin = async (authUserId) => {
   if (!supabaseService) {
     return null;
@@ -135,113 +153,21 @@ const fetchPlatformAdmin = async (authUserId) => {
     .maybeSingle();
 
   if (error) {
-    throw badRequest(error.message);
+    return null;
   }
 
   return data || null;
 };
 
-const normalizeProfileRow = (row) => {
-  if (!row) {
-    return null;
-  }
-
-  return {
-    id: row.id,
-    auth_id: row.auth_id || row.id,
-    email: row.email || null,
-    firstName: row.first_name || '',
-    lastName: row.last_name || '',
-    phone: row.phone || null,
-    bio: row.bio || null,
-    avatarUrl: row.avatar_url || null,
-    role: safeRole(row.role, 'TENANT'),
-    createdAt: row.created_at || null,
-    updatedAt: row.updated_at || null,
-    countryCode: row.country_code || null,
-    locale: row.locale || null,
-    timezone: row.timezone || null,
-  };
-};
-
-// Inserta o actualiza el perfil persistido a partir del usuario autenticado.
-const upsertProfile = async (authUser, existingProfile = null) => {
-  const payload = profilePayloadFromAuthUser(authUser);
-  const baseData = {
-    id: authUser.id,
-    auth_id: authUser.id,
-    email: authUser.email || payload.email,
-    first_name: payload.firstName,
-    last_name: payload.lastName,
-    phone: payload.phone,
-    bio: payload.bio,
-    avatar_url: payload.avatarUrl,
-    role: payload.role,
-    country_code: payload.countryCode,
-    locale: payload.locale,
-    timezone: payload.timezone,
-  };
-
-  if (!supabaseService) {
-    return null;
-  }
-
-  if (existingProfile) {
-    const { data, error } = await supabaseService
-      .from('profiles')
-      .update(baseData)
-      .or(`id.eq.${authUser.id},auth_id.eq.${authUser.id}`)
-      .select(PROFILE_SELECT)
-      .maybeSingle();
-
-    if (error) {
-      throw badRequest(error.message);
-    }
-
-    return normalizeProfileRow(data);
-  }
-
-  const { data, error } = await supabaseService
-    .from('profiles')
-    .insert(baseData)
-    .select(PROFILE_SELECT)
-    .maybeSingle();
-
-  if (error) {
-    throw badRequest(error.message);
-  }
-
-  return normalizeProfileRow(data);
-};
-
-// Garantiza que todo usuario autenticado tenga un perfil de negocio asociado.
-const ensureProfile = async (authUser) => {
-  if (!authUser) {
-    return null;
-  }
-
-  const existingProfile = await fetchProfile(authUser.id);
-
-  if (existingProfile) {
-    return normalizeProfileRow(existingProfile);
-  }
-
-  if (supabaseService) {
-    return upsertProfile(authUser);
-  }
-
-  return buildFallbackProfile(authUser);
-};
-
 // Enriquece el perfil con permisos administrativos otorgados por plataforma.
 const decorateProfile = async (authUser, profile) => {
   const isAdminGrant = await fetchPlatformAdmin(authUser.id);
-  const isAuthAdmin = safeRole(authUser?.app_metadata?.role, profile?.role) === 'ADMIN';
+  const hasAdminPrivileges = Boolean(isAdminGrant) || isAuthAdmin(authUser);
 
   return {
     ...profile,
-    role: isAdminGrant || isAuthAdmin ? 'ADMIN' : profile.role,
-    isPlatformAdmin: Boolean(isAdminGrant) || isAuthAdmin,
+    role: hasAdminPrivileges ? 'ADMIN' : safeRole(profile?.role, 'TENANT'),
+    isPlatformAdmin: hasAdminPrivileges,
   };
 };
 

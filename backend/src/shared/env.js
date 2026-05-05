@@ -44,6 +44,10 @@ const env = {
     clean(process.env.SUPABASE_SERVICE_ROLE_KEY) ||
     clean(process.env.SUPABASE_SERVICE_KEY) ||
     '',
+  SUPABASE_PROPERTY_MEDIA_BUCKET:
+    process.env.SUPABASE_PROPERTY_MEDIA_BUCKET ||
+    process.env.VITE_SUPABASE_PROPERTY_MEDIA_BUCKET ||
+    'property-media-public',
   DEEPSEK_API_KEY: process.env.DEEPSEK_API_KEY || process.env.VITE_DEEPSEK_API_KEY || '',
 };
 

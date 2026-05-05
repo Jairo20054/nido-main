@@ -7,6 +7,7 @@ import {
   RENTAL_TYPE_OPTIONS,
 } from '../../lib/constants';
 import { PropertyMediaManager } from './PropertyMediaManager';
+import { normalizeExistingMediaItem, sanitizeMediaForSubmission } from './propertyMediaService';
 
 // Pasos del wizard para dividir la captura de una propiedad en bloques manejables.
 const STEPS = [
@@ -99,9 +100,22 @@ const toFormState = (property) => {
     specialConditions: property.specialConditions || '',
     contactMethod: property.contactMethod || '',
     verificationDetails: property.verificationDetails || '',
-    media: property.media || [],
+    media: (property.media || []).map(normalizeExistingMediaItem),
   };
 };
+
+const serializeDraftForm = (form) =>
+  JSON.stringify({
+    ...form,
+    media: form.media
+      .filter((item) => item.uploadStatus !== 'uploading' && item.uploadStatus !== 'error')
+      .map((item, index) => ({
+        ...item,
+        position: index,
+        uploadStatus: 'uploaded',
+        isPersisted: true,
+      })),
+  });
 
 // Normaliza el campo libre de amenidades hacia una lista apta para la API.
 const parseAmenities = (value) =>
@@ -119,6 +133,14 @@ const validateForAction = (form, action) => {
   if (!form.monthlyRent) return 'El canon mensual es obligatorio';
   if (!form.description.trim() || form.description.trim().length < 80) {
     return 'La descripcion debe explicar bien la vivienda';
+  }
+
+  if (form.media.some((item) => item.uploadStatus === 'uploading')) {
+    return 'Espera a que terminen de subirse las imagenes antes de guardar.';
+  }
+
+  if (form.media.some((item) => item.uploadStatus === 'error')) {
+    return 'Corrige o elimina los archivos con error antes de continuar.';
   }
 
   const imageCount = form.media.filter((item) => item.type === 'IMAGE').length;
@@ -151,6 +173,7 @@ const normalizePayload = (form, targetStatus) => ({
   minLeaseMonths: Number(form.minLeaseMonths),
   availableFrom: form.availableImmediately ? null : form.availableFrom,
   amenities: parseAmenities(form.amenities),
+  media: sanitizeMediaForSubmission(form.media),
 });
 
 /**
@@ -176,7 +199,12 @@ export function PropertyForm({ property, submitting, onCancel, onSubmit, canPubl
     const stored = localStorage.getItem(PROPERTY_DRAFT_STORAGE_KEY);
     if (stored) {
       try {
-        setForm({ ...emptyForm, ...JSON.parse(stored) });
+        const parsed = JSON.parse(stored);
+        setForm({
+          ...emptyForm,
+          ...parsed,
+          media: (parsed.media || []).map(normalizeExistingMediaItem),
+        });
       } catch (_error) {
         setForm(emptyForm);
       }
@@ -191,7 +219,7 @@ export function PropertyForm({ property, submitting, onCancel, onSubmit, canPubl
     }
 
     // El guardado local es oportunista: no bloquea la UI y solo aplica a nuevas publicaciones.
-    localStorage.setItem(PROPERTY_DRAFT_STORAGE_KEY, JSON.stringify(form));
+    localStorage.setItem(PROPERTY_DRAFT_STORAGE_KEY, serializeDraftForm(form));
     setSavedDraftMessage('Borrador local guardado automaticamente');
   }, [form, property]);
 
@@ -213,6 +241,7 @@ export function PropertyForm({ property, submitting, onCancel, onSubmit, canPubl
   );
 
   const setField = (field, value) => setForm((current) => ({ ...current, [field]: value }));
+  const hasPendingUploads = form.media.some((item) => item.uploadStatus === 'uploading');
 
   // Centraliza la salida del wizard para que todas las acciones pasen por la misma validacion.
   const handleSubmit = async (targetStatus) => {
@@ -223,15 +252,19 @@ export function PropertyForm({ property, submitting, onCancel, onSubmit, canPubl
       return;
     }
 
-    setError('');
-    await onSubmit(normalizePayload(form, targetStatus));
+    try {
+      setError('');
+      await onSubmit(normalizePayload(form, targetStatus));
 
-    if (!property && targetStatus === 'DRAFT') {
-      localStorage.setItem(PROPERTY_DRAFT_STORAGE_KEY, JSON.stringify(form));
-    }
+      if (!property && targetStatus === 'DRAFT') {
+        localStorage.setItem(PROPERTY_DRAFT_STORAGE_KEY, serializeDraftForm(form));
+      }
 
-    if (!property && targetStatus !== 'DRAFT') {
-      localStorage.removeItem(PROPERTY_DRAFT_STORAGE_KEY);
+      if (!property && targetStatus !== 'DRAFT') {
+        localStorage.removeItem(PROPERTY_DRAFT_STORAGE_KEY);
+      }
+    } catch (requestError) {
+      setError(requestError.message || 'No fue posible guardar la propiedad.');
     }
   };
 
@@ -489,11 +522,11 @@ export function PropertyForm({ property, submitting, onCancel, onSubmit, canPubl
           </div>
 
           <div className="form-card__actions-right">
-            <button className="button button--secondary" type="button" disabled={submitting} onClick={() => handleSubmit('DRAFT')}>
-              Guardar borrador
+            <button className="button button--secondary" type="button" disabled={submitting || hasPendingUploads} onClick={() => handleSubmit('DRAFT')}>
+              {hasPendingUploads ? 'Subiendo archivos...' : 'Guardar borrador'}
             </button>
-            <button className="button" type="button" disabled={submitting} onClick={() => handleSubmit(canPublishDirectly ? 'PUBLISHED' : 'PENDING')}>
-              {submitting ? 'Guardando...' : canPublishDirectly ? 'Publicar ahora' : 'Enviar a revision'}
+            <button className="button" type="button" disabled={submitting || hasPendingUploads} onClick={() => handleSubmit(canPublishDirectly ? 'PUBLISHED' : 'PENDING')}>
+              {submitting ? 'Guardando...' : hasPendingUploads ? 'Subiendo archivos...' : canPublishDirectly ? 'Publicar ahora' : 'Enviar a revision'}
             </button>
             {onCancel ? (
               <button className="button button--ghost-danger" type="button" onClick={onCancel}>

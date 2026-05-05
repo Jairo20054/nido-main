@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560" role="img" aria-labelledby="title desc">
+  <title id="title">Habitacion privada</title>
+  <desc id="desc">Ilustracion de habitacion con cama, ventana y escritorio.</desc>
+  <rect width="800" height="560" fill="#f5efe6" />
+  <rect x="0" y="420" width="800" height="140" fill="#d7ccb9" />
+  <rect x="90" y="120" width="620" height="300" rx="28" fill="#fffaf2" />
+  <rect x="132" y="160" width="168" height="118" rx="18" fill="#b8dff1" />
+  <rect x="136" y="286" width="160" height="22" rx="11" fill="#d79f71" />
+  <rect x="360" y="238" width="272" height="102" rx="24" fill="#d9c0a6" />
+  <rect x="388" y="208" width="146" height="40" rx="18" fill="#c48d65" />
+  <rect x="566" y="220" width="54" height="118" rx="14" fill="#a56e4c" />
+  <rect x="392" y="346" width="218" height="16" rx="8" fill="#b88458" />
+  <circle cx="650" cy="104" r="34" fill="#ffd282" />
+</svg>

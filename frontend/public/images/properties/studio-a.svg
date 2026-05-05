@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560" role="img" aria-labelledby="title desc">
+  <title id="title">Studio funcional</title>
+  <desc id="desc">Ilustracion de studio compacto con ventana, sofa y cocina abierta.</desc>
+  <rect width="800" height="560" fill="#eef5ea" />
+  <rect x="0" y="404" width="800" height="156" fill="#dcd0bd" />
+  <rect x="114" y="120" width="572" height="284" rx="30" fill="#fff8ef" />
+  <rect x="156" y="154" width="178" height="148" rx="18" fill="#bedcf4" />
+  <rect x="404" y="184" width="210" height="66" rx="22" fill="#d2b193" />
+  <rect x="396" y="252" width="230" height="92" rx="26" fill="#bcd8cf" />
+  <rect x="430" y="344" width="162" height="16" rx="8" fill="#b27c54" />
+  <rect x="204" y="308" width="84" height="22" rx="11" fill="#d99669" />
+  <path d="M132 430h536c20 0 36 16 36 36v14H96v-14c0-20 16-36 36-36z" fill="#345445" />
+  <circle cx="644" cy="98" r="38" fill="#ffd173" />
+</svg>

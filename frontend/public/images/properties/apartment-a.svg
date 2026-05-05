@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560" role="img" aria-labelledby="title desc">
+  <title id="title">Apartamento urbano</title>
+  <desc id="desc">Ilustracion de un apartamento luminoso con balcon y ciudad al fondo.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#dff3f4" />
+      <stop offset="100%" stop-color="#f7ede2" />
+    </linearGradient>
+    <linearGradient id="building" x1="0" x2="1">
+      <stop offset="0%" stop-color="#f6f1e9" />
+      <stop offset="100%" stop-color="#dfd2c0" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="560" fill="url(#sky)" />
+  <circle cx="640" cy="96" r="46" fill="#ffd27d" />
+  <rect x="0" y="372" width="800" height="188" fill="#d7e9cf" />
+  <rect x="148" y="120" width="504" height="280" rx="26" fill="url(#building)" />
+  <rect x="188" y="156" width="428" height="172" rx="18" fill="#ffffff" opacity="0.88" />
+  <rect x="220" y="190" width="88" height="106" rx="12" fill="#9ed2d1" />
+  <rect x="332" y="190" width="88" height="106" rx="12" fill="#b5d9f4" />
+  <rect x="444" y="190" width="88" height="106" rx="12" fill="#9ed2d1" />
+  <rect x="556" y="190" width="28" height="138" rx="10" fill="#3f5f4b" />
+  <rect x="230" y="334" width="344" height="18" rx="9" fill="#b5865b" />
+  <rect x="208" y="352" width="388" height="22" rx="11" fill="#cc9a6d" />
+  <path d="M258 372c24-38 52-38 76 0" stroke="#3f7d5a" stroke-width="10" fill="none" stroke-linecap="round" />
+  <path d="M398 372c24-38 52-38 76 0" stroke="#3f7d5a" stroke-width="10" fill="none" stroke-linecap="round" />
+  <path d="M182 408h436c18 0 32 14 32 32v16H150v-16c0-18 14-32 32-32z" fill="#254336" opacity="0.88" />
+</svg>

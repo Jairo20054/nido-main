@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560" role="img" aria-labelledby="title desc">
+  <title id="title">Apartamento familiar</title>
+  <desc id="desc">Ilustracion de fachada residencial con balcon y jardin.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#e8f5e9" />
+      <stop offset="100%" stop-color="#fde6cf" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="560" fill="url(#bg)" />
+  <rect x="0" y="390" width="800" height="170" fill="#d7e8c2" />
+  <rect x="110" y="160" width="580" height="240" rx="30" fill="#f3ede3" />
+  <rect x="152" y="198" width="496" height="162" rx="22" fill="#ffffff" />
+  <rect x="188" y="228" width="92" height="92" rx="14" fill="#afdbdf" />
+  <rect x="304" y="228" width="92" height="92" rx="14" fill="#d3e5f6" />
+  <rect x="420" y="228" width="92" height="92" rx="14" fill="#afdbdf" />
+  <rect x="536" y="228" width="78" height="132" rx="14" fill="#315747" />
+  <rect x="248" y="360" width="304" height="18" rx="9" fill="#d69b6a" />
+  <rect x="220" y="378" width="360" height="22" rx="11" fill="#b77948" />
+  <path d="M170 430h460c28 0 52 18 60 44H110c8-26 32-44 60-44z" fill="#29493c" />
+  <circle cx="192" cy="468" r="22" fill="#5c8c63" />
+  <circle cx="608" cy="468" r="22" fill="#5c8c63" />
+  <circle cx="672" cy="98" r="40" fill="#ffd181" />
+</svg>

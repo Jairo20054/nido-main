@@ -1,7 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { Bath, BedDouble, Heart, MapPin, Ruler } from 'lucide-react';
+import React from 'react';
+import { BadgeCheck, Bath, BedDouble, Heart, MapPin, Ruler, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { PropertyImage } from '../../components/ui/PropertyImage';
 import { formatCurrency, getPropertyTypeLabel } from '../../lib/formatters';
+import {
+  getPropertyLocationLabel,
+  getPropertyReputationLabel,
+  getPropertyTrustLabel,
+} from '../../lib/propertyPresentation';
 
 export function PropertyCard({
   property,
@@ -9,66 +15,82 @@ export function PropertyCard({
   disabledFavorite = false,
   variant = 'default',
 }) {
-  const [isFavorite, setIsFavorite] = useState(property.isFavorite || false);
+  const features = [];
+  if (property.furnished) features.push('Amoblado');
+  if (property.petsAllowed) features.push('Mascotas OK');
+  if (property.parkingSpots) features.push('Parqueadero');
+  if (property.utilitiesIncluded) features.push('Servicios incluidos');
+  if (property.maintenanceFee) features.push(`Adm. ${formatCurrency(property.maintenanceFee)}`);
 
-  useEffect(() => {
-    setIsFavorite(property.isFavorite || false);
-  }, [property.isFavorite]);
+  const area = property.areaM2 || property.area || 0;
+  const typeLabel = getPropertyTypeLabel(property.propertyType);
+  const trustLabel = getPropertyTrustLabel(property);
+  const reputationLabel = getPropertyReputationLabel(property);
+  const totalMonthly = (property.monthlyRent || 0) + (property.maintenanceFee || 0);
 
   const handleToggleFavorite = (event) => {
     event.preventDefault();
-    setIsFavorite(!isFavorite);
+    event.stopPropagation();
+
     if (onToggleFavorite) {
       onToggleFavorite(property);
     }
   };
 
-  const getPropertyFeatures = () => {
-    const features = [];
-    if (property.furnished) features.push('Amoblado');
-    if (property.petsAllowed) features.push('Mascotas OK');
-    if (property.parkingSpots) features.push('Parqueadero');
-    if (property.maintenanceFee) features.push(`Adm. ${formatCurrency(property.maintenanceFee)}`);
-    return features;
-  };
-
-  const features = getPropertyFeatures();
-  const area = property.areaM2 || property.area || 0;
-  const typeLabel = getPropertyTypeLabel(property.propertyType);
-
   return (
     <Link to={`/properties/${property.id}`} className={`property-card property-card--${variant}`}>
       <div className="property-card__media">
-        <img src={property.coverImage} alt={property.title} className="property-card__image" />
+        <PropertyImage property={property} alt={property.title} className="property-card__image" />
 
-        <span className="property-card__badge">{typeLabel}</span>
+        <div className="property-card__badge-row">
+          <span className="property-card__badge">{typeLabel}</span>
+          <span className="property-card__badge property-card__badge--trust">
+            <ShieldCheck size={13} />
+            {trustLabel}
+          </span>
+        </div>
 
-        <button
-          type="button"
-          className={`property-card__favorite ${isFavorite ? 'property-card__favorite--active' : ''}`}
-          onClick={handleToggleFavorite}
-          disabled={disabledFavorite}
-        >
-          <Heart size={16} />
-        </button>
+        {onToggleFavorite ? (
+          <button
+            type="button"
+            className={`property-card__favorite ${property.isFavorite ? 'property-card__favorite--active' : ''}`}
+            onClick={handleToggleFavorite}
+            disabled={disabledFavorite}
+            aria-label={property.isFavorite ? 'Quitar de guardados' : 'Guardar propiedad'}
+          >
+            <Heart size={16} />
+          </button>
+        ) : null}
       </div>
 
       <div className="property-card__body">
-        <p className="property-card__price">{formatCurrency(property.monthlyRent)} / mes</p>
-        <h3 className="property-card__title">{property.title}</h3>
-        <p className="property-card__summary">{property.summary}</p>
-        <p className="property-card__location">
-          <MapPin size={14} />
-          {property.neighborhood || 'Zona residencial'} · {property.city}
-        </p>
-
-        <div className="property-card__stats">
-          <span><BedDouble size={14} /> {property.bedrooms}</span>
-          <span><Bath size={14} /> {property.bathrooms}</span>
-          <span><Ruler size={14} /> {area}m2</span>
+        <div className="property-card__headline">
+          <div>
+            <p className="property-card__price">{formatCurrency(property.monthlyRent)} / mes</p>
+            {property.maintenanceFee ? (
+              <p className="property-card__price-note">Total estimado: {formatCurrency(totalMonthly)}</p>
+            ) : null}
+          </div>
+          <span className="property-card__signal">
+            <BadgeCheck size={14} />
+            {reputationLabel}
+          </span>
         </div>
 
-        {features.length > 0 && (
+        <h3 className="property-card__title">{property.title}</h3>
+        <p className="property-card__location">
+          <MapPin size={14} />
+          {getPropertyLocationLabel(property)}
+        </p>
+        <p className="property-card__summary">{property.summary}</p>
+
+        <div className="property-card__stats">
+          <span><BedDouble size={14} /> {property.bedrooms} hab.</span>
+          <span><Bath size={14} /> {property.bathrooms} banos</span>
+          <span><Ruler size={14} /> {area} m2</span>
+        </div>
+
+        {features.length > 0 ? (
           <div className="property-card__tags">
             {features.slice(0, 4).map((feature) => (
               <span key={feature} className="property-card__tag">
@@ -76,7 +98,16 @@ export function PropertyCard({
               </span>
             ))}
           </div>
-        )}
+        ) : null}
+
+        <div className="property-card__footer">
+          <span className="property-card__footer-badge">
+            {property.availableImmediately ? 'Disponible ahora' : 'Agenda visita'}
+          </span>
+          <span className="property-card__footer-note">
+            {property.requestCount ? `${property.requestCount} solicitud${property.requestCount > 1 ? 'es' : ''}` : 'Sin friccion para comparar'}
+          </span>
+        </div>
       </div>
     </Link>
   );

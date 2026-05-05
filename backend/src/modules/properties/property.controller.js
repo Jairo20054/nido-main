@@ -1,6 +1,8 @@
 const { randomBytes } = require('crypto');
 const { MediaType, PropertyStatus, UserRole } = require('@prisma/client');
+const { env } = require('../../shared/env');
 const { prisma } = require('../../shared/prisma');
+const { supabaseService } = require('../../shared/supabase');
 const { badRequest, forbidden, notFound } = require('../../shared/errors');
 const { slugify } = require('../../shared/slugify');
 const { serializeProperty } = require('../../shared/serializers');
@@ -12,6 +14,7 @@ const LANDLORD_ALLOWED_CREATE_STATUSES = [
   PropertyStatus.PENDING,
   PropertyStatus.PUBLISHED,
 ];
+const PROPERTY_MEDIA_BUCKET = env.SUPABASE_PROPERTY_MEDIA_BUCKET || 'property-media-public';
 
 // Include reutilizable para las lecturas de propiedades. Agrega favoritos solo cuando
 // hay usuario autenticado para no consultar relaciones innecesarias en publico.
@@ -72,6 +75,47 @@ const normalizePropertyInput = (payload = {}) => ({
 // Toma la primera imagen como portada cuando no se define explicitamente.
 const getCoverImage = (payload, fallback = null) =>
   payload.media.find((item) => item.type === MediaType.IMAGE)?.url || fallback;
+
+// Reconstruye el path interno de Storage para poder limpiar assets huérfanos
+// despues de editar o eliminar una propiedad.
+const deriveStoragePathFromUrl = (url) => {
+  if (!url || typeof url !== 'string') {
+    return null;
+  }
+
+  try {
+    const parsed = new URL(url, env.SUPABASE_URL || 'http://localhost');
+    const publicPrefix = `/storage/v1/object/public/${PROPERTY_MEDIA_BUCKET}/`;
+    const authenticatedPrefix = `/storage/v1/object/authenticated/${PROPERTY_MEDIA_BUCKET}/`;
+
+    if (parsed.pathname.includes(publicPrefix)) {
+      return decodeURIComponent(parsed.pathname.split(publicPrefix)[1] || '');
+    }
+
+    if (parsed.pathname.includes(authenticatedPrefix)) {
+      return decodeURIComponent(parsed.pathname.split(authenticatedPrefix)[1] || '');
+    }
+  } catch (_error) {
+    return null;
+  }
+
+  return null;
+};
+
+const cleanupPropertyMediaAssets = async (mediaUrls = []) => {
+  const storagePaths = [...new Set(mediaUrls.map(deriveStoragePathFromUrl).filter(Boolean))];
+
+  if (!storagePaths.length || !supabaseService) {
+    return;
+  }
+
+  const { error } = await supabaseService.storage.from(PROPERTY_MEDIA_BUCKET).remove(storagePaths);
+
+  if (error) {
+    // La propiedad ya quedo consistente en Prisma; el cleanup puede reintentarse luego.
+    console.error('No fue posible limpiar assets de propiedades en Storage:', error.message);
+  }
+};
 
 // Genera un slug estable y suficientemente unico para URLs amigables.
 const generateSlug = async (title, city, propertyId = '') => {
@@ -439,6 +483,9 @@ const createProperty = async (req, res) => {
 const updateProperty = async (req, res) => {
   const existing = await prisma.property.findUnique({
     where: { id: req.params.id },
+    include: {
+      media: true,
+    },
   });
 
   if (!existing) {
@@ -454,6 +501,17 @@ const updateProperty = async (req, res) => {
     ...req.body,
   });
   const nextStatus = resolveStatusForUpdate(req.user, existing, req.body.status);
+  const removedMediaUrls = req.body.media
+    ? existing.media
+        .filter(
+          (currentItem) =>
+            !payload.media.some(
+              (nextItem) =>
+                nextItem.type === currentItem.type && nextItem.url === currentItem.url
+            )
+        )
+        .map((item) => item.url)
+    : [];
 
   const property = await prisma.$transaction(async (tx) => {
     const updated = await tx.property.update({
@@ -492,8 +550,11 @@ const updateProperty = async (req, res) => {
         specialConditions: payload.specialConditions,
         contactMethod: payload.contactMethod,
         verificationDetails: payload.verificationDetails,
-        rejectionReason: nextStatus === PropertyStatus.REJECTED ? payload.reviewNote || existing.rejectionReason : null,
-        coverImage: getCoverImage(payload, existing.coverImage),
+        rejectionReason:
+          nextStatus === PropertyStatus.REJECTED
+            ? payload.reviewNote || existing.rejectionReason
+            : null,
+        coverImage: req.body.media ? getCoverImage(payload, null) : existing.coverImage,
         latitude: payload.latitude,
         longitude: payload.longitude,
         approvedAt:
@@ -524,6 +585,8 @@ const updateProperty = async (req, res) => {
 
     return updated;
   });
+
+  await cleanupPropertyMediaAssets(removedMediaUrls);
 
   res.json({
     success: true,
@@ -585,6 +648,9 @@ const changePropertyStatus = async (req, res) => {
 const deleteProperty = async (req, res) => {
   const property = await prisma.property.findUnique({
     where: { id: req.params.id },
+    include: {
+      media: true,
+    },
   });
 
   if (!property) {
@@ -611,6 +677,8 @@ const deleteProperty = async (req, res) => {
   await prisma.property.delete({
     where: { id: req.params.id },
   });
+
+  await cleanupPropertyMediaAssets(property.media.map((item) => item.url));
 
   res.json({
     success: true,

@@ -2,11 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Map, SlidersHorizontal, X } from 'lucide-react';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { InlineMessage } from '../../components/ui/InlineMessage';
-import { LoadingState } from '../../components/ui/LoadingState';
 import { useAuth } from '../../app/providers/AuthProvider';
 import { api } from '../../lib/apiClient';
 import { formatCurrency, getPropertyTypeLabel } from '../../lib/formatters';
 import { PropertyCard } from './PropertyCard';
+import { PropertyCardSkeleton } from './PropertyCardSkeleton';
 import { PropertyFilters } from './PropertyFilters';
 import { useSearchFilters } from './useSearchFilters';
 
@@ -202,7 +202,9 @@ export function SearchPage() {
               </div>
             ) : null}
             {loading ? (
-              <LoadingState label="Buscando propiedades..." />
+              <div className="property-grid">
+                <PropertyCardSkeleton count={6} />
+              </div>
             ) : properties.length ? (
               <div className="property-grid">
                 {properties.map((property) => (

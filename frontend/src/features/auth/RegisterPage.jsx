@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { useAuth } from '../../app/providers/AuthProvider';
+import { resolvePostAuthDestination } from './authRedirects';
 
 /**
  * Componente de uso para el registro publico.
@@ -10,13 +11,15 @@ import { useAuth } from '../../app/providers/AuthProvider';
  */
 export function RegisterPage() {
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const location = useLocation();
+  const { isAuthenticated, register, user } = useAuth();
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
     password: '',
+    confirmPassword: '',
     role: 'TENANT',
   });
   const [error, setError] = useState('');
@@ -29,21 +32,38 @@ export function RegisterPage() {
       [field]: event.target.value,
     }));
 
+  if (isAuthenticated) {
+    return <Navigate to={resolvePostAuthDestination(null, user)} replace />;
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setSubmitting(true);
     setError('');
     setMessage('');
 
+    if (form.password !== form.confirmPassword) {
+      setError('Las contrasenas no coinciden.');
+      setSubmitting(false);
+      return;
+    }
+
     try {
-      const result = await register(form);
+      const result = await register({
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        phone: form.phone,
+        password: form.password,
+        role: form.role,
+      });
 
       if (result.requiresEmailConfirmation) {
-        setMessage('Revisa tu correo para activar la cuenta y luego inicia sesión.');
+        setMessage('Revisa tu correo para activar la cuenta y luego inicia sesion.');
         return;
       }
 
-      navigate(result.profile?.role === 'LANDLORD' ? '/manage' : '/account', { replace: true });
+      navigate(resolvePostAuthDestination(location.state, result.profile), { replace: true });
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -116,6 +136,20 @@ export function RegisterPage() {
                 required
               />
             </div>
+            <div className="field-group">
+              <label htmlFor="confirmPassword">Confirmar contrasena</label>
+              <input
+                id="confirmPassword"
+                type="password"
+                value={form.confirmPassword}
+                onChange={updateField('confirmPassword')}
+                autoComplete="new-password"
+                minLength={8}
+                required
+              />
+            </div>
+          </div>
+          <div className="field-grid">
             <div className="field-group">
               <label htmlFor="role">Perfil</label>
               <select id="role" value={form.role} onChange={updateField('role')}>

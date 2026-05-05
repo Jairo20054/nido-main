@@ -10,9 +10,10 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { EmptyState } from '../../components/ui/EmptyState';
-import { LoadingState } from '../../components/ui/LoadingState';
+import { InlineMessage } from '../../components/ui/InlineMessage';
 import { api } from '../../lib/apiClient';
 import { PropertyCard } from '../properties/PropertyCard';
+import { PropertyCardSkeleton } from '../properties/PropertyCardSkeleton';
 
 const POPULAR_CITIES = ['Bogota', 'Medellin', 'Cali', 'Barranquilla', 'Envigado'];
 const BUDGET_OPTIONS = [
@@ -37,6 +38,7 @@ export function HomePage() {
   const navigate = useNavigate();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [searchFilters, setSearchFilters] = useState({
     city: '',
     budget: 4500000,
@@ -51,11 +53,13 @@ export function HomePage() {
       .then((response) => {
         if (active) {
           setProperties(response.data || []);
+          setError('');
         }
       })
-      .catch(() => {
+      .catch((requestError) => {
         if (active) {
           setProperties([]);
+          setError(requestError.message || 'No pudimos cargar las propiedades destacadas.');
         }
       })
       .finally(() => {
@@ -207,8 +211,11 @@ export function HomePage() {
           </span>
         </div>
 
+        <InlineMessage tone="danger">{error}</InlineMessage>
         {loading ? (
-          <LoadingState label="Cargando propiedades..." />
+          <div className="property-grid property-grid--featured">
+            <PropertyCardSkeleton count={3} variant="featured" />
+          </div>
         ) : leadProperties.length > 0 ? (
           <div className="property-grid property-grid--featured">
             {leadProperties.map((property) => (
@@ -255,6 +262,19 @@ export function HomePage() {
             {moreProperties.map((property) => (
               <PropertyCard key={property.id} property={property} />
             ))}
+          </div>
+        </section>
+      ) : loading ? (
+        <section className="home-featured">
+          <div className="section__heading home-section-heading">
+            <div>
+              <span className="section__eyebrow">Mas para explorar</span>
+              <h2>Cargando mas propiedades curadas</h2>
+            </div>
+          </div>
+
+          <div className="property-grid">
+            <PropertyCardSkeleton count={3} />
           </div>
         </section>
       ) : null}

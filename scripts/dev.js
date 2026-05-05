@@ -2,14 +2,60 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
-const dotenv = require('dotenv');
 
 const rootDir = path.resolve(__dirname, '..');
 const viteCliPath = path.join(rootDir, 'node_modules', 'vite', 'bin', 'vite.js');
 const envPath = path.join(rootDir, '.env');
 
+const loadEnvFile = (targetPath, override = false) => {
+  if (!fs.existsSync(targetPath)) {
+    return;
+  }
+
+  try {
+    const dotenv = require('dotenv');
+    dotenv.config({ path: targetPath, override });
+    return;
+  } catch (error) {
+    if (error?.code !== 'MODULE_NOT_FOUND') {
+      throw error;
+    }
+  }
+
+  const content = fs.readFileSync(targetPath, 'utf8');
+
+  for (const rawLine of content.split(/\r?\n/u)) {
+    const line = rawLine.trim();
+
+    if (!line || line.startsWith('#')) {
+      continue;
+    }
+
+    const separatorIndex = line.indexOf('=');
+    if (separatorIndex === -1) {
+      continue;
+    }
+
+    const key = line.slice(0, separatorIndex).trim();
+    if (!key || (!override && process.env[key] !== undefined)) {
+      continue;
+    }
+
+    let value = line.slice(separatorIndex + 1).trim();
+
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+
+    process.env[key] = value;
+  }
+};
+
 if (fs.existsSync(envPath)) {
-  dotenv.config({ path: envPath, override: process.env.NODE_ENV !== 'production' });
+  loadEnvFile(envPath, process.env.NODE_ENV !== 'production');
 }
 
 let backendProcess = null;

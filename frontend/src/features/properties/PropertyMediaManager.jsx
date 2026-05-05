@@ -1,30 +1,26 @@
-import React, { useRef, useState } from 'react';
-import { ImagePlus, MoveLeft, MoveRight, Trash2, Video } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  ImagePlus,
+  LoaderCircle,
+  MoveLeft,
+  MoveRight,
+  Trash2,
+  Video,
+} from 'lucide-react';
+import { useAuth } from '../../app/providers/AuthProvider';
 import { InlineMessage } from '../../components/ui/InlineMessage';
-
-const MAX_IMAGE_SIZE = 4 * 1024 * 1024;
-const MAX_VIDEO_SIZE = 20 * 1024 * 1024;
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
-
-// Convierte archivos locales a data URLs para previsualizacion inmediata sin requerir backend.
-const readFileAsDataUrl = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error('No fue posible leer el archivo'));
-    reader.readAsDataURL(file);
-  });
-
-// Normaliza el archivo del navegador al shape esperado por el formulario de propiedades.
-const buildMediaItem = async (file, type, position) => ({
-  type,
-  url: await readFileAsDataUrl(file),
-  alt: file.name,
-  position,
-  mimeType: file.type,
-  sizeBytes: file.size,
-});
+import {
+  ALLOWED_IMAGE_TYPES,
+  ALLOWED_VIDEO_TYPES,
+  MAX_IMAGE_COUNT,
+  MAX_IMAGE_SIZE,
+  MAX_VIDEO_COUNT,
+  MAX_VIDEO_SIZE,
+  buildPendingMediaItem,
+  deletePropertyMedia,
+  disposeMediaPreview,
+  uploadPropertyMedia,
+} from './propertyMediaService';
 
 /**
  * Componente de uso para la seccion multimedia del formulario de propiedades.
@@ -32,20 +28,54 @@ const buildMediaItem = async (file, type, position) => ({
  * orden manual de imagenes y el manejo de un video opcional.
  */
 export function PropertyMediaManager({ media, onChange }) {
+  const { user } = useAuth();
   const imageInputRef = useRef(null);
   const videoInputRef = useRef(null);
+  const mediaRef = useRef(media);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [workingMediaId, setWorkingMediaId] = useState('');
+
+  useEffect(() => {
+    mediaRef.current = media;
+  }, [media]);
+
+  useEffect(
+    () => () => {
+      mediaRef.current.forEach((item) => disposeMediaPreview(item));
+    },
+    []
+  );
 
   const imageItems = media.filter((item) => item.type === 'IMAGE');
   const videoItem = media.find((item) => item.type === 'VIDEO') || null;
 
+  const commitMedia = (nextMedia) => {
+    mediaRef.current = nextMedia;
+    onChange(nextMedia);
+  };
+
   // Mantiene un unico origen de verdad para posiciones e integridad del arreglo mixto.
-  const syncMedia = (images, video = videoItem) => {
+  const syncMedia = (images, video = null) => {
     const normalized = [
       ...images.map((item, index) => ({ ...item, position: index })),
       ...(video ? [{ ...video, position: images.length }] : []),
     ];
-    onChange(normalized);
+
+    commitMedia(normalized);
+    return normalized;
+  };
+
+  const replaceMediaItem = (mediaId, updater) => {
+    const currentImages = mediaRef.current.filter((item) => item.type === 'IMAGE');
+    const currentVideo = mediaRef.current.find((item) => item.type === 'VIDEO') || null;
+    const nextImages = currentImages.map((item) =>
+      item.id === mediaId ? updater(item) : item
+    );
+    const nextVideo =
+      currentVideo?.id === mediaId ? updater(currentVideo) : currentVideo;
+
+    syncMedia(nextImages, nextVideo);
   };
 
   // Valida tipos/tamanos y agrega multiples imagenes en el orden de seleccion.
@@ -57,26 +87,68 @@ export function PropertyMediaManager({ media, onChange }) {
     }
 
     try {
+      if (imageItems.length + files.length > MAX_IMAGE_COUNT) {
+        throw new Error(`Puedes subir hasta ${MAX_IMAGE_COUNT} fotos por propiedad.`);
+      }
+
       for (const file of files) {
         if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-          throw new Error('Solo se permiten imagenes JPG, PNG o WEBP');
+          throw new Error('Solo se permiten imagenes JPG, PNG o WEBP.');
         }
 
         if (file.size > MAX_IMAGE_SIZE) {
-          throw new Error('Cada imagen debe pesar maximo 4 MB');
+          throw new Error('Cada imagen debe pesar maximo 4 MB.');
         }
       }
 
-      const nextImages = [...imageItems];
+      const currentImages = mediaRef.current.filter((item) => item.type === 'IMAGE');
+      const currentVideo = mediaRef.current.find((item) => item.type === 'VIDEO') || null;
+      const pendingItems = files.map((file, index) =>
+        buildPendingMediaItem(file, 'IMAGE', currentImages.length + index)
+      );
 
-      for (const file of files) {
-        nextImages.push(await buildMediaItem(file, 'IMAGE', nextImages.length));
-      }
-
-      syncMedia(nextImages);
+      syncMedia([...currentImages, ...pendingItems], currentVideo);
       setError('');
+      setMessage('Subiendo imagenes...');
+
+      await Promise.all(
+        pendingItems.map(async (pendingItem, index) => {
+          try {
+            const uploaded = await uploadPropertyMedia(files[index], {
+              ownerId: user?.id,
+              type: 'IMAGE',
+            });
+
+            replaceMediaItem(pendingItem.id, (currentItem) => {
+              disposeMediaPreview(currentItem);
+              return {
+                ...currentItem,
+                url: uploaded.url,
+                storagePath: uploaded.storagePath,
+                uploadStatus: 'uploaded',
+                isPersisted: false,
+              };
+            });
+          } catch (uploadError) {
+            replaceMediaItem(pendingItem.id, (currentItem) => ({
+              ...currentItem,
+              uploadStatus: 'error',
+              uploadError: uploadError.message,
+            }));
+          }
+        })
+      );
+
+      const failedUploads = mediaRef.current.filter((item) => item.uploadStatus === 'error').length;
+      if (failedUploads) {
+        setError('Algunos archivos fallaron. Eliminalos y vuelve a intentarlo.');
+        setMessage('');
+      } else {
+        setMessage('Fotos listas para guardar en la propiedad.');
+      }
     } catch (requestError) {
       setError(requestError.message);
+      setMessage('');
     } finally {
       event.target.value = '';
     }
@@ -91,26 +163,81 @@ export function PropertyMediaManager({ media, onChange }) {
     }
 
     try {
+      if (videoItem && MAX_VIDEO_COUNT === 1) {
+        throw new Error('Solo puedes adjuntar un video por publicacion.');
+      }
+
       if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
-        throw new Error('El video debe estar en MP4, MOV o WEBM');
+        throw new Error('El video debe estar en MP4, MOV o WEBM.');
       }
 
       if (file.size > MAX_VIDEO_SIZE) {
-        throw new Error('El video debe pesar maximo 20 MB');
+        throw new Error('El video debe pesar maximo 20 MB.');
       }
 
-      const built = await buildMediaItem(file, 'VIDEO', imageItems.length);
-      syncMedia(imageItems, built);
+      const currentImages = mediaRef.current.filter((item) => item.type === 'IMAGE');
+      const pendingVideo = buildPendingMediaItem(file, 'VIDEO', currentImages.length);
+      syncMedia(currentImages, pendingVideo);
       setError('');
+      setMessage('Subiendo video...');
+
+      const uploaded = await uploadPropertyMedia(file, {
+        ownerId: user?.id,
+        type: 'VIDEO',
+      });
+
+      replaceMediaItem(pendingVideo.id, (currentItem) => {
+        disposeMediaPreview(currentItem);
+        return {
+          ...currentItem,
+          url: uploaded.url,
+          storagePath: uploaded.storagePath,
+          uploadStatus: 'uploaded',
+          isPersisted: false,
+        };
+      });
+
+      setMessage('Video listo para guardar.');
     } catch (requestError) {
       setError(requestError.message);
+      setMessage('');
     } finally {
       event.target.value = '';
     }
   };
 
-  const removeImage = (index) => {
-    syncMedia(imageItems.filter((_, itemIndex) => itemIndex !== index));
+  const removeMediaItem = async (item) => {
+    const currentImages = mediaRef.current.filter((entry) => entry.type === 'IMAGE');
+    const currentVideo = mediaRef.current.find((entry) => entry.type === 'VIDEO') || null;
+
+    try {
+      setWorkingMediaId(item.id || '');
+      if (!item.isPersisted && item.storagePath) {
+        await deletePropertyMedia(item.storagePath);
+      }
+
+      disposeMediaPreview(item);
+
+      if (item.type === 'VIDEO') {
+        syncMedia(currentImages, null);
+      } else {
+        syncMedia(currentImages.filter((entry) => entry.id !== item.id), currentVideo);
+      }
+
+      setError('');
+      setMessage(
+        item.isPersisted
+          ? 'El archivo se quitara de la propiedad cuando guardes los cambios.'
+          : item.type === 'VIDEO'
+            ? 'Video eliminado.'
+            : 'Archivo eliminado.'
+      );
+    } catch (requestError) {
+      setError(requestError.message);
+      setMessage('');
+    } finally {
+      setWorkingMediaId('');
+    }
   };
 
   // Reordena el carrusel de fotos preservando posiciones consecutivas.
@@ -123,7 +250,7 @@ export function PropertyMediaManager({ media, onChange }) {
     }
 
     [next[index], next[target]] = [next[target], next[index]];
-    syncMedia(next);
+    syncMedia(next, videoItem);
   };
 
   return (
@@ -137,6 +264,7 @@ export function PropertyMediaManager({ media, onChange }) {
 
       <p>Necesitas minimo 4 fotos para enviar la publicacion a revision o publicarla.</p>
       <InlineMessage tone="danger">{error}</InlineMessage>
+      <InlineMessage tone="success">{message}</InlineMessage>
 
       <div className="media-toolbar">
         <button className="button button--secondary" type="button" onClick={() => imageInputRef.current?.click()}>
@@ -149,23 +277,40 @@ export function PropertyMediaManager({ media, onChange }) {
         </button>
       </div>
 
+      <div className="media-toolbar__hint">
+        Hasta {MAX_IMAGE_COUNT} fotos en JPG, PNG o WEBP. Video opcional en MP4, MOV o WEBM.
+      </div>
+
       <input ref={imageInputRef} type="file" accept="image/png,image/jpeg,image/webp" hidden multiple onChange={handleAddImages} />
       <input ref={videoInputRef} type="file" accept="video/mp4,video/webm,video/quicktime" hidden onChange={handleAddVideo} />
 
       <div className="media-grid">
         {imageItems.map((item, index) => (
-          <article key={`${item.url}-${index}`} className="media-card">
+          <article key={item.id || `${item.url}-${index}`} className={`media-card media-card--${item.uploadStatus || 'uploaded'}`}>
             <img src={item.url} alt={item.alt || `Imagen ${index + 1}`} className="media-card__preview" />
+            <div className="media-card__overlay">
+              {item.uploadStatus === 'uploading' ? (
+                <span className="media-status-pill media-status-pill--loading">
+                  <LoaderCircle size={14} />
+                  Subiendo...
+                </span>
+              ) : item.uploadStatus === 'error' ? (
+                <span className="media-status-pill media-status-pill--danger">Error</span>
+              ) : (
+                <span className="media-status-pill">Lista</span>
+              )}
+              {index === 0 ? <span className="media-status-pill media-status-pill--accent">Principal</span> : null}
+            </div>
             <div className="media-card__actions">
-              <span>Foto {index + 1}</span>
+              <span>{item.uploadStatus === 'error' ? item.uploadError || 'Vuelve a subir esta imagen.' : `Foto ${index + 1}`}</span>
               <div className="media-card__buttons">
-                <button className="icon-button" type="button" onClick={() => moveImage(index, -1)}>
+                <button className="icon-button" type="button" onClick={() => moveImage(index, -1)} disabled={item.uploadStatus === 'uploading'}>
                   <MoveLeft size={14} />
                 </button>
-                <button className="icon-button" type="button" onClick={() => moveImage(index, 1)}>
+                <button className="icon-button" type="button" onClick={() => moveImage(index, 1)} disabled={item.uploadStatus === 'uploading'}>
                   <MoveRight size={14} />
                 </button>
-                <button className="icon-button icon-button--danger" type="button" onClick={() => removeImage(index)}>
+                <button className="icon-button icon-button--danger" type="button" onClick={() => removeMediaItem(item)} disabled={workingMediaId === item.id}>
                   <Trash2 size={14} />
                 </button>
               </div>
@@ -182,15 +327,19 @@ export function PropertyMediaManager({ media, onChange }) {
       </div>
 
       {videoItem ? (
-        <div className="video-preview-card">
+        <div className={`video-preview-card video-preview-card--${videoItem.uploadStatus || 'uploaded'}`}>
           <video src={videoItem.url} controls className="video-preview-card__video" />
-          <button
-            className="button button--ghost-danger"
-            type="button"
-            onClick={() => syncMedia(imageItems, null)}
-          >
-            Eliminar video
-          </button>
+          <div className="video-preview-card__footer">
+            <span>{videoItem.uploadStatus === 'uploading' ? 'Subiendo video...' : videoItem.uploadStatus === 'error' ? videoItem.uploadError || 'Error al subir el video.' : 'Video listo para guardar.'}</span>
+            <button
+              className="button button--ghost-danger"
+              type="button"
+              disabled={workingMediaId === videoItem.id}
+              onClick={() => removeMediaItem(videoItem)}
+            >
+              Eliminar video
+            </button>
+          </div>
         </div>
       ) : (
         <div className="empty-media-card empty-media-card--video">

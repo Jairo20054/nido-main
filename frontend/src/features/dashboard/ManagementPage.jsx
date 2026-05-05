@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { LoadingState } from '../../components/ui/LoadingState';
+import { PropertyImage } from '../../components/ui/PropertyImage';
 import { PropertyStatusBadge } from '../../components/ui/PropertyStatusBadge';
 import { RequestStatusBadge } from '../../components/ui/RequestStatusBadge';
 import { useAuth } from '../../app/providers/AuthProvider';
@@ -72,8 +73,10 @@ export function ManagementPage() {
 
       setEditingProperty(null);
       await loadDashboard();
+      return true;
     } catch (requestError) {
       setMessage(requestError.message);
+      throw requestError;
     } finally {
       setSubmitting(false);
     }
@@ -170,7 +173,7 @@ export function ManagementPage() {
                   {properties.map((property) => (
                     <div className="management-item management-item--stack" key={property.id}>
                       <div className="management-item__main">
-                        <img src={property.coverImage} alt={property.title} className="management-item__thumb" />
+                        <PropertyImage property={property} alt={property.title} className="management-item__thumb" />
                         <div>
                           <strong>{property.title}</strong>
                           <p>

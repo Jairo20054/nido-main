@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { LoadingState } from '../../components/ui/LoadingState';
+import { PropertyImage } from '../../components/ui/PropertyImage';
 import { PropertyStatusBadge } from '../../components/ui/PropertyStatusBadge';
 import { api } from '../../lib/apiClient';
 import { formatCurrency, formatDate, getRoleLabel } from '../../lib/formatters';
@@ -89,8 +90,10 @@ export function AdminPage() {
       );
       setEditingProperty(null);
       setMessage('Publicacion actualizada por administracion.');
+      return true;
     } catch (requestError) {
       setMessage(requestError.message);
+      throw requestError;
     } finally {
       setSubmitting(false);
     }
@@ -148,7 +151,7 @@ export function AdminPage() {
                   {properties.map((property) => (
                     <div key={property.id} className="management-item management-item--stack">
                       <div className="management-item__main">
-                        <img src={property.coverImage} alt={property.title} className="management-item__thumb" />
+                        <PropertyImage property={property} alt={property.title} className="management-item__thumb" />
                         <div>
                           <strong>{property.title}</strong>
                           <p>

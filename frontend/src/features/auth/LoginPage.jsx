@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { useAuth } from '../../app/providers/AuthProvider';
+import { resolvePostAuthDestination } from './authRedirects';
 
 /**
  * Componente de uso para el ingreso principal.
@@ -11,10 +12,14 @@ import { useAuth } from '../../app/providers/AuthProvider';
 export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { isAuthenticated, login, user } = useAuth();
   const [form, setForm] = useState({ identifier: '', password: '' });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  if (isAuthenticated) {
+    return <Navigate to={resolvePostAuthDestination(null, user)} replace />;
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -22,10 +27,8 @@ export function LoginPage() {
     setError('');
 
     try {
-      const user = await login(form);
-      const nextRoute =
-        location.state?.from ||
-        (user.role === 'ADMIN' ? '/admin' : user.role === 'LANDLORD' ? '/manage' : '/account');
+      const nextUser = await login(form);
+      const nextRoute = resolvePostAuthDestination(location.state, nextUser);
       navigate(nextRoute, { replace: true });
     } catch (requestError) {
       setError(requestError.message);

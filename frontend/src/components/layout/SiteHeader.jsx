@@ -16,8 +16,8 @@ export function SiteHeader() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/');
   };
 
@@ -36,8 +36,8 @@ export function SiteHeader() {
 
         <nav className="site-header__nav" aria-label="Principal">
           <Link to="/properties">Buscar</Link>
-          <a href="#como-funciona">Como funciona</a>
-          <a href="#para-propietarios">Para propietarios</a>
+          <Link to="/#como-funciona">Como funciona</Link>
+          <Link to="/#para-propietarios">Para propietarios</Link>
         </nav>
 
         <div className="site-header__actions">

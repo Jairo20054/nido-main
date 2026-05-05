@@ -30,7 +30,14 @@ const updateProfile = async (req, res) => {
   res.json({
     success: true,
     message: 'Perfil actualizado',
-    data: serializeUser(user, true),
+    data: serializeUser(
+      {
+        ...user,
+        role: req.user.role,
+        isPlatformAdmin: req.user.isPlatformAdmin,
+      },
+      true
+    ),
   });
 };
 

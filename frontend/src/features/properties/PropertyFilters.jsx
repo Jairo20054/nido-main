@@ -10,6 +10,7 @@ import {
   MapPin,
   Shield,
   Sofa,
+  Sparkles,
   Trees,
 } from 'lucide-react';
 import { SORT_OPTIONS } from '../../lib/constants';
@@ -29,7 +30,7 @@ const EXTRA_OPTIONS = [
   { value: 'gatedCommunity', label: 'Conjunto cerrado', icon: Trees },
 ];
 
-const RECENT_CITIES = ['Medellín', 'Bogotá', 'Cali', 'Barranquilla', 'Chapinero', 'Envigado'];
+const RECENT_CITIES = ['Medellin', 'Bogota', 'Cali', 'Barranquilla', 'Chapinero', 'Envigado'];
 
 function Stepper({ label, icon: Icon, value, onChange, min = 0 }) {
   return (
@@ -40,7 +41,7 @@ function Stepper({ label, icon: Icon, value, onChange, min = 0 }) {
       </div>
       <div className="stepper__controls" role="group" aria-label={label}>
         <button type="button" onClick={() => onChange(Math.max(min, value - 1))} aria-label={`Reducir ${label}`}>
-          −
+          -
         </button>
         <span aria-live="polite">{value}</span>
         <button type="button" onClick={() => onChange(value + 1)} aria-label={`Aumentar ${label}`}>
@@ -60,17 +61,17 @@ function DualRangeSlider({ min, max, valueMin, valueMax, onChange }) {
 
   return (
     <div className="dual-range">
-      <div className="dual-range__values">{formatCurrency(safeMin)} — {formatCurrency(safeMax)}</div>
+      <div className="dual-range__values">{formatCurrency(safeMin)} - {formatCurrency(safeMax)}</div>
       <div className="dual-range__track">
-        <span className="dual-range__rail"></span>
-        <span className="dual-range__fill" style={{ left: `${left}%`, width: `${right - left}%` }}></span>
+        <span className="dual-range__rail" />
+        <span className="dual-range__fill" style={{ left: `${left}%`, width: `${right - left}%` }} />
         <input
           type="range"
           min={min}
           max={max}
           step="100000"
           value={safeMin}
-          aria-label="Canon mensual mínimo"
+          aria-label="Canon mensual minimo"
           onChange={(event) => onChange('min', Math.min(Number(event.target.value), safeMax - 100000))}
         />
         <input
@@ -79,7 +80,7 @@ function DualRangeSlider({ min, max, valueMin, valueMax, onChange }) {
           max={max}
           step="100000"
           value={safeMax}
-          aria-label="Canon mensual máximo"
+          aria-label="Canon mensual maximo"
           onChange={(event) => onChange('max', Math.max(Number(event.target.value), safeMin + 100000))}
         />
       </div>
@@ -128,7 +129,7 @@ export function PropertyFilters({
       <div className="filter-panel__header">
         <div>
           <span className="section__eyebrow">Filtros</span>
-          <h2>Encuentra algo que sí te quede bien</h2>
+          <h2>Encuentra algo que si te quede bien</h2>
         </div>
         {onDismiss ? (
           <button type="button" className="filter-panel__dismiss" onClick={onDismiss}>
@@ -145,7 +146,7 @@ export function PropertyFilters({
             list="recent-cities"
             value={filters.city}
             onChange={(event) => onChange('city', event.target.value)}
-            placeholder="Ej. Medellín, Chapinero, Envigado"
+            placeholder="Ej. Medellin, Chapinero, Envigado"
           />
           <datalist id="recent-cities">
             {RECENT_CITIES.map((city) => (
@@ -205,9 +206,9 @@ export function PropertyFilters({
         />
       </AccordionSection>
 
-      <AccordionSection icon={Bath} title="Baños">
+      <AccordionSection icon={Bath} title="Banos">
         <Stepper
-          label="Baños"
+          label="Banos"
           icon={Bath}
           value={filters.bathrooms}
           min={1}
@@ -215,7 +216,7 @@ export function PropertyFilters({
         />
       </AccordionSection>
 
-      <AccordionSection icon={SparklesIcon} title="Extras">
+      <AccordionSection icon={Sparkles} title="Extras">
         <div className="filter-chip-row">
           {EXTRA_OPTIONS.map(({ value, label, icon: Icon }) => (
             <button
@@ -247,16 +248,16 @@ export function PropertyFilters({
         <button className="ghost-link" type="button" onClick={onClear}>
           Limpiar filtros
         </button>
-        <button className="button button--accent" type="button" onClick={onDismiss}>
-          Ver {resultCount} propiedades →
-        </button>
+        {onDismiss ? (
+          <button className="button button--accent" type="button" onClick={onDismiss}>
+            Ver {resultCount} propiedades
+          </button>
+        ) : (
+          <div className="filter-panel__result-pill">{resultCount} propiedades visibles</div>
+        )}
       </div>
 
       <div className="filter-panel__footer-note">{activeCount} filtros activos</div>
     </form>
   );
-}
-
-function SparklesIcon(props) {
-  return <span className="sparkles-icon" {...props}>✨</span>;
 }

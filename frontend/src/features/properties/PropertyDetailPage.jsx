@@ -22,6 +22,7 @@ import { LoadingState } from '../../components/ui/LoadingState';
 import { useAuth } from '../../app/providers/AuthProvider';
 import { api } from '../../lib/apiClient';
 import { formatCurrency, formatDate, getPropertyTypeLabel } from '../../lib/formatters';
+import { getFallbackPropertyImage, getPropertyLocationLabel, getPropertyPrimaryImage } from '../../lib/propertyPresentation';
 
 export function PropertyDetailPage() {
   const { isAuthenticated } = useAuth();
@@ -61,7 +62,7 @@ export function PropertyDetailPage() {
   useEffect(() => {
     if (!property) return;
 
-    const firstImage = property.images?.[0]?.url || property.coverImage || '';
+    const firstImage = getPropertyPrimaryImage(property);
     setSelectedImage(firstImage);
   }, [property]);
 
@@ -70,8 +71,8 @@ export function PropertyDetailPage() {
 
     const allImages = property.images?.length
       ? property.images.map((image) => image.url)
-      : property.coverImage
-        ? [property.coverImage]
+      : getPropertyPrimaryImage(property)
+        ? [getPropertyPrimaryImage(property)]
         : [];
 
     return [...new Set(allImages)];
@@ -97,7 +98,7 @@ export function PropertyDetailPage() {
             {
               icon: CalendarDays,
               label: 'Disponible',
-              value: formatDate(property.availableFrom),
+              value: property.availableImmediately ? 'Inmediata' : formatDate(property.availableFrom) || 'Por confirmar',
             },
           ]
         : [],
@@ -149,7 +150,9 @@ export function PropertyDetailPage() {
 
     return [
       `Ubicada en ${property.city}${property.neighborhood ? `, ${property.neighborhood}` : ''}.`,
-      `Disponible desde ${formatDate(property.availableFrom)} con contrato minimo de ${property.minLeaseMonths} meses.`,
+      property.availableImmediately
+        ? `Disponible de inmediato con contrato minimo de ${property.minLeaseMonths} meses.`
+        : `Disponible desde ${formatDate(property.availableFrom)} con contrato minimo de ${property.minLeaseMonths} meses.`,
       property.requestCount
         ? `${property.requestCount} persona${property.requestCount > 1 ? 's' : ''} ya mostraron interes en esta propiedad.`
         : 'Aun sin solicitudes activas, ideal para decidir con calma.',
@@ -193,11 +196,18 @@ export function PropertyDetailPage() {
       <section className="property-hero">
         <div className="property-hero__gallery property-hero__gallery--enhanced">
           <div className="property-hero__main">
-            <img src={selectedImage} alt={property.title} className="property-hero__cover" />
+            <img
+              src={selectedImage}
+              alt={property.title}
+              className="property-hero__cover"
+              onError={(event) => {
+                event.currentTarget.src = getFallbackPropertyImage(property.propertyType);
+              }}
+            />
             <div className="property-hero__floating-card">
               <span className="section__eyebrow">{getPropertyTypeLabel(property.propertyType)}</span>
               <strong>{formatCurrency(property.monthlyRent)} / mes</strong>
-              <p>{property.city}{property.neighborhood ? `, ${property.neighborhood}` : ''}</p>
+              <p>{getPropertyLocationLabel(property)}</p>
             </div>
           </div>
 
@@ -209,7 +219,13 @@ export function PropertyDetailPage() {
                 className={`property-hero__thumb ${selectedImage === image ? 'property-hero__thumb--active' : ''}`}
                 onClick={() => setSelectedImage(image)}
               >
-                <img src={image} alt={`${property.title} vista ${index + 1}`} />
+                <img
+                  src={image}
+                  alt={`${property.title} vista ${index + 1}`}
+                  onError={(event) => {
+                    event.currentTarget.src = getFallbackPropertyImage(property.propertyType);
+                  }}
+                />
               </button>
             ))}
           </div>
@@ -231,7 +247,9 @@ export function PropertyDetailPage() {
                 </span>
                 <span>
                   <ShieldCheck size={16} />
-                  Disponible desde {formatDate(property.availableFrom)}
+                  {property.availableImmediately
+                    ? 'Disponible ahora'
+                    : `Disponible desde ${formatDate(property.availableFrom) || 'fecha por confirmar'}`}
                 </span>
               </div>
             </div>

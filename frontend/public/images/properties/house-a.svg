@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560" role="img" aria-labelledby="title desc">
+  <title id="title">Casa amplia</title>
+  <desc id="desc">Ilustracion de casa de dos niveles con patio y arboles.</desc>
+  <rect width="800" height="560" fill="#eef7f4" />
+  <rect x="0" y="372" width="800" height="188" fill="#d8efcf" />
+  <path d="M120 260 392 92l288 168v184H120z" fill="#f6f0e5" />
+  <path d="M120 260 392 92l288 168-38 0-250-146-234 146z" fill="#c46c43" />
+  <rect x="174" y="250" width="146" height="108" rx="18" fill="#b6dbf0" />
+  <rect x="344" y="216" width="108" height="142" rx="18" fill="#5d3d2f" />
+  <rect x="476" y="250" width="146" height="108" rx="18" fill="#b6dbf0" />
+  <rect x="250" y="384" width="286" height="20" rx="10" fill="#d18f63" />
+  <circle cx="118" cy="470" r="40" fill="#72a16f" />
+  <circle cx="684" cy="450" r="46" fill="#72a16f" />
+  <circle cx="646" cy="116" r="38" fill="#ffd17a" />
+  <path d="M0 430c86-36 176-28 280-6 96 20 196 30 320-4 76-20 140-18 200 10v130H0z" fill="#9ccf97" opacity="0.72" />
+</svg>

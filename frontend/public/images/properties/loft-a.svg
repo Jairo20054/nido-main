@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560" role="img" aria-labelledby="title desc">
+  <title id="title">Loft moderno</title>
+  <desc id="desc">Ilustracion de loft contemporaneo con ventanales y skyline.</desc>
+  <rect width="800" height="560" fill="#eaf2f4" />
+  <rect x="0" y="392" width="800" height="168" fill="#d9e4d9" />
+  <rect x="152" y="106" width="496" height="306" rx="30" fill="#26353a" />
+  <rect x="188" y="142" width="424" height="234" rx="22" fill="#faf6ef" />
+  <rect x="222" y="176" width="160" height="170" rx="16" fill="#9fd0d6" />
+  <rect x="418" y="176" width="160" height="170" rx="16" fill="#c0d8ee" />
+  <rect x="394" y="142" width="12" height="234" fill="#26353a" opacity="0.6" />
+  <rect x="560" y="210" width="30" height="166" rx="12" fill="#3d474c" />
+  <rect x="246" y="392" width="308" height="18" rx="9" fill="#b8875b" />
+  <path d="M88 430h624c18 0 32 14 32 32v18H56v-18c0-18 14-32 32-32z" fill="#24362f" />
+  <circle cx="626" cy="92" r="42" fill="#ffc96a" />
+</svg>
