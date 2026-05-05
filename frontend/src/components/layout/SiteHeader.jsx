@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { House, LogOut, Menu, User } from 'lucide-react';
+import { House, LogOut, Menu, User, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../app/providers/AuthProvider';
 
@@ -7,6 +7,9 @@ export function SiteHeader() {
   const navigate = useNavigate();
   const { isAuthenticated, logout, user } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const dashboardHref =
+    user?.role === 'ADMIN' ? '/admin' : user?.role === 'LANDLORD' ? '/manage' : '/saved';
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 16);
@@ -16,15 +19,64 @@ export function SiteHeader() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
+
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
+
   const handleLogout = async () => {
     await logout();
+    closeMobileMenu();
     navigate('/');
   };
+
+  const renderNavLinks = () => (
+    <>
+      <Link to="/properties" onClick={closeMobileMenu}>
+        Buscar
+      </Link>
+      <a href="/#como-funciona" onClick={closeMobileMenu}>
+        Como funciona
+      </a>
+      <a href="/#para-propietarios" onClick={closeMobileMenu}>
+        Para propietarios
+      </a>
+    </>
+  );
+
+  const renderAuthenticatedLinks = () => (
+    <>
+      <Link to={dashboardHref} className="site-header__link" onClick={closeMobileMenu}>
+        {user?.role === 'ADMIN'
+          ? 'Panel'
+          : user?.role === 'LANDLORD'
+            ? 'Gestion'
+            : 'Guardados'}
+      </Link>
+      <Link to="/account" className="site-header__link" onClick={closeMobileMenu}>
+        <User size={16} />
+        {user?.firstName}
+      </Link>
+      <button
+        className="site-header__button site-header__button--ghost"
+        type="button"
+        onClick={handleLogout}
+      >
+        <LogOut size={14} />
+        Salir
+      </button>
+    </>
+  );
 
   return (
     <header className={`site-header ${isScrolled ? 'site-header--scrolled' : ''}`}>
       <div className="site-header__container">
-        <Link to="/" className="brand">
+        <Link to="/" className="brand" onClick={closeMobileMenu}>
           <span className="brand__mark" aria-hidden="true">
             <span className="brand__mark-home">
               <House size={13} strokeWidth={2.4} />
@@ -35,24 +87,16 @@ export function SiteHeader() {
         </Link>
 
         <nav className="site-header__nav" aria-label="Principal">
-          <Link to="/properties">Buscar</Link>
-          <Link to="/#como-funciona">Como funciona</Link>
-          <Link to="/#para-propietarios">Para propietarios</Link>
+          {renderNavLinks()}
         </nav>
 
         <div className="site-header__actions">
-          {!isAuthenticated ? <span className="site-header__hint">Explora sin iniciar sesion</span> : null}
+          {!isAuthenticated ? (
+            <span className="site-header__hint">Explora sin iniciar sesion</span>
+          ) : null}
+
           {isAuthenticated ? (
-            <>
-              <Link to="/account" className="site-header__link">
-                <User size={16} />
-                {user?.firstName}
-              </Link>
-              <button className="site-header__button site-header__button--ghost" type="button" onClick={handleLogout}>
-                <LogOut size={14} />
-                Salir
-              </button>
-            </>
+            renderAuthenticatedLinks()
           ) : (
             <>
               <Link to="/login" className="site-header__link">
@@ -63,11 +107,40 @@ export function SiteHeader() {
               </Link>
             </>
           )}
-          <button type="button" className="site-header__menu" aria-label="Abrir menu">
-            <Menu size={18} />
+
+          <button
+            type="button"
+            className="site-header__menu"
+            aria-label={isMobileMenuOpen ? 'Cerrar menu' : 'Abrir menu'}
+            aria-expanded={isMobileMenuOpen}
+            onClick={() => setIsMobileMenuOpen((current) => !current)}
+          >
+            {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
       </div>
+
+      {isMobileMenuOpen ? (
+        <div className="site-header__mobile-panel">
+          <nav className="site-header__mobile-nav" aria-label="Principal movil">
+            {renderNavLinks()}
+          </nav>
+          <div className="site-header__mobile-actions">
+            {isAuthenticated ? (
+              renderAuthenticatedLinks()
+            ) : (
+              <>
+                <Link to="/login" className="site-header__link" onClick={closeMobileMenu}>
+                  Ingresar
+                </Link>
+                <Link to="/register" className="site-header__button" onClick={closeMobileMenu}>
+                  Crear cuenta
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      ) : null}
     </header>
   );
 }

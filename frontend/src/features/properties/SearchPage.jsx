@@ -161,7 +161,11 @@ export function SearchPage() {
           <div className="search-layout__results">
             <div className="search-results__topbar">
               <div>
-                <h1>{properties.length} propiedades en {filters.city || 'Colombia'}</h1>
+                <h1>
+                  {loading
+                    ? `Buscando propiedades en ${filters.city || 'Colombia'}`
+                    : `${properties.length} propiedades en ${filters.city || 'Colombia'}`}
+                </h1>
                 <p>
                   Explora opciones pensadas para renta residencial, con filtros visibles, fotos
                   claras y sin necesidad de iniciar sesion para comparar.

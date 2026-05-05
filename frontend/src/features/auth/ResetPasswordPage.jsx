@@ -31,7 +31,7 @@ export function ResetPasswordPage() {
 
     try {
       await resetPassword(password);
-      setMessage('Contraseña actualizada correctamente.');
+      setMessage('Contrasena actualizada correctamente.');
       setTimeout(() => navigate('/account', { replace: true }), 800);
     } catch (requestError) {
       setError(requestError.message);
@@ -44,16 +44,18 @@ export function ResetPasswordPage() {
     <div className="auth-page">
       <div className="auth-card">
         <span className="section__eyebrow">Seguridad</span>
-        <h1>Define tu nueva contraseña</h1>
+        <h1>Define tu nueva contrasena</h1>
         <p>
           {isPasswordRecovery
-            ? 'Puedes crear una nueva contraseña desde el enlace de recuperación.'
-            : 'Si llegaste aquí desde un enlace de recuperación, podrás restablecer tu contraseña.'}
+            ? 'Puedes crear una nueva contrasena desde el enlace de recuperacion.'
+            : 'Si llegaste aqui desde un enlace de recuperacion, podras restablecer tu contrasena.'}
         </p>
+
         <form className="auth-form" onSubmit={handleSubmit}>
           <InlineMessage tone={error ? 'danger' : 'success'}>{error || message}</InlineMessage>
+
           <div className="field-group">
-            <label htmlFor="newPassword">Nueva contraseña</label>
+            <label htmlFor="newPassword">Nueva contrasena</label>
             <input
               id="newPassword"
               type="password"
@@ -63,8 +65,9 @@ export function ResetPasswordPage() {
               required
             />
           </div>
+
           <div className="field-group">
-            <label htmlFor="confirmPassword">Confirmar contraseña</label>
+            <label htmlFor="confirmPassword">Confirmar contrasena</label>
             <input
               id="confirmPassword"
               type="password"
@@ -74,9 +77,11 @@ export function ResetPasswordPage() {
               required
             />
           </div>
+
           <button className="button" type="submit" disabled={submitting}>
-            {submitting ? 'Actualizando...' : 'Actualizar contraseña'}
+            {submitting ? 'Actualizando...' : 'Actualizar contrasena'}
           </button>
+
           <div className="auth-form__footer">
             <Link to="/login" className="auth-form__link">
               Volver al ingreso

@@ -1,16 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560" role="img" aria-labelledby="title desc">
-  <title id="title">Casa amplia</title>
-  <desc id="desc">Ilustracion de casa de dos niveles con patio y arboles.</desc>
-  <rect width="800" height="560" fill="#eef7f4" />
-  <rect x="0" y="372" width="800" height="188" fill="#d8efcf" />
-  <path d="M120 260 392 92l288 168v184H120z" fill="#f6f0e5" />
-  <path d="M120 260 392 92l288 168-38 0-250-146-234 146z" fill="#c46c43" />
-  <rect x="174" y="250" width="146" height="108" rx="18" fill="#b6dbf0" />
-  <rect x="344" y="216" width="108" height="142" rx="18" fill="#5d3d2f" />
-  <rect x="476" y="250" width="146" height="108" rx="18" fill="#b6dbf0" />
-  <rect x="250" y="384" width="286" height="20" rx="10" fill="#d18f63" />
-  <circle cx="118" cy="470" r="40" fill="#72a16f" />
-  <circle cx="684" cy="450" r="46" fill="#72a16f" />
-  <circle cx="646" cy="116" r="38" fill="#ffd17a" />
-  <path d="M0 430c86-36 176-28 280-6 96 20 196 30 320-4 76-20 140-18 200 10v130H0z" fill="#9ccf97" opacity="0.72" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1100" role="img" aria-labelledby="title desc">
+  <title id="title">Casa familiar</title>
+  <desc id="desc">Ilustracion de una casa amplia con jardin frontal.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f8f2e6"/>
+      <stop offset="100%" stop-color="#dce9e0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1100" fill="url(#sky)"/>
+  <circle cx="1220" cy="160" r="110" fill="#efc58f" opacity=".7"/>
+  <path d="M250 540 790 170l560 370v330H250Z" fill="#fff8ef"/>
+  <path d="M360 540 790 246l450 294v272H360Z" fill="#ead8c2"/>
+  <path d="M214 540 790 120l596 420h-176L790 242 390 540Z" fill="#315744"/>
+  <rect x="660" y="610" width="210" height="260" rx="28" fill="#496b57"/>
+  <rect x="460" y="610" width="150" height="150" rx="22" fill="#fdf8f0"/>
+  <rect x="948" y="610" width="150" height="150" rx="22" fill="#fdf8f0"/>
+  <rect x="430" y="900" width="740" height="48" rx="24" fill="#f4d4ae"/>
+  <path d="M0 930c174-70 348-92 526-66 130 20 256 56 400 56 188 0 286-68 496-68 62 0 120 6 178 14v234H0Z" fill="#214738"/>
+  <path d="M0 992c188-56 390-56 604 0 118 30 206 48 328 48 160 0 298-54 502-54 58 0 114 4 166 10v104H0Z" fill="#2e5f49"/>
 </svg>

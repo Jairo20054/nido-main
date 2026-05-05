@@ -22,7 +22,7 @@ export function ForgotPasswordPage() {
 
     try {
       await forgotPassword(email);
-      setMessage('Te enviamos un enlace para restablecer tu contraseña.');
+      setMessage('Te enviamos un enlace para restablecer tu contrasena.');
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -33,11 +33,13 @@ export function ForgotPasswordPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <span className="section__eyebrow">Recuperación</span>
+        <span className="section__eyebrow">Recuperacion</span>
         <h1>Recupera tu acceso</h1>
-        <p>Te enviaremos un enlace seguro para restablecer tu contraseña.</p>
+        <p>Te enviaremos un enlace seguro para restablecer tu contrasena.</p>
+
         <form className="auth-form" onSubmit={handleSubmit}>
           <InlineMessage tone={error ? 'danger' : 'success'}>{error || message}</InlineMessage>
+
           <div className="field-group">
             <label htmlFor="recoveryEmail">Correo</label>
             <input
@@ -48,9 +50,11 @@ export function ForgotPasswordPage() {
               required
             />
           </div>
+
           <button className="button" type="submit" disabled={submitting}>
             {submitting ? 'Enviando...' : 'Enviar enlace'}
           </button>
+
           <div className="auth-form__footer">
             <Link to="/login" className="auth-form__link">
               Volver al ingreso

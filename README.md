@@ -4,10 +4,10 @@ Aplicacion full stack para publicar, administrar y arrendar propiedades. El proy
 
 ## Arquitectura
 
-- `src/`: frontend React, rutas, paginas de negocio y componentes reutilizables.
+- `frontend/src/`: frontend React, rutas, paginas de negocio y componentes reutilizables.
 - `backend/src/`: API REST, modulos por dominio, middlewares compartidos y capa de seguridad.
-- `prisma/`: modelo de datos, generacion del cliente y seed de demo.
-- `public/`: assets estaticos servidos por el frontend.
+- `backend/prisma/`: modelo de datos, generacion del cliente y seed de demo.
+- `frontend/public/`: assets estaticos servidos por el frontend.
 - `scripts/`: utilidades de arranque, limpieza de procesos y verificaciones locales.
 - `supabase/`: configuracion y artefactos auxiliares para la integracion con Supabase.
 
@@ -18,7 +18,7 @@ Aplicacion full stack para publicar, administrar y arrendar propiedades. El proy
 - Busqueda de propiedades con detalle, favoritos y solicitudes de arriendo.
 - Publicacion y edicion de inmuebles con estados editoriales.
 - Panel administrativo para moderacion, metricas y gestion de arrendadores.
-- Carga local de imagenes y video para previsualizar medios de una propiedad.
+- Carga real de imagenes y video de propiedades sobre Supabase Storage con previsualizacion inmediata.
 
 ## Stack tecnico
 
@@ -90,6 +90,7 @@ Las variables base viven en `.env.example`:
 - `VITE_API_BASE_URL`: base relativa o absoluta para el cliente HTTP del frontend.
 - `VITE_SUPABASE_URL`: URL expuesta al cliente para Auth.
 - `VITE_SUPABASE_ANON_KEY`: clave publica expuesta al cliente.
+- `VITE_SUPABASE_PROPERTY_MEDIA_BUCKET`: bucket publico usado para imagenes y videos de propiedades.
 - `VITE_SUPABASE_REDIRECT_URL`: URL de retorno del flujo de recuperacion de contrasena.
 
 ## Scripts utiles
@@ -107,7 +108,7 @@ Las variables base viven en `.env.example`:
 
 1. El frontend inicia sesion con Supabase.
 2. El token de acceso se mantiene en memoria y se adjunta al cliente API.
-3. El backend valida el token usando Supabase y garantiza la existencia del perfil en `profiles`.
+3. El backend valida el token usando Supabase y garantiza la existencia del perfil operativo en Prisma `user`.
 4. La API devuelve un perfil enriquecido con rol efectivo y permisos administrativos.
 
 Este diseno evita duplicar contrasenas en la aplicacion y centraliza la autorizacion de negocio en el backend.

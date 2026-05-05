@@ -43,33 +43,47 @@ export function LoginPage() {
         <span className="section__eyebrow">Acceso</span>
         <h1>Ingresa a tu cuenta</h1>
         <p>Gestiona guardados, solicitudes y propiedades desde una sola experiencia.</p>
+
         <form className="auth-form" onSubmit={handleSubmit}>
           <InlineMessage tone="danger">{error}</InlineMessage>
+
           <div className="field-group">
             <label htmlFor="identifier">Correo o usuario</label>
             <input
               id="identifier"
               value={form.identifier}
-              onChange={(event) => setForm((current) => ({ ...current, identifier: event.target.value }))}
+              onChange={(event) =>
+                setForm((current) => ({ ...current, identifier: event.target.value }))
+              }
               placeholder="admin o correo@dominio.com"
               autoComplete="username"
+              required
             />
           </div>
+
           <div className="field-group">
             <label htmlFor="password">Contrasena</label>
             <input
               id="password"
               type="password"
               value={form.password}
-              onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
+              onChange={(event) =>
+                setForm((current) => ({ ...current, password: event.target.value }))
+              }
               autoComplete="current-password"
+              required
             />
           </div>
+
           <div className="auth-form__footer">
             <Link to="/forgot-password" className="auth-form__link">
-              ¿Olvidaste tu contraseña?
+              Olvidaste tu contrasena?
+            </Link>
+            <Link to="/register" className="auth-form__link">
+              Crear cuenta
             </Link>
           </div>
+
           <button className="button" type="submit" disabled={submitting}>
             {submitting ? 'Ingresando...' : 'Ingresar'}
           </button>

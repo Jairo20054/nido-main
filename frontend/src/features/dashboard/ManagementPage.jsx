@@ -50,7 +50,10 @@ export function ManagementPage() {
   const dashboardStats = useMemo(
     () => [
       { label: 'Mis publicaciones', value: properties.length },
-      { label: 'Pendientes de revision', value: properties.filter((item) => item.status === 'PENDING').length },
+      {
+        label: 'Pendientes de revision',
+        value: properties.filter((item) => item.status === 'PENDING').length,
+      },
       { label: 'Solicitudes recibidas', value: requests.length },
       { label: 'Rol actual', value: user?.role || 'LANDLORD' },
     ],
@@ -143,7 +146,9 @@ export function ManagementPage() {
           ))}
         </div>
 
-        <InlineMessage tone={message && !message.toLowerCase().includes('error') ? 'success' : 'danger'}>
+        <InlineMessage
+          tone={message && !message.toLowerCase().includes('error') ? 'success' : 'danger'}
+        >
           {message}
         </InlineMessage>
 
@@ -173,12 +178,17 @@ export function ManagementPage() {
                   {properties.map((property) => (
                     <div className="management-item management-item--stack" key={property.id}>
                       <div className="management-item__main">
-                        <PropertyImage property={property} alt={property.title} className="management-item__thumb" />
+                        <PropertyImage
+                          property={property}
+                          alt={property.title}
+                          className="management-item__thumb"
+                        />
                         <div>
                           <strong>{property.title}</strong>
                           <p>
                             {property.city}
-                            {property.neighborhood ? `, ${property.neighborhood}` : ''} · {formatCurrency(property.monthlyRent)}
+                            {property.neighborhood ? `, ${property.neighborhood}` : ''} -{' '}
+                            {formatCurrency(property.monthlyRent)}
                           </p>
                           <small>
                             {property.availableImmediately
@@ -189,10 +199,18 @@ export function ManagementPage() {
                       </div>
                       <div className="management-item__actions">
                         <PropertyStatusBadge status={property.status} />
-                        <button className="button button--secondary" type="button" onClick={() => setEditingProperty(property)}>
+                        <button
+                          className="button button--secondary"
+                          type="button"
+                          onClick={() => setEditingProperty(property)}
+                        >
                           Editar
                         </button>
-                        <button className="button button--ghost-danger" type="button" onClick={() => handleDeleteProperty(property.id)}>
+                        <button
+                          className="button button--ghost-danger"
+                          type="button"
+                          onClick={() => handleDeleteProperty(property.id)}
+                        >
                           Eliminar
                         </button>
                       </div>
@@ -223,7 +241,8 @@ export function ManagementPage() {
                       <div>
                         <strong>{request.property.title}</strong>
                         <p>
-                          {request.tenant.fullName} · ingreso {formatDate(request.desiredMoveIn)} · {request.leaseMonths} meses
+                          {request.tenant.fullName} - ingreso {formatDate(request.desiredMoveIn)} -{' '}
+                          {request.leaseMonths} meses
                         </p>
                         <small>{request.message}</small>
                       </div>
@@ -231,10 +250,18 @@ export function ManagementPage() {
                         <RequestStatusBadge status={request.status} />
                         {request.status === 'PENDING' ? (
                           <div className="request-item__buttons">
-                            <button className="button" type="button" onClick={() => handleReviewRequest(request.id, 'APPROVED')}>
+                            <button
+                              className="button"
+                              type="button"
+                              onClick={() => handleReviewRequest(request.id, 'APPROVED')}
+                            >
                               Aprobar
                             </button>
-                            <button className="button button--secondary" type="button" onClick={() => handleReviewRequest(request.id, 'REJECTED')}>
+                            <button
+                              className="button button--secondary"
+                              type="button"
+                              onClick={() => handleReviewRequest(request.id, 'REJECTED')}
+                            >
                               Rechazar
                             </button>
                           </div>

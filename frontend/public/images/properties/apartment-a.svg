@@ -1,28 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1100" role="img" aria-labelledby="title desc">
   <title id="title">Apartamento urbano</title>
-  <desc id="desc">Ilustracion de un apartamento luminoso con balcon y ciudad al fondo.</desc>
+  <desc id="desc">Ilustracion editorial de un apartamento moderno con tonos calidos.</desc>
   <defs>
-    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
-      <stop offset="0%" stop-color="#dff3f4" />
-      <stop offset="100%" stop-color="#f7ede2" />
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f6efe6"/>
+      <stop offset="100%" stop-color="#d5e6dd"/>
     </linearGradient>
-    <linearGradient id="building" x1="0" x2="1">
-      <stop offset="0%" stop-color="#f6f1e9" />
-      <stop offset="100%" stop-color="#dfd2c0" />
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fefcf8"/>
+      <stop offset="100%" stop-color="#cfe2d8"/>
     </linearGradient>
   </defs>
-  <rect width="800" height="560" fill="url(#sky)" />
-  <circle cx="640" cy="96" r="46" fill="#ffd27d" />
-  <rect x="0" y="372" width="800" height="188" fill="#d7e9cf" />
-  <rect x="148" y="120" width="504" height="280" rx="26" fill="url(#building)" />
-  <rect x="188" y="156" width="428" height="172" rx="18" fill="#ffffff" opacity="0.88" />
-  <rect x="220" y="190" width="88" height="106" rx="12" fill="#9ed2d1" />
-  <rect x="332" y="190" width="88" height="106" rx="12" fill="#b5d9f4" />
-  <rect x="444" y="190" width="88" height="106" rx="12" fill="#9ed2d1" />
-  <rect x="556" y="190" width="28" height="138" rx="10" fill="#3f5f4b" />
-  <rect x="230" y="334" width="344" height="18" rx="9" fill="#b5865b" />
-  <rect x="208" y="352" width="388" height="22" rx="11" fill="#cc9a6d" />
-  <path d="M258 372c24-38 52-38 76 0" stroke="#3f7d5a" stroke-width="10" fill="none" stroke-linecap="round" />
-  <path d="M398 372c24-38 52-38 76 0" stroke="#3f7d5a" stroke-width="10" fill="none" stroke-linecap="round" />
-  <path d="M182 408h436c18 0 32 14 32 32v16H150v-16c0-18 14-32 32-32z" fill="#254336" opacity="0.88" />
+  <rect width="1600" height="1100" fill="url(#bg)"/>
+  <circle cx="1280" cy="190" r="120" fill="#f3c992" opacity=".55"/>
+  <circle cx="260" cy="940" r="220" fill="#cddfd5" opacity=".55"/>
+  <rect x="210" y="240" width="1180" height="620" rx="52" fill="#fffaf2"/>
+  <rect x="260" y="290" width="1080" height="520" rx="34" fill="#efe7db"/>
+  <rect x="320" y="350" width="330" height="400" rx="24" fill="url(#glass)"/>
+  <rect x="690" y="350" width="280" height="180" rx="22" fill="#e1efe7"/>
+  <rect x="1010" y="350" width="270" height="400" rx="22" fill="#f7d8b3"/>
+  <rect x="720" y="570" width="230" height="180" rx="22" fill="#dbe9e0"/>
+  <rect x="760" y="610" width="150" height="20" rx="10" fill="#8aa691"/>
+  <rect x="760" y="648" width="110" height="16" rx="8" fill="#a0b7a7"/>
+  <rect x="1100" y="420" width="90" height="160" rx="18" fill="#3f5d4d"/>
+  <rect x="1210" y="420" width="42" height="160" rx="18" fill="#e8f0ea"/>
+  <rect x="370" y="420" width="90" height="200" rx="18" fill="#c98d63"/>
+  <rect x="470" y="420" width="120" height="120" rx="18" fill="#6d8f79"/>
+  <path d="M0 920c180-90 330-130 450-120 178 16 264 124 466 124 188 0 252-84 452-84 112 0 189 20 232 36v224H0Z" fill="#214738"/>
+  <path d="M0 980c174-76 336-102 486-78 142 24 242 76 388 76 166 0 254-74 450-74 120 0 212 26 276 52v144H0Z" fill="#2f5d49"/>
 </svg>

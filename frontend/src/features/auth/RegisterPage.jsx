@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { useAuth } from '../../app/providers/AuthProvider';
 import { resolvePostAuthDestination } from './authRedirects';
@@ -156,11 +156,19 @@ export function RegisterPage() {
                 <option value="TENANT">Arrendatario</option>
                 <option value="LANDLORD">Arrendador</option>
               </select>
+              <small className="field-help">
+                El perfil define si entraras a explorar propiedades o a publicar inventario.
+              </small>
             </div>
           </div>
           <button className="button" type="submit" disabled={submitting}>
             {submitting ? 'Creando cuenta...' : 'Crear cuenta'}
           </button>
+          <div className="auth-form__footer">
+            <Link to="/login" className="auth-form__link">
+              Ya tienes cuenta? Ingresar
+            </Link>
+          </div>
         </form>
       </div>
     </div>
