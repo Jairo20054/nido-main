@@ -29,8 +29,8 @@ export function AdminPage() {
 
     try {
       const [propertiesResponse, landlordsResponse, statsResponse] = await Promise.all([
-        api.get('/admin/properties'),
-        api.get('/admin/landlords'),
+        api.get('/admin/properties', { query: { limit: 50 } }),
+        api.get('/admin/landlords', { query: { limit: 50 } }),
         api.get('/admin/stats'),
       ]);
 

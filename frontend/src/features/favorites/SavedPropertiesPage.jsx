@@ -21,7 +21,7 @@ export function SavedPropertiesPage() {
     setError('');
 
     try {
-      const response = await api.get('/favorites');
+      const response = await api.get('/favorites', { query: { limit: 50 } });
       setItems(response.data);
     } catch (requestError) {
       setError(requestError.message);

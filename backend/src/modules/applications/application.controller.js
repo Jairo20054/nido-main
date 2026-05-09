@@ -1,4 +1,4 @@
-const { supabaseAdmin } = require('../../shared/supabase');
+const { supabaseService: supabaseAdmin } = require('../../shared/supabase');
 const { badRequest, notFound } = require('../../shared/errors');
 const { serializeProperty } = require('../../shared/serializers');
 
@@ -353,6 +353,10 @@ const calculatePrequalification = (property, payload) => {
 };
 
 const prequalifyApplication = async (req, res) => {
+  if (!supabaseAdmin) {
+    throw badRequest('Supabase de administracion no esta configurado en el servidor');
+  }
+
   const { data: propertyRow, error: propertyError } = await supabaseAdmin
     .from('properties')
     .select('*')
@@ -394,7 +398,7 @@ const prequalifyApplication = async (req, res) => {
       .single();
 
     if (applicationError) {
-      throw badRequest(applicationError.message);
+      throw badRequest('No fue posible iniciar la aplicacion para esta propiedad');
     }
 
     applicationId = application.id;

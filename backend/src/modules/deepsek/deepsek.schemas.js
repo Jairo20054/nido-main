@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const analyzeSchema = Joi.object({
-  text: Joi.string().min(1).required(),
+  text: Joi.string().trim().min(1).max(4000).required(),
 });
 
 module.exports = { analyzeSchema };

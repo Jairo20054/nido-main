@@ -57,7 +57,7 @@ const deleteProfile = async (req, res) => {
   }
 
   await deleteAuthUser(req.user.id);
-  await prisma.user.delete({
+  await prisma.user.deleteMany({
     where: { id: req.user.id },
   });
 

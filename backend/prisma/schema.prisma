@@ -132,6 +132,7 @@ model Property {
 
   @@index([city, status])
   @@index([ownerId, status])
+  @@index([status, publishedAt, createdAt])
   @@index([monthlyRent, bedrooms])
   @@index([propertyType, rentalType])
   @@index([availableFrom, minLeaseMonths])
@@ -179,6 +180,7 @@ model Favorite {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, propertyId])
+  @@index([userId, createdAt])
   @@index([propertyId])
 }
 
@@ -203,6 +205,8 @@ model RentalRequest {
   tenant        User          @relation("TenantRequests", fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([tenantId, status])
+  @@index([tenantId, createdAt])
   @@index([landlordId, status])
+  @@index([landlordId, createdAt])
   @@index([propertyId, status])
 }

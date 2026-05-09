@@ -1,12 +1,20 @@
-const fetch = require('node-fetch');
 const { env } = require('../../shared/env');
 
-const deepsekKey = env.DEEPSEK_API_KEY || process.env.DEEPSEK_API_KEY || '';
-const DEEPSEK_BASE = process.env.DEEPSEK_API_BASE || 'https://api.deepsek.ai';
+const deepsekKey = env.DEEPSEK_API_KEY;
+const DEEPSEK_BASE = env.DEEPSEK_API_BASE;
 
 if (!deepsekKey) {
   console.warn('[warn] DEEPSEK_API_KEY is not configured. Deepsek calls will fail.');
 }
+
+const getFetch = async () => {
+  if (typeof fetch === 'function') {
+    return fetch;
+  }
+
+  const { default: nodeFetch } = await import('node-fetch');
+  return nodeFetch;
+};
 
 async function analyzeText(text) {
   if (!deepsekKey) {
@@ -14,8 +22,9 @@ async function analyzeText(text) {
   }
 
   const url = `${DEEPSEK_BASE}/v1/analyze`;
+  const request = await getFetch();
 
-  const res = await fetch(url, {
+  const res = await request(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

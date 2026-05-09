@@ -1,5 +1,6 @@
 const { UserRole } = require('@prisma/client');
 const { prisma } = require('../../shared/prisma');
+const { buildPaginationMeta, getPagination } = require('../../shared/pagination');
 const { serializeProperty, serializeUser } = require('../../shared/serializers');
 
 // Include especifico del panel admin para exponer relaciones utiles en moderacion.
@@ -23,6 +24,7 @@ const adminPropertyInclude = {
 // Devuelve el inventario completo con filtros administrativos y metadatos de moderacion.
 const listAdminProperties = async (req, res) => {
   const { status, city, q } = req.query;
+  const { page, limit, skip, take } = getPagination(req.query);
   const where = {};
 
   if (status) {
@@ -48,26 +50,36 @@ const listAdminProperties = async (req, res) => {
     ];
   }
 
-  const items = await prisma.property.findMany({
-    where,
-    include: adminPropertyInclude,
-    orderBy: [{ updatedAt: 'desc' }],
-  });
+  const [items, total] = await Promise.all([
+    prisma.property.findMany({
+      where,
+      include: adminPropertyInclude,
+      orderBy: [{ updatedAt: 'desc' }],
+      skip,
+      take,
+    }),
+    prisma.property.count({ where }),
+  ]);
 
   res.json({
     success: true,
     data: items.map((item) => serializeProperty(item, req.user.id)),
+    meta: buildPaginationMeta({ page, limit, total }),
   });
 };
 
 // Lista arrendadores junto con el numero de propiedades asociadas a cada perfil.
-const listLandlords = async (_req, res) => {
-  const [landlords, propertyCounts] = await Promise.all([
+const listLandlords = async (req, res) => {
+  const { page, limit, skip, take } = getPagination(req.query);
+  const where = {
+    role: UserRole.LANDLORD,
+  };
+  const [landlords, propertyCounts, total] = await Promise.all([
     prisma.user.findMany({
-      where: {
-        role: UserRole.LANDLORD,
-      },
+      where,
       orderBy: [{ createdAt: 'desc' }],
+      skip,
+      take,
     }),
     prisma.property.groupBy({
       by: ['ownerId'],
@@ -75,6 +87,7 @@ const listLandlords = async (_req, res) => {
         _all: true,
       },
     }),
+    prisma.user.count({ where }),
   ]);
 
   const propertyMap = new Map(propertyCounts.map((item) => [item.ownerId, item._count._all]));
@@ -85,6 +98,7 @@ const listLandlords = async (_req, res) => {
       ...serializeUser(user, true),
       propertyCount: propertyMap.get(user.id) || 0,
     })),
+    meta: buildPaginationMeta({ page, limit, total }),
   });
 };
 

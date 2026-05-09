@@ -1,48 +1,61 @@
+const { PropertyStatus } = require('@prisma/client');
 const { prisma } = require('../../shared/prisma');
 const { notFound } = require('../../shared/errors');
+const { buildPaginationMeta, getPagination } = require('../../shared/pagination');
 const { serializeProperty } = require('../../shared/serializers');
 
 // Devuelve las propiedades guardadas por el usuario actual.
 const listFavorites = async (req, res) => {
-  const favorites = await prisma.favorite.findMany({
-    where: {
-      userId: req.user.id,
-    },
-    include: {
-      property: {
-        include: {
-          owner: true,
-          media: true,
-          favorites: {
-            where: {
-              userId: req.user.id,
+  const { page, limit, skip, take } = getPagination(req.query);
+  const where = {
+    userId: req.user.id,
+  };
+  const [favorites, total] = await Promise.all([
+    prisma.favorite.findMany({
+      where,
+      include: {
+        property: {
+          include: {
+            owner: true,
+            media: true,
+            favorites: {
+              where: {
+                userId: req.user.id,
+              },
             },
-          },
-          _count: {
-            select: {
-              rentalRequests: true,
+            _count: {
+              select: {
+                rentalRequests: true,
+              },
             },
           },
         },
       },
-    },
-    orderBy: [{ createdAt: 'desc' }],
-  });
+      orderBy: [{ createdAt: 'desc' }],
+      skip,
+      take,
+    }),
+    prisma.favorite.count({ where }),
+  ]);
 
   res.json({
     success: true,
     data: favorites.map((favorite) => serializeProperty(favorite.property, req.user.id)),
+    meta: buildPaginationMeta({ page, limit, total }),
   });
 };
 
 // Guarda una propiedad como favorita idempotentemente usando upsert.
 const addFavorite = async (req, res) => {
-  const property = await prisma.property.findUnique({
-    where: { id: req.params.propertyId },
+  const property = await prisma.property.findFirst({
+    where: {
+      id: req.params.propertyId,
+      status: PropertyStatus.PUBLISHED,
+    },
   });
 
   if (!property) {
-    throw notFound('La propiedad no existe');
+    throw notFound('La propiedad no esta disponible');
   }
 
   await prisma.favorite.upsert({

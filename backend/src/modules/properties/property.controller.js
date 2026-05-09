@@ -4,6 +4,7 @@ const { env } = require('../../shared/env');
 const { prisma } = require('../../shared/prisma');
 const { supabaseService } = require('../../shared/supabase');
 const { badRequest, forbidden, notFound } = require('../../shared/errors');
+const { buildPaginationMeta, getPagination } = require('../../shared/pagination');
 const { slugify } = require('../../shared/slugify');
 const { serializeProperty } = require('../../shared/serializers');
 
@@ -260,7 +261,7 @@ const buildWhere = (query, user) => {
       where.status = query.status;
     } else {
       // Los usuarios publicos nunca deben forzar estados internos desde la URL.
-      where.status = query.status === PropertyStatus.PUBLISHED ? PropertyStatus.PUBLISHED : PropertyStatus.PUBLISHED;
+      where.status = PropertyStatus.PUBLISHED;
     }
   } else if (!canSeeAllStatuses) {
     where.status = {
@@ -320,10 +321,7 @@ const listProperties = async (req, res) => {
     success: true,
     data: items.map((property) => serializeProperty(property, currentUserId)),
     meta: {
-      page,
-      limit,
-      total,
-      pages: Math.ceil(total / limit),
+      ...buildPaginationMeta({ page, limit, total }),
     },
   });
 };
@@ -349,6 +347,7 @@ const getFeaturedProperties = async (req, res) => {
 // Devuelve el inventario del arrendador autenticado o todo el inventario para admin.
 const getMyProperties = async (req, res) => {
   assertLandlordOrAdmin(req.user);
+  const { page, limit, skip, take } = getPagination(req.query);
 
   const where = isAdmin(req.user)
     ? {}
@@ -356,15 +355,21 @@ const getMyProperties = async (req, res) => {
         ownerId: req.user.id,
       };
 
-  const items = await prisma.property.findMany({
-    where,
-    include: propertyInclude(req.user.id),
-    orderBy: [{ updatedAt: 'desc' }],
-  });
+  const [items, total] = await Promise.all([
+    prisma.property.findMany({
+      where,
+      include: propertyInclude(req.user.id),
+      orderBy: [{ updatedAt: 'desc' }],
+      skip,
+      take,
+    }),
+    prisma.property.count({ where }),
+  ]);
 
   res.json({
     success: true,
     data: items.map((property) => serializeProperty(property, req.user.id)),
+    meta: buildPaginationMeta({ page, limit, total }),
   });
 };
 

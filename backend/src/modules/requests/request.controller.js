@@ -1,6 +1,7 @@
 const { RequestStatus, PropertyStatus } = require('@prisma/client');
 const { prisma } = require('../../shared/prisma');
 const { badRequest, forbidden, notFound } = require('../../shared/errors');
+const { buildPaginationMeta, getPagination } = require('../../shared/pagination');
 const { serializeRentalRequest } = require('../../shared/serializers');
 
 // Include reutilizable para leer solicitudes con toda la informacion necesaria
@@ -58,34 +59,36 @@ const createRequest = async (req, res) => {
     throw badRequest('No puedes solicitar tu propia propiedad');
   }
 
-  const existingRequest = await prisma.rentalRequest.findFirst({
-    where: {
-      propertyId: property.id,
-      tenantId: req.user.id,
-      status: {
-        in: [RequestStatus.PENDING, RequestStatus.APPROVED],
+  const request = await prisma.$transaction(async (tx) => {
+    const existingRequest = await tx.rentalRequest.findFirst({
+      where: {
+        propertyId: property.id,
+        tenantId: req.user.id,
+        status: {
+          in: [RequestStatus.PENDING, RequestStatus.APPROVED],
+        },
       },
-    },
-  });
+    });
 
-  if (existingRequest) {
-    throw badRequest('Ya tienes una solicitud activa para esta propiedad');
-  }
+    if (existingRequest) {
+      throw badRequest('Ya tienes una solicitud activa para esta propiedad');
+    }
 
-  const request = await prisma.rentalRequest.create({
-    data: {
-      propertyId: property.id,
-      tenantId: req.user.id,
-      landlordId: property.ownerId,
-      desiredMoveIn: req.body.desiredMoveIn,
-      leaseMonths: req.body.leaseMonths,
-      occupants: req.body.occupants,
-      monthlyIncome: req.body.monthlyIncome ?? null,
-      hasPets: req.body.hasPets,
-      phone: req.body.phone,
-      message: req.body.message,
-    },
-    include: requestInclude(req.user.id),
+    return tx.rentalRequest.create({
+      data: {
+        propertyId: property.id,
+        tenantId: req.user.id,
+        landlordId: property.ownerId,
+        desiredMoveIn: req.body.desiredMoveIn,
+        leaseMonths: req.body.leaseMonths,
+        occupants: req.body.occupants,
+        monthlyIncome: req.body.monthlyIncome ?? null,
+        hasPets: req.body.hasPets,
+        phone: req.body.phone,
+        message: req.body.message,
+      },
+      include: requestInclude(req.user.id),
+    });
   });
 
   res.status(201).json({
@@ -97,33 +100,49 @@ const createRequest = async (req, res) => {
 
 // Solicitudes emitidas por el usuario autenticado en rol de arrendatario.
 const getMyRequests = async (req, res) => {
-  const requests = await prisma.rentalRequest.findMany({
-    where: {
-      tenantId: req.user.id,
-    },
-    include: requestInclude(req.user.id),
-    orderBy: [{ createdAt: 'desc' }],
-  });
+  const { page, limit, skip, take } = getPagination(req.query);
+  const where = {
+    tenantId: req.user.id,
+  };
+  const [requests, total] = await Promise.all([
+    prisma.rentalRequest.findMany({
+      where,
+      include: requestInclude(req.user.id),
+      orderBy: [{ createdAt: 'desc' }],
+      skip,
+      take,
+    }),
+    prisma.rentalRequest.count({ where }),
+  ]);
 
   res.json({
     success: true,
     data: requests.map((request) => serializeRentalRequest(request, req.user.id)),
+    meta: buildPaginationMeta({ page, limit, total }),
   });
 };
 
 // Solicitudes recibidas por el propietario de las viviendas.
 const getReceivedRequests = async (req, res) => {
-  const requests = await prisma.rentalRequest.findMany({
-    where: {
-      landlordId: req.user.id,
-    },
-    include: requestInclude(req.user.id),
-    orderBy: [{ createdAt: 'desc' }],
-  });
+  const { page, limit, skip, take } = getPagination(req.query);
+  const where = {
+    landlordId: req.user.id,
+  };
+  const [requests, total] = await Promise.all([
+    prisma.rentalRequest.findMany({
+      where,
+      include: requestInclude(req.user.id),
+      orderBy: [{ createdAt: 'desc' }],
+      skip,
+      take,
+    }),
+    prisma.rentalRequest.count({ where }),
+  ]);
 
   res.json({
     success: true,
     data: requests.map((request) => serializeRentalRequest(request, req.user.id)),
+    meta: buildPaginationMeta({ page, limit, total }),
   });
 };
 

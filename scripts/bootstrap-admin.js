@@ -40,13 +40,12 @@ const adminEmail = (
   process.env.ADMIN_LOGIN_EMAIL ||
   process.env.VITE_SUPER_ADMIN_LOGIN_EMAIL ||
   process.env.VITE_ADMIN_LOGIN_EMAIL ||
-  'castillojairo2001@gmail.com'
+  'admin@nido.local'
 ).trim().toLowerCase();
-const adminPassword =
-  process.env.SUPER_ADMIN_LOGIN_PASSWORD || process.env.ADMIN_LOGIN_PASSWORD || 'Andres2001*';
+const adminPassword = process.env.SUPER_ADMIN_LOGIN_PASSWORD || process.env.ADMIN_LOGIN_PASSWORD || '';
 
 const hasPlaceholderUrl = /your-project\.supabase\.co/i.test(supabaseUrl);
-const hasPlaceholderKey = /your-(anon|service-role)-key/i.test(serviceRoleKey);
+const hasPlaceholderKey = /^your-(anon|publishable|secret|service)/i.test(serviceRoleKey.trim());
 
 if (!supabaseUrl || !serviceRoleKey || hasPlaceholderUrl || hasPlaceholderKey) {
   throw new Error(
@@ -55,7 +54,7 @@ if (!supabaseUrl || !serviceRoleKey || hasPlaceholderUrl || hasPlaceholderKey) {
 }
 
 if (adminPassword.length < 8) {
-  throw new Error('SUPER_ADMIN_LOGIN_PASSWORD debe tener al menos 8 caracteres.');
+  throw new Error('Define SUPER_ADMIN_LOGIN_PASSWORD o ADMIN_LOGIN_PASSWORD con al menos 8 caracteres.');
 }
 
 const supabase = createClient(supabaseUrl, serviceRoleKey, {
@@ -71,7 +70,6 @@ const buildMetadata = () => ({
   last_name: 'Nido',
   full_name: 'Admin Nido',
   phone: null,
-  role: 'ADMIN',
   access_alias: adminAlias,
   country_code: null,
   locale: 'es',

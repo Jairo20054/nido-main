@@ -13,7 +13,8 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 // Construye URLs relativas al backend y elimina query params vacios para evitar ruido en la API.
 const buildUrl = (path, query) => {
-  const url = new URL(`${API_BASE_URL}${path}`, window.location.origin);
+  const normalizedBase = API_BASE_URL.replace(/\/$/, '');
+  const url = new URL(`${normalizedBase}${path}`, window.location.origin);
 
   Object.entries(query || {}).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
@@ -21,7 +22,11 @@ const buildUrl = (path, query) => {
     }
   });
 
-  return `${url.pathname}${url.search}`;
+  if (url.origin === window.location.origin) {
+    return `${url.pathname}${url.search}`;
+  }
+
+  return `${url.origin}${url.pathname}${url.search}`;
 };
 
 /**

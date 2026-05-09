@@ -1,11 +1,17 @@
 const Joi = require('joi');
 const { MediaType, PropertyStatus, PropertyType, RentalType } = require('@prisma/client');
 
+const PROPERTY_MEDIA_URL_MAX_LENGTH = 2048;
+
 // Esquemas de validacion para el payload de propiedades y sus consultas.
 const propertyMediaSchema = Joi.object({
   id: Joi.string().trim().optional(),
   type: Joi.string().valid(MediaType.IMAGE, MediaType.VIDEO).required(),
-  url: Joi.string().trim().min(12).max(4000000).required(),
+  url: Joi.string()
+    .trim()
+    .uri({ scheme: ['http', 'https'] })
+    .max(PROPERTY_MEDIA_URL_MAX_LENGTH)
+    .required(),
   alt: Joi.string().trim().max(160).allow('', null),
   position: Joi.number().integer().min(0).required(),
   mimeType: Joi.string().trim().max(80).allow('', null),
@@ -158,7 +164,7 @@ const propertyQuerySchema = Joi.object({
   ),
   sort: Joi.string().valid('recommended', 'latest', 'rent-asc', 'rent-desc').default('recommended'),
   page: Joi.number().integer().min(1).default(1),
-  limit: Joi.number().integer().min(1).max(24).default(9),
+  limit: Joi.number().integer().min(1).max(50).default(9),
 });
 
 const propertyStatusSchema = Joi.object({

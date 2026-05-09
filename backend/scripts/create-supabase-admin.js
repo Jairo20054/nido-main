@@ -107,10 +107,12 @@ async function createUser() {
     user_metadata: {
       firstName,
       lastName,
-      role: 'admin',
       locale: 'es-CO',
       countryCode: 'CO',
       timezone: 'America/Bogota',
+    },
+    app_metadata: {
+      role: 'ADMIN',
     },
   });
 
@@ -156,7 +158,6 @@ async function main() {
 
   console.log('Usuario admin creado correctamente.');
   console.log(`Email: ${email}`);
-  console.log(`Password: ${password}`);
   console.log(`User ID: ${user.id}`);
 
   if (verification.skipped) {

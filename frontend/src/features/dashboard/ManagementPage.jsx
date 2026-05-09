@@ -30,8 +30,8 @@ export function ManagementPage() {
 
     try {
       const [propertyResponse, requestResponse] = await Promise.all([
-        api.get('/properties/mine'),
-        api.get('/requests/received'),
+        api.get('/properties/mine', { query: { limit: 50 } }),
+        api.get('/requests/received', { query: { limit: 50 } }),
       ]);
       setProperties(propertyResponse.data);
       setRequests(requestResponse.data);

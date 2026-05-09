@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { api } from '../../lib/apiClient';
 import { clearAuthToken, setAuthToken } from '../../lib/authToken';
 import { getPasswordResetUrl, getSupabaseConfigError, resolveAuthEmail, supabase } from '../../lib/supabaseClient';
@@ -57,6 +57,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState('');
   const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
+  const authTaskTimers = useRef(new Set());
 
   // Rehidrata el estado local cada vez que cambia la sesion remota.
   const hydrateSession = async (nextSession, options = {}) => {
@@ -135,7 +136,9 @@ export function AuthProvider({ children }) {
     } = supabase.auth.onAuthStateChange((event, nextSession) => {
       // El callback de Supabase puede ejecutarse durante el render; por eso se
       // delega a la cola de tareas para evitar estados inconsistentes.
-      setTimeout(() => {
+      const taskId = setTimeout(() => {
+        authTaskTimers.current.delete(taskId);
+
         if (!mounted) {
           return;
         }
@@ -158,10 +161,14 @@ export function AuthProvider({ children }) {
           void hydrateSession(nextSession, { keepError: true });
         }
       }, 0);
+
+      authTaskTimers.current.add(taskId);
     });
 
     return () => {
       mounted = false;
+      authTaskTimers.current.forEach((taskId) => clearTimeout(taskId));
+      authTaskTimers.current.clear();
       subscription.unsubscribe();
     };
   }, []);

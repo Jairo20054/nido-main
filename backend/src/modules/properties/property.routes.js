@@ -1,6 +1,7 @@
 const express = require('express');
 const { asyncHandler } = require('../../shared/asyncHandler');
 const { optionalAuth, requireAuth, requireRoles } = require('../../shared/auth');
+const { paginationQuerySchema } = require('../../shared/pagination');
 const { validate } = require('../../shared/validate');
 const {
   createPropertySchema,
@@ -15,7 +16,7 @@ const router = express.Router();
 
 router.get('/', optionalAuth, validate(propertyQuerySchema, 'query'), asyncHandler(controller.listProperties));
 router.get('/featured', optionalAuth, asyncHandler(controller.getFeaturedProperties));
-router.get('/mine', requireAuth, asyncHandler(controller.getMyProperties));
+router.get('/mine', requireAuth, validate(paginationQuerySchema, 'query'), asyncHandler(controller.getMyProperties));
 router.post(
   '/',
   requireRoles('LANDLORD', 'ADMIN'),

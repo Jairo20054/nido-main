@@ -28,10 +28,15 @@ const safeRole = (role, fallback = 'TENANT') => {
   return ['ADMIN', 'LANDLORD', 'TENANT'].includes(normalized) ? normalized : fallback;
 };
 
-const getAuthRole = (authUser, fallback = 'TENANT') =>
-  safeRole(authUser?.app_metadata?.role || authUser?.user_metadata?.role, fallback);
+const getAppRole = (authUser, fallback = 'TENANT') =>
+  safeRole(authUser?.app_metadata?.role, fallback);
 
-const isAuthAdmin = (authUser) => getAuthRole(authUser, 'TENANT') === 'ADMIN';
+// user_metadata es editable por el usuario: solo sirve para roles publicos de alta,
+// nunca para conceder privilegios administrativos.
+const getSelfAssignedRole = (authUser, fallback = 'TENANT') =>
+  safeRole(authUser?.user_metadata?.role, fallback);
+
+const isAuthAdmin = (authUser) => getAppRole(authUser, 'TENANT') === 'ADMIN';
 
 // Deriva nombre y apellido cuando la metadata de autenticacion llega incompleta.
 const deriveNameParts = (user) => {
@@ -52,7 +57,7 @@ const deriveNameParts = (user) => {
 const profilePayloadFromAuthUser = (authUser) => {
   const metadata = authUser.user_metadata || {};
   const { firstName, lastName } = deriveNameParts(authUser);
-  const selfAssignedRole = getAuthRole(authUser, 'TENANT');
+  const selfAssignedRole = getSelfAssignedRole(authUser, 'TENANT');
 
   return {
     firstName,
