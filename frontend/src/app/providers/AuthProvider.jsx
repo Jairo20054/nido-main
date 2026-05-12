@@ -1,9 +1,34 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { api } from '../../lib/apiClient';
 import { clearAuthToken, setAuthToken } from '../../lib/authToken';
-import { getPasswordResetUrl, getSupabaseConfigError, resolveAuthEmail, supabase } from '../../lib/supabaseClient';
+import {
+  getEmailConfirmationUrl,
+  getPasswordResetUrl,
+  getSupabaseConfigError,
+  resolveAuthEmail,
+  supabase,
+} from '../../lib/supabaseClient';
 
 const AuthContext = createContext(null);
+
+const normalizeAuthError = (error, fallback = 'No fue posible completar la autenticacion.') => {
+  const message = error?.message || fallback;
+  const normalized = message.toLowerCase();
+
+  if (
+    normalized.includes('invalid login credentials') ||
+    normalized.includes('email not confirmed') ||
+    normalized.includes('invalid credentials')
+  ) {
+    return new Error('Correo o contrasena incorrectos, o la cuenta aun no esta confirmada.');
+  }
+
+  if (normalized.includes('failed to fetch') || normalized.includes('network')) {
+    return new Error('No pudimos conectar con el servicio de autenticacion. Intenta de nuevo.');
+  }
+
+  return new Error(message);
+};
 
 // Sincroniza el token recibido desde Supabase con el cliente HTTP y recupera
 // el perfil enriquecido desde el backend para unificar permisos y datos de usuario.
@@ -85,7 +110,7 @@ export function AuthProvider({ children }) {
       setSession(null);
       setUser(null);
       if (!options.keepError) {
-        setAuthError(error.message);
+        setAuthError(normalizeAuthError(error).message);
       }
       throw error;
     } finally {
@@ -124,7 +149,7 @@ export function AuthProvider({ children }) {
         clearAuthToken();
         setSession(null);
         setUser(null);
-        setAuthError(error.message);
+        setAuthError(normalizeAuthError(error).message);
         setLoading(false);
       }
     };
@@ -158,7 +183,11 @@ export function AuthProvider({ children }) {
         }
 
         if (nextSession?.access_token) {
-          void hydrateSession(nextSession, { keepError: true });
+          void hydrateSession(nextSession, { keepError: true }).catch((error) => {
+            if (mounted) {
+              setAuthError(normalizeAuthError(error).message);
+            }
+          });
         }
       }, 0);
 
@@ -191,16 +220,16 @@ export function AuthProvider({ children }) {
     });
 
     if (error) {
-      if (error.message === getSupabaseConfigError()) {
-        throw error;
-      }
-
-      throw error;
+      throw error.message === getSupabaseConfigError() ? error : normalizeAuthError(error);
     }
 
-    const profile = await hydrateSession(data.session, { keepError: true });
-    setAuthError('');
-    return profile;
+    try {
+      const profile = await hydrateSession(data.session, { keepError: true });
+      setAuthError('');
+      return profile;
+    } catch (profileError) {
+      throw normalizeAuthError(profileError, 'Sesion creada, pero no fue posible cargar tu perfil.');
+    }
   };
 
   const register = async (payload) => {
@@ -211,6 +240,7 @@ export function AuthProvider({ children }) {
       email: String(payload.email || '').trim().toLowerCase(),
       password: payload.password,
       options: {
+        emailRedirectTo: getEmailConfirmationUrl(),
         data: {
           first_name: String(payload.firstName || '').trim(),
           last_name: String(payload.lastName || '').trim(),
@@ -221,17 +251,21 @@ export function AuthProvider({ children }) {
     });
 
     if (error) {
-      throw error;
+      throw normalizeAuthError(error, 'No fue posible crear la cuenta.');
     }
 
     if (data.session) {
-      const profile = await hydrateSession(data.session, { keepError: true });
-      setAuthError('');
-      return {
-        profile,
-        requiresEmailConfirmation: false,
-        session: data.session,
-      };
+      try {
+        const profile = await hydrateSession(data.session, { keepError: true });
+        setAuthError('');
+        return {
+          profile,
+          requiresEmailConfirmation: false,
+          session: data.session,
+        };
+      } catch (profileError) {
+        throw normalizeAuthError(profileError, 'Cuenta creada, pero no fue posible cargar tu perfil.');
+      }
     }
 
     clearAuthToken();
@@ -247,12 +281,15 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
-    clearAuthToken();
-    setSession(null);
-    setUser(null);
-    setIsPasswordRecovery(false);
-    setAuthError('');
+    try {
+      await supabase.auth.signOut();
+    } finally {
+      clearAuthToken();
+      setSession(null);
+      setUser(null);
+      setIsPasswordRecovery(false);
+      setAuthError('');
+    }
   };
 
   const forgotPassword = async (email) => {
@@ -261,23 +298,27 @@ export function AuthProvider({ children }) {
     });
 
     if (error) {
-      throw error;
+      throw normalizeAuthError(error, 'No fue posible enviar el enlace de recuperacion.');
     }
   };
 
   const resetPassword = async (password) => {
-    const { data, error } = await supabase.auth.updateUser({
+    const { error } = await supabase.auth.updateUser({
       password,
     });
 
     if (error) {
-      throw error;
+      throw normalizeAuthError(error, 'No fue posible actualizar la contrasena.');
     }
 
     setIsPasswordRecovery(false);
 
-    if (data.session?.access_token) {
-      await hydrateSession(data.session, { keepError: true });
+    const {
+      data: { session: currentSession },
+    } = await supabase.auth.getSession();
+
+    if (currentSession?.access_token) {
+      await hydrateSession(currentSession, { keepError: true });
     }
 
     setAuthError('');
@@ -295,7 +336,7 @@ export function AuthProvider({ children }) {
     forgotPassword,
     hasRole: (...roles) => roles.includes(user?.role),
     isAdmin: user?.role === 'ADMIN',
-    isAuthenticated: Boolean(user),
+    isAuthenticated: Boolean(session?.access_token && user),
     isLandlord: user?.role === 'LANDLORD' || user?.role === 'ADMIN',
     isPasswordRecovery,
     isTenant: user?.role === 'TENANT',
