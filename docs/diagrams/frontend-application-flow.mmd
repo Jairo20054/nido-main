@@ -1,0 +1,118 @@
+flowchart TD
+  subgraph FE00["Frontend - Inicializacion y control de acceso"]
+    FE01["App monta AuthProvider y rutas"] --> FE02{"Existe token en localStorage?"}
+    FE02 -->|No| FE03["Sesion anonima"]
+    FE02 -->|Si| FE04["GET /api/auth/me"]
+    FE04 --> FE05{"Token valido?"}
+    FE05 -->|Si| FE06["Guardar usuario en contexto"]
+    FE05 -->|No| FE07["Limpiar token y volver a sesion anonima"]
+  end
+
+  subgraph FE10["Frontend publico - Exploracion del catalogo"]
+    FE11["Usuario entra a Home /"] --> FE12["GET /api/properties/featured"]
+    FE12 --> FE13{"Respuesta exitosa?"}
+    FE13 -->|Si| FE14["Mostrar propiedades destacadas"]
+    FE13 -->|No| FE15["Mostrar empty state"]
+
+    FE16["Usuario abre /properties"] --> FE17["Leer filtros desde URL"]
+    FE17 --> FE18["Sincronizar filtros + debounce"]
+    FE18 --> FE19["GET /api/properties con query params"]
+    FE19 --> FE20{"Hay resultados?"}
+    FE20 -->|Si| FE21["Renderizar grid de propiedades"]
+    FE20 -->|No| FE22["Mostrar no encontramos resultados"]
+
+    FE21 --> FE23{"Usuario intenta guardar favorito?"}
+    FE23 -->|No| FE24["Continuar exploracion"]
+    FE23 -->|Si| FE25{"Sesion autenticada?"}
+    FE25 -->|No| FE26["Mostrar mensaje para iniciar sesion"]
+    FE25 -->|Si| FE27["POST o DELETE /api/favorites/:propertyId"]
+    FE27 --> FE28["Actualizar estado isFavorite en UI"]
+  end
+
+  subgraph FE20["Frontend publico - Detalle de propiedad"]
+    FE31["Usuario abre /properties/:id"] --> FE32["GET /api/properties/:id"]
+    FE32 --> FE33{"Propiedad disponible?"}
+    FE33 -->|No| FE34["Mostrar pagina vacia o mensaje de error"]
+    FE33 -->|Si| FE35["Mostrar galeria, costos, amenidades y propietario"]
+    FE35 --> FE36{"Usuario pulsa Guardar?"}
+    FE36 -->|Si| FE25
+    FE36 -->|No| FE37["Usuario puede pulsar Arrendar"]
+  end
+
+  subgraph FE30["Frontend de autenticacion"]
+    FE41["Usuario entra a /login o /register"] --> FE42["Completa formulario"]
+    FE42 --> FE43["POST /api/auth/login o POST /api/auth/register"]
+    FE43 --> FE44{"Operacion exitosa?"}
+    FE44 -->|No| FE45["Mostrar error de autenticacion"]
+    FE44 -->|Si| FE46["Guardar token en localStorage"]
+    FE46 --> FE47["Guardar usuario en AuthContext"]
+    FE47 --> FE48["Redirigir a route from o /account"]
+  end
+
+  subgraph FE40["Frontend de postulacion guiada"]
+    FE51["Desde PropertyDetailPage el usuario pulsa Arrendar"] --> FE52["Abrir /properties/:id/apply/start"]
+    FE52 --> FE53["GET /api/properties/:id para resumen"]
+    FE53 --> FE54{"Propiedad cargada?"}
+    FE54 -->|No| FE55["Mostrar error del flujo"]
+    FE54 -->|Si| FE56["Mostrar resumen del proceso"]
+    FE56 --> FE57["Continuar a /apply/prequal"]
+
+    FE57 --> FE58["Usuario diligencia ocupacion, ingresos, ocupantes y respaldo"]
+    FE58 --> FE59["POST /api/applications/prequalify"]
+    FE59 --> FE60{"Resultado recibido?"}
+    FE60 -->|No| FE61["Mostrar error de precalificacion"]
+    FE60 -->|Si| FE62["Guardar prequalForm, prequalification y documentChecklist en localStorage"]
+    FE62 --> FE63{"Resultado = not_eligible?"}
+    FE63 -->|Si| FE64["Sugerir otros inmuebles o reintento con respaldo"]
+    FE63 -->|No| FE65["Permitir continuar a /apply/documents"]
+
+    FE65 --> FE66["Cargar draft local y resumen del inmueble"]
+    FE66 --> FE67{"Usuario autenticado?"}
+    FE67 -->|No| FE68["Mostrar gate a login o registro"]
+    FE67 -->|Si| FE69["Completar fecha de ingreso, plazo, telefono y mensaje"]
+    FE69 --> FE70["Seleccionar archivos por documento"]
+    FE70 --> FE71["Validar extension y tamano solo en cliente"]
+    FE71 --> FE72{"Todos los documentos quedaron uploaded?"}
+    FE72 -->|No| FE73["Bloquear envio y pedir correccion"]
+    FE72 -->|Si| FE74["POST /api/requests"]
+    FE74 --> FE75{"Solicitud creada?"}
+    FE75 -->|No| FE76["Mostrar error de envio"]
+    FE75 -->|Si| FE77["Guardar submittedRequest en localStorage"]
+    FE77 --> FE78["Redirigir a /apply/review"]
+
+    FE78 --> FE79["Reconstruir timeline con draft local + submittedRequest"]
+    FE79 --> FE80{"Estado request?"}
+    FE80 -->|PENDING| FE81["Mostrar en revision"]
+    FE80 -->|APPROVED| FE82["Mostrar aprobada"]
+    FE80 -->|REJECTED| FE83["Mostrar cerrada y sugerir otras opciones"]
+  end
+
+  subgraph FE50["Frontend autenticado - Cuenta y gestion"]
+    FE91["ProtectedRoute valida acceso a /saved, /account y /manage"] --> FE92{"Sesion autenticada?"}
+    FE92 -->|No| FE93["Redirigir a /login con state.from"]
+    FE92 -->|Si| FE94["Renderizar pagina protegida"]
+
+    FE94 --> FE95["/saved -> GET /api/favorites"]
+    FE94 --> FE96["/account -> GET /api/requests/mine"]
+    FE94 --> FE97["/manage -> GET /api/properties/mine y GET /api/requests/received"]
+
+    FE96 --> FE98["Editar perfil -> PATCH /api/users/me"]
+    FE97 --> FE99{"Gestiona propiedades?"}
+    FE99 -->|Crear| FE100["POST /api/properties"]
+    FE99 -->|Editar| FE101["PATCH /api/properties/:id"]
+    FE99 -->|Eliminar| FE102["DELETE /api/properties/:id"]
+    FE97 --> FE103{"Revisar solicitud?"}
+    FE103 -->|Aprobar| FE104["PATCH /api/requests/:id/status APPROVED"]
+    FE103 -->|Rechazar| FE105["PATCH /api/requests/:id/status REJECTED"]
+  end
+
+  FE03 --> FE11
+  FE03 --> FE16
+  FE03 --> FE31
+  FE06 --> FE11
+  FE06 --> FE16
+  FE06 --> FE31
+  FE26 --> FE41
+  FE37 --> FE51
+  FE68 --> FE41
+  FE48 --> FE66

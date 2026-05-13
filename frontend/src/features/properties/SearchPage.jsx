@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Map, SlidersHorizontal, X } from 'lucide-react';
+import { Map, Search, SlidersHorizontal, X } from 'lucide-react';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { useAuth } from '../../app/providers/AuthProvider';
@@ -18,6 +18,37 @@ const EXTRA_LABELS = {
   gatedCommunity: 'Conjunto cerrado',
 };
 
+const SEARCH_BUDGET_OPTIONS = [
+  { value: 2500000, label: 'Hasta $2.5M' },
+  { value: 3500000, label: 'Hasta $3.5M' },
+  { value: 4500000, label: 'Hasta $4.5M' },
+  { value: 6500000, label: 'Hasta $6.5M' },
+  { value: 9000000, label: 'Hasta $9M' },
+];
+
+const SEARCH_PROPERTY_TYPES = [
+  { value: '', label: 'Cualquier tipo' },
+  { value: 'apartment', label: 'Apartamento' },
+  { value: 'house', label: 'Casa' },
+  { value: 'studio', label: 'Estudio' },
+];
+
+const QUICK_SEARCH_CHIPS = [
+  { key: 'bogota', label: 'Bogota', field: 'city', value: 'Bogota' },
+  { key: 'medellin', label: 'Medellin', field: 'city', value: 'Medellin' },
+  { key: 'apartment', label: 'Apartamentos', field: 'propertyType', value: 'apartment' },
+  { key: 'furnished', label: 'Amoblados', extra: 'furnished' },
+  { key: 'petsAllowed', label: 'Mascotas OK', extra: 'petsAllowed' },
+];
+
+const MAP_PIN_POSITIONS = [
+  { top: '22%', left: '64%' },
+  { top: '36%', left: '32%' },
+  { top: '52%', left: '74%' },
+  { top: '66%', left: '44%' },
+  { top: '78%', left: '58%' },
+];
+
 const getAmenityText = (property) => (property.amenities || []).join(' ').toLowerCase();
 
 export function SearchPage() {
@@ -30,6 +61,9 @@ export function SearchPage() {
   const [savingFavorite, setSavingFavorite] = useState('');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [mapView, setMapView] = useState(false);
+  const budgetSelectValue = SEARCH_BUDGET_OPTIONS.some((option) => option.value === filters.maxRent)
+    ? String(filters.maxRent)
+    : 'custom';
 
   const fetchProperties = async (activeFilters) => {
     setLoading(true);
@@ -143,9 +177,107 @@ export function SearchPage() {
     toggleExtra(key);
   };
 
+  const applyQuickSearch = (chip) => {
+    if (chip.extra) {
+      if (!filters.extras.includes(chip.extra)) {
+        toggleExtra(chip.extra);
+      }
+      return;
+    }
+
+    setFilter(chip.field, chip.value);
+  };
+
+  const showPopularResults = () => {
+    clearFilters();
+    setFilter('city', 'Bogota');
+    setFilter('propertyType', '');
+    setFilter('minRent', 1800000);
+    setFilter('maxRent', 6500000);
+    setFilter('bedrooms', 1);
+    setFilter('bathrooms', 1);
+  };
+
   return (
     <div className="page page--search search-page">
       <section className="section section--compact">
+        <form
+          className="search-command"
+          onSubmit={(event) => {
+            event.preventDefault();
+          }}
+        >
+          <label className="search-command__field search-command__field--location">
+            <span>Donde quieres vivir?</span>
+            <input
+              type="text"
+              placeholder="Ciudad, barrio o zona"
+              value={filters.city}
+              onChange={(event) => setFilter('city', event.target.value)}
+            />
+          </label>
+
+          <label className="search-command__field">
+            <span>Presupuesto</span>
+            <select
+              value={budgetSelectValue}
+              onChange={(event) => {
+                if (event.target.value !== 'custom') {
+                  setFilter('maxRent', Number(event.target.value));
+                }
+              }}
+            >
+              {budgetSelectValue === 'custom' ? (
+                <option value="custom">Hasta {formatCurrency(filters.maxRent)}</option>
+              ) : null}
+              {SEARCH_BUDGET_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="search-command__field">
+            <span>Tipo de vivienda</span>
+            <select
+              value={filters.propertyType}
+              onChange={(event) => setFilter('propertyType', event.target.value)}
+            >
+              {SEARCH_PROPERTY_TYPES.map((option) => (
+                <option key={option.label} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <button type="submit" className="search-command__button">
+            <Search size={18} />
+            Buscar
+          </button>
+
+          <div className="search-command__chips" aria-label="Filtros rapidos">
+            <span>Rapido:</span>
+            {QUICK_SEARCH_CHIPS.map((chip) => {
+              const active = chip.extra
+                ? filters.extras.includes(chip.extra)
+                : filters[chip.field] === chip.value;
+
+              return (
+                <button
+                  key={chip.key}
+                  type="button"
+                  className={`search-command__chip ${active ? 'search-command__chip--active' : ''}`}
+                  onClick={() => applyQuickSearch(chip)}
+                >
+                  {chip.label}
+                </button>
+              );
+            })}
+          </div>
+        </form>
+
         <div className="search-layout">
           <aside className="search-layout__sidebar search-layout__sidebar--desktop">
             <PropertyFilters
@@ -161,14 +293,14 @@ export function SearchPage() {
           <div className="search-layout__results">
             <div className="search-results__topbar">
               <div>
+                <span className="section__eyebrow">Resultados</span>
                 <h1>
                   {loading
-                    ? `Buscando propiedades en ${filters.city || 'Colombia'}`
-                    : `${properties.length} propiedades en ${filters.city || 'Colombia'}`}
+                    ? `Buscando en ${filters.city || 'Colombia'}`
+                    : `${properties.length} propiedades encontradas`}
                 </h1>
                 <p>
-                  Explora opciones pensadas para renta residencial, con filtros visibles, fotos
-                  claras y sin necesidad de iniciar sesion para comparar.
+                  Compara precio, ubicacion y atributos clave sin perder de vista tus filtros.
                 </p>
               </div>
               <div className="search-results__actions">
@@ -183,7 +315,7 @@ export function SearchPage() {
                 </label>
                 <button type="button" className="map-toggle" onClick={() => setMapView((current) => !current)}>
                   <Map size={16} />
-                  {mapView ? 'Ocultar mapa' : 'Ver mapa'}
+                  {mapView ? 'Lista' : 'Mapa'}
                 </button>
               </div>
             </div>
@@ -199,35 +331,58 @@ export function SearchPage() {
             ) : null}
 
             <InlineMessage tone="danger">{error}</InlineMessage>
-            {mapView ? (
-              <div className="map-placeholder">
-                <Map size={20} />
-                <span>Vista de mapa proximamente</span>
-              </div>
-            ) : null}
-            {loading ? (
-              <div className="property-grid">
-                <PropertyCardSkeleton count={6} />
-              </div>
-            ) : properties.length ? (
-              <div className="property-grid">
-                {properties.map((property) => (
-                  <PropertyCard
-                    key={property.id}
-                    property={property}
-                    onToggleFavorite={toggleFavorite}
-                    disabledFavorite={savingFavorite === property.id}
+            <div className={`search-results__content ${mapView ? 'search-results__content--with-map' : ''}`}>
+              <div className="search-results__list">
+                {loading ? (
+                  <div className="property-grid property-grid--results">
+                    <PropertyCardSkeleton count={mapView ? 4 : 8} variant="compact" />
+                  </div>
+                ) : properties.length ? (
+                  <div className="property-grid property-grid--results">
+                    {properties.map((property) => (
+                      <PropertyCard
+                        key={property.id}
+                        property={property}
+                        variant="compact"
+                        onToggleFavorite={toggleFavorite}
+                        disabledFavorite={savingFavorite === property.id}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState
+                    title="No hay propiedades que coincidan"
+                    description="Prueba ampliar el presupuesto, quitar un filtro o revisar una zona cercana."
+                    actionLabel="Limpiar filtros"
+                    onAction={clearFilters}
+                    secondaryActionLabel="Ver populares"
+                    onSecondaryAction={showPopularResults}
                   />
-                ))}
+                )}
               </div>
-            ) : (
-              <EmptyState
-                title="No encontramos resultados"
-                description="Prueba con otro rango de canon, una ciudad distinta o menos restricciones."
-                actionLabel="Limpiar filtros"
-                onAction={clearFilters}
-              />
-            )}
+
+              {mapView ? (
+                <aside className="search-map-panel" aria-label="Mapa referencial de resultados">
+                  <div className="search-map-panel__header">
+                    <span>Mapa</span>
+                    <strong>{filters.city || 'Colombia'}</strong>
+                  </div>
+                  <div className="search-map-panel__canvas">
+                    <span className="search-map-panel__city">{filters.city || 'Zonas principales'}</span>
+                    {(properties.length ? properties : []).slice(0, 5).map((property, index) => (
+                      <span
+                        key={property.id}
+                        className="search-map-pin"
+                        style={MAP_PIN_POSITIONS[index]}
+                      >
+                        {formatCurrency(property.monthlyRent).replace(/\s/g, '')}
+                      </span>
+                    ))}
+                  </div>
+                  <p>Usa la vista dividida para comparar zonas sin salir de la lista.</p>
+                </aside>
+              ) : null}
+            </div>
           </div>
         </div>
       </section>

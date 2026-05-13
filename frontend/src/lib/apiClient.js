@@ -11,6 +11,33 @@ export class ApiError extends Error {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
+const TECHNICAL_ERROR_PATTERNS = [
+  /database_url/i,
+  /prisma/i,
+  /connection string/i,
+  /p\d{4}/i,
+  /econnrefused/i,
+  /failed to fetch/i,
+  /networkerror/i,
+];
+
+const sanitizeErrorMessage = (message, status) => {
+  const fallback =
+    status >= 500
+      ? 'No pudimos cargar la informacion en este momento. Intenta de nuevo en unos minutos.'
+      : 'No fue posible completar la solicitud. Revisa los datos e intenta de nuevo.';
+
+  if (!message) {
+    return fallback;
+  }
+
+  if (TECHNICAL_ERROR_PATTERNS.some((pattern) => pattern.test(message))) {
+    return fallback;
+  }
+
+  return message;
+};
+
 // Construye URLs relativas al backend y elimina query params vacios para evitar ruido en la API.
 const buildUrl = (path, query) => {
   const normalizedBase = API_BASE_URL.replace(/\/$/, '');
@@ -38,20 +65,26 @@ export async function apiRequest(path, options = {}) {
   const { method = 'GET', body, query, auth = true } = options;
   const token = auth ? getAuthToken() : null;
 
-  const response = await fetch(buildUrl(path, query), {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  let response;
+
+  try {
+    response = await fetch(buildUrl(path, query), {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  } catch (error) {
+    throw new ApiError(sanitizeErrorMessage(error.message, 503), 503, null);
+  }
 
   const payload = await response.json().catch(() => ({}));
 
   if (!response.ok) {
     throw new ApiError(
-      payload.message || 'No fue posible completar la solicitud',
+      sanitizeErrorMessage(payload.message, response.status),
       response.status,
       payload.details
     );

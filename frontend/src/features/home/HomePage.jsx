@@ -33,6 +33,29 @@ const TRUST_POINTS = [
   { icon: ShieldCheck, label: 'Costos claros' },
   { icon: Sparkles, label: 'Explora sin cuenta' },
 ];
+const QUICK_FILTERS = [
+  {
+    label: 'Apartamentos listos',
+    description: 'Ve directo a opciones faciles de comparar.',
+    filters: { propertyType: 'apartment' },
+  },
+  {
+    label: 'Hasta $3.5M',
+    description: 'Presupuesto controlado sin perder calidad.',
+    filters: { budget: 3500000 },
+  },
+  {
+    label: 'Con mascotas',
+    description: 'Filtra hogares pet friendly desde el inicio.',
+    filters: { extras: 'petsAllowed' },
+  },
+  {
+    label: 'Publicar inmueble',
+    description: 'Gestiona tu propiedad con una ficha clara.',
+    href: '/register',
+    anchorId: 'para-propietarios',
+  },
+];
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -75,16 +98,36 @@ export function HomePage() {
 
   const handleSearch = (event) => {
     event.preventDefault();
+    navigate(getSearchPath());
+  };
+
+  const getSearchPath = (overrides = {}) => {
+    const nextFilters = { ...searchFilters, ...overrides };
     const params = new URLSearchParams();
 
-    if (searchFilters.city) params.set('ciudad', searchFilters.city);
+    if (nextFilters.city) params.set('ciudad', nextFilters.city);
     params.set('min', '1800000');
-    params.set('max', String(searchFilters.budget));
+    params.set('max', String(nextFilters.budget));
     params.set('hab', '1');
     params.set('banos', '1');
-    if (searchFilters.propertyType) params.set('tipo', searchFilters.propertyType);
+    if (nextFilters.propertyType) params.set('tipo', nextFilters.propertyType);
+    if (nextFilters.extras) params.set('extras', nextFilters.extras);
 
-    navigate(`/properties?${params.toString()}`);
+    return `/properties?${params.toString()}`;
+  };
+
+  const handleCitySearch = (city) => {
+    setSearchFilters((current) => ({ ...current, city }));
+    navigate(getSearchPath({ city }));
+  };
+
+  const handleQuickFilter = (quickFilter) => {
+    if (quickFilter.href) {
+      navigate(quickFilter.href);
+      return;
+    }
+
+    navigate(getSearchPath(quickFilter.filters));
   };
 
   const displayCity = searchFilters.city || 'Colombia';
@@ -97,11 +140,11 @@ export function HomePage() {
       <section className="home-hero">
         <div className="home-hero__content">
           <div className="home-hero__intro">
-            <span className="hero-kicker">Vivienda en arriendo en Colombia</span>
-            <h1 className="home-hero__title">Encontrar hogar deberia sentirse simple.</h1>
+            <span className="hero-kicker">Arriendos claros en Colombia</span>
+            <h1 className="home-hero__title">Donde quieres vivir hoy?</h1>
             <p className="home-hero__subtitle">
-              Busca por zona, presupuesto y tipo de vivienda. Nido te muestra opciones claras,
-              comparables y listas para explorar en segundos.
+              Busca por zona, presupuesto y tipo de vivienda. Nido convierte el catalogo en
+              opciones claras para comparar, guardar y visitar mas rapido.
             </p>
           </div>
 
@@ -175,7 +218,7 @@ export function HomePage() {
                 className={`home-city-chip ${
                   searchFilters.city === city ? 'home-city-chip--active' : ''
                 }`}
-                onClick={() => setSearchFilters((current) => ({ ...current, city }))}
+                onClick={() => handleCitySearch(city)}
               >
                 {city}
               </button>
@@ -225,27 +268,27 @@ export function HomePage() {
         ) : (
           <EmptyState
             title="No hay propiedades disponibles"
-            description="Intenta cambiar tus filtros o busqueda."
+            description="Intenta cambiar la ciudad, ampliar presupuesto o revisar el catalogo completo."
+            actionLabel="Explorar catalogo"
+            onAction={() => navigate('/properties')}
           />
         )}
       </section>
 
-      <section className="home-insights" id="como-funciona">
-        <div className="home-insight-card">
-          <span>01</span>
-          <strong>Busca en una sola accion</strong>
-          <p>Zona, presupuesto y tipo de vivienda. Lo esencial para avanzar rapido.</p>
-        </div>
-        <div className="home-insight-card">
-          <span>02</span>
-          <strong>Compara sin distracciones</strong>
-          <p>Tarjetas visuales con precio, ubicacion y atributos clave desde el primer vistazo.</p>
-        </div>
-        <div className="home-insight-card" id="para-propietarios">
-          <span>03</span>
-          <strong>Avanza con confianza</strong>
-          <p>Explora libremente y crea cuenta solo cuando quieras guardar o reservar.</p>
-        </div>
+      <section className="home-insights" id="como-funciona" aria-label="Atajos de busqueda">
+        {QUICK_FILTERS.map((quickFilter, index) => (
+          <button
+            key={quickFilter.label}
+            id={quickFilter.anchorId}
+            type="button"
+            className="home-insight-card"
+            onClick={() => handleQuickFilter(quickFilter)}
+          >
+            <span>{String(index + 1).padStart(2, '0')}</span>
+            <strong>{quickFilter.label}</strong>
+            <p>{quickFilter.description}</p>
+          </button>
+        ))}
       </section>
 
       {moreProperties.length > 0 ? (

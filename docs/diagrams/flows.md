@@ -1,5 +1,10 @@
 # Diagrama de flujo principal
 
+## Flujos separados recomendados
+
+- `frontend-application-flow.mmd`: cubre sesion, catalogo, detalle, autenticacion, postulacion, cuenta y gestion.
+- `backend-application-flow.mmd`: cubre middleware, auth, propiedades, favoritos, perfil, precalificacion y solicitudes.
+
 ## De postulacion guiada a solicitud de arriendo
 
 ```mermaid

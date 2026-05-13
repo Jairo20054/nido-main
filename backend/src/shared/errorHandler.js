@@ -41,7 +41,7 @@ const errorHandler = (error, _req, res, _next) => {
   if (error instanceof Prisma.PrismaClientInitializationError) {
     return res.status(503).json({
       success: false,
-      message: 'La base de datos no esta disponible o DATABASE_URL es invalida',
+      message: 'El servicio de datos no esta disponible. Intenta nuevamente en unos minutos',
       details: null,
     });
   }

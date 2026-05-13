@@ -10,7 +10,7 @@ const controller = require('./admin.controller');
 // Rutas exclusivas del rol administrador.
 const router = express.Router();
 
-router.use(requireAdmin);
+router.use(...requireAdmin);
 router.get('/properties', validate(propertyQuerySchema, 'query'), asyncHandler(controller.listAdminProperties));
 router.get('/landlords', validate(paginationQuerySchema, 'query'), asyncHandler(controller.listLandlords));
 router.get('/stats', asyncHandler(propertyController.getAdminPropertyStats));

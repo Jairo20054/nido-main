@@ -1,0 +1,179 @@
+flowchart TD
+  subgraph BE00["Backend - Entrada comun"]
+    BE01["Request llega a Express app"] --> BE02["Aplicar CORS, json parser y urlencoded parser"]
+    BE02 --> BE03{"Ruta /health?"}
+    BE03 -->|Si| BE04["Responder status ok"]
+    BE03 -->|No| BE05["Entrar a router /api"]
+    BE05 --> BE06{"Ruta requiere autenticacion?"}
+    BE06 -->|No| BE07["Continuar sin req.user o con auth opcional"]
+    BE06 -->|Si| BE08["Extraer Bearer token"]
+    BE08 --> BE09{"Token presente?"}
+    BE09 -->|No| BE10["Responder 401"]
+    BE09 -->|Si| BE11["Validar token con Supabase Auth"]
+    BE11 --> BE12{"Token valido?"}
+    BE12 -->|No| BE13["Responder 401 token invalido o expirado"]
+    BE12 -->|Si| BE14["Cargar perfil extendido desde Supabase profiles"]
+    BE14 --> BE15["Adjuntar req.user y continuar"]
+  end
+
+  subgraph BE10["Backend - Autenticacion"]
+    BE21["POST /api/auth/register"] --> BE22["Validar schema Joi"]
+    BE22 --> BE23["Supabase signUp"]
+    BE23 --> BE24{"Usuario Auth creado?"}
+    BE24 -->|No| BE25["Responder 400 con mensaje"]
+    BE24 -->|Si| BE26["Crear perfil en Supabase profiles"]
+    BE26 --> BE27{"Perfil creado?"}
+    BE27 -->|No| BE28["Eliminar usuario Auth y responder error"]
+    BE27 -->|Si| BE29["Intentar auto login con signIn"]
+    BE29 --> BE30["Responder 201 con token y user"]
+
+    BE31["POST /api/auth/login"] --> BE32["Validar schema Joi"]
+    BE32 --> BE33["Supabase signInWithPassword"]
+    BE33 --> BE34{"Credenciales validas?"}
+    BE34 -->|No| BE35["Responder 401"]
+    BE34 -->|Si| BE36["Leer perfil y serializar user"]
+    BE36 --> BE37["Responder token + user"]
+
+    BE38["GET /api/auth/me"] --> BE39["Requiere auth"]
+    BE39 --> BE40["Serializar req.user y responder"]
+  end
+
+  subgraph BE20["Backend - Propiedades"]
+    BE41["GET /api/properties"] --> BE42["Auth opcional + validar query"]
+    BE42 --> BE43["Construir filtros where y orderBy"]
+    BE43 --> BE44["Consultar Prisma property.findMany y count"]
+    BE44 --> BE45["Serializar propiedades y meta"]
+    BE45 --> BE46["Responder listado paginado"]
+
+    BE47["GET /api/properties/featured"] --> BE48["Consultar Prisma con status PUBLISHED"]
+    BE48 --> BE49["Serializar y responder destacadas"]
+
+    BE50["GET /api/properties/:id"] --> BE51["Buscar property por id en Prisma"]
+    BE51 --> BE52{"Existe?"}
+    BE52 -->|No| BE53["Responder 404"]
+    BE52 -->|Si| BE54{"Es owner o status = PUBLISHED?"}
+    BE54 -->|No| BE55["Responder 404 no disponible"]
+    BE54 -->|Si| BE56["Serializar detalle y responder"]
+
+    BE57["POST /api/properties"] --> BE58["Requiere auth + validar payload"]
+    BE58 --> BE59["Normalizar payload y generar slug"]
+    BE59 --> BE60["Crear property e imagenes en Prisma"]
+    BE60 --> BE61{"req.user.role === TENANT?"}
+    BE61 -->|Si| BE62["Intentar promover a LANDLORD en prisma.user"]
+    BE61 -->|No| BE63["Mantener rol actual"]
+    BE62 --> BE64["Responder propiedad creada"]
+    BE63 --> BE64
+
+    BE65["PATCH /api/properties/:id"] --> BE66["Requiere auth + validar payload"]
+    BE66 --> BE67["Buscar property actual"]
+    BE67 --> BE68{"Existe?"}
+    BE68 -->|No| BE69["Responder 404"]
+    BE68 -->|Si| BE70{"ownerId coincide con req.user.id?"}
+    BE70 -->|No| BE71["Responder 403"]
+    BE70 -->|Si| BE72["Actualizar property y recrear imagenes si llegaron"]
+    BE72 --> BE73["Responder propiedad actualizada"]
+
+    BE74["DELETE /api/properties/:id"] --> BE75["Requiere auth"]
+    BE75 --> BE76["Buscar property"]
+    BE76 --> BE77{"Existe?"}
+    BE77 -->|No| BE78["Responder 404"]
+    BE77 -->|Si| BE79{"ownerId coincide con req.user.id?"}
+    BE79 -->|No| BE80["Responder 403"]
+    BE79 -->|Si| BE81["Contar rentalRequests activas PENDING o APPROVED"]
+    BE81 --> BE82{"Hay activas?"}
+    BE82 -->|Si| BE83["Responder 400 no se puede eliminar"]
+    BE82 -->|No| BE84["Eliminar property en Prisma"]
+    BE84 --> BE85["Responder exito"]
+  end
+
+  subgraph BE30["Backend - Favoritos y perfil"]
+    BE91["GET /api/favorites"] --> BE92["Requiere auth"]
+    BE92 --> BE93["Listar favoritos del usuario en Prisma"]
+    BE93 --> BE94["Serializar propiedades y responder"]
+
+    BE95["POST /api/favorites/:propertyId"] --> BE96["Requiere auth"]
+    BE96 --> BE97["Buscar property"]
+    BE97 --> BE98{"Existe?"}
+    BE98 -->|No| BE99["Responder 404"]
+    BE98 -->|Si| BE100["Upsert favorite"]
+    BE100 --> BE101["Responder guardado"]
+
+    BE102["PATCH /api/users/me"] --> BE103["Requiere auth + validar payload"]
+    BE103 --> BE104["Upsert perfil en Supabase profiles"]
+    BE104 --> BE105["Serializar user y responder"]
+  end
+
+  subgraph BE40["Backend - Precalificacion guiada"]
+    BE111["POST /api/applications/prequalify"] --> BE112["Auth opcional + validar schema Joi"]
+    BE112 --> BE113["Buscar property en Supabase public.properties"]
+    BE113 --> BE114{"Existe y status = published?"}
+    BE114 -->|No| BE115["Responder 404 no disponible para aplicar"]
+    BE114 -->|Si| BE116{"backupOption distinto de NONE sin hasBackup?"}
+    BE116 -->|Si| BE117["Responder 400 inconsistencia de respaldo"]
+    BE116 -->|No| BE118["Cargar owner, imagenes y conteos desde Supabase"]
+    BE118 --> BE119["Calcular ratio, score, riskBand y requiresBackup"]
+    BE119 --> BE120{"req.user existe?"}
+    BE120 -->|No| BE121["No crear application server side"]
+    BE120 -->|Si| BE122["Insertar draft en Supabase public.applications"]
+    BE122 --> BE123{"Insert exitoso?"}
+    BE123 -->|No| BE124["Responder 400"]
+    BE123 -->|Si| BE125["Guardar applicationId"]
+    BE121 --> BE126["Construir documentChecklist"]
+    BE125 --> BE126
+    BE126 --> BE127["Responder property + prequalification + transparency + checklist"]
+  end
+
+  subgraph BE50["Backend - Solicitudes formales"]
+    BE131["POST /api/requests"] --> BE132["Requiere auth + validar payload"]
+    BE132 --> BE133["Buscar property en Prisma"]
+    BE133 --> BE134{"Existe y status = PUBLISHED?"}
+    BE134 -->|No| BE135["Responder 404"]
+    BE134 -->|Si| BE136{"property.ownerId = req.user.id?"}
+    BE136 -->|Si| BE137["Responder 400 no puedes solicitar tu propia propiedad"]
+    BE136 -->|No| BE138["Buscar solicitud activa previa del mismo tenant"]
+    BE138 --> BE139{"Ya existe PENDING o APPROVED?"}
+    BE139 -->|Si| BE140["Responder 400 solicitud activa existente"]
+    BE139 -->|No| BE141["Crear RentalRequest en Prisma"]
+    BE141 --> BE142["Serializar request y responder 201"]
+
+    BE143["GET /api/requests/mine"] --> BE144["Listar requests por tenantId"]
+    BE145["GET /api/requests/received"] --> BE146["Listar requests por landlordId"]
+
+    BE147["PATCH /api/requests/:id"] --> BE148["Buscar request"]
+    BE148 --> BE149{"tenantId coincide?"}
+    BE149 -->|No| BE150["Responder 403"]
+    BE149 -->|Si| BE151{"status = PENDING?"}
+    BE151 -->|No| BE152["Responder 400 solo pendientes"]
+    BE151 -->|Si| BE153["Actualizar request"]
+    BE153 --> BE154["Responder request actualizada"]
+
+    BE155["PATCH /api/requests/:id/status"] --> BE156["Buscar request"]
+    BE156 --> BE157{"landlordId coincide?"}
+    BE157 -->|No| BE158["Responder 403"]
+    BE157 -->|Si| BE159["Actualizar status a APPROVED o REJECTED"]
+    BE159 --> BE160["Responder request revisada"]
+  end
+
+  subgraph BE60["Backend - Manejo de errores"]
+    BE171["Cualquier controlador lanza error"] --> BE172["errorHandler normaliza status, message y details"]
+    BE172 --> BE173["Responder JSON de error"]
+  end
+
+  BE07 --> BE21
+  BE07 --> BE31
+  BE07 --> BE41
+  BE07 --> BE47
+  BE07 --> BE50
+  BE07 --> BE111
+  BE15 --> BE38
+  BE15 --> BE57
+  BE15 --> BE65
+  BE15 --> BE74
+  BE15 --> BE91
+  BE15 --> BE95
+  BE15 --> BE102
+  BE15 --> BE131
+  BE15 --> BE143
+  BE15 --> BE145
+  BE15 --> BE147
+  BE15 --> BE155

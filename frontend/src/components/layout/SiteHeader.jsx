@@ -40,9 +40,9 @@ export function SiteHeader() {
       <Link to="/properties" onClick={closeMobileMenu}>
         Buscar
       </Link>
-      <a href="/#como-funciona" onClick={closeMobileMenu}>
-        Como funciona
-      </a>
+      <Link to="/saved" onClick={closeMobileMenu}>
+        Guardados
+      </Link>
       <a href="/#para-propietarios" onClick={closeMobileMenu}>
         Para propietarios
       </a>

@@ -22,11 +22,13 @@ export function PropertyCard({
   if (property.utilitiesIncluded) features.push('Servicios incluidos');
   if (property.maintenanceFee) features.push(`Adm. ${formatCurrency(property.maintenanceFee)}`);
 
+  const isCompact = variant === 'compact';
   const area = property.areaM2 || property.area || 0;
   const typeLabel = getPropertyTypeLabel(property.propertyType);
   const trustLabel = getPropertyTrustLabel(property);
   const reputationLabel = getPropertyReputationLabel(property);
   const totalMonthly = (property.monthlyRent || 0) + (property.maintenanceFee || 0);
+  const visibleFeatures = features.slice(0, isCompact ? 2 : 4);
 
   const handleToggleFavorite = (event) => {
     event.preventDefault();
@@ -44,10 +46,12 @@ export function PropertyCard({
 
         <div className="property-card__badge-row">
           <span className="property-card__badge">{typeLabel}</span>
-          <span className="property-card__badge property-card__badge--trust">
-            <ShieldCheck size={13} />
-            {trustLabel}
-          </span>
+          {!isCompact ? (
+            <span className="property-card__badge property-card__badge--trust">
+              <ShieldCheck size={13} />
+              {trustLabel}
+            </span>
+          ) : null}
         </div>
 
         {onToggleFavorite ? (
@@ -71,10 +75,12 @@ export function PropertyCard({
               <p className="property-card__price-note">Total estimado: {formatCurrency(totalMonthly)}</p>
             ) : null}
           </div>
-          <span className="property-card__signal">
+          {!isCompact ? (
+            <span className="property-card__signal">
             <BadgeCheck size={14} />
             {reputationLabel}
-          </span>
+            </span>
+          ) : null}
         </div>
 
         <h3 className="property-card__title">{property.title}</h3>
@@ -82,7 +88,7 @@ export function PropertyCard({
           <MapPin size={14} />
           {getPropertyLocationLabel(property)}
         </p>
-        <p className="property-card__summary">{property.summary}</p>
+        {!isCompact ? <p className="property-card__summary">{property.summary}</p> : null}
 
         <div className="property-card__stats">
           <span><BedDouble size={14} /> {property.bedrooms} hab.</span>
@@ -90,9 +96,9 @@ export function PropertyCard({
           <span><Ruler size={14} /> {area} m2</span>
         </div>
 
-        {features.length > 0 ? (
+        {visibleFeatures.length > 0 ? (
           <div className="property-card__tags">
-            {features.slice(0, 4).map((feature) => (
+            {visibleFeatures.map((feature) => (
               <span key={feature} className="property-card__tag">
                 {feature}
               </span>
@@ -104,9 +110,7 @@ export function PropertyCard({
           <span className="property-card__footer-badge">
             {property.availableImmediately ? 'Disponible ahora' : 'Agenda visita'}
           </span>
-          <span className="property-card__footer-note">
-            {property.requestCount ? `${property.requestCount} solicitud${property.requestCount > 1 ? 'es' : ''}` : 'Sin friccion para comparar'}
-          </span>
+          <span className="property-card__cta">Ver detalles</span>
         </div>
       </div>
     </Link>

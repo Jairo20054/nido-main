@@ -58,6 +58,15 @@ if (fs.existsSync(envPath)) {
   loadEnvFile(envPath, process.env.NODE_ENV !== 'production');
 }
 
+// Map server-side Supabase env vars to Vite-prefixed vars so the client can access them.
+// This allows using SUPABASE_URL / SUPABASE_ANON_KEY in .env while still exposing VITE_* to the frontend.
+if (!process.env.VITE_SUPABASE_URL && process.env.SUPABASE_URL) {
+  process.env.VITE_SUPABASE_URL = process.env.SUPABASE_URL;
+}
+if (!process.env.VITE_SUPABASE_ANON_KEY && process.env.SUPABASE_ANON_KEY) {
+  process.env.VITE_SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+}
+
 let backendProcess = null;
 let clientProcess = null;
 let clientStarted = false;
