@@ -90,10 +90,15 @@ const login = async (req, res) => {
   });
 };
 
-// En desarrollo, permite login con credenciales del .env sin validar Supabase.
+// En desarrollo, permite login con el alias admin del .env, pero siempre
+// devolviendo una sesion real de Supabase para que las rutas protegidas validen.
 const devLogin = async (req, res) => {
   if (process.env.NODE_ENV !== 'development') {
     throw unauthorized('Dev login solo disponible en desarrollo');
+  }
+
+  if (!supabaseAnon) {
+    throw badRequest('Supabase no esta configurado en el servidor');
   }
 
   const { identifier, password } = req.body;
@@ -107,27 +112,21 @@ const devLogin = async (req, res) => {
     throw unauthorized('Correo o contrasena incorrectos');
   }
 
-  const mockUser = {
-    id: 'dev-admin-id-' + Date.now(),
+  const { data, error } = await supabaseAnon.auth.signInWithPassword({
     email: adminEmail,
-    user_metadata: {
-      first_name: 'Admin',
-      last_name: 'Dev',
-      role: 'ADMIN',
-    },
-  };
+    password: adminPassword,
+  });
 
-  const profile = await ensureProfile(mockUser);
-  const mockSession = {
-    access_token: 'dev-token-' + Date.now(),
-    refresh_token: null,
-    expires_at: new Date(Date.now() + 86400000).toISOString(),
-  };
+  if (error || !data.user || !data.session) {
+    throw unauthorized('No fue posible iniciar la sesion admin en Supabase');
+  }
+
+  const profile = await ensureProfile(data.user);
 
   res.json({
     success: true,
     message: 'Sesion iniciada (dev)',
-    data: buildAuthPayload(mockSession, profile),
+    data: buildAuthPayload(data.session, profile),
   });
 };
 

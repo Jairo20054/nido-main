@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { useAuth } from '../../app/providers/AuthProvider';
+import { hasSupabaseConfig } from '../../lib/supabaseClient';
 import { resolvePostAuthDestination } from './authRedirects';
 
 /**
@@ -27,10 +28,10 @@ export function LoginPage() {
     setError('');
 
     try {
-      const isDev = import.meta.env.MODE === 'development' || process.env.NODE_ENV === 'development';
+      const isDev = import.meta.env.DEV;
       let nextUser;
 
-      if (isDev) {
+      if (isDev && !hasSupabaseConfig) {
         try {
           nextUser = await devLogin(form);
         } catch (_devError) {

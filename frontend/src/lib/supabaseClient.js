@@ -14,7 +14,7 @@ const missingSupabaseConfigMessage =
 const hasPlaceholderConfig =
   /your-project\.supabase\.co/i.test(String(supabaseUrl || '')) ||
   /^your-(anon|publishable|secret|service)/i.test(String(supabaseAnonKey || '').trim());
-const hasSupabaseConfig = Boolean(supabaseUrl && supabaseAnonKey && !hasPlaceholderConfig);
+export const hasSupabaseConfig = Boolean(supabaseUrl && supabaseAnonKey && !hasPlaceholderConfig);
 
 // Punto unico de integracion del cliente web con Supabase Auth.
 // Cliente de respaldo para no romper la aplicacion en entornos donde faltan variables
