@@ -90,7 +90,47 @@ const login = async (req, res) => {
   });
 };
 
-// Expone el usuario autenticado ya cargado por el middleware de seguridad.
+// En desarrollo, permite login con credenciales del .env sin validar Supabase.
+const devLogin = async (req, res) => {
+  if (process.env.NODE_ENV !== 'development') {
+    throw unauthorized('Dev login solo disponible en desarrollo');
+  }
+
+  const { identifier, password } = req.body;
+  const adminAlias = (process.env.ADMIN_LOGIN_ALIAS || 'admin').toLowerCase();
+  const adminEmail = (process.env.ADMIN_LOGIN_EMAIL || 'admin@nido.local').toLowerCase();
+  const adminPassword = process.env.ADMIN_LOGIN_PASSWORD;
+
+  const normalizedIdentifier = String(identifier || '').trim().toLowerCase();
+
+  if (normalizedIdentifier !== adminAlias || password !== adminPassword) {
+    throw unauthorized('Correo o contrasena incorrectos');
+  }
+
+  const mockUser = {
+    id: 'dev-admin-id-' + Date.now(),
+    email: adminEmail,
+    user_metadata: {
+      first_name: 'Admin',
+      last_name: 'Dev',
+      role: 'ADMIN',
+    },
+  };
+
+  const profile = await ensureProfile(mockUser);
+  const mockSession = {
+    access_token: 'dev-token-' + Date.now(),
+    refresh_token: null,
+    expires_at: new Date(Date.now() + 86400000).toISOString(),
+  };
+
+  res.json({
+    success: true,
+    message: 'Sesion iniciada (dev)',
+    data: buildAuthPayload(mockSession, profile),
+  });
+};
+
 const me = async (req, res) => {
   res.json({
     success: true,
@@ -129,6 +169,7 @@ const forgotPassword = async (req, res) => {
 };
 
 module.exports = {
+  devLogin,
   forgotPassword,
   login,
   logout,

@@ -232,6 +232,29 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // En desarrollo, permite login via backend con credenciales del .env sin Supabase.
+  const devLogin = async ({ identifier, password }) => {
+    if (!String(password || '').trim()) {
+      throw new Error('Ingresa la contrasena.');
+    }
+
+    const response = await api.post('/auth/dev-login', {
+      identifier: String(identifier || '').trim().toLowerCase(),
+      password,
+    });
+
+    if (!response.data.data.token) {
+      throw new Error('Sesion no pudo ser establecida.');
+    }
+
+    setAuthToken(response.data.data.token);
+    setSession(response.data.data);
+    setUser(response.data.data.user);
+    setAuthError('');
+
+    return response.data.data.user;
+  };
+
   const register = async (payload) => {
     validateRegisterPayload(payload);
 
@@ -333,6 +356,7 @@ export function AuthProvider({ children }) {
 
   const value = {
     authError,
+    devLogin,
     forgotPassword,
     hasRole: (...roles) => roles.includes(user?.role),
     isAdmin: user?.role === 'ADMIN',

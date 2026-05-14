@@ -12,7 +12,7 @@ import { resolvePostAuthDestination } from './authRedirects';
 export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, login, user } = useAuth();
+  const { isAuthenticated, login, devLogin, user } = useAuth();
   const [form, setForm] = useState({ identifier: '', password: '' });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -27,7 +27,19 @@ export function LoginPage() {
     setError('');
 
     try {
-      const nextUser = await login(form);
+      const isDev = import.meta.env.MODE === 'development' || process.env.NODE_ENV === 'development';
+      let nextUser;
+
+      if (isDev) {
+        try {
+          nextUser = await devLogin(form);
+        } catch (_devError) {
+          nextUser = await login(form);
+        }
+      } else {
+        nextUser = await login(form);
+      }
+
       const nextRoute = resolvePostAuthDestination(location.state, nextUser);
       navigate(nextRoute, { replace: true });
     } catch (requestError) {
