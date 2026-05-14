@@ -8,8 +8,7 @@ export function SiteHeader() {
   const { isAuthenticated, logout, user } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const dashboardHref =
-    user?.role === 'ADMIN' ? '/admin' : user?.role === 'LANDLORD' ? '/manage' : '/saved';
+  const dashboardHref = '/dashboard';
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 16);
@@ -52,11 +51,7 @@ export function SiteHeader() {
   const renderAuthenticatedLinks = () => (
     <>
       <Link to={dashboardHref} className="site-header__link" onClick={closeMobileMenu}>
-        {user?.role === 'ADMIN'
-          ? 'Panel'
-          : user?.role === 'LANDLORD'
-            ? 'Gestion'
-            : 'Guardados'}
+        Panel
       </Link>
       <Link to="/account" className="site-header__link" onClick={closeMobileMenu}>
         <User size={16} />

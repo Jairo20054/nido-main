@@ -4,6 +4,7 @@ import { InlineMessage } from '../../components/ui/InlineMessage';
 import { LoadingState } from '../../components/ui/LoadingState';
 import { api } from '../../lib/apiClient';
 import { PropertyCard } from '../properties/PropertyCard';
+import { isRecoverableDashboardError, mockProperties } from '../dashboard/dashboardData';
 
 /**
  * Componente de uso para la pagina de favoritos.
@@ -24,7 +25,12 @@ export function SavedPropertiesPage() {
       const response = await api.get('/favorites', { query: { limit: 50 } });
       setItems(response.data);
     } catch (requestError) {
-      setError(requestError.message);
+      if (isRecoverableDashboardError(requestError)) {
+        setItems(mockProperties);
+        setError('Mostrando favoritos de ejemplo mientras se conecta el backend.');
+      } else {
+        setError(requestError.message);
+      }
     } finally {
       setLoading(false);
     }

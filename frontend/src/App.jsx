@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './app/providers/AuthProvider';
 import { ProtectedRoute } from './app/routes/ProtectedRoute';
 import { PublicOnlyRoute } from './app/routes/PublicOnlyRoute';
+import { AuthenticatedLayout } from './components/layout/AuthenticatedLayout';
 import { SiteLayout } from './components/layout/SiteLayout';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { LoadingState } from './components/ui/LoadingState';
@@ -42,9 +43,14 @@ const ResetPasswordPage = lazyPage(
   'ResetPasswordPage'
 );
 const AdminPage = lazyPage(() => import('./features/dashboard/AdminPage'), 'AdminPage');
+const DashboardPage = lazyPage(() => import('./features/dashboard/DashboardPage'), 'DashboardPage');
 const ManagementPage = lazyPage(
   () => import('./features/dashboard/ManagementPage'),
   'ManagementPage'
+);
+const OperationalPage = lazyPage(
+  () => import('./features/dashboard/OperationalPage'),
+  'OperationalPage'
 );
 const SavedPropertiesPage = lazyPage(
   () => import('./features/favorites/SavedPropertiesPage'),
@@ -56,6 +62,14 @@ const PropertyDetailPage = lazyPage(
   'PropertyDetailPage'
 );
 const SearchPage = lazyPage(() => import('./features/properties/SearchPage'), 'SearchPage');
+
+function ProtectedAppPage({ children, roles }) {
+  return (
+    <ProtectedRoute roles={roles}>
+      <AuthenticatedLayout>{children}</AuthenticatedLayout>
+    </ProtectedRoute>
+  );
+}
 
 /**
  * Componente de uso raiz de la SPA.
@@ -97,42 +111,99 @@ function App() {
                 }
               />
               <Route path="/acceso-denegado" element={<AccessDeniedPage />} />
-              {/* Rutas que requieren sesion iniciada */}
-              <Route
-                path="/saved"
-                element={
-                  <ProtectedRoute>
-                    <SavedPropertiesPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/account"
-                element={
-                  <ProtectedRoute>
-                    <AccountPage />
-                  </ProtectedRoute>
-                }
-              />
-              {/* Rutas con permisos especiales por rol */}
-              <Route
-                path="/manage"
-                element={
-                  <ProtectedRoute roles={['LANDLORD', 'ADMIN']}>
-                    <ManagementPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute roles={['ADMIN']}>
-                    <AdminPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
+
+            {/* Rutas que requieren sesion iniciada */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedAppPage>
+                  <DashboardPage />
+                </ProtectedAppPage>
+              }
+            />
+            <Route
+              path="/saved"
+              element={
+                <ProtectedAppPage>
+                  <SavedPropertiesPage />
+                </ProtectedAppPage>
+              }
+            />
+            <Route
+              path="/account"
+              element={
+                <ProtectedAppPage>
+                  <AccountPage />
+                </ProtectedAppPage>
+              }
+            />
+            <Route
+              path="/applications"
+              element={
+                <ProtectedAppPage>
+                  <OperationalPage type="applications" />
+                </ProtectedAppPage>
+              }
+            />
+            <Route
+              path="/documents"
+              element={
+                <ProtectedAppPage>
+                  <OperationalPage type="documents" />
+                </ProtectedAppPage>
+              }
+            />
+            <Route
+              path="/requests"
+              element={
+                <ProtectedAppPage roles={['LANDLORD', 'ADMIN']}>
+                  <OperationalPage type="requests" />
+                </ProtectedAppPage>
+              }
+            />
+            <Route
+              path="/stats"
+              element={
+                <ProtectedAppPage roles={['LANDLORD', 'ADMIN']}>
+                  <OperationalPage type="stats" />
+                </ProtectedAppPage>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedAppPage>
+                  <OperationalPage type="settings" />
+                </ProtectedAppPage>
+              }
+            />
+            {/* Rutas con permisos especiales por rol */}
+            <Route
+              path="/manage"
+              element={
+                <ProtectedAppPage roles={['LANDLORD', 'ADMIN']}>
+                  <ManagementPage />
+                </ProtectedAppPage>
+              }
+            />
+            <Route
+              path="/publish"
+              element={
+                <ProtectedAppPage roles={['LANDLORD', 'ADMIN']}>
+                  <ManagementPage />
+                </ProtectedAppPage>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedAppPage roles={['ADMIN']}>
+                  <AdminPage />
+                </ProtectedAppPage>
+              }
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
       </AuthProvider>

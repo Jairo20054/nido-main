@@ -3,13 +3,5 @@ export const resolvePostAuthDestination = (state, user) => {
     return state.from;
   }
 
-  if (user?.role === 'ADMIN') {
-    return '/admin';
-  }
-
-  if (user?.role === 'LANDLORD') {
-    return '/manage';
-  }
-
-  return '/account';
+  return '/dashboard';
 };

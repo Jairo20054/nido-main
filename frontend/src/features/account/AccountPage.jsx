@@ -6,6 +6,7 @@ import { RequestStatusBadge } from '../../components/ui/RequestStatusBadge';
 import { useAuth } from '../../app/providers/AuthProvider';
 import { api } from '../../lib/apiClient';
 import { formatCurrency, formatDate } from '../../lib/formatters';
+import { isRecoverableDashboardError, mockTenantRequests } from '../dashboard/dashboardData';
 
 /**
  * Componente de uso para la pagina "Mi cuenta".
@@ -45,7 +46,14 @@ export function AccountPage() {
     api
       .get('/requests/mine')
       .then((response) => setRequests(response.data))
-      .catch((requestError) => setMessage(requestError.message))
+      .catch((requestError) => {
+        if (isRecoverableDashboardError(requestError)) {
+          setRequests(mockTenantRequests);
+          setMessage('Mostrando postulaciones de ejemplo mientras se conecta el backend.');
+          return;
+        }
+        setMessage(requestError.message);
+      })
       .finally(() => setLoading(false));
   }, []);
 
