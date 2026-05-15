@@ -102,6 +102,20 @@ const syncPrismaSchema = () => {
     return;
   }
 
+  try {
+    const prismaCommand = process.platform === 'win32' ? 'cmd.exe' : prismaBin;
+    const prismaArgs =
+      process.platform === 'win32'
+        ? ['/d', '/c', `npm exec -- prisma generate --schema ${prismaSchemaPath}`]
+        : ['generate', '--schema', prismaSchemaPath];
+
+    run(prismaCommand, prismaArgs, { stdio: 'inherit' });
+  } catch (error) {
+    const details = error && error.message ? error.message : 'No se pudo ejecutar prisma generate';
+    console.warn(`Aviso: ${details}`);
+    console.warn('El backend podria fallar si @prisma/client no esta generado.');
+  }
+
   if (!process.env.DATABASE_URL) {
     console.warn('DATABASE_URL no esta configurada en .env ni .env.example; se omite prisma db push.');
     return;
