@@ -40,7 +40,7 @@ const applySessionProfile = async (session, { silent = false } = {}) => {
 
   setAuthToken(session.access_token);
 
-  const response = await api.get('/auth/me');
+  const response = await api.post('/auth/sync-user');
 
   if (!silent) {
     // No-op placeholder for future toast integration.

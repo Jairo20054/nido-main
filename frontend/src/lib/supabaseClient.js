@@ -10,7 +10,7 @@ const adminLoginEmail = (import.meta.env.VITE_ADMIN_LOGIN_EMAIL || 'admin@nido.l
   .toLowerCase();
 
 const missingSupabaseConfigMessage =
-  'La autenticacion no esta configurada. Define VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY.';
+  'La autenticacion no esta configurada. Define VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY o VITE_SUPABASE_PUBLISHABLE_KEY.';
 const hasPlaceholderConfig =
   /your-project\.supabase\.co/i.test(String(supabaseUrl || '')) ||
   /^your-(anon|publishable|secret|service)/i.test(String(supabaseAnonKey || '').trim());

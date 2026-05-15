@@ -73,67 +73,57 @@ const profilePayloadFromAuthUser = (authUser) => {
   };
 };
 
-// Crea la fila Prisma del usuario si aun no existe y completa datos basicos
-// sin sobrescribir cambios editados desde la app.
+// Crea o sincroniza la fila Prisma del usuario de forma idempotente.
 const ensureProfile = async (authUser) => {
   if (!authUser) {
     return null;
   }
 
   const authPayload = profilePayloadFromAuthUser(authUser);
-  const existingProfile = await prisma.user.findUnique({
+  const syncedProfile = await prisma.user.upsert({
     where: {
       id: authUser.id,
     },
+    create: {
+      id: authUser.id,
+      email: authUser.email || authPayload.email,
+      firstName: authPayload.firstName,
+      lastName: authPayload.lastName,
+      phone: authPayload.phone,
+      bio: authPayload.bio,
+      avatarUrl: authPayload.avatarUrl,
+      role: isAuthAdmin(authUser) ? 'ADMIN' : authPayload.role,
+    },
+    update: {
+      ...(authUser.email ? { email: authUser.email } : {}),
+      ...(isAuthAdmin(authUser) ? { role: 'ADMIN' } : {}),
+    },
   });
-
-  if (!existingProfile) {
-    return prisma.user.create({
-      data: {
-        id: authUser.id,
-        email: authUser.email || authPayload.email,
-        firstName: authPayload.firstName,
-        lastName: authPayload.lastName,
-        phone: authPayload.phone,
-        bio: authPayload.bio,
-        avatarUrl: authPayload.avatarUrl,
-        role: isAuthAdmin(authUser) ? 'ADMIN' : authPayload.role,
-      },
-    });
-  }
 
   const patch = {};
 
-  if (authUser.email && authUser.email !== existingProfile.email) {
-    patch.email = authUser.email;
-  }
-
-  if (!existingProfile.firstName && authPayload.firstName) {
+  if (!syncedProfile.firstName && authPayload.firstName) {
     patch.firstName = authPayload.firstName;
   }
 
-  if (!existingProfile.lastName && authPayload.lastName) {
+  if (!syncedProfile.lastName && authPayload.lastName) {
     patch.lastName = authPayload.lastName;
   }
 
-  if (!existingProfile.phone && authPayload.phone) {
+  if (!syncedProfile.phone && authPayload.phone) {
     patch.phone = authPayload.phone;
   }
 
-  if (!existingProfile.bio && authPayload.bio) {
+  if (!syncedProfile.bio && authPayload.bio) {
     patch.bio = authPayload.bio;
   }
 
-  if (!existingProfile.avatarUrl && authPayload.avatarUrl) {
+  if (!syncedProfile.avatarUrl && authPayload.avatarUrl) {
     patch.avatarUrl = authPayload.avatarUrl;
   }
 
-  if (existingProfile.role !== 'ADMIN' && isAuthAdmin(authUser)) {
-    patch.role = 'ADMIN';
-  }
-
   if (!Object.keys(patch).length) {
-    return existingProfile;
+    return syncedProfile;
   }
 
   return prisma.user.update({
