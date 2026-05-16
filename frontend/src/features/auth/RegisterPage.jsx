@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { useAuth } from '../../app/providers/AuthProvider';
+import { GoogleAuthButton } from './GoogleAuthButton';
 import { resolvePostAuthDestination } from './authRedirects';
 
 /**
@@ -12,7 +13,7 @@ import { resolvePostAuthDestination } from './authRedirects';
 export function RegisterPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, register, user } = useAuth();
+  const { isAuthenticated, register, signInWithGoogle, user } = useAuth();
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
@@ -25,6 +26,7 @@ export function RegisterPage() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [googleSubmitting, setGoogleSubmitting] = useState(false);
 
   const updateField = (field) => (event) =>
     setForm((current) => ({
@@ -71,12 +73,35 @@ export function RegisterPage() {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setGoogleSubmitting(true);
+    setError('');
+    setMessage('');
+
+    try {
+      await signInWithGoogle();
+    } catch (requestError) {
+      setError(requestError.message);
+      setGoogleSubmitting(false);
+    }
+  };
+
   return (
     <div className="auth-page">
       <div className="auth-card auth-card--wide">
         <span className="section__eyebrow">Registro</span>
         <h1>Crea tu cuenta</h1>
         <p>Empieza a guardar propiedades, enviar solicitudes o publicar tu inventario de arriendos.</p>
+        <div className="auth-social">
+          <GoogleAuthButton
+            disabled={submitting}
+            loading={googleSubmitting}
+            onClick={handleGoogleSignIn}
+          />
+          <div className="auth-divider" aria-hidden="true">
+            <span>o crea tu cuenta con correo</span>
+          </div>
+        </div>
         <form className="auth-form" onSubmit={handleSubmit}>
           <InlineMessage tone={error ? 'danger' : 'success'}>{error || message}</InlineMessage>
           <div className="field-grid">
@@ -161,7 +186,7 @@ export function RegisterPage() {
               </small>
             </div>
           </div>
-          <button className="button" type="submit" disabled={submitting}>
+          <button className="button" type="submit" disabled={submitting || googleSubmitting}>
             {submitting ? 'Creando cuenta...' : 'Crear cuenta'}
           </button>
           <div className="auth-form__footer">

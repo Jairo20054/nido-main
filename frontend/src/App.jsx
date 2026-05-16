@@ -32,6 +32,10 @@ const AccessDeniedPage = lazyPage(
   () => import('./features/auth/AccessDeniedPage'),
   'AccessDeniedPage'
 );
+const AuthCallbackPage = lazyPage(
+  () => import('./features/auth/AuthCallbackPage'),
+  'AuthCallbackPage'
+);
 const ForgotPasswordPage = lazyPage(
   () => import('./features/auth/ForgotPasswordPage'),
   'ForgotPasswordPage'
@@ -101,6 +105,7 @@ function App() {
                 }
               />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/auth/callback" element={<AuthCallbackPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route
                 path="/register"

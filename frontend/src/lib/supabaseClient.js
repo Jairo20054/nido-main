@@ -3,7 +3,6 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey =
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY;
-const siteUrl = (import.meta.env.VITE_SITE_URL || window.location.origin).replace(/\/$/, '');
 const adminLoginAlias = (import.meta.env.VITE_ADMIN_LOGIN_ALIAS || 'admin').trim().toLowerCase();
 const adminLoginEmail = (import.meta.env.VITE_ADMIN_LOGIN_EMAIL || 'admin@nido.local')
   .trim()
@@ -50,12 +49,33 @@ export const supabase =
       })
     : createMissingConfigClient();
 
+const withProtocol = (value) => {
+  if (!value) {
+    return '';
+  }
+
+  return /^https?:\/\//i.test(value) ? value : `https://${value}`;
+};
+
+export const getSiteUrl = () => {
+  const runtimeOrigin =
+    typeof window !== 'undefined' && window.location?.origin ? window.location.origin : '';
+  const configuredOrigin = withProtocol(
+    import.meta.env.VITE_SITE_URL || import.meta.env.VITE_VERCEL_URL || runtimeOrigin
+  );
+
+  return configuredOrigin.replace(/\/$/, '');
+};
+
 // URL de retorno usada por el flujo de restablecimiento de contrasena.
 export const getPasswordResetUrl = () =>
-  import.meta.env.VITE_SUPABASE_REDIRECT_URL || `${siteUrl}/reset-password`;
+  import.meta.env.VITE_SUPABASE_REDIRECT_URL || `${getSiteUrl()}/reset-password`;
 
 export const getEmailConfirmationUrl = () =>
-  import.meta.env.VITE_SUPABASE_EMAIL_CONFIRMATION_URL || `${siteUrl}/login`;
+  import.meta.env.VITE_SUPABASE_EMAIL_CONFIRMATION_URL || `${getSiteUrl()}/login`;
+
+export const getOAuthCallbackUrl = () =>
+  import.meta.env.VITE_SUPABASE_OAUTH_REDIRECT_URL || `${getSiteUrl()}/auth/callback`;
 
 // Permite iniciar sesion con un alias funcional para el admin sin exponer
 // una UX distinta al resto de usuarios.

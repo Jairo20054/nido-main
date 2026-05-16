@@ -3,9 +3,11 @@ import { api } from '../../lib/apiClient';
 import { clearAuthToken, setAuthToken } from '../../lib/authToken';
 import {
   getEmailConfirmationUrl,
+  getOAuthCallbackUrl,
   getPasswordResetUrl,
   supabase,
 } from '../../lib/supabaseClient';
+import { normalizeAuthRedirectPath } from '../../features/auth/authRedirects';
 
 const AuthContext = createContext(null);
 
@@ -23,6 +25,14 @@ const normalizeAuthError = (error, fallback = 'No fue posible completar la auten
 
   if (normalized.includes('failed to fetch') || normalized.includes('network')) {
     return new Error('No pudimos conectar con el servicio de autenticacion. Intenta de nuevo.');
+  }
+
+  if (
+    normalized.includes('oauth') ||
+    normalized.includes('provider') ||
+    normalized.includes('access_denied')
+  ) {
+    return new Error('No pudimos completar el ingreso con Google. Intenta de nuevo.');
   }
 
   return new Error(message);
@@ -310,6 +320,26 @@ export function AuthProvider({ children }) {
     };
   };
 
+  const signInWithGoogle = async ({ next } = {}) => {
+    const callbackUrl = new URL(getOAuthCallbackUrl());
+    const normalizedNext = normalizeAuthRedirectPath(next);
+
+    if (normalizedNext) {
+      callbackUrl.searchParams.set('next', normalizedNext);
+    }
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: callbackUrl.toString(),
+      },
+    });
+
+    if (error) {
+      throw normalizeAuthError(error, 'No pudimos completar el ingreso con Google.');
+    }
+  };
+
   const logout = async () => {
     try {
       await supabase.auth.signOut();
@@ -378,6 +408,7 @@ export function AuthProvider({ children }) {
     register,
     resetPassword,
     session,
+    signInWithGoogle,
     updateProfile,
     user,
   };
