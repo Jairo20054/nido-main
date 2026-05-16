@@ -4,8 +4,6 @@ import { clearAuthToken, setAuthToken } from '../../lib/authToken';
 import {
   getEmailConfirmationUrl,
   getPasswordResetUrl,
-  getSupabaseConfigError,
-  resolveAuthEmail,
   supabase,
 } from '../../lib/supabaseClient';
 
@@ -202,11 +200,17 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
+  const sessionFromApiPayload = (payload) => ({
+    access_token: payload?.token || null,
+    refresh_token: payload?.refreshToken || null,
+    expires_at: payload?.expiresAt || null,
+  });
+
   // Acciones de alto nivel consumidas por formularios y rutas protegidas.
   const login = async ({ email, identifier, password }) => {
-    const resolvedEmail = resolveAuthEmail(identifier || email);
+    const resolvedIdentifier = String(identifier || email || '').trim();
 
-    if (!resolvedEmail) {
+    if (!resolvedIdentifier) {
       throw new Error('Ingresa tu correo o usuario.');
     }
 
@@ -214,46 +218,49 @@ export function AuthProvider({ children }) {
       throw new Error('Ingresa la contrasena.');
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: resolvedEmail,
-      password,
-    });
+    const response = await api.post(
+      '/auth/login',
+      {
+        identifier: resolvedIdentifier,
+        password,
+      },
+      { auth: false }
+    );
+    const payload = response.data;
 
-    if (error) {
-      throw error.message === getSupabaseConfigError() ? error : normalizeAuthError(error);
-    }
-
-    try {
-      const profile = await hydrateSession(data.session, { keepError: true });
-      setAuthError('');
-      return profile;
-    } catch (profileError) {
-      throw normalizeAuthError(profileError, 'Sesion creada, pero no fue posible cargar tu perfil.');
-    }
-  };
-
-  // En desarrollo, permite login via backend con credenciales del .env sin Supabase.
-  const devLogin = async ({ identifier, password }) => {
-    if (!String(password || '').trim()) {
-      throw new Error('Ingresa la contrasena.');
-    }
-
-    const response = await api.post('/auth/dev-login', {
-      identifier: String(identifier || '').trim().toLowerCase(),
-      password,
-    });
-
-    if (!response.data.data.token) {
+    if (!payload?.token || !payload?.refreshToken) {
       throw new Error('Sesion no pudo ser establecida.');
     }
 
-    setAuthToken(response.data.data.token);
-    setSession(response.data.data);
-    setUser(response.data.data.user);
+    const nextSession = sessionFromApiPayload(payload);
+
+    if (supabase.auth.setSession) {
+      const { data, error } = await supabase.auth.setSession({
+        access_token: payload.token,
+        refresh_token: payload.refreshToken,
+      });
+
+      if (error) {
+        throw normalizeAuthError(error, 'Sesion creada, pero no fue posible persistirla.');
+      }
+
+      if (data.session?.access_token) {
+        nextSession.access_token = data.session.access_token;
+        nextSession.refresh_token = data.session.refresh_token;
+        nextSession.expires_at = data.session.expires_at;
+      }
+    }
+
+    setAuthToken(nextSession.access_token);
+    setSession(nextSession);
+    setUser(payload.user);
     setAuthError('');
 
-    return response.data.data.user;
+    return payload.user;
   };
+
+  // Compatibilidad para formularios antiguos: el alias admin usa el mismo login real.
+  const devLogin = async ({ identifier, password }) => login({ identifier, password });
 
   const register = async (payload) => {
     validateRegisterPayload(payload);

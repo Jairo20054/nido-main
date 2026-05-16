@@ -1,5 +1,5 @@
 const { randomBytes } = require('crypto');
-const { MediaType, PropertyStatus, UserRole } = require('@prisma/client');
+const { MediaType, Prisma, PropertyStatus, UserRole } = require('@prisma/client');
 const { env } = require('../../shared/env');
 const { prisma } = require('../../shared/prisma');
 const { supabaseService } = require('../../shared/supabase');
@@ -16,6 +16,7 @@ const LANDLORD_ALLOWED_CREATE_STATUSES = [
   PropertyStatus.PUBLISHED,
 ];
 const PROPERTY_MEDIA_BUCKET = env.SUPABASE_PROPERTY_MEDIA_BUCKET || 'property-media-public';
+const PRISMA_UNAVAILABLE_CODES = ['P1000', 'P1001', 'P1012', 'P2021'];
 
 // Include reutilizable para las lecturas de propiedades. Agrega favoritos solo cuando
 // hay usuario autenticado para no consultar relaciones innecesarias en publico.
@@ -43,6 +44,12 @@ const propertyInclude = (currentUserId) => ({
     },
   },
 });
+
+const isPrismaUnavailable = (error) =>
+  error instanceof Prisma.PrismaClientInitializationError ||
+  (error instanceof Prisma.PrismaClientKnownRequestError &&
+    PRISMA_UNAVAILABLE_CODES.includes(error.code)) ||
+  /Environment variable not found: DATABASE_URL|Can't reach database server/i.test(error?.message || '');
 
 // Normaliza campos opcionales, disponibilidad y coleccion de medios antes de persistir.
 const normalizePropertyInput = (payload = {}) => ({
@@ -329,14 +336,22 @@ const listProperties = async (req, res) => {
 // Seleccion reducida para la home publica.
 const getFeaturedProperties = async (req, res) => {
   const currentUserId = req.user?.id || null;
-  const items = await prisma.property.findMany({
-    where: {
-      status: PropertyStatus.PUBLISHED,
-    },
-    include: propertyInclude(currentUserId),
-    orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
-    take: 6,
-  });
+  let items = [];
+
+  try {
+    items = await prisma.property.findMany({
+      where: {
+        status: PropertyStatus.PUBLISHED,
+      },
+      include: propertyInclude(currentUserId),
+      orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
+      take: 6,
+    });
+  } catch (error) {
+    if (!isPrismaUnavailable(error)) {
+      throw error;
+    }
+  }
 
   res.json({
     success: true,

@@ -3,7 +3,7 @@
 > node scripts/prestart.js
 
 Aviso: Prisma schema loaded from prisma\schema.prisma
-Datasource "db": PostgreSQL database "nido_media", schema "public" at "localhost:5433"
+Datasource "db": Prisma connection was not configured for this Option B run.
 
 
 warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).

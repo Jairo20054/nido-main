@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { useAuth } from '../../app/providers/AuthProvider';
-import { hasSupabaseConfig } from '../../lib/supabaseClient';
 import { resolvePostAuthDestination } from './authRedirects';
 
 /**
@@ -13,7 +12,7 @@ import { resolvePostAuthDestination } from './authRedirects';
 export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, login, devLogin, user } = useAuth();
+  const { isAuthenticated, login, user } = useAuth();
   const [form, setForm] = useState({ identifier: '', password: '' });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -28,18 +27,7 @@ export function LoginPage() {
     setError('');
 
     try {
-      const isDev = import.meta.env.DEV;
-      let nextUser;
-
-      if (isDev && !hasSupabaseConfig) {
-        try {
-          nextUser = await devLogin(form);
-        } catch (_devError) {
-          nextUser = await login(form);
-        }
-      } else {
-        nextUser = await login(form);
-      }
+      const nextUser = await login(form);
 
       const nextRoute = resolvePostAuthDestination(location.state, nextUser);
       navigate(nextRoute, { replace: true });

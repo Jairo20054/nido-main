@@ -1,6 +1,6 @@
 const { badRequest, unauthorized } = require('../../shared/errors');
 const { supabaseAnon } = require('../../shared/supabase');
-const { ensureProfile } = require('../../shared/auth');
+const { decorateProfile, ensureProfile } = require('../../shared/auth');
 const { serializeUser } = require('../../shared/serializers');
 const { env } = require('../../shared/env');
 
@@ -12,6 +12,39 @@ const buildAuthPayload = (session, user) => ({
   expiresAt: session?.expires_at || null,
   user: serializeUser(user, true),
 });
+
+const normalizeIdentifier = (value) => String(value || '').trim().toLowerCase();
+
+const adminAliases = () =>
+  [
+    process.env.ADMIN_LOGIN_ALIAS,
+    process.env.VITE_ADMIN_LOGIN_ALIAS,
+    process.env.SUPER_ADMIN_LOGIN_ALIAS,
+    process.env.VITE_SUPER_ADMIN_LOGIN_ALIAS,
+    'admin',
+  ]
+    .map(normalizeIdentifier)
+    .filter(Boolean);
+
+const resolveLoginEmail = (identifier) => {
+  const normalized = normalizeIdentifier(identifier);
+
+  if (!normalized) {
+    return '';
+  }
+
+  if (adminAliases().includes(normalized)) {
+    return normalizeIdentifier(
+      process.env.ADMIN_LOGIN_EMAIL ||
+        process.env.VITE_ADMIN_LOGIN_EMAIL ||
+        process.env.SUPER_ADMIN_LOGIN_EMAIL ||
+        process.env.VITE_SUPER_ADMIN_LOGIN_EMAIL ||
+        'admin@nido.local'
+    );
+  }
+
+  return normalized;
+};
 
 // El registro publico solo permite roles de negocio esperados por la plataforma.
 const normalizeRole = (role) => {
@@ -51,6 +84,7 @@ const register = async (req, res) => {
   }
 
   const profile = data.user ? await ensureProfile(data.user) : null;
+  const decoratedProfile = profile ? await decorateProfile(data.user, profile) : null;
 
   res.status(201).json({
     success: true,
@@ -58,7 +92,7 @@ const register = async (req, res) => {
       ? 'Cuenta creada correctamente'
       : 'Cuenta creada. Revisa tu correo para confirmar el acceso.',
     data: {
-      ...buildAuthPayload(data.session, profile),
+      ...buildAuthPayload(data.session, decoratedProfile),
       requiresEmailConfirmation: !data.session,
     },
   });
@@ -70,10 +104,11 @@ const login = async (req, res) => {
     throw badRequest('Supabase no esta configurado en el servidor');
   }
 
-  const { email, password } = req.body;
+  const { email, identifier, password } = req.body;
+  const resolvedEmail = resolveLoginEmail(identifier || email);
 
   const { data, error } = await supabaseAnon.auth.signInWithPassword({
-    email,
+    email: resolvedEmail,
     password,
   });
 
@@ -82,52 +117,18 @@ const login = async (req, res) => {
   }
 
   const profile = await ensureProfile(data.user);
+  const decoratedProfile = await decorateProfile(data.user, profile);
 
   res.json({
     success: true,
     message: 'Sesion iniciada',
-    data: buildAuthPayload(data.session, profile),
+    data: buildAuthPayload(data.session, decoratedProfile),
   });
 };
 
-// En desarrollo, permite login con el alias admin del .env, pero siempre
-// devolviendo una sesion real de Supabase para que las rutas protegidas validen.
+// Compatibilidad para clientes viejos: usa el mismo flujo real de Supabase.
 const devLogin = async (req, res) => {
-  if (process.env.NODE_ENV !== 'development') {
-    throw unauthorized('Dev login solo disponible en desarrollo');
-  }
-
-  if (!supabaseAnon) {
-    throw badRequest('Supabase no esta configurado en el servidor');
-  }
-
-  const { identifier, password } = req.body;
-  const adminAlias = (process.env.ADMIN_LOGIN_ALIAS || 'admin').toLowerCase();
-  const adminEmail = (process.env.ADMIN_LOGIN_EMAIL || 'admin@nido.local').toLowerCase();
-  const adminPassword = process.env.ADMIN_LOGIN_PASSWORD;
-
-  const normalizedIdentifier = String(identifier || '').trim().toLowerCase();
-
-  if (normalizedIdentifier !== adminAlias || password !== adminPassword) {
-    throw unauthorized('Correo o contrasena incorrectos');
-  }
-
-  const { data, error } = await supabaseAnon.auth.signInWithPassword({
-    email: adminEmail,
-    password: adminPassword,
-  });
-
-  if (error || !data.user || !data.session) {
-    throw unauthorized('No fue posible iniciar la sesion admin en Supabase');
-  }
-
-  const profile = await ensureProfile(data.user);
-
-  res.json({
-    success: true,
-    message: 'Sesion iniciada (dev)',
-    data: buildAuthPayload(data.session, profile),
-  });
+  return login(req, res);
 };
 
 const me = async (req, res) => {

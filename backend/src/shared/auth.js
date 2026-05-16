@@ -1,11 +1,12 @@
-const { prisma } = require('./prisma');
-const { badRequest, forbidden, unauthorized } = require('./errors');
-const { supabaseAnon, supabaseService } = require('./supabase');
+const { badRequest, forbidden, serviceUnavailable, unauthorized } = require('./errors');
+const { supabaseAnon } = require('./supabase');
+const { supabaseAdmin } = require('./supabaseAdmin');
 
-// Capa transversal de autenticacion/autorizacion. Supabase valida la identidad
-// y Prisma conserva el perfil operativo que usa el resto del dominio.
+// Capa transversal de autenticacion/autorizacion. Supabase Auth valida la identidad
+// y Supabase Postgres conserva el perfil operativo que usa el resto del dominio.
 const ALLOWED_SELF_ASSIGNED_ROLES = ['TENANT', 'LANDLORD'];
 const ADMIN_SELECT = ['auth_user_id', 'profile_id'].join(', ');
+const PROFILE_TABLE = 'profiles';
 
 // Extrae el bearer token desde el header Authorization si existe.
 const extractToken = (req) => {
@@ -27,6 +28,8 @@ const safeRole = (role, fallback = 'TENANT') => {
   const normalized = role.toUpperCase();
   return ['ADMIN', 'LANDLORD', 'TENANT'].includes(normalized) ? normalized : fallback;
 };
+
+const roleToProfileDb = (role) => safeRole(role, 'TENANT').toLowerCase();
 
 const getAppRole = (authUser, fallback = 'TENANT') =>
   safeRole(authUser?.app_metadata?.role, fallback);
@@ -53,7 +56,7 @@ const deriveNameParts = (user) => {
   };
 };
 
-// Traduce el usuario autenticado al shape esperado por Prisma.
+// Traduce el usuario autenticado al shape operativo esperado por la API.
 const profilePayloadFromAuthUser = (authUser) => {
   const metadata = authUser.user_metadata || {};
   const { firstName, lastName } = deriveNameParts(authUser);
@@ -73,33 +76,107 @@ const profilePayloadFromAuthUser = (authUser) => {
   };
 };
 
-// Crea la fila Prisma del usuario si aun no existe y completa datos basicos
+const requireSupabaseAdmin = () => {
+  if (!supabaseAdmin) {
+    throw serviceUnavailable('Supabase de administracion no esta configurado en el servidor');
+  }
+
+  return supabaseAdmin;
+};
+
+const profileRowToUser = (profile) => {
+  if (!profile) {
+    return null;
+  }
+
+  return {
+    id: profile.id,
+    email: profile.email,
+    firstName: profile.firstName ?? profile.first_name ?? '',
+    lastName: profile.lastName ?? profile.last_name ?? '',
+    phone: profile.phone ?? null,
+    bio: profile.bio ?? null,
+    avatarUrl: profile.avatarUrl ?? profile.avatar_url ?? null,
+    role: safeRole(profile.role, 'TENANT'),
+    countryCode: profile.countryCode ?? profile.country_code ?? null,
+    locale: profile.locale ?? null,
+    timezone: profile.timezone ?? null,
+    createdAt: profile.createdAt ?? profile.created_at ?? null,
+    updatedAt: profile.updatedAt ?? profile.updated_at ?? null,
+  };
+};
+
+const profileInsertFromAuthUser = (authUser, authPayload) => ({
+  id: authUser.id,
+  auth_id: authUser.id,
+  email: authUser.email || authPayload.email,
+  full_name: `${authPayload.firstName || ''} ${authPayload.lastName || ''}`.trim(),
+  first_name: authPayload.firstName,
+  last_name: authPayload.lastName,
+  phone: authPayload.phone,
+  bio: authPayload.bio,
+  avatar_url: authPayload.avatarUrl,
+  role: roleToProfileDb(authPayload.role),
+  country_code: authPayload.countryCode,
+  locale: authPayload.locale,
+  timezone: authPayload.timezone,
+});
+
+const profilePatchToRow = (patch) => {
+  const row = {};
+
+  if (patch.email !== undefined) row.email = patch.email;
+  if (patch.firstName !== undefined) row.first_name = patch.firstName;
+  if (patch.lastName !== undefined) row.last_name = patch.lastName;
+  if (patch.phone !== undefined) row.phone = patch.phone;
+  if (patch.bio !== undefined) row.bio = patch.bio;
+  if (patch.avatarUrl !== undefined) row.avatar_url = patch.avatarUrl;
+
+  return row;
+};
+
+const fetchProfileById = async (profileId) => {
+  const client = requireSupabaseAdmin();
+  const { data, error } = await client
+    .from(PROFILE_TABLE)
+    .select('*')
+    .eq('id', profileId)
+    .maybeSingle();
+
+  if (error) {
+    throw serviceUnavailable('No fue posible cargar tu perfil desde Supabase');
+  }
+
+  return profileRowToUser(data);
+};
+
+// Crea la fila del perfil en Supabase si aun no existe y completa datos basicos
 // sin sobrescribir cambios editados desde la app.
 const ensureProfile = async (authUser) => {
   if (!authUser) {
     return null;
   }
 
+  const client = requireSupabaseAdmin();
   const authPayload = profilePayloadFromAuthUser(authUser);
-  const existingProfile = await prisma.user.findUnique({
-    where: {
-      id: authUser.id,
-    },
-  });
+  const existingProfile = await fetchProfileById(authUser.id);
 
   if (!existingProfile) {
-    return prisma.user.create({
-      data: {
-        id: authUser.id,
-        email: authUser.email || authPayload.email,
-        firstName: authPayload.firstName,
-        lastName: authPayload.lastName,
-        phone: authPayload.phone,
-        bio: authPayload.bio,
-        avatarUrl: authPayload.avatarUrl,
-        role: isAuthAdmin(authUser) ? 'ADMIN' : authPayload.role,
-      },
-    });
+    const { data, error } = await client
+      .from(PROFILE_TABLE)
+      .insert(profileInsertFromAuthUser(authUser, authPayload))
+      .select('*')
+      .single();
+
+    if (error) {
+      if (error.code === '23505') {
+        return fetchProfileById(authUser.id);
+      }
+
+      throw serviceUnavailable('No fue posible crear tu perfil en Supabase');
+    }
+
+    return profileRowToUser(data);
   }
 
   const patch = {};
@@ -128,40 +205,101 @@ const ensureProfile = async (authUser) => {
     patch.avatarUrl = authPayload.avatarUrl;
   }
 
-  if (existingProfile.role !== 'ADMIN' && isAuthAdmin(authUser)) {
-    patch.role = 'ADMIN';
-  }
-
   if (!Object.keys(patch).length) {
     return existingProfile;
   }
 
-  return prisma.user.update({
-    where: {
-      id: authUser.id,
-    },
-    data: patch,
-  });
-};
+  const { data, error } = await client
+    .from(PROFILE_TABLE)
+    .update({
+      ...profilePatchToRow(patch),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', authUser.id)
+    .select('*')
+    .single();
 
-// Lee el grant administrativo desde Supabase sin bloquear el login si la
-// tabla aun no existe en el proyecto conectado.
-const fetchPlatformAdmin = async (authUserId) => {
-  if (!supabaseService) {
-    return null;
+  if (error) {
+    throw serviceUnavailable('No fue posible actualizar tu perfil en Supabase');
   }
 
-  const { data, error } = await supabaseService
-    .from('platform_admins')
-    .select(ADMIN_SELECT)
-    .or(`auth_user_id.eq.${authUserId},profile_id.eq.${authUserId}`)
-    .maybeSingle();
+  return profileRowToUser(data);
+};
+
+const tryAdminQuery = async (query) => {
+  const { data, error } = await query;
 
   if (error) {
     return null;
   }
 
   return data || null;
+};
+
+// Lee grants administrativos desde el schema vivo de Supabase sin bloquear el
+// login si una tabla/columna pertenece a una migracion no aplicada.
+const fetchPlatformAdmin = async (authUserId) => {
+  if (!supabaseAdmin) {
+    return null;
+  }
+
+  const platformGrant = await tryAdminQuery(
+    supabaseAdmin
+      .from('platform_admins')
+      .select(ADMIN_SELECT)
+      .or(`auth_user_id.eq.${authUserId},profile_id.eq.${authUserId}`)
+      .limit(1)
+      .maybeSingle()
+  );
+
+  if (platformGrant) {
+    return platformGrant;
+  }
+
+  const legacyProfileRole = await tryAdminQuery(
+    supabaseAdmin
+      .from('profiles')
+      .select('id, role')
+      .eq('id', authUserId)
+      .eq('role', 'admin')
+      .limit(1)
+      .maybeSingle()
+  );
+
+  if (legacyProfileRole) {
+    return { auth_user_id: authUserId, profile_id: authUserId };
+  }
+
+  const accountProfileRole = await tryAdminQuery(
+    supabaseAdmin
+      .from('profiles')
+      .select('id, primary_role')
+      .eq('id', authUserId)
+      .eq('primary_role', 'admin')
+      .limit(1)
+      .maybeSingle()
+  );
+
+  if (accountProfileRole) {
+    return { auth_user_id: authUserId, profile_id: authUserId };
+  }
+
+  const roleGrant = await tryAdminQuery(
+    supabaseAdmin
+      .from('roles')
+      .select('profile_id, role_key')
+      .eq('profile_id', authUserId)
+      .eq('role_key', 'admin')
+      .eq('status', 'active')
+      .limit(1)
+      .maybeSingle()
+  );
+
+  if (roleGrant) {
+    return { auth_user_id: authUserId, profile_id: authUserId };
+  }
+
+  return null;
 };
 
 // Enriquece el perfil con permisos administrativos otorgados por plataforma.
@@ -189,27 +327,39 @@ const attachUser = async (req, strict) => {
     return;
   }
 
-  try {
-    if (!supabaseAnon) {
+  if (!supabaseAnon) {
+    if (strict) {
       throw unauthorized('Supabase no esta configurado en el servidor');
     }
 
-    const { data, error } = await supabaseAnon.auth.getUser(token);
+    req.user = null;
+    return;
+  }
 
-    if (error || !data?.user) {
+  const { data, error } = await supabaseAnon.auth.getUser(token);
+
+  if (error || !data?.user) {
+    if (strict) {
       throw unauthorized('Tu sesion expiro o no es valida');
     }
 
+    req.user = null;
+    return;
+  }
+
+  try {
     const profile = await ensureProfile(data.user);
 
     if (!profile) {
-      throw unauthorized('No fue posible cargar tu perfil');
+      throw serviceUnavailable('No fue posible cargar tu perfil. Intenta nuevamente en unos minutos.');
     }
 
     req.user = await decorateProfile(data.user, profile);
-  } catch (error) {
+  } catch (profileError) {
     if (strict) {
-      throw error?.statusCode ? error : unauthorized('Tu sesion expiro o no es valida');
+      throw profileError?.statusCode
+        ? profileError
+        : serviceUnavailable('No fue posible cargar tu perfil. Verifica la conexion de la base de datos.');
     }
 
     req.user = null;
@@ -259,15 +409,20 @@ const assertOwnershipOrAdmin = (reqUser, ownerId) => {
 };
 
 const deleteAuthUser = async (userId) => {
-  if (!supabaseService) {
+  if (!supabaseAdmin) {
     throw badRequest('Supabase de administracion no esta configurado en el servidor');
   }
 
-  await supabaseService.auth.admin.deleteUser(userId);
+  const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
+
+  if (error) {
+    throw badRequest(error.message);
+  }
 };
 
 module.exports = {
   assertOwnershipOrAdmin,
+  decorateProfile,
   deleteAuthUser,
   ensureProfile,
   fetchPlatformAdmin,

@@ -2,7 +2,7 @@
 
 ## Requisitos previos
 - **Node.js** (v16 o superior)
-- **Docker Desktop** (para PostgreSQL y otros servicios)
+- **Docker Desktop** (opcional para servicios auxiliares locales)
 - **npm** (incluido con Node.js)
 
 ## Pasos para iniciar NIDO
@@ -12,7 +12,7 @@
 npm install
 ```
 
-### 2. Iniciar Docker Compose (PostgreSQL, Redis, MinIO, ClamAV)
+### 2. Iniciar servicios locales opcionales (Redis, MinIO, ClamAV)
 
 Opción A - Automático (Recomendado):
 ```bash
@@ -33,7 +33,7 @@ npm start
 
 - **API Backend**: http://localhost:5000/health
 - **Frontend**: http://localhost:5173 (después de `npm run dev:client` en otra terminal)
-- **PostgreSQL**: localhost:5433
+- **Supabase Postgres**: configura `DATABASE_URL` solo si vas a usar modulos Prisma no migrados
 - **Redis**: localhost:6379
 - **MinIO Console**: http://localhost:9001 (usuario: minioadmin / contraseña: minioadmin)
 
@@ -51,19 +51,19 @@ npm start
 
 ### Error: "La base de datos no esta disponible"
 
-**Causa**: PostgreSQL no está accesible en `localhost:5433`
+**Causa**: `DATABASE_URL` no apunta a una base PostgreSQL accesible o se dejo vacio para el flujo Option B.
 
 **Solución**:
-1. Verifica que docker-compose está corriendo: `docker-compose ps`
-2. Si no, inicia: `docker-compose up -d`
-3. Espera a que PostgreSQL esté listo (estado "healthy")
-4. Reinicia el backend: `npm start`
+1. Para auth/perfil, verifica `SUPABASE_URL`, `SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY`.
+2. Para modulos Prisma no migrados, configura `DATABASE_URL` con el pooler de Supabase.
+3. Reinicia el backend: `npm start`
 
 ### Error: "DATABASE_URL no esta configurada"
 
-**Solución**: El archivo `.env` debe tener la variable `DATABASE_URL`. Verifica que existe y contiene:
+**Solución**: Para Option B puedes dejar Prisma desactivado en desarrollo:
 ```
-DATABASE_URL="postgresql://postgres:postgres@localhost:5433/nido_media"
+DATABASE_URL=""
+DIRECT_URL=""
 ```
 
 ## Comandos útiles
@@ -101,7 +101,11 @@ docker-compose down
 
 El archivo `.env` debe tener:
 ```
-DATABASE_URL="postgresql://postgres:postgres@localhost:5433/nido_media"
+DATABASE_URL=""
+DIRECT_URL=""
+SUPABASE_URL="https://your-project.supabase.co"
+SUPABASE_ANON_KEY="your-anon-key"
+SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
 JWT_SECRET="nido-local-secret"
 JWT_EXPIRES_IN="7d"
 PORT=5000

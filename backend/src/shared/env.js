@@ -42,6 +42,7 @@ const env = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: Number(process.env.PORT || 5000),
   DATABASE_URL: process.env.DATABASE_URL || '',
+  DIRECT_URL: process.env.DIRECT_URL || '',
   CLIENT_URL: clientUrls[0] || 'http://localhost:5173',
   CLIENT_URLS: clientUrls.length ? clientUrls : ['http://localhost:5173'],
   SUPABASE_URL: clean(process.env.SUPABASE_URL) || clean(process.env.VITE_SUPABASE_URL) || '',
