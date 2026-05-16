@@ -138,6 +138,15 @@ const me = async (req, res) => {
   });
 };
 
+// Endpoint idempotente para sincronizar la sesion Supabase con el perfil Prisma.
+// requireAuth valida el JWT, ejecuta ensureProfile con upsert y deja req.user listo.
+const syncUser = async (req, res) => {
+  res.json({
+    success: true,
+    data: serializeUser(req.user, true),
+  });
+};
+
 // El frontend invalida la sesion real; este endpoint sirve como confirmacion semantica.
 const logout = async (_req, res) => {
   res.json({
@@ -175,4 +184,5 @@ module.exports = {
   logout,
   me,
   register,
+  syncUser,
 };

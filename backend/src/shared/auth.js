@@ -159,9 +159,9 @@ const ensureProfile = async (authUser) => {
 
   const client = requireSupabaseAdmin();
   const authPayload = profilePayloadFromAuthUser(authUser);
-  const existingProfile = await fetchProfileById(authUser.id);
+  let syncedProfile = await fetchProfileById(authUser.id);
 
-  if (!existingProfile) {
+  if (!syncedProfile) {
     const { data, error } = await client
       .from(PROFILE_TABLE)
       .insert(profileInsertFromAuthUser(authUser, authPayload))
@@ -178,35 +178,30 @@ const ensureProfile = async (authUser) => {
 
     return profileRowToUser(data);
   }
-
   const patch = {};
 
-  if (authUser.email && authUser.email !== existingProfile.email) {
-    patch.email = authUser.email;
-  }
-
-  if (!existingProfile.firstName && authPayload.firstName) {
+  if (!syncedProfile.firstName && authPayload.firstName) {
     patch.firstName = authPayload.firstName;
   }
 
-  if (!existingProfile.lastName && authPayload.lastName) {
+  if (!syncedProfile.lastName && authPayload.lastName) {
     patch.lastName = authPayload.lastName;
   }
 
-  if (!existingProfile.phone && authPayload.phone) {
+  if (!syncedProfile.phone && authPayload.phone) {
     patch.phone = authPayload.phone;
   }
 
-  if (!existingProfile.bio && authPayload.bio) {
+  if (!syncedProfile.bio && authPayload.bio) {
     patch.bio = authPayload.bio;
   }
 
-  if (!existingProfile.avatarUrl && authPayload.avatarUrl) {
+  if (!syncedProfile.avatarUrl && authPayload.avatarUrl) {
     patch.avatarUrl = authPayload.avatarUrl;
   }
 
   if (!Object.keys(patch).length) {
-    return existingProfile;
+    return syncedProfile;
   }
 
   const { data, error } = await client
