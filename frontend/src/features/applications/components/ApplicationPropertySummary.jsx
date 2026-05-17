@@ -22,7 +22,7 @@ export function ApplicationPropertySummary({ property, prequalification }) {
           <strong>{formatCurrency(property.monthlyRent)}</strong>
         </div>
         <div>
-          <span>Administracion</span>
+          <span>Administración</span>
           <strong>{formatCurrency(property.maintenanceFee)}</strong>
         </div>
         <div>

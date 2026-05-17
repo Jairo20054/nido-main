@@ -59,7 +59,7 @@ export function ApplyStartPage() {
               <span className="section__eyebrow">Que vas a ver</span>
               <div className="application-overview-list">
                 <div>
-                  <strong>1. Precalificacion instantanea</strong>
+                  <strong>1. Precalificación instantánea</strong>
                   <p>Respondes 4 preguntas y obtienes resultado inmediato.</p>
                 </div>
                 <div>
@@ -67,7 +67,7 @@ export function ApplyStartPage() {
                   <p>Solo pedimos lo necesario segun tu ocupacion y respaldo.</p>
                 </div>
                 <div>
-                  <strong>3. Revision y trazabilidad</strong>
+                  <strong>3. Revisión y trazabilidad</strong>
                   <p>Verás el estado del proceso sin arbitrariedad ni pasos ocultos.</p>
                 </div>
               </div>

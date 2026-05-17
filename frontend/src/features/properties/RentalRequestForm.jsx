@@ -55,9 +55,9 @@ export function RentalRequestForm({
     return (
       <div className="status-card">
         <h3>Esta es tu propiedad</h3>
-        <p>Puedes gestionarla desde el panel y revisar desde alla las solicitudes que lleguen.</p>
+        <p>Puedes gestionarla desde el panel y revisar desde allí las solicitudes que lleguen.</p>
         <Link to="/manage" className="button">
-          Ir a gestion
+          Ir a gestión
         </Link>
       </div>
     );
@@ -67,7 +67,7 @@ export function RentalRequestForm({
     event.preventDefault();
 
     if (!form.desiredMoveIn || !form.phone || form.message.trim().length < 20) {
-      setError('Completa la fecha, tu telefono y un mensaje claro de al menos 20 caracteres.');
+      setError('Completa la fecha, tu teléfono y un mensaje claro de al menos 20 caracteres.');
       return;
     }
 

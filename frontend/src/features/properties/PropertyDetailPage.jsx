@@ -373,7 +373,7 @@ export function PropertyDetailPage() {
             </div>
             <div className="price-card__rows">
               <div>
-                <span>Administracion</span>
+                <span>Administración</span>
                 <span>{formatCurrency(property.maintenanceFee)}</span>
               </div>
               <div>

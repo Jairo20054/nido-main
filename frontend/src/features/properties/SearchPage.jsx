@@ -116,7 +116,7 @@ export function SearchPage() {
 
   const toggleFavorite = async (property) => {
     if (!isAuthenticated) {
-      setError('Explora sin cuenta. Inicia sesión solo si quieres guardar propiedades.');
+      setError('Puedes explorar sin cuenta. Inicia sesión solo si quieres guardar propiedades.');
       return;
     }
 

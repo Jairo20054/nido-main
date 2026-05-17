@@ -128,7 +128,7 @@ export function ApplyPrequalificationPage() {
           <div className="application-layout__main">
             <form className="form-card application-form-card" onSubmit={handleEvaluate}>
               <div className="form-card__header">
-                <span className="section__eyebrow">Precalificacion</span>
+                <span className="section__eyebrow">Precalificación</span>
                 <h1>Ve si este inmueble encaja contigo</h1>
                 <p>
                   Responde estas preguntas para darte una salida clara y sin cobro por revisión.
@@ -178,7 +178,7 @@ export function ApplyPrequalificationPage() {
                   />
                 </div>
                 <div className="field-group">
-                  <label htmlFor="occupants">Cuantas personas viviran aqui</label>
+                  <label htmlFor="occupants">Cuántas personas vivirán aquí</label>
                   <input
                     id="occupants"
                     type="number"

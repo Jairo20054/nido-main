@@ -92,8 +92,8 @@ function StatsContent() {
       </article>
       <article className="dashboard-stat-card">
         <strong>{mockAdminStats.totals.requests}</strong>
-        <span>Solicitudes</span>
-        <small>Interacciones historicas</small>
+        <span>Postulaciones</span>
+        <small>Interacciones históricas</small>
       </article>
       <article className="dashboard-stat-card">
         <strong>{mockAdminStats.totals.favorites}</strong>

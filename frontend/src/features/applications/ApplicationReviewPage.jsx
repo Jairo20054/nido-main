@@ -67,9 +67,9 @@ export function ApplicationReviewPage() {
         status: request?.status === 'PENDING' || !request ? 'current' : 'done',
         title:
           request?.status === 'APPROVED'
-            ? 'Revision completada'
+            ? 'Revisión completada'
             : request?.status === 'REJECTED'
-              ? 'Revision cerrada'
+              ? 'Revisión cerrada'
               : 'En revisión',
         description:
           request?.status === 'APPROVED'
@@ -98,7 +98,7 @@ export function ApplicationReviewPage() {
   if (!draft?.prequalification || !request) {
     return (
       <EmptyState
-        title="Aun no has enviado tu solicitud"
+        title="Aún no has enviado tu solicitud"
         description="Completa documentos y envía el caso para que podamos mostrarte el estado."
         actionLabel="Ir a documentos"
         onAction={() => navigate(`/properties/${property.id}/apply/documents`)}
@@ -141,7 +141,7 @@ export function ApplicationReviewPage() {
                   {request.status === 'APPROVED'
                     ? 'Tu solicitud ya fue aprobada'
                     : request.status === 'REJECTED'
-                      ? 'Esta solicitud se cerro'
+                      ? 'Esta solicitud se cerró'
                       : 'Tu expediente ya está en cola de revisión'}
                 </h2>
                 <p>

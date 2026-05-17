@@ -61,7 +61,7 @@ export function RegisterPage() {
       });
 
       if (result.requiresEmailConfirmation) {
-        setMessage('Revisa tu correo para activar la cuenta y luego inicia sesión.');
+        setMessage('Revisa tu correo para confirmar la cuenta y luego inicia sesión.');
         return;
       }
 

@@ -70,8 +70,8 @@ export function SavedPropertiesPage() {
           </div>
         ) : (
           <EmptyState
-            title="Aun no guardas propiedades"
-            description="Explora el catalogo y marca las opciones que quieras revisar luego con calma."
+            title="Aún no guardas propiedades"
+            description="Explora el catálogo y marca las opciones que quieras revisar luego con calma."
           />
         )}
       </section>

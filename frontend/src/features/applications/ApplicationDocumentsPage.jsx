@@ -42,7 +42,7 @@ const validateDocumentFile = (document, file) => {
   if (file.size < 30_000) {
     return {
       status: 'requires_correction',
-      validationMessage: 'La imagen o PDF parece incompleto. Intenta subir un archivo mas claro.',
+      validationMessage: 'La imagen o PDF parece incompleto. Intenta subir un archivo más claro.',
     };
   }
 
@@ -113,9 +113,9 @@ export function ApplicationDocumentsPage() {
   if (!draft?.prequalification) {
     return (
       <EmptyState
-        title="Primero necesitamos tu precalificacion"
+        title="Primero necesitamos tu precalificación"
         description="Asi podemos pedirte solo los documentos correctos para este inmueble."
-        actionLabel="Ir a precalificacion"
+        actionLabel="Ir a precalificación"
         onAction={() => navigate(`/properties/${property.id}/apply/prequal`)}
       />
     );
@@ -207,7 +207,7 @@ export function ApplicationDocumentsPage() {
                 <span className="section__eyebrow">Cuenta necesaria</span>
                 <h1>Guarda tus documentos con trazabilidad</h1>
                 <p>
-                  Ya tienes tu precalificacion. Ahora necesitamos una cuenta para dejar la solicitud
+                  Ya tienes tu precalificación. Ahora necesitamos una cuenta para dejar la solicitud
                   asociada a tu identidad y mostrarte el estado del proceso.
                 </p>
                 <div className="application-actions">
@@ -247,7 +247,7 @@ export function ApplicationDocumentsPage() {
               <div className="form-card">
                 <div className="form-card__header">
                   <span className="section__eyebrow">Documentos</span>
-                  <h1>Sube lo necesario, nada mas</h1>
+                  <h1>Sube lo necesario, nada más</h1>
                   <p>
                     Cada documento explica por que se pide, el formato aceptado y como corregirlo si
                     hace falta.
@@ -302,7 +302,7 @@ export function ApplicationDocumentsPage() {
                     />
                   </div>
                   <div className="field-group">
-                    <label htmlFor="leaseMonths">Duracion estimada</label>
+                    <label htmlFor="leaseMonths">Duración estimada</label>
                     <input
                       id="leaseMonths"
                       type="number"
@@ -346,7 +346,7 @@ export function ApplicationDocumentsPage() {
                           }))
                         }
                       />
-                      Vivire con mascotas
+                      Viviré con mascotas
                     </label>
                   </div>
                 </div>
@@ -363,7 +363,7 @@ export function ApplicationDocumentsPage() {
                         message: event.target.value,
                       }))
                     }
-                    placeholder="Cuentanos cuando quieres mudarte, quien vivira contigo y cualquier dato util para revisar la solicitud."
+                    placeholder="Cuéntanos cuándo quieres mudarte, quién vivirá contigo y cualquier dato útil para revisar la solicitud."
                   />
                 </div>
               </div>
@@ -381,7 +381,7 @@ export function ApplicationDocumentsPage() {
 
               <div className="application-actions">
                 <Link to={`/properties/${property.id}/apply/prequal`} className="button button--secondary">
-                  Volver a precalificacion
+                  Volver a precalificación
                 </Link>
                 <button className="button" type="submit" disabled={submitting || !isAuthenticated}>
                   {submitting ? 'Enviando a revisión...' : (

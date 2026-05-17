@@ -127,7 +127,7 @@ const DOCUMENT_LIBRARY = {
   FOREIGNER: [
     {
       key: 'valid-foreign-id',
-      label: 'Documento valido',
+      label: 'Documento válido',
       why: 'Necesitamos verificar identidad con el documento habilitado en tu caso.',
       formats: ['PDF', 'JPG', 'PNG'],
       exampleHint: 'Pasaporte, cedula de extranjeria o documento equivalente.',
@@ -240,12 +240,12 @@ const buildRecommendations = ({ result, hasBackup, monthlyTotal }) => {
       hasBackup
         ? 'Avanza con tu respaldo y sube los documentos del titular y del respaldo juntos.'
         : 'Puedes mejorar tu resultado agregando codeudor o garantía.',
-      'Si prefieres, tambien puedes explorar inmuebles con un canon mas bajo.',
+      'Si prefieres, también puedes explorar inmuebles con un canon más bajo.',
     ];
   }
 
   return [
-    'Explora inmuebles con un canon mas alineado a tu presupuesto.',
+    'Explora inmuebles con un canon más alineado a tu presupuesto.',
     'Si cuentas con respaldo adicional, puedes intentar una nueva evaluacion.',
   ];
 };
@@ -346,7 +346,7 @@ const prequalifyApplication = async (req, res) => {
   }
 
   if (req.body.backupOption !== 'NONE' && !req.body.hasBackup) {
-    throw badRequest('Si indicas una opcion de respaldo, tambien debes confirmar que cuentas con respaldo.');
+    throw badRequest('Si indicas una opción de respaldo, también debes confirmar que cuentas con respaldo.');
   }
 
   const evaluation = calculatePrequalification(property, req.body);

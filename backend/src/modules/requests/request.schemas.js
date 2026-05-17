@@ -13,7 +13,7 @@ const createRequestSchema = Joi.object({
   monthlyIncome: Joi.number().integer().min(0).allow(null),
   hasPets: Joi.boolean().default(false),
   phone: Joi.string().trim().pattern(colombianPhonePattern).required().messages({
-    'string.pattern.base': 'El telefono debe ser un celular colombiano valido, por ejemplo +57 300 000 0000.',
+    'string.pattern.base': 'El teléfono debe ser un celular colombiano válido, por ejemplo +57 300 000 0000.',
   }),
   message: Joi.string().trim().min(20).max(1000).required(),
 });
@@ -25,7 +25,7 @@ const updateRequestSchema = Joi.object({
   monthlyIncome: Joi.number().integer().min(0).allow(null),
   hasPets: Joi.boolean(),
   phone: Joi.string().trim().pattern(colombianPhonePattern).messages({
-    'string.pattern.base': 'El telefono debe ser un celular colombiano valido, por ejemplo +57 300 000 0000.',
+    'string.pattern.base': 'El teléfono debe ser un celular colombiano válido, por ejemplo +57 300 000 0000.',
   }),
   message: Joi.string().trim().min(20).max(1000),
 }).min(1);

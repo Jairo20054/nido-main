@@ -24,7 +24,7 @@ const text = (schema) => schema.custom(safeText, 'validacion de texto seguro');
 const optionalText = (max) => text(Joi.string().trim().max(max).allow('', null));
 const requiredText = (min, max) => text(Joi.string().trim().min(min).max(max).required());
 const phoneText = optionalText(32).pattern(SAFE_PHONE_PATTERN).messages({
-  'string.pattern.base': 'Ingresa un telefono valido.',
+  'string.pattern.base': 'Ingresa un teléfono válido.',
 });
 const enumText = (...values) => text(Joi.string().valid(...values));
 const listText = (min = 2, max = 60) => text(Joi.string().trim().min(min).max(max));

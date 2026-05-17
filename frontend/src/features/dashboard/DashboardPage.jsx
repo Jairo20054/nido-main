@@ -33,14 +33,14 @@ import {
 const dashboardCopy = {
   TENANT: {
     eyebrow: 'Arrendatario',
-    title: 'Encuentra y gestiona tu proximo hogar.',
+    title: 'Encuentra y gestiona tu próximo hogar.',
     description: 'Sigue postulaciones, revisa favoritos y prepara tus documentos sin perder el hilo.',
     action: { label: 'Buscar propiedades', href: '/properties' },
   },
   LANDLORD: {
     eyebrow: 'Arrendador',
-    title: 'Gestiona tus inmuebles desde un solo panel.',
-    description: 'Publica, revisa solicitudes y mide el interes de cada propiedad en Nido.',
+    title: 'Gestiona tus propiedades desde un solo panel.',
+    description: 'Publica, revisa solicitudes y mide el interés de cada propiedad en Nido.',
     action: { label: 'Publicar propiedad', href: '/publish' },
   },
   ADMIN: {
@@ -239,7 +239,7 @@ function LandlordDashboard({ data }) {
         </section>
 
         <HelpCard
-          title="Publica mas rapido"
+          title="Publica más rápido"
           description="Usa fotos claras, precio completo y disponibilidad para mejorar la conversion."
           cta="Nueva propiedad"
           href="/publish"
@@ -255,7 +255,7 @@ function AdminDashboard({ data }) {
       <div className="dashboard-stat-grid dashboard-stat-grid--four">
         <StatCard icon={Home} label="Propiedades" value={data.stats.totals.properties} helper="Total plataforma" />
         <StatCard icon={Users} label="Usuarios" value={data.stats.totals.users} helper="Cuentas creadas" />
-        <StatCard icon={Clock3} label="Solicitudes" value={data.stats.totals.requests} helper="Historicas" />
+        <StatCard icon={Clock3} label="Solicitudes" value={data.stats.totals.requests} helper="Históricas" />
         <StatCard icon={Heart} label="Guardados" value={data.stats.totals.favorites} helper="Interacciones" />
       </div>
 

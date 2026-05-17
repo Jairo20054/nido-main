@@ -143,7 +143,7 @@ export function HomePage() {
             <span className="hero-kicker">Arriendos claros en Colombia</span>
             <h1 className="home-hero__title">¿Dónde quieres vivir hoy?</h1>
             <p className="home-hero__subtitle">
-              Busca por zona, presupuesto y tipo de vivienda. Nido convierte el catalogo en
+              Busca por zona, presupuesto y tipo de vivienda. Nido convierte el catálogo en
               opciones claras para comparar, guardar y visitar más rápido.
             </p>
           </div>
@@ -209,7 +209,7 @@ export function HomePage() {
             </button>
           </form>
 
-          <div className="home-quick-row" aria-label="Busquedas rapidas">
+          <div className="home-quick-row" aria-label="Búsquedas rápidas">
             <span>Popular:</span>
             {POPULAR_CITIES.map((city) => (
               <button
@@ -268,8 +268,8 @@ export function HomePage() {
         ) : (
           <EmptyState
             title="No hay propiedades disponibles"
-            description="Intenta cambiar la ciudad, ampliar presupuesto o revisar el catalogo completo."
-            actionLabel="Explorar catalogo"
+            description="Intenta cambiar la ciudad, ampliar presupuesto o revisar el catálogo completo."
+            actionLabel="Explorar catálogo"
             onAction={() => navigate('/properties')}
           />
         )}
@@ -312,7 +312,7 @@ export function HomePage() {
           <div className="section__heading home-section-heading">
             <div>
               <span className="section__eyebrow">Más para explorar</span>
-              <h2>Cargando mas propiedades curadas</h2>
+              <h2>Cargando más propiedades curadas</h2>
             </div>
           </div>
 

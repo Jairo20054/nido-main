@@ -10,7 +10,7 @@ const analyzeLimiter = createRateLimiter({
   windowMs: 60 * 1000,
   max: 12,
   keyPrefix: 'deepsek-analyze',
-  message: 'Demasiadas solicitudes de analisis. Intenta nuevamente en un momento',
+  message: 'Demasiadas solicitudes de análisis. Intenta nuevamente en un momento',
 });
 
 router.post('/analyze', analyzeLimiter, validate(analyzeSchema), asyncHandler(controller.analyze));

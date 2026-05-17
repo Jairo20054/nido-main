@@ -104,7 +104,7 @@ export function AdminPage() {
       <section className="section">
         <div className="section__heading">
           <div>
-            <span className="section__eyebrow">Administracion</span>
+            <span className="section__eyebrow">Administración</span>
             <h1>Panel de control de Nido</h1>
           </div>
         </div>

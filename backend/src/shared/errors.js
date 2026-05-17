@@ -14,7 +14,7 @@ const unauthorized = (message = 'Necesitas iniciar sesión') => new AppError(401
 const forbidden = (message = 'No tienes permiso para realizar esta acción') => new AppError(403, message);
 const serviceUnavailable = (message = 'Servicio temporalmente no disponible', details) =>
   new AppError(503, message, details);
-const tooManyRequests = (message = 'Demasiados intentos. Intenta nuevamente mas tarde') =>
+const tooManyRequests = (message = 'Demasiados intentos. Intenta nuevamente más tarde') =>
   new AppError(429, message);
 
 module.exports = {
