@@ -2,7 +2,7 @@ import React from 'react';
 import { BarChart3, ClipboardList, FileText, Settings, UploadCloud } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RequestStatusBadge } from '../../components/ui/RequestStatusBadge';
-import { useAuth } from '../../app/providers/AuthProvider';
+import { useAuth } from '../../app/providers/useAuth';
 import { formatDate } from '../../lib/formatters';
 import {
   mockAdminStats,

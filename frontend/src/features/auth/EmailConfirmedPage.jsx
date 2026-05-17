@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../app/providers/AuthProvider';
+import { useAuth } from '../../app/providers/useAuth';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { LoadingState } from '../../components/ui/LoadingState';
 import { supabase } from '../../lib/supabaseClient';

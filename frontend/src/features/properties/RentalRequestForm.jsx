@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { CalendarDays, CircleUserRound, CreditCard, ShieldCheck } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { InlineMessage } from '../../components/ui/InlineMessage';
-import { useAuth } from '../../app/providers/AuthProvider';
+import { useAuth } from '../../app/providers/useAuth';
 import { formatCurrency } from '../../lib/formatters';
 
 const initialForm = {

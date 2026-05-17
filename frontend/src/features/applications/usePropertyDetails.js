@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '../../app/providers/AuthProvider';
+import { useAuth } from '../../app/providers/useAuth';
 import { api } from '../../lib/apiClient';
 
 export function usePropertyDetails(propertyId) {

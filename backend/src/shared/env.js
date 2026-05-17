@@ -2,8 +2,10 @@ const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
 
-const rootDir = path.resolve(__dirname, '..', '..', '..');
-const envPath = path.join(rootDir, '.env');
+const backendDir = path.resolve(__dirname, '..', '..');
+const rootDir = path.resolve(backendDir, '..');
+const rootEnvPath = path.join(rootDir, '.env');
+const backendEnvPath = path.join(backendDir, '.env');
 const examplePath = path.join(rootDir, '.env.example');
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -11,10 +13,14 @@ const isProduction = process.env.NODE_ENV === 'production';
 // Carga el entorno desde la raiz del proyecto para evitar depender del cwd
 // con el que se levante el backend o se ejecuten scripts auxiliares.
 // En desarrollo, el .env local debe ganar sobre variables viejas del sistema.
-if (fs.existsSync(envPath)) {
-  dotenv.config({ path: envPath, override: !isProduction });
+if (fs.existsSync(rootEnvPath)) {
+  dotenv.config({ path: rootEnvPath, override: !isProduction });
 } else {
   dotenv.config();
+}
+
+if (fs.existsSync(backendEnvPath)) {
+  dotenv.config({ path: backendEnvPath, override: !isProduction });
 }
 
 if (process.env.NODE_ENV !== 'production' && !process.env.DATABASE_URL && fs.existsSync(examplePath)) {

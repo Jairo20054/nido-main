@@ -8,6 +8,7 @@ gh/
 gh.zip
 supabase/.temp/
 .env
+backend/.env
 .DS_Store
 coverage/
 backend/prisma/dev.db

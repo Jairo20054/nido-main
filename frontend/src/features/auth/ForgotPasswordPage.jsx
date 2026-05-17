@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { InlineMessage } from '../../components/ui/InlineMessage';
-import { useAuth } from '../../app/providers/AuthProvider';
+import { useAuth } from '../../app/providers/useAuth';
 
 /**
  * Componente de uso para iniciar recuperación de contraseña.

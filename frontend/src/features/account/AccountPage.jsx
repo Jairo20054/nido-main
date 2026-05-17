@@ -3,7 +3,7 @@ import { EmptyState } from '../../components/ui/EmptyState';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { LoadingState } from '../../components/ui/LoadingState';
 import { RequestStatusBadge } from '../../components/ui/RequestStatusBadge';
-import { useAuth } from '../../app/providers/AuthProvider';
+import { useAuth } from '../../app/providers/useAuth';
 import { api } from '../../lib/apiClient';
 import { formatCurrency, formatDate } from '../../lib/formatters';
 import { isRecoverableDashboardError, mockTenantRequests } from '../dashboard/dashboardData';

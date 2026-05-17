@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { House, LogOut, Menu, User, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../app/providers/AuthProvider';
+import { useAuth } from '../../app/providers/useAuth';
 
 export function SiteHeader() {
   const navigate = useNavigate();

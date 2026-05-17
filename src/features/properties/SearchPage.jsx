@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { LoadingState } from '../../components/ui/LoadingState';
-import { useAuth } from '../../app/providers/AuthProvider';
+import { useAuth } from '../../app/providers/useAuth';
 import { PROPERTY_STATUS_OPTIONS, PUBLIC_PROPERTY_STATUS_OPTIONS } from '../../lib/constants';
 import { api } from '../../lib/apiClient';
 import { PropertyCard } from './PropertyCard';

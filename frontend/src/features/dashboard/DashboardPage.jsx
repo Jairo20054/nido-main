@@ -18,7 +18,7 @@ import { RequestStatusBadge } from '../../components/ui/RequestStatusBadge';
 import { LoadingState } from '../../components/ui/LoadingState';
 import { PropertyImage } from '../../components/ui/PropertyImage';
 import { PropertyStatusBadge } from '../../components/ui/PropertyStatusBadge';
-import { useAuth } from '../../app/providers/AuthProvider';
+import { useAuth } from '../../app/providers/useAuth';
 import { api } from '../../lib/apiClient';
 import { formatCurrency, formatDate } from '../../lib/formatters';
 import {

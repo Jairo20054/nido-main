@@ -11,7 +11,7 @@ import {
   UploadCloud,
   Video,
 } from 'lucide-react';
-import { useAuth } from '../../app/providers/AuthProvider';
+import { useAuth } from '../../app/providers/useAuth';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import {
   ALLOWED_IMAGE_TYPES,

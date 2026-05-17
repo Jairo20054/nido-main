@@ -346,9 +346,24 @@ const attachUser = async (req, strict) => {
     return;
   }
 
-  const { data, error } = await supabaseAnon.auth.getUser(token);
+  let userData;
 
-  if (error || !data?.user) {
+  try {
+    const { data, error } = await supabaseAnon.auth.getUser(token);
+
+    if (error) {
+      throw error;
+    }
+
+    userData = data;
+  } catch (err) {
+    console.error('[Nido Auth] No se pudo verificar el token con Supabase:', err.message);
+    throw serviceUnavailable(
+      'El servicio de autenticación no está disponible. Intenta de nuevo en unos segundos.'
+    );
+  }
+
+  if (!userData?.user) {
     if (strict) {
       throw unauthorized('Tu sesión expiró o no es válida');
     }
@@ -358,13 +373,13 @@ const attachUser = async (req, strict) => {
   }
 
   try {
-    const profile = await ensureProfile(data.user);
+    const profile = await ensureProfile(userData.user);
 
     if (!profile) {
       throw serviceUnavailable('No fue posible cargar tu perfil. Intenta nuevamente en unos minutos.');
     }
 
-    req.user = await decorateProfile(data.user, profile);
+    req.user = await decorateProfile(userData.user, profile);
   } catch (profileError) {
     if (strict) {
       throw profileError?.statusCode

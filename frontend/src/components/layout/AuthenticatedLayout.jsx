@@ -16,7 +16,7 @@ import {
   User,
 } from 'lucide-react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../app/providers/AuthProvider';
+import { useAuth } from '../../app/providers/useAuth';
 import { getRoleLabel } from '../../lib/formatters';
 
 const roleNavItems = {

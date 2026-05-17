@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Map, Search, SlidersHorizontal, X } from 'lucide-react';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { InlineMessage } from '../../components/ui/InlineMessage';
-import { useAuth } from '../../app/providers/AuthProvider';
+import { useAuth } from '../../app/providers/useAuth';
 import { api } from '../../lib/apiClient';
 import { formatCurrency, getPropertyTypeLabel } from '../../lib/formatters';
 import { PropertyCard } from './PropertyCard';

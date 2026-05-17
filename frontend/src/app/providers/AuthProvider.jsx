@@ -1,12 +1,11 @@
 import React, {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
+import { AuthContext } from './AuthContext';
 import { api } from '../../lib/apiClient';
 import { clearAuthToken, setAuthToken } from '../../lib/authToken';
 import {
@@ -16,8 +15,6 @@ import {
   supabase,
 } from '../../lib/supabaseClient';
 import { normalizeAuthRedirectPath } from '../../features/auth/authRedirects';
-
-const AuthContext = createContext(null);
 
 const normalizeAuthError = (error, fallback = 'No fue posible completar la autenticación.') => {
   const message = error?.message || fallback;
@@ -429,14 +426,4 @@ export function AuthProvider({ children }) {
   ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error('useAuth debe usarse dentro de AuthProvider');
-  }
-
-  return context;
 }

@@ -1,21 +1,28 @@
 const { createClient } = require('@supabase/supabase-js');
 const { env } = require('./env');
 
+const supabaseUrl = env.SUPABASE_URL;
+const supabaseServiceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseServiceRoleKey) {
+  throw new Error('[Nido] SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY no están definidas en el .env del backend');
+}
+
+try {
+  new URL(supabaseUrl);
+} catch (_error) {
+  throw new Error('[Nido] SUPABASE_URL no es una URL valida de Supabase');
+}
+
 // Centraliza la creacion de clientes de Supabase para evitar configuraciones
 // inconsistentes entre operaciones anonimas y administrativas.
 // Fabrica clientes de Supabase con configuracion adecuada para uso en backend.
 const createSupabaseClient = (key, authOptions = {}) => {
-  if (!env.SUPABASE_URL || !key) {
+  if (!key) {
     return null;
   }
 
-  try {
-    new URL(env.SUPABASE_URL);
-  } catch (_error) {
-    return null;
-  }
-
-  return createClient(env.SUPABASE_URL, key, {
+  return createClient(supabaseUrl, key, {
     auth: {
       autoRefreshToken: false,
       detectSessionInUrl: false,
@@ -26,8 +33,8 @@ const createSupabaseClient = (key, authOptions = {}) => {
 };
 
 // Cliente anonimo para operaciones de usuario final y cliente service para tareas administrativas.
-const supabaseAnon = createSupabaseClient(env.SUPABASE_ANON_KEY);
-const supabaseService = createSupabaseClient(env.SUPABASE_SERVICE_ROLE_KEY);
+const supabaseAnon = createSupabaseClient(env.SUPABASE_ANON_KEY || supabaseServiceRoleKey);
+const supabaseService = createSupabaseClient(supabaseServiceRoleKey);
 
 module.exports = {
   createSupabaseClient,

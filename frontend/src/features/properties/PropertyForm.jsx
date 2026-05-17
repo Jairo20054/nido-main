@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, ArrowRight, CheckCircle2, Save, Send } from 'lucide-react';
-import { useAuth } from '../../app/providers/AuthProvider';
+import { useAuth } from '../../app/providers/useAuth';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import {
   PROPERTY_DRAFT_STORAGE_KEY,

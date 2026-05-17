@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { LoadingState } from '../../components/ui/LoadingState';
-import { useAuth } from '../providers/AuthProvider';
+import { useAuth } from '../providers/useAuth';
 import { resolvePostAuthDestination } from '../../features/auth/authRedirects';
 
 /**
