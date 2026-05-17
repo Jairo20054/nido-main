@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { LoadingState } from '../../components/ui/LoadingState';
+import { useAuth } from '../../app/providers/AuthProvider';
 import { api } from '../../lib/apiClient';
 import { ApplicationStepper } from './components/ApplicationStepper';
 import { ApplicationPropertySummary } from './components/ApplicationPropertySummary';
@@ -21,6 +22,7 @@ const initialForm = {
 
 export function ApplyPrequalificationPage() {
   const navigate = useNavigate();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const { id: propertyId } = useParams();
   const { property, loading, error } = usePropertyDetails(propertyId);
   const [form, setForm] = useState(initialForm);
@@ -51,15 +53,26 @@ export function ApplyPrequalificationPage() {
     [result]
   );
 
-  if (loading) {
+  if (loading || authLoading) {
     return <LoadingState label="Cargando requisitos del inmueble..." />;
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <EmptyState
+        title="Necesitas una cuenta para precalificar"
+        description="Asi protegemos tus datos y dejamos trazabilidad de la solicitud desde el primer paso."
+        actionLabel="Ingresar"
+        onAction={() => navigate('/login', { state: { from: `/properties/${propertyId}/apply/prequal` } })}
+      />
+    );
   }
 
   if (!property) {
     return (
       <EmptyState
-        title="No pudimos cargar la precalificacion"
-        description={error || 'La propiedad ya no esta disponible.'}
+        title="No pudimos cargar la precalificación"
+        description={error || 'La propiedad ya no está disponible.'}
       />
     );
   }
@@ -80,7 +93,6 @@ export function ApplyPrequalificationPage() {
           hasBackup: Boolean(form.hasBackup),
           backupOption: form.hasBackup ? form.backupOption : 'NONE',
         },
-        { auth: false }
       );
 
       setResult(response.data);
@@ -119,7 +131,7 @@ export function ApplyPrequalificationPage() {
                 <span className="section__eyebrow">Precalificacion</span>
                 <h1>Ve si este inmueble encaja contigo</h1>
                 <p>
-                  Responde estas preguntas para darte una salida clara y sin cobro por revision.
+                  Responde estas preguntas para darte una salida clara y sin cobro por revisión.
                 </p>
               </div>
 

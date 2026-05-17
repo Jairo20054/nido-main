@@ -40,6 +40,10 @@ const ForgotPasswordPage = lazyPage(
   () => import('./features/auth/ForgotPasswordPage'),
   'ForgotPasswordPage'
 );
+const EmailConfirmedPage = lazyPage(
+  () => import('./features/auth/EmailConfirmedPage'),
+  'EmailConfirmedPage'
+);
 const LoginPage = lazyPage(() => import('./features/auth/LoginPage'), 'LoginPage');
 const RegisterPage = lazyPage(() => import('./features/auth/RegisterPage'), 'RegisterPage');
 const ResetPasswordPage = lazyPage(
@@ -106,6 +110,7 @@ function App() {
               />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/auth/callback" element={<AuthCallbackPage />} />
+              <Route path="/email-confirmed" element={<EmailConfirmedPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route
                 path="/register"

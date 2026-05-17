@@ -2,12 +2,15 @@ import { getSupabaseConfigError, supabase } from '../../lib/supabaseClient';
 
 export const PROPERTY_MEDIA_BUCKET =
   import.meta.env.VITE_SUPABASE_PROPERTY_MEDIA_BUCKET || 'property-media-public';
-export const MAX_IMAGE_COUNT = 10;
+export const MIN_IMAGE_COUNT_TO_PUBLISH = 3;
+export const MAX_IMAGE_COUNT = 20;
 export const MAX_VIDEO_COUNT = 1;
 export const MAX_IMAGE_SIZE = 4 * 1024 * 1024;
 export const MAX_VIDEO_SIZE = 20 * 1024 * 1024;
 export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-export const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
+export const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm'];
+export const EXTERNAL_VIDEO_MIME_TYPE = 'video/external';
+export const EXTERNAL_VIDEO_URL_PATTERN = /^https:\/\/(www\.)?(youtube\.com|youtu\.be|vimeo\.com)\//i;
 
 const createObjectUrl = (file) => URL.createObjectURL(file);
 
@@ -37,7 +40,7 @@ const buildStoragePath = (ownerId, file, kind) => {
 
 const getReadableUploadError = (error) => {
   if (!error?.message) {
-    return 'No fue posible subir el archivo.';
+    return 'No pudimos cargar el archivo. Inténtalo nuevamente.';
   }
 
   if (/bucket/i.test(error.message) || /not found/i.test(error.message)) {
@@ -45,7 +48,7 @@ const getReadableUploadError = (error) => {
   }
 
   if (/row-level security|permission|not allowed/i.test(error.message)) {
-    return 'Tu sesion no tiene permisos para subir archivos a Storage.';
+    return 'Tu sesión no tiene permisos para cargar archivos a Storage.';
   }
 
   return error.message;
@@ -62,11 +65,25 @@ export const buildPendingMediaItem = (file, type, position) => ({
   uploadStatus: 'uploading',
   storagePath: null,
   isPersisted: false,
+  sourceFile: file,
+});
+
+export const buildExternalVideoMediaItem = (url, position) => ({
+  id: `external-video-${Date.now()}`,
+  type: 'VIDEO',
+  url,
+  alt: 'Video de la propiedad',
+  position,
+  mimeType: EXTERNAL_VIDEO_MIME_TYPE,
+  sizeBytes: null,
+  uploadStatus: 'uploaded',
+  storagePath: null,
+  isPersisted: false,
 });
 
 export const uploadPropertyMedia = async (file, { ownerId, type }) => {
   if (!ownerId) {
-    throw new Error('Necesitas una sesion valida para subir archivos.');
+    throw new Error('Necesitas una sesión válida para cargar archivos.');
   }
 
   if (!supabase?.storage) {

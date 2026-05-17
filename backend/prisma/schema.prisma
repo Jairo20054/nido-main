@@ -58,20 +58,20 @@ enum RequestStatus {
 
 /// Perfil de negocio persistido en `profiles`, sincronizado con Supabase Auth.
 model User {
-  id               String                   @id @default(uuid()) @db.Uuid
-  firstName        String                   @map("first_name")
-  lastName         String                   @map("last_name")
-  email            String                   @unique
+  id               String                    @id @default(uuid()) @db.Uuid
+  firstName        String                    @map("first_name")
+  lastName         String                    @map("last_name")
+  email            String                    @unique
   phone            String?
   bio              String?
-  avatarUrl        String?                  @map("avatar_url")
-  role             UserRole                 @default(TENANT)
-  createdAt        DateTime                 @default(now()) @map("created_at")
-  updatedAt        DateTime                 @updatedAt @map("updated_at")
+  avatarUrl        String?                   @map("avatar_url")
+  role             UserRole                  @default(TENANT)
+  createdAt        DateTime                  @default(now()) @map("created_at")
+  updatedAt        DateTime                  @updatedAt @map("updated_at")
   favorites        Favorite[]
-  ownedProperties  Property[]               @relation("PropertyOwner")
-  rentalRequests   RentalRequest[]          @relation("TenantRequests")
-  receivedRequests RentalRequest[]          @relation("LandlordRequests")
+  ownedProperties  Property[]                @relation("PropertyOwner")
+  rentalRequests   RentalRequest[]           @relation("TenantRequests")
+  receivedRequests RentalRequest[]           @relation("LandlordRequests")
   approvalActions  PropertyApprovalHistory[]
 
   @@index([role])
@@ -80,55 +80,85 @@ model User {
 
 /// Entidad principal del marketplace: inmueble publicado o en proceso de moderacion.
 model Property {
-  id                    String                   @id @default(cuid())
-  slug                  String                   @unique
-  ownerId               String                   @db.Uuid
-  title                 String
-  summary               String
-  description           String
-  propertyType          PropertyType
-  rentalType            RentalType               @default(FULL_HOME)
-  status                PropertyStatus           @default(DRAFT)
-  city                  String
-  neighborhood          String?
-  addressLine           String
-  zoneReference         String?
-  monthlyRent           Int
-  maintenanceFee        Int                      @default(0)
-  securityDeposit       Int                      @default(0)
-  availableImmediately  Boolean                  @default(false)
-  availableFrom         DateTime?
-  bedrooms              Int
-  bathrooms             Int
-  areaM2                Int
-  floor                 Int?
-  parkingSpots          Int                      @default(0)
-  strata                Int?
-  maxOccupants          Int                      @default(1)
-  furnished             Boolean                  @default(false)
-  petsAllowed           Boolean                  @default(false)
-  utilitiesIncluded     Boolean                  @default(false)
-  minLeaseMonths        Int                      @default(6)
-  amenities             String[]
-  rules                 String?
-  requirements          String?
-  idealTenantProfile    String?
-  specialConditions     String?
-  contactMethod         String?
-  verificationDetails   String?
-  rejectionReason       String?
-  coverImage            String?
-  latitude              Decimal?                 @db.Decimal(9, 6)
-  longitude             Decimal?                 @db.Decimal(9, 6)
-  approvedAt            DateTime?
-  publishedAt           DateTime?
-  createdAt             DateTime                 @default(now())
-  updatedAt             DateTime                 @updatedAt
-  owner                 User                     @relation("PropertyOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  media                 PropertyMedia[]
-  approvalHistory       PropertyApprovalHistory[]
-  favorites             Favorite[]
-  rentalRequests        RentalRequest[]
+  id                      String                    @id @default(cuid())
+  slug                    String                    @unique
+  ownerId                 String                    @db.Uuid
+  title                   String
+  summary                 String
+  description             String
+  propertyType            PropertyType
+  rentalType              RentalType                @default(FULL_HOME)
+  status                  PropertyStatus            @default(DRAFT)
+  city                    String
+  department              String?
+  neighborhood            String?
+  addressLine             String
+  addressDetail           String?
+  hideExactAddress        Boolean                   @default(false)
+  zoneReference           String?
+  monthlyRent             Int
+  maintenanceFee          Int                       @default(0)
+  administrationIncluded  Boolean                   @default(false)
+  securityDeposit         Int                       @default(0)
+  depositRequired         Boolean                   @default(false)
+  servicesIncluded        String[]                  @default([])
+  availableImmediately    Boolean                   @default(false)
+  availableFrom           DateTime?
+  bedrooms                Int
+  bathrooms               Int
+  areaM2                  Int
+  floor                   Int?
+  parkingSpots            Int                       @default(0)
+  strata                  Int?
+  maxOccupants            Int                       @default(1)
+  furnished               Boolean                   @default(false)
+  petsAllowed             Boolean                   @default(false)
+  utilitiesIncluded       Boolean                   @default(false)
+  balcony                 Boolean                   @default(false)
+  equippedKitchen         Boolean                   @default(false)
+  laundryArea             Boolean                   @default(false)
+  elevator                Boolean                   @default(false)
+  doorman                 Boolean                   @default(false)
+  security                Boolean                   @default(false)
+  commonAreas             Boolean                   @default(false)
+  minLeaseMonths          Int                       @default(6)
+  amenities               String[]
+  rules                   String?
+  requirements            String?
+  idealTenantProfile      String?
+  specialConditions       String?
+  contactMethod           String?
+  verificationDetails     String?
+  contactName             String?
+  contactDocumentType     String?
+  contactDocumentNumber   String?
+  contactPhone            String?
+  contactWhatsapp         String?
+  contactEmail            String?
+  contactRelationship     String?
+  contactHours            String?
+  contactPreference       String?
+  publishingAuthorization Boolean                   @default(false)
+  acceptsStudents         Boolean                   @default(false)
+  acceptsFamilies         Boolean                   @default(false)
+  acceptsCosigner         Boolean                   @default(false)
+  requiresRentalStudy     Boolean                   @default(false)
+  visitsAllowed           Boolean                   @default(false)
+  visitHours              String?
+  visitNotes              String?
+  rejectionReason         String?
+  coverImage              String?
+  latitude                Decimal?                  @db.Decimal(9, 6)
+  longitude               Decimal?                  @db.Decimal(9, 6)
+  approvedAt              DateTime?
+  publishedAt             DateTime?
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  owner                   User                      @relation("PropertyOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  media                   PropertyMedia[]
+  approvalHistory         PropertyApprovalHistory[]
+  favorites               Favorite[]
+  rentalRequests          RentalRequest[]
 
   @@index([city, status])
   @@index([ownerId, status])
@@ -156,15 +186,15 @@ model PropertyMedia {
 
 /// Bitacora de cambios de estado para auditoria editorial y operativa.
 model PropertyApprovalHistory {
-  id          String         @id @default(cuid())
-  propertyId  String
-  actorId     String         @db.Uuid
-  fromStatus  PropertyStatus?
-  toStatus    PropertyStatus
-  note        String?
-  createdAt   DateTime       @default(now())
-  actor       User           @relation(fields: [actorId], references: [id], onDelete: Cascade)
-  property    Property       @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  id         String          @id @default(cuid())
+  propertyId String
+  actorId    String          @db.Uuid
+  fromStatus PropertyStatus?
+  toStatus   PropertyStatus
+  note       String?
+  createdAt  DateTime        @default(now())
+  actor      User            @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  property   Property        @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@index([propertyId, createdAt])
   @@index([actorId, createdAt])

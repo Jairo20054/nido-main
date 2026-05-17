@@ -17,7 +17,7 @@ export function PropertyCard({
 }) {
   const features = [];
   if (property.furnished) features.push('Amoblado');
-  if (property.petsAllowed) features.push('Mascotas OK');
+  if (property.petsAllowed) features.push('Acepta mascotas');
   if (property.parkingSpots) features.push('Parqueadero');
   if (property.utilitiesIncluded) features.push('Servicios incluidos');
   if (property.maintenanceFee) features.push(`Adm. ${formatCurrency(property.maintenanceFee)}`);
@@ -92,8 +92,8 @@ export function PropertyCard({
 
         <div className="property-card__stats">
           <span><BedDouble size={14} /> {property.bedrooms} hab.</span>
-          <span><Bath size={14} /> {property.bathrooms} banos</span>
-          <span><Ruler size={14} /> {area} m2</span>
+          <span><Bath size={14} /> {property.bathrooms} baños</span>
+          <span><Ruler size={14} /> {area} m²</span>
         </div>
 
         {visibleFeatures.length > 0 ? (

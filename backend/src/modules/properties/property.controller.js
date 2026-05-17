@@ -54,14 +54,44 @@ const isPrismaUnavailable = (error) =>
 // Normaliza campos opcionales, disponibilidad y coleccion de medios antes de persistir.
 const normalizePropertyInput = (payload = {}) => ({
   ...payload,
+  department: payload.department || null,
   neighborhood: payload.neighborhood || null,
+  addressDetail: payload.addressDetail || null,
+  hideExactAddress: Boolean(payload.hideExactAddress),
   zoneReference: payload.zoneReference || null,
+  administrationIncluded: Boolean(payload.administrationIncluded),
+  depositRequired: Boolean(payload.depositRequired),
+  servicesIncluded: payload.servicesIncluded || [],
   rules: payload.rules || null,
   requirements: payload.requirements || null,
   idealTenantProfile: payload.idealTenantProfile || null,
   specialConditions: payload.specialConditions || null,
   contactMethod: payload.contactMethod || null,
   verificationDetails: payload.verificationDetails || null,
+  contactName: payload.contactName || null,
+  contactDocumentType: payload.contactDocumentType || null,
+  contactDocumentNumber: payload.contactDocumentNumber || null,
+  contactPhone: payload.contactPhone || null,
+  contactWhatsapp: payload.contactWhatsapp || null,
+  contactEmail: payload.contactEmail || null,
+  contactRelationship: payload.contactRelationship || null,
+  contactHours: payload.contactHours || null,
+  contactPreference: payload.contactPreference || null,
+  publishingAuthorization: Boolean(payload.publishingAuthorization),
+  balcony: Boolean(payload.balcony),
+  equippedKitchen: Boolean(payload.equippedKitchen),
+  laundryArea: Boolean(payload.laundryArea),
+  elevator: Boolean(payload.elevator),
+  doorman: Boolean(payload.doorman),
+  security: Boolean(payload.security),
+  commonAreas: Boolean(payload.commonAreas),
+  acceptsStudents: Boolean(payload.acceptsStudents),
+  acceptsFamilies: Boolean(payload.acceptsFamilies),
+  acceptsCosigner: Boolean(payload.acceptsCosigner),
+  requiresRentalStudy: Boolean(payload.requiresRentalStudy),
+  visitsAllowed: Boolean(payload.visitsAllowed),
+  visitHours: payload.visitHours || null,
+  visitNotes: payload.visitNotes || null,
   floor: payload.floor ?? null,
   strata: payload.strata ?? null,
   latitude: payload.latitude ?? null,
@@ -140,7 +170,7 @@ const isAdmin = (user) => user?.role === UserRole.ADMIN;
 
 const assertLandlordOrAdmin = (user) => {
   if (![UserRole.LANDLORD, UserRole.ADMIN].includes(user.role)) {
-    throw forbidden('Solo un arrendador o administrador puede gestionar viviendas');
+    throw forbidden('Solo un arrendador o administrador puede gestionar propiedades');
   }
 };
 
@@ -400,7 +430,7 @@ const getPropertyById = async (req, res) => {
   }
 
   if (!canManageProperty(req.user, property) && !PUBLIC_STATUSES.includes(property.status)) {
-    throw notFound('La propiedad no esta disponible');
+    throw notFound('La propiedad no está disponible');
   }
 
   res.json({
@@ -429,12 +459,18 @@ const createProperty = async (req, res) => {
         rentalType: payload.rentalType,
         status: finalStatus,
         city: payload.city,
+        department: payload.department,
         neighborhood: payload.neighborhood,
         addressLine: payload.addressLine,
+        addressDetail: payload.addressDetail,
+        hideExactAddress: payload.hideExactAddress,
         zoneReference: payload.zoneReference,
         monthlyRent: payload.monthlyRent,
         maintenanceFee: payload.maintenanceFee,
+        administrationIncluded: payload.administrationIncluded,
         securityDeposit: payload.securityDeposit,
+        depositRequired: payload.depositRequired,
+        servicesIncluded: payload.servicesIncluded,
         availableImmediately: payload.availableImmediately,
         availableFrom: payload.availableFrom,
         bedrooms: payload.bedrooms,
@@ -447,6 +483,13 @@ const createProperty = async (req, res) => {
         furnished: payload.furnished,
         petsAllowed: payload.petsAllowed,
         utilitiesIncluded: payload.utilitiesIncluded,
+        balcony: payload.balcony,
+        equippedKitchen: payload.equippedKitchen,
+        laundryArea: payload.laundryArea,
+        elevator: payload.elevator,
+        doorman: payload.doorman,
+        security: payload.security,
+        commonAreas: payload.commonAreas,
         minLeaseMonths: payload.minLeaseMonths,
         amenities: payload.amenities,
         rules: payload.rules,
@@ -455,6 +498,23 @@ const createProperty = async (req, res) => {
         specialConditions: payload.specialConditions,
         contactMethod: payload.contactMethod,
         verificationDetails: payload.verificationDetails,
+        contactName: payload.contactName,
+        contactDocumentType: payload.contactDocumentType,
+        contactDocumentNumber: payload.contactDocumentNumber,
+        contactPhone: payload.contactPhone,
+        contactWhatsapp: payload.contactWhatsapp,
+        contactEmail: payload.contactEmail,
+        contactRelationship: payload.contactRelationship,
+        contactHours: payload.contactHours,
+        contactPreference: payload.contactPreference,
+        publishingAuthorization: payload.publishingAuthorization,
+        acceptsStudents: payload.acceptsStudents,
+        acceptsFamilies: payload.acceptsFamilies,
+        acceptsCosigner: payload.acceptsCosigner,
+        requiresRentalStudy: payload.requiresRentalStudy,
+        visitsAllowed: payload.visitsAllowed,
+        visitHours: payload.visitHours,
+        visitNotes: payload.visitNotes,
         coverImage: getCoverImage(payload, null),
         latitude: payload.latitude,
         longitude: payload.longitude,
@@ -483,7 +543,7 @@ const createProperty = async (req, res) => {
       actorId: req.user.id,
       fromStatus: null,
       toStatus: finalStatus,
-      note: payload.reviewNote || (finalStatus === PropertyStatus.PENDING ? 'Enviada para revision' : null),
+      note: payload.reviewNote || (finalStatus === PropertyStatus.PENDING ? 'Enviada para revisión' : null),
     });
 
     return created;
@@ -493,7 +553,7 @@ const createProperty = async (req, res) => {
     success: true,
     message:
       property.status === PropertyStatus.PENDING
-        ? 'Propiedad enviada a revision'
+        ? 'Tu propiedad fue enviada para revisión'
         : 'Propiedad guardada correctamente',
     data: serializeProperty(property, req.user.id),
   });
@@ -544,12 +604,18 @@ const updateProperty = async (req, res) => {
         rentalType: payload.rentalType,
         status: nextStatus,
         city: payload.city,
+        department: payload.department,
         neighborhood: payload.neighborhood,
         addressLine: payload.addressLine,
+        addressDetail: payload.addressDetail,
+        hideExactAddress: payload.hideExactAddress,
         zoneReference: payload.zoneReference,
         monthlyRent: payload.monthlyRent,
         maintenanceFee: payload.maintenanceFee,
+        administrationIncluded: payload.administrationIncluded,
         securityDeposit: payload.securityDeposit,
+        depositRequired: payload.depositRequired,
+        servicesIncluded: payload.servicesIncluded,
         availableImmediately: payload.availableImmediately,
         availableFrom: payload.availableFrom,
         bedrooms: payload.bedrooms,
@@ -562,6 +628,13 @@ const updateProperty = async (req, res) => {
         furnished: payload.furnished,
         petsAllowed: payload.petsAllowed,
         utilitiesIncluded: payload.utilitiesIncluded,
+        balcony: payload.balcony,
+        equippedKitchen: payload.equippedKitchen,
+        laundryArea: payload.laundryArea,
+        elevator: payload.elevator,
+        doorman: payload.doorman,
+        security: payload.security,
+        commonAreas: payload.commonAreas,
         minLeaseMonths: payload.minLeaseMonths,
         amenities: payload.amenities,
         rules: payload.rules,
@@ -570,6 +643,23 @@ const updateProperty = async (req, res) => {
         specialConditions: payload.specialConditions,
         contactMethod: payload.contactMethod,
         verificationDetails: payload.verificationDetails,
+        contactName: payload.contactName,
+        contactDocumentType: payload.contactDocumentType,
+        contactDocumentNumber: payload.contactDocumentNumber,
+        contactPhone: payload.contactPhone,
+        contactWhatsapp: payload.contactWhatsapp,
+        contactEmail: payload.contactEmail,
+        contactRelationship: payload.contactRelationship,
+        contactHours: payload.contactHours,
+        contactPreference: payload.contactPreference,
+        publishingAuthorization: payload.publishingAuthorization,
+        acceptsStudents: payload.acceptsStudents,
+        acceptsFamilies: payload.acceptsFamilies,
+        acceptsCosigner: payload.acceptsCosigner,
+        requiresRentalStudy: payload.requiresRentalStudy,
+        visitsAllowed: payload.visitsAllowed,
+        visitHours: payload.visitHours,
+        visitNotes: payload.visitNotes,
         rejectionReason:
           nextStatus === PropertyStatus.REJECTED
             ? payload.reviewNote || existing.rejectionReason
@@ -610,7 +700,7 @@ const updateProperty = async (req, res) => {
 
   res.json({
     success: true,
-    message: 'Propiedad actualizada',
+    message: 'Propiedad actualizada correctamente',
     data: serializeProperty(property, req.user.id),
   });
 };
@@ -659,7 +749,7 @@ const changePropertyStatus = async (req, res) => {
 
   res.json({
     success: true,
-    message: 'Estado actualizado',
+    message: 'Estado actualizado correctamente',
     data: serializeProperty(updated, req.user.id),
   });
 };

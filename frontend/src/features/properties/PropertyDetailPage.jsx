@@ -83,11 +83,11 @@ export function PropertyDetailPage() {
       property
         ? [
             { icon: BedDouble, label: 'Habitaciones', value: property.bedrooms },
-            { icon: Bath, label: 'Banos', value: property.bathrooms },
-            { icon: Ruler, label: 'Area', value: `${property.areaM2} m2` },
+            { icon: Bath, label: 'Baños', value: property.bathrooms },
+            { icon: Ruler, label: 'Área', value: `${property.areaM2} m²` },
             {
               icon: BriefcaseBusiness,
-              label: 'Contrato minimo',
+              label: 'Contrato mínimo',
               value: `${property.minLeaseMonths} meses`,
             },
             {
@@ -111,15 +111,15 @@ export function PropertyDetailPage() {
     return [
       property.furnished
         ? { icon: Sofa, title: 'Amoblado', description: 'Listo para llegar con menos mudanza.' }
-        : { icon: Sparkles, title: 'Sin amoblar', description: 'Mas libertad para personalizar.' },
+        : { icon: Sparkles, title: 'Sin amoblar', description: 'Más libertad para personalizar.' },
       property.petsAllowed
-        ? { icon: PawPrint, title: 'Mascotas bienvenidas', description: 'Ideal si vives con compania.' }
+        ? { icon: PawPrint, title: 'Mascotas bienvenidas', description: 'Ideal si vives con compañía.' }
         : { icon: ShieldCheck, title: 'Sin mascotas', description: 'Regla definida por el propietario.' },
       property.parkingSpots
         ? {
             icon: SquareParking,
             title: `${property.parkingSpots} parqueadero${property.parkingSpots > 1 ? 's' : ''}`,
-            description: 'Un punto practico para el dia a dia.',
+            description: 'Un punto práctico para el día a día.',
           }
         : {
             icon: MapPin,
@@ -134,13 +134,13 @@ export function PropertyDetailPage() {
 
     return [
       { label: 'Canon mensual', value: formatCurrency(property.monthlyRent) },
-      { label: 'Administracion', value: formatCurrency(property.maintenanceFee) },
-      { label: 'Deposito', value: formatCurrency(property.securityDeposit) },
+      { label: 'Administración', value: formatCurrency(property.maintenanceFee) },
+      { label: 'Depósito', value: formatCurrency(property.securityDeposit) },
       {
         label: 'Costo mensual estimado',
         value: formatCurrency((property.monthlyRent || 0) + (property.maintenanceFee || 0)),
       },
-      { label: 'Direccion', value: property.addressLine || 'Se comparte al reservar' },
+      { label: 'Dirección', value: property.hideExactAddress ? 'Se comparte durante el proceso' : property.addressLine || 'Se comparte durante el proceso' },
       { label: 'Barrio', value: property.neighborhood || 'Zona residencial' },
     ];
   }, [property]);
@@ -151,17 +151,17 @@ export function PropertyDetailPage() {
     return [
       `Ubicada en ${property.city}${property.neighborhood ? `, ${property.neighborhood}` : ''}.`,
       property.availableImmediately
-        ? `Disponible de inmediato con contrato minimo de ${property.minLeaseMonths} meses.`
-        : `Disponible desde ${formatDate(property.availableFrom)} con contrato minimo de ${property.minLeaseMonths} meses.`,
+        ? `Disponible de inmediato con contrato mínimo de ${property.minLeaseMonths} meses.`
+        : `Disponible desde ${formatDate(property.availableFrom)} con contrato mínimo de ${property.minLeaseMonths} meses.`,
       property.requestCount
-        ? `${property.requestCount} persona${property.requestCount > 1 ? 's' : ''} ya mostraron interes en esta propiedad.`
-        : 'Aun sin solicitudes activas, ideal para decidir con calma.',
+        ? `${property.requestCount} persona${property.requestCount > 1 ? 's' : ''} ya mostraron interés en esta propiedad.`
+        : 'Aún sin postulaciones activas, ideal para decidir con calma.',
     ];
   }, [property]);
 
   const toggleFavorite = async () => {
     if (!isAuthenticated) {
-      setPageMessage('Puedes explorar libremente. Inicia sesion solo cuando quieras guardar o seguir una solicitud.');
+      setPageMessage('Puedes explorar libremente. Inicia sesión solo cuando quieras guardar o seguir una postulación.');
       return;
     }
 
@@ -186,7 +186,7 @@ export function PropertyDetailPage() {
     return (
       <EmptyState
         title="No encontramos esta propiedad"
-        description={error || 'Puede que ya no este publicada o que el enlace haya cambiado.'}
+        description={error || 'Puede que ya no esté publicada o que el enlace haya cambiado.'}
       />
     );
   }
@@ -280,8 +280,8 @@ export function PropertyDetailPage() {
 
           <div className="content-card detail-section">
             <div className="detail-section__header">
-              <h2>Lo que mas destaca</h2>
-              <p>Un resumen rapido para saber si esta opcion realmente encaja con tu estilo de vida.</p>
+              <h2>Lo que más destaca</h2>
+              <p>Un resumen rápido para saber si esta opción realmente encaja con tu estilo de vida.</p>
             </div>
             <div className="highlight-grid">
               {stayHighlights.map((item) => {
@@ -303,16 +303,16 @@ export function PropertyDetailPage() {
 
           <div className="content-card detail-section">
             <div className="detail-section__header">
-              <h2>Descripcion</h2>
-              <p>Informacion amplia para que compares sin tener que adivinar detalles importantes.</p>
+              <h2>Descripción</h2>
+              <p>Información amplia para que compares sin tener que adivinar detalles importantes.</p>
             </div>
             <p>{property.description}</p>
           </div>
 
           <div className="content-card detail-section">
             <div className="detail-section__header">
-              <h2>Detalles practicos</h2>
-              <p>Transparencia en valores, ubicacion y condiciones desde la misma ficha.</p>
+              <h2>Detalles prácticos</h2>
+              <p>Transparencia en valores, ubicación y condiciones desde la misma ficha.</p>
             </div>
             <div className="practical-list">
               {practicalDetails.map((item) => (
@@ -327,7 +327,7 @@ export function PropertyDetailPage() {
           <div className="content-card detail-section">
             <div className="detail-section__header">
               <h2>Amenidades</h2>
-              <p>Todo lo que ya viene incluido o mejora la experiencia de vivir aqui.</p>
+              <p>Todo lo que ya viene incluido o mejora la experiencia de vivir aquí.</p>
             </div>
             <div className="tag-list">
               {property.amenities.map((amenity) => (
@@ -341,7 +341,7 @@ export function PropertyDetailPage() {
           <div className="content-card detail-section">
             <div className="detail-section__header">
               <h2>Contexto de la estancia</h2>
-              <p>Notas utiles para decidir con mas seguridad y menos friccion.</p>
+              <p>Notas útiles para decidir con más seguridad y menos fricción.</p>
             </div>
             <div className="insight-list">
               {lifestyleNotes.map((note) => (
@@ -357,7 +357,7 @@ export function PropertyDetailPage() {
             <div>
               <span className="section__eyebrow">Propietario</span>
               <h2>{property.owner.fullName}</h2>
-              <p>{property.owner.bio || 'Anfitrion enfocado en respuestas claras y seguimiento oportuno.'}</p>
+              <p>{property.owner.bio || 'Anfitrión enfocado en respuestas claras y seguimiento oportuno.'}</p>
             </div>
             {property.owner.avatarUrl ? (
               <img src={property.owner.avatarUrl} alt={property.owner.fullName} />
@@ -396,7 +396,7 @@ export function PropertyDetailPage() {
               <span className="section__eyebrow">Arrendar con NIDO</span>
               <h3>Aplica gratis y sigue un proceso claro</h3>
               <p>
-                Veras requisitos, precalificacion instantanea, checklist documental y estado del caso
+                Verás requisitos, precalificación instantánea, checklist documental y estado del caso
                 sin arbitrariedad.
               </p>
             </div>
@@ -408,11 +408,11 @@ export function PropertyDetailPage() {
               </div>
               <div>
                 <ShieldCheck size={16} />
-                <span>Te mostramos por que pedimos cada documento.</span>
+                <span>Te mostramos por qué pedimos cada documento.</span>
               </div>
               <div>
                 <ShieldCheck size={16} />
-                <span>El pago inicial se deja para despues y con proteccion.</span>
+                <span>El pago inicial se deja para después y con protección.</span>
               </div>
             </div>
 

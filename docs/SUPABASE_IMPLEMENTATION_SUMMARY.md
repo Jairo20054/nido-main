@@ -5,8 +5,8 @@
 ### Project Details
 - **Estado**: ✅ Production-Ready
 - **Platform**: Supabase PostgreSQL
-- **Project URL**: https://hoqcfprckuozcsnwzgei.supabase.co
-- **Publishable Key**: `sb_publishable_Q9naTZLx0fUqmqL4ud6wdA_JEOFKHT4`
+- **Project URL**: https://your-project.supabase.co
+- **Publishable Key**: `your-publishable-key`
 - **Implementation Date**: 2026-04-24
 
 ---

@@ -51,7 +51,7 @@ export function ManagementPage() {
     () => [
       { label: 'Mis publicaciones', value: properties.length },
       {
-        label: 'Pendientes de revision',
+        label: 'Pendientes de revisión',
         value: properties.filter((item) => item.status === 'PENDING').length,
       },
       { label: 'Solicitudes recibidas', value: requests.length },
@@ -68,10 +68,10 @@ export function ManagementPage() {
     try {
       if (editingProperty) {
         await api.patch(`/properties/${editingProperty.id}`, payload);
-        setMessage('Publicacion actualizada correctamente.');
+        setMessage('Publicación actualizada correctamente.');
       } else {
         const response = await api.post('/properties', payload);
-        setMessage(response.message || 'Publicacion guardada correctamente.');
+        setMessage(response.message || 'Publicación guardada correctamente.');
       }
 
       setEditingProperty(null);
@@ -87,10 +87,16 @@ export function ManagementPage() {
 
   // Actualiza la bandeja local tras eliminar una propiedad.
   const handleDeleteProperty = async (propertyId) => {
+    const confirmed = window.confirm('¿Quieres eliminar esta propiedad? Esta acción no se puede deshacer.');
+
+    if (!confirmed) {
+      return;
+    }
+
     try {
       await api.delete(`/properties/${propertyId}`);
       setProperties((current) => current.filter((item) => item.id !== propertyId));
-      setMessage('Publicacion eliminada.');
+      setMessage('Propiedad eliminada.');
     } catch (requestError) {
       setMessage(requestError.message);
     }
@@ -103,7 +109,7 @@ export function ManagementPage() {
       setRequests((current) =>
         current.map((item) => (item.id === requestId ? response.data : item))
       );
-      setMessage('Solicitud actualizada.');
+      setMessage('Postulación actualizada.');
     } catch (requestError) {
       setMessage(requestError.message);
     }
@@ -116,7 +122,7 @@ export function ManagementPage() {
         <section className="section">
           <EmptyState
             title="El administrador tiene su propio panel"
-            description="Usa el panel admin para revisar propiedades, aprobar publicaciones y consultar estadisticas."
+            description="Usa el panel de administración para revisar propiedades, aprobar publicaciones y consultar métricas."
             actionLabel="Ir al panel admin"
             onAction={() => {
               window.location.href = '/admin';
@@ -133,7 +139,7 @@ export function ManagementPage() {
         <div className="section__heading">
           <div>
             <span className="section__eyebrow">Panel arrendador</span>
-            <h1>Publica, edita y sigue tus viviendas</h1>
+            <h1>Publica, edita y da seguimiento a tus propiedades</h1>
           </div>
         </div>
 
@@ -219,8 +225,8 @@ export function ManagementPage() {
                 </div>
               ) : (
                 <EmptyState
-                  title="Aun no has publicado viviendas"
-                  description="Usa el wizard para guardar un borrador o enviar tu primera publicacion a revision."
+                  title="Aún no has publicado propiedades"
+                  description="Usa el formulario guiado para guardar un borrador o enviar tu primera publicación a revisión."
                 />
               )}
             </div>
@@ -228,8 +234,8 @@ export function ManagementPage() {
             <div className="content-card">
               <div className="section__heading section__heading--tight">
                 <div>
-                  <span className="section__eyebrow">Solicitudes</span>
-                  <h2>Solicitudes recibidas</h2>
+                  <span className="section__eyebrow">Postulaciones</span>
+                  <h2>Postulaciones recibidas</h2>
                 </div>
               </div>
               {loading ? (
@@ -272,8 +278,8 @@ export function ManagementPage() {
                 </div>
               ) : (
                 <EmptyState
-                  title="Aun no tienes solicitudes"
-                  description="Cuando un arrendatario aplique a una vivienda podras revisarlo aqui."
+                  title="Aún no tienes postulaciones"
+                  description="Cuando un arrendatario se postule a una propiedad podrás revisarlo aquí."
                 />
               )}
             </div>

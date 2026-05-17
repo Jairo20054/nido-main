@@ -52,7 +52,7 @@ const createRequest = async (req, res) => {
   });
 
   if (!property || property.status !== PropertyStatus.PUBLISHED) {
-    throw notFound('La propiedad no esta disponible');
+    throw notFound('La propiedad no está disponible');
   }
 
   if (property.ownerId === req.user.id) {

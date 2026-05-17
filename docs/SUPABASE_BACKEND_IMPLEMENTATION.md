@@ -6,7 +6,7 @@ This document describes the production-ready Supabase backend implementation for
 
 **Estado**: ✅ Production-Ready
 **Database**: Supabase PostgreSQL
-**Project URL**: https://hoqcfprckuozcsnwzgei.supabase.co
+**Project URL**: https://your-project.supabase.co
 
 ---
 
@@ -503,8 +503,8 @@ All critical tables have indexes on:
 ### 1. Configuration
 ```javascript
 // Environment variables
-SUPABASE_URL=https://hoqcfprckuozcsnwzgei.supabase.co
-SUPABASE_PUBLISHABLE_KEY=sb_publishable_Q9naTZLx0fUqmqL4ud6wdA_JEOFKHT4
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 SUPABASE_SERVICE_KEY=your_service_key_here
 ```
 
@@ -650,7 +650,7 @@ ORDER BY v.created_at ASC
 
 ## 📞 Soporte
 
-**Project URL**: https://hoqcfprckuozcsnwzgei.supabase.co
+**Project URL**: https://your-project.supabase.co
 **Documentation**: https://supabase.com/docs
 
 For issues or questions, refer to:

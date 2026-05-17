@@ -25,7 +25,7 @@ export class ErrorBoundary extends React.Component {
             <div className="status-card status-card--empty">
               <span className="section__eyebrow">Error de interfaz</span>
               <h1>No pudimos cargar esta vista.</h1>
-              <p>Actualiza la pagina o vuelve al inicio para continuar.</p>
+              <p>Actualiza la página o vuelve al inicio para continuar.</p>
             </div>
           </section>
         </main>

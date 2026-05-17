@@ -45,14 +45,14 @@ export function ApplicationReviewPage() {
         id: 'received',
         status: 'done',
         title: 'Solicitud recibida',
-        description: 'Tu aplicacion ya quedo registrada en el flujo del inmueble.',
+        description: 'Tu postulación ya quedó registrada en el flujo de la propiedad.',
         meta: request?.createdAt ? new Date(request.createdAt).toLocaleString('es-CO') : 'Lista',
       },
       {
         id: 'documents',
         status: 'done',
         title: 'Documentos listos',
-        description: `${(draft.documentChecklist || []).filter((item) => item.status === 'uploaded').length} documentos marcados como listos para revision.`,
+        description: `${(draft.documentChecklist || []).filter((item) => item.status === 'uploaded').length} documentos marcados como listos para revisión.`,
         meta: 'Con explicacion y formato visible',
       },
       {
@@ -60,7 +60,7 @@ export function ApplicationReviewPage() {
         status: 'done',
         title: 'Score base generado',
         description: `Tu score base fue ${draft.prequalification?.score || 0}/100 con riesgo ${draft.prequalification?.riskBand || 'medio'}.`,
-        meta: 'Motor de precalificacion inicial',
+        meta: 'Motor de precalificación inicial',
       },
       {
         id: 'review',
@@ -70,13 +70,13 @@ export function ApplicationReviewPage() {
             ? 'Revision completada'
             : request?.status === 'REJECTED'
               ? 'Revision cerrada'
-              : 'En revision',
+              : 'En revisión',
         description:
           request?.status === 'APPROVED'
             ? 'La solicitud fue aprobada en el MVP actual.'
             : request?.status === 'REJECTED'
               ? 'La solicitud fue cerrada por el propietario o el equipo revisor.'
-              : 'Ahora sigue una validacion manual para confirmar consistencia y avanzar al siguiente paso.',
+              : 'Ahora sigue una validación manual para confirmar consistencia y avanzar al siguiente paso.',
         meta: 'Trazabilidad visible en este panel',
       },
     ];
@@ -90,7 +90,7 @@ export function ApplicationReviewPage() {
     return (
       <EmptyState
         title="No pudimos cargar el estado"
-        description={error || 'La propiedad ya no esta disponible.'}
+        description={error || 'La propiedad ya no está disponible.'}
       />
     );
   }
@@ -99,7 +99,7 @@ export function ApplicationReviewPage() {
     return (
       <EmptyState
         title="Aun no has enviado tu solicitud"
-        description="Completa documentos y envia el caso para que podamos mostrarte el estado."
+        description="Completa documentos y envía el caso para que podamos mostrarte el estado."
         actionLabel="Ir a documentos"
         onAction={() => navigate(`/properties/${property.id}/apply/documents`)}
       />
@@ -118,8 +118,8 @@ export function ApplicationReviewPage() {
                 <span className="section__eyebrow">Estado de la solicitud</span>
                 <h1>Seguimiento claro y sin pasos ocultos</h1>
                 <p>
-                  En este MVP, la revision final sigue siendo manual, pero ya conservamos
-                  precalificacion, contexto y trazabilidad del caso.
+                  En este MVP, la revisión final sigue siendo manual, pero ya conservamos
+                  precalificación, contexto y trazabilidad del caso.
                 </p>
               </div>
               <ApplicationStatusBadge status={applicationStatus} />
@@ -128,7 +128,7 @@ export function ApplicationReviewPage() {
             <div className="content-card">
               <div className="application-banner">
                 <Clock3 size={16} />
-                <span>Tiempo estimado de revision inicial: 1 a 2 dias habiles.</span>
+                <span>Tiempo estimado de revisión inicial: 1 a 2 días hábiles.</span>
               </div>
 
               <ReviewTimeline items={timelineItems} />
@@ -142,14 +142,14 @@ export function ApplicationReviewPage() {
                     ? 'Tu solicitud ya fue aprobada'
                     : request.status === 'REJECTED'
                       ? 'Esta solicitud se cerro'
-                      : 'Tu expediente ya esta en cola de revision'}
+                      : 'Tu expediente ya está en cola de revisión'}
                 </h2>
                 <p>
                   {request.status === 'APPROVED'
                     ? 'El siguiente bloque del blueprint es contrato, firma y pago protegido.'
                     : request.status === 'REJECTED'
                       ? 'Puedes explorar otras opciones o ajustar presupuesto y respaldo.'
-                      : 'Todavia no hay automatizacion de contrato en este stack, pero el flujo ya deja lista la entrada para esa fase.'}
+                      : 'Todavía no hay automatización de contrato en este stack, pero el flujo ya deja lista la entrada para esa fase.'}
                 </p>
               </div>
 

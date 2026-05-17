@@ -199,7 +199,7 @@ function LandlordDashboard({ data }) {
     <>
       <div className="dashboard-stat-grid">
         <StatCard icon={Home} label="Propiedades" value={data.properties.length} helper="Activas y borradores" />
-        <StatCard icon={Clock3} label="Pendientes" value={pending} helper="En revision" />
+        <StatCard icon={Clock3} label="Pendientes" value={pending} helper="En revisión" />
         <StatCard icon={Users} label="Solicitudes" value={data.requests.length} helper="Recibidas" />
       </div>
 

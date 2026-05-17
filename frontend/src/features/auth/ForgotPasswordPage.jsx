@@ -4,8 +4,8 @@ import { InlineMessage } from '../../components/ui/InlineMessage';
 import { useAuth } from '../../app/providers/AuthProvider';
 
 /**
- * Componente de uso para iniciar recuperacion de contrasena.
- * Solo pide el correo y delega el envio del enlace seguro al proveedor de autenticacion.
+ * Componente de uso para iniciar recuperación de contraseña.
+ * Solo pide el correo y delega el envío del enlace seguro al proveedor de autenticación.
  */
 export function ForgotPasswordPage() {
   const { forgotPassword } = useAuth();
@@ -22,7 +22,7 @@ export function ForgotPasswordPage() {
 
     try {
       await forgotPassword(email);
-      setMessage('Te enviamos un enlace para restablecer tu contrasena.');
+      setMessage('Te enviamos un enlace para restablecer tu contraseña.');
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -33,9 +33,9 @@ export function ForgotPasswordPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <span className="section__eyebrow">Recuperacion</span>
+        <span className="section__eyebrow">Recuperación</span>
         <h1>Recupera tu acceso</h1>
-        <p>Te enviaremos un enlace seguro para restablecer tu contrasena.</p>
+        <p>Te enviaremos un enlace seguro para restablecer tu contraseña.</p>
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <InlineMessage tone={error ? 'danger' : 'success'}>{error || message}</InlineMessage>

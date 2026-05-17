@@ -145,7 +145,7 @@ export function AuthenticatedLayout({ children }) {
                 <small>{user?.email || 'Cuenta Nido'}</small>
               </span>
             </Link>
-            <button className="icon-button icon-button--danger" type="button" onClick={handleLogout} aria-label="Cerrar sesion">
+            <button className="icon-button icon-button--danger" type="button" onClick={handleLogout} aria-label="Cerrar sesión">
               <LogOut size={18} />
             </button>
           </div>

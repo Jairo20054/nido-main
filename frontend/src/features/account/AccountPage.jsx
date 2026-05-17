@@ -9,8 +9,8 @@ import { formatCurrency, formatDate } from '../../lib/formatters';
 import { isRecoverableDashboardError, mockTenantRequests } from '../dashboard/dashboardData';
 
 /**
- * Componente de uso para la pagina "Mi cuenta".
- * Reune en una sola vista la edicion del perfil autenticado y el historial
+ * Componente de uso para la página "Mi cuenta".
+ * Reúne en una sola vista la edición del perfil autenticado y el historial
  * de solicitudes que el usuario ha enviado a propiedades publicadas.
  */
 export function AccountPage() {
@@ -101,7 +101,7 @@ export function AccountPage() {
             </div>
           </div>
           <div className="field-group">
-            <label htmlFor="accountPhone">Telefono</label>
+            <label htmlFor="accountPhone">Teléfono</label>
             <input
               id="accountPhone"
               value={profileForm.phone}
@@ -133,7 +133,7 @@ export function AccountPage() {
         <div className="content-card">
           <div className="section__heading section__heading--tight">
             <div>
-              <span className="section__eyebrow">Solicitudes</span>
+              <span className="section__eyebrow">Postulaciones</span>
               <h2>Mis postulaciones</h2>
             </div>
           </div>
@@ -160,8 +160,8 @@ export function AccountPage() {
             </div>
           ) : (
             <EmptyState
-              title="Aun no has enviado solicitudes"
-              description="Cuando te postules a una propiedad veras aqui el estado de cada conversacion."
+              title="Aún no has enviado postulaciones"
+              description="Cuando te postules a una propiedad verás aquí el estado de cada conversación."
             />
           )}
         </div>

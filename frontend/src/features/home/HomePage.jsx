@@ -15,7 +15,7 @@ import { api } from '../../lib/apiClient';
 import { PropertyCard } from '../properties/PropertyCard';
 import { PropertyCardSkeleton } from '../properties/PropertyCardSkeleton';
 
-const POPULAR_CITIES = ['Bogota', 'Medellin', 'Cali', 'Barranquilla', 'Envigado'];
+const POPULAR_CITIES = ['Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Envigado'];
 const BUDGET_OPTIONS = [
   { value: 2500000, label: 'Hasta $2.5M' },
   { value: 3500000, label: 'Hasta $3.5M' },
@@ -141,10 +141,10 @@ export function HomePage() {
         <div className="home-hero__content">
           <div className="home-hero__intro">
             <span className="hero-kicker">Arriendos claros en Colombia</span>
-            <h1 className="home-hero__title">Donde quieres vivir hoy?</h1>
+            <h1 className="home-hero__title">¿Dónde quieres vivir hoy?</h1>
             <p className="home-hero__subtitle">
               Busca por zona, presupuesto y tipo de vivienda. Nido convierte el catalogo en
-              opciones claras para comparar, guardar y visitar mas rapido.
+              opciones claras para comparar, guardar y visitar más rápido.
             </p>
           </div>
 
@@ -156,7 +156,7 @@ export function HomePage() {
               </span>
               <input
                 type="text"
-                placeholder="Bogota, Medellin, Chapinero..."
+                placeholder="Bogotá, Medellín, Chapinero..."
                 value={searchFilters.city}
                 onChange={(event) =>
                   setSearchFilters({ ...searchFilters, city: event.target.value })
@@ -295,8 +295,8 @@ export function HomePage() {
         <section className="home-featured">
           <div className="section__heading home-section-heading">
             <div>
-              <span className="section__eyebrow">Mas para explorar</span>
-              <h2>Opciones recientes con buena relacion valor-ubicacion</h2>
+              <span className="section__eyebrow">Más para explorar</span>
+              <h2>Opciones recientes con buena relación valor-ubicación</h2>
             </div>
             <LinkishButton onClick={() => navigate('/properties')}>Ver todas</LinkishButton>
           </div>
@@ -311,7 +311,7 @@ export function HomePage() {
         <section className="home-featured">
           <div className="section__heading home-section-heading">
             <div>
-              <span className="section__eyebrow">Mas para explorar</span>
+              <span className="section__eyebrow">Más para explorar</span>
               <h2>Cargando mas propiedades curadas</h2>
             </div>
           </div>

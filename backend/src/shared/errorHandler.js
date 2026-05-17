@@ -32,7 +32,7 @@ const errorHandler = (error, _req, res, _next) => {
     if (error.code === 'P2021' || error.code === 'P1001' || error.code === 'P1000') {
       return res.status(503).json({
         success: false,
-        message: 'La base de datos no esta inicializada o no es accesible',
+        message: 'La base de datos no está inicializada o no es accesible',
         details: error.meta?.table || null,
       });
     }
@@ -41,7 +41,7 @@ const errorHandler = (error, _req, res, _next) => {
   if (error instanceof Prisma.PrismaClientInitializationError) {
     return res.status(503).json({
       success: false,
-      message: 'El servicio de datos no esta disponible. Intenta nuevamente en unos minutos',
+      message: 'El servicio de datos no está disponible. Intenta nuevamente en unos minutos',
       details: null,
     });
   }

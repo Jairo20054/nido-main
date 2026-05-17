@@ -1,4 +1,5 @@
-const { supabaseService: supabaseAdmin } = require('../../shared/supabase');
+const { PropertyStatus } = require('@prisma/client');
+const { prisma } = require('../../shared/prisma');
 const { badRequest, notFound } = require('../../shared/errors');
 const { serializeProperty } = require('../../shared/serializers');
 
@@ -152,50 +153,12 @@ const DOCUMENT_LIBRARY = {
       label: 'Documento del respaldo',
       why: 'Necesitamos validar la alternativa que respalda la solicitud.',
       formats: ['PDF', 'JPG', 'PNG'],
-      exampleHint: 'Codeudor, poliza o garantia, segun la opcion que elijas.',
+      exampleHint: 'Codeudor, póliza o garantía, según la opción que elijas.',
     },
   ],
 };
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-
-const normalizePropertyRow = async (propertyRow) => {
-  if (!propertyRow) {
-    return null;
-  }
-
-  const [{ data: landlord }, { data: images }, { count: requestCount }] = await Promise.all([
-    supabaseAdmin
-      .from('profiles')
-      .select('*')
-      .eq('id', propertyRow.landlord_id)
-      .single(),
-    supabaseAdmin
-      .from('property_images')
-      .select('*')
-      .eq('property_id', propertyRow.id)
-      .order('sort_order', { ascending: true }),
-    supabaseAdmin
-      .from('applications')
-      .select('id', { count: 'exact', head: true })
-      .eq('property_id', propertyRow.id),
-  ]);
-
-  return {
-    ...propertyRow,
-    owner: landlord || null,
-    images: (images || []).map((image) => ({
-      id: image.id,
-      url: image.image_url,
-      alt: image.alt_text,
-      position: image.sort_order,
-    })),
-    favorites: [],
-    _count: {
-      rentalRequests: requestCount || 0,
-    },
-  };
-};
 
 const getIncomeThresholds = (occupationType) => {
   const occupationRule = OCCUPATION_RULES[occupationType];
@@ -220,7 +183,7 @@ const getDocumentChecklist = (occupationType, hasBackup, backupOption) => {
       ...DOCUMENT_LIBRARY.backup[0],
       label:
         backupOption === 'INSURANCE'
-          ? 'Soporte de garantia o poliza'
+          ? 'Soporte de garantía o póliza'
           : 'Soporte del codeudor o respaldo',
     });
   }
@@ -276,7 +239,7 @@ const buildRecommendations = ({ result, hasBackup, monthlyTotal }) => {
     return [
       hasBackup
         ? 'Avanza con tu respaldo y sube los documentos del titular y del respaldo juntos.'
-        : 'Puedes mejorar tu resultado agregando codeudor o garantia.',
+        : 'Puedes mejorar tu resultado agregando codeudor o garantía.',
       'Si prefieres, tambien puedes explorar inmuebles con un canon mas bajo.',
     ];
   }
@@ -353,62 +316,46 @@ const calculatePrequalification = (property, payload) => {
 };
 
 const prequalifyApplication = async (req, res) => {
-  if (!supabaseAdmin) {
-    throw badRequest('Supabase de administracion no esta configurado en el servidor');
+  const property = await prisma.property.findFirst({
+    where: {
+      id: req.body.propertyId,
+      status: PropertyStatus.PUBLISHED,
+    },
+    include: {
+      owner: true,
+      media: true,
+      favorites: {
+        where: {
+          userId: req.user.id,
+        },
+      },
+      _count: {
+        select: {
+          rentalRequests: true,
+        },
+      },
+    },
+  });
+
+  if (!property) {
+    throw notFound('La propiedad no está disponible para aplicar');
   }
 
-  const { data: propertyRow, error: propertyError } = await supabaseAdmin
-    .from('properties')
-    .select('*')
-    .eq('id', req.body.propertyId)
-    .single();
-
-  if (propertyError || !propertyRow || propertyRow.status !== 'published') {
-    throw notFound('La propiedad no esta disponible para aplicar');
+  if (property.ownerId === req.user.id) {
+    throw badRequest('No puedes precalificarte para tu propia propiedad');
   }
 
   if (req.body.backupOption !== 'NONE' && !req.body.hasBackup) {
     throw badRequest('Si indicas una opcion de respaldo, tambien debes confirmar que cuentas con respaldo.');
   }
 
-  const property = await normalizePropertyRow(propertyRow);
   const evaluation = calculatePrequalification(property, req.body);
-
-  let applicationId = null;
-  if (req.user?.id) {
-    const { data: application, error: applicationError } = await supabaseAdmin
-      .from('applications')
-      .insert([
-        {
-          property_id: propertyRow.id,
-          tenant_id: req.user.id,
-          landlord_id: propertyRow.landlord_id,
-          occupation_type: req.body.occupationType.toLowerCase(),
-          monthly_income: req.body.monthlyIncome,
-          has_guarantor: req.body.hasBackup,
-          backup_option: req.body.backupOption.toLowerCase(),
-          occupants: req.body.occupants,
-          desired_move_in: req.body.desiredMoveIn || propertyRow.available_from || new Date().toISOString().slice(0, 10),
-          lease_months: req.body.leaseMonths || propertyRow.min_lease_months || 6,
-          status: 'draft',
-          notes: req.body.notes || null,
-        },
-      ])
-      .select('id')
-      .single();
-
-    if (applicationError) {
-      throw badRequest('No fue posible iniciar la aplicacion para esta propiedad');
-    }
-
-    applicationId = application.id;
-  }
 
   res.json({
     success: true,
     data: {
-      applicationId,
-      property: serializeProperty(property, req.user?.id || null),
+      applicationId: null,
+      property: serializeProperty(property, req.user.id),
       prequalification: {
         result: evaluation.result,
         riskBand: evaluation.riskBand,

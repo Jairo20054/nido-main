@@ -8,7 +8,7 @@ export function AccessDeniedPage() {
       <div className="auth-card">
         <span className="section__eyebrow">Permisos</span>
         <h1>Acceso denegado</h1>
-        <p>Tu cuenta no tiene permisos para entrar en esta seccion.</p>
+        <p>Tu cuenta no tiene permisos para entrar en esta sección.</p>
         <div className="form-card__actions">
           <Link className="button" to="/">
             Volver al inicio

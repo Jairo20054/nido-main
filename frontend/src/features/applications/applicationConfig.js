@@ -1,8 +1,8 @@
 export const APPLICATION_STEPS = [
   { key: 'start', label: 'Resumen' },
-  { key: 'prequal', label: 'Precalificacion' },
+  { key: 'prequal', label: 'Precalificación' },
   { key: 'documents', label: 'Documentos' },
-  { key: 'review', label: 'Revision' },
+  { key: 'review', label: 'Revisión' },
   { key: 'contract', label: 'Contrato' },
   { key: 'payment', label: 'Pago' },
   { key: 'move-in', label: 'Entrega' },
@@ -32,15 +32,15 @@ export const OCCUPATION_OPTIONS = [
   {
     value: 'FOREIGNER',
     label: 'Extranjero',
-    description: 'Documento valido y soporte migratorio si aplica.',
+    description: 'Documento válido y soporte migratorio si aplica.',
   },
 ];
 
 export const BACKUP_OPTIONS = [
-  { value: 'NONE', label: 'Aun no', description: 'Quiero ver primero si puedo continuar.' },
+  { value: 'NONE', label: 'Aún no', description: 'Quiero ver primero si puedo continuar.' },
   { value: 'CO_SIGNER', label: 'Codeudor', description: 'Otra persona respalda la solicitud.' },
-  { value: 'INSURANCE', label: 'Poliza', description: 'Prefiero respaldo con garantia o poliza.' },
-  { value: 'GUARANTOR', label: 'Garantia', description: 'Tengo otra alternativa de respaldo.' },
+  { value: 'INSURANCE', label: 'Póliza', description: 'Prefiero respaldo con garantía o póliza.' },
+  { value: 'GUARANTOR', label: 'Garantía', description: 'Tengo otra alternativa de respaldo.' },
 ];
 
 export const PREQUAL_RESULT_CONTENT = {
@@ -48,12 +48,12 @@ export const PREQUAL_RESULT_CONTENT = {
     badge: 'Apto para continuar',
     title: 'Puedes avanzar con este inmueble',
     description:
-      'Tu informacion inicial se ve alineada con este canon. El siguiente paso es validar documentos.',
+      'Tu información inicial se ve alineada con este canon. El siguiente paso es validar documentos.',
     tone: 'success',
   },
   eligible_with_backup: {
     badge: 'Apto con respaldo',
-    title: 'Puedes continuar con una condicion clara',
+    title: 'Puedes continuar con una condición clara',
     description:
       'Tu perfil puede seguir, pero necesitaremos un respaldo para estandarizar el riesgo.',
     tone: 'warning',
@@ -62,15 +62,15 @@ export const PREQUAL_RESULT_CONTENT = {
     badge: 'No apto para este inmueble',
     title: 'Este inmueble puede quedar fuera de tu rango actual',
     description:
-      'Te mostramos alternativas para que no pierdas tiempo ni pagues por una revision que no te favorece.',
+      'Te mostramos alternativas para que no pierdas tiempo ni pagues por una revisión que no te favorece.',
     tone: 'danger',
   },
 };
 
 export const APPLICATION_STATUS_CONTENT = {
   draft: { label: 'Pendiente', tone: 'muted' },
-  in_review: { label: 'En revision', tone: 'warning' },
-  correction_required: { label: 'Requiere correccion', tone: 'danger' },
+  in_review: { label: 'En revisión', tone: 'warning' },
+  correction_required: { label: 'Requiere corrección', tone: 'danger' },
   approved: { label: 'Aprobado', tone: 'success' },
   conditionally_approved: { label: 'Condicionado', tone: 'warning' },
   rejected: { label: 'Rechazado', tone: 'danger' },
@@ -83,7 +83,7 @@ export const APPLICATION_STATUS_CONTENT = {
 export const DOCUMENT_STATUS_CONTENT = {
   pending: { label: 'Pendiente', tone: 'muted' },
   uploaded: { label: 'Cargado', tone: 'success' },
-  requires_correction: { label: 'Requiere correccion', tone: 'danger' },
+  requires_correction: { label: 'Requiere corrección', tone: 'danger' },
 };
 
 export const getPrequalResultContent = (result) =>

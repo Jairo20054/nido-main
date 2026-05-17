@@ -5,10 +5,25 @@ const { supabaseAnon } = require('../../shared/supabase');
 const { supabaseAdmin } = require('../../shared/supabaseAdmin');
 
 const PROFILE_TABLE = 'profiles';
+const PROFILE_SELECT = [
+  'id',
+  'email',
+  'first_name',
+  'last_name',
+  'phone',
+  'bio',
+  'avatar_url',
+  'role',
+  'country_code',
+  'locale',
+  'timezone',
+  'created_at',
+  'updated_at',
+].join(', ');
 
 const requireSupabaseAdmin = () => {
   if (!supabaseAdmin) {
-    throw serviceUnavailable('Supabase de administracion no esta configurado en el servidor');
+    throw serviceUnavailable('Supabase de administración no está configurado en el servidor');
   }
 
   return supabaseAdmin;
@@ -46,7 +61,7 @@ const updateProfile = async (req, res) => {
     .from(PROFILE_TABLE)
     .update(payload)
     .eq('id', req.user.id)
-    .select('*')
+    .select(PROFILE_SELECT)
     .single();
 
   if (error) {
@@ -70,7 +85,7 @@ const updateProfile = async (req, res) => {
 // Reautentica con contrasena antes de eliminar la cuenta y el usuario de Supabase.
 const deleteProfile = async (req, res) => {
   if (!supabaseAnon) {
-    throw badRequest('Supabase no esta configurado en el servidor');
+    throw badRequest('Supabase no está configurado en el servidor');
   }
 
   const { error } = await supabaseAnon.auth.signInWithPassword({
@@ -79,7 +94,7 @@ const deleteProfile = async (req, res) => {
   });
 
   if (error) {
-    throw unauthorized('La contrasena no coincide');
+    throw unauthorized('La contraseña no coincide');
   }
 
   await deleteAuthUser(req.user.id);

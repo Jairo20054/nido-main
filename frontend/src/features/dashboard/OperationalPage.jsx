@@ -15,7 +15,7 @@ const pageConfig = {
     icon: ClipboardList,
     eyebrow: 'Postulaciones',
     title: 'Seguimiento de solicitudes',
-    description: 'Una bandeja sencilla para revisar el estado de cada conversacion iniciada en Nido.',
+    description: 'Una bandeja sencilla para revisar el estado de cada conversación iniciada en NIDO.',
   },
   documents: {
     icon: FileText,
@@ -27,13 +27,13 @@ const pageConfig = {
     icon: ClipboardList,
     eyebrow: 'Solicitudes',
     title: 'Solicitudes recibidas',
-    description: 'Prioriza interesados, revisa estados y mantente al dia con cada propiedad.',
+    description: 'Prioriza interesados, revisa estados y mantente al día con cada propiedad.',
   },
   stats: {
     icon: BarChart3,
     eyebrow: 'Estadisticas',
     title: 'Rendimiento de Nido',
-    description: 'Metricas base para tomar decisiones sobre publicaciones, trafico e interes.',
+    description: 'Métricas base para tomar decisiones sobre publicaciones, tráfico e interés.',
   },
   settings: {
     icon: Settings,

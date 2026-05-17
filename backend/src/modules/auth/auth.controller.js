@@ -18,9 +18,7 @@ const normalizeIdentifier = (value) => String(value || '').trim().toLowerCase();
 const adminAliases = () =>
   [
     process.env.ADMIN_LOGIN_ALIAS,
-    process.env.VITE_ADMIN_LOGIN_ALIAS,
     process.env.SUPER_ADMIN_LOGIN_ALIAS,
-    process.env.VITE_SUPER_ADMIN_LOGIN_ALIAS,
     'admin',
   ]
     .map(normalizeIdentifier)
@@ -36,9 +34,7 @@ const resolveLoginEmail = (identifier) => {
   if (adminAliases().includes(normalized)) {
     return normalizeIdentifier(
       process.env.ADMIN_LOGIN_EMAIL ||
-        process.env.VITE_ADMIN_LOGIN_EMAIL ||
         process.env.SUPER_ADMIN_LOGIN_EMAIL ||
-        process.env.VITE_SUPER_ADMIN_LOGIN_EMAIL ||
         'admin@nido.local'
     );
   }
@@ -59,7 +55,7 @@ const normalizeRole = (role) => {
 // Crea la cuenta en Supabase y garantiza la existencia del perfil en la capa de negocio.
 const register = async (req, res) => {
   if (!supabaseAnon) {
-    throw badRequest('Supabase no esta configurado en el servidor');
+    throw badRequest('Supabase no está configurado en el servidor');
   }
 
   const { firstName, lastName, email, password, phone, role } = req.body;
@@ -69,7 +65,7 @@ const register = async (req, res) => {
     email,
     password,
     options: {
-      emailRedirectTo: `${env.CLIENT_URL}/login`,
+      emailRedirectTo: `${env.CLIENT_URL}/email-confirmed`,
       data: {
         first_name: firstName,
         last_name: lastName,
@@ -89,7 +85,7 @@ const register = async (req, res) => {
   res.status(201).json({
     success: true,
     message: data.session
-      ? 'Cuenta creada correctamente'
+      ? 'Cuenta creada correctamente.'
       : 'Cuenta creada. Revisa tu correo para confirmar el acceso.',
     data: {
       ...buildAuthPayload(data.session, decoratedProfile),
@@ -101,7 +97,7 @@ const register = async (req, res) => {
 // Inicia sesion contra Supabase y devuelve el perfil enriquecido con permisos.
 const login = async (req, res) => {
   if (!supabaseAnon) {
-    throw badRequest('Supabase no esta configurado en el servidor');
+    throw badRequest('Supabase no está configurado en el servidor');
   }
 
   const { email, identifier, password } = req.body;
@@ -113,7 +109,7 @@ const login = async (req, res) => {
   });
 
   if (error || !data.user) {
-    throw unauthorized('Correo o contrasena incorrectos');
+    throw unauthorized('Correo o contraseña incorrectos');
   }
 
   const profile = await ensureProfile(data.user);
@@ -121,7 +117,7 @@ const login = async (req, res) => {
 
   res.json({
     success: true,
-    message: 'Sesion iniciada',
+    message: 'Sesión iniciada',
     data: buildAuthPayload(data.session, decoratedProfile),
   });
 };
@@ -151,14 +147,14 @@ const syncUser = async (req, res) => {
 const logout = async (_req, res) => {
   res.json({
     success: true,
-    message: 'Sesion cerrada',
+    message: 'Sesión cerrada',
   });
 };
 
 // Dispara el correo de recuperacion apuntando al flujo de reset del cliente.
 const forgotPassword = async (req, res) => {
   if (!supabaseAnon) {
-    throw badRequest('Supabase no esta configurado en el servidor');
+    throw badRequest('Supabase no está configurado en el servidor');
   }
 
   const { email } = req.body;
@@ -173,7 +169,7 @@ const forgotPassword = async (req, res) => {
 
   res.json({
     success: true,
-    message: 'Si el correo existe, recibiras instrucciones para restablecer la contrasena.',
+    message: 'Si el correo existe, recibirás instrucciones para restablecer la contraseña.',
   });
 };
 

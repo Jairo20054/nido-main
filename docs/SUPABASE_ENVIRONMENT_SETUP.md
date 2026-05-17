@@ -6,8 +6,8 @@
 
 ```bash
 # Supabase Configuration
-SUPABASE_URL=https://hoqcfprckuozcsnwzgei.supabase.co
-SUPABASE_PUBLISHABLE_KEY=sb_publishable_Q9naTZLx0fUqmqL4ud6wdA_JEOFKHT4
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 
 # For backend operations only (NEVER expose to frontend)
 SUPABASE_SERVICE_KEY=your_service_role_key_here
@@ -45,8 +45,8 @@ ENABLE_EMAIL_NOTIFICATIONS=true
 
 ```bash
 # Supabase - PUBLIC KEYS ONLY
-VITE_SUPABASE_URL=https://hoqcfprckuozcsnwzgei.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvcWNmcHJja3VvemNzbnd6Z2VpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MDQ5ODAsImV4cCI6MjA5MjM4MDk4MH0.REZoC3R91W1xWMQHdUOt5ejM_XkivH4wtP-a9Ac3RJ8
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-or-publishable-key
 
 # API Configuration
 VITE_API_URL=http://localhost:3000
@@ -100,7 +100,7 @@ npm run prisma:generate
 
 Or if using Supabase CLI:
 ```bash
-supabase gen types typescript --project-id hoqcfprckuozcsnwzgei
+supabase gen types typescript --project-id your-project-ref
 ```
 
 ### Step 4: Run Migrations (if needed)
@@ -148,12 +148,12 @@ supabase db push --remote
 supabase db query
 
 # Or using psql directly
-psql postgresql://postgres:password@db.hoqcfprckuozcsnwzgei.supabase.co:5432/postgres
+psql postgresql://postgres:password@db.your-project-ref.supabase.co:5432/postgres
 ```
 
 **Method 3: Supabase Dashboard**
 ```
-1. Go to https://supabase.com/dashboard/project/hoqcfprckuozcsnwzgei/sql
+1. Go to https://supabase.com/dashboard/project/your-project-ref/sql
 2. Click "New Query"
 3. Paste your SQL
 4. Execute
@@ -175,7 +175,7 @@ psql postgresql://postgres:password@db.hoqcfprckuozcsnwzgei.supabase.co:5432/pos
 
 ### How to Get Keys
 ```
-1. Go to https://supabase.com/dashboard/project/hoqcfprckuozcsnwzgei/settings/api
+1. Go to https://supabase.com/dashboard/project/your-project-ref/settings/api
 2. Copy the values:
    - Project URL → SUPABASE_URL
    - Publishable key → SUPABASE_ANON_KEY
@@ -197,10 +197,10 @@ psql postgresql://postgres:password@db.hoqcfprckuozcsnwzgei.supabase.co:5432/pos
 ### Connect with psql
 ```bash
 # Via URL
-psql "postgresql://postgres:PASSWORD@db.hoqcfprckuozcsnwzgei.supabase.co:5432/postgres"
+psql "postgresql://postgres:PASSWORD@db.your-project-ref.supabase.co:5432/postgres"
 
 # Or individually
-psql -h db.hoqcfprckuozcsnwzgei.supabase.co \
+psql -h db.your-project-ref.supabase.co \
      -U postgres \
      -d postgres \
      -p 5432
@@ -242,8 +242,8 @@ curl http://localhost:3000/health
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
-  'https://hoqcfprckuozcsnwzgei.supabase.co',
-  'sb_publishable_Q9naTZLx0fUqmqL4ud6wdA_JEOFKHT4'
+  'https://your-project.supabase.co',
+  'your-publishable-key'
 )
 
 // Try to get user
@@ -385,7 +385,7 @@ Query slow?
 
 ### Supabase Dashboard
 ```
-https://supabase.com/dashboard/project/hoqcfprckuozcsnwzgei
+https://supabase.com/dashboard/project/your-project-ref
 - Logs: Database, API, Edge Functions, Auth
 - Storage: Usage, bandwidth
 - Backups: Automated daily backups
@@ -472,8 +472,8 @@ ORDER BY idx_scan DESC;
 ### Environment Variables (Production)
 ```bash
 NODE_ENV=production
-SUPABASE_URL=https://hoqcfprckuozcsnwzgei.supabase.co
-SUPABASE_PUBLISHABLE_KEY=sb_publishable_Q9naTZLx0fUqmqL4ud6wdA_JEOFKHT4
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 SUPABASE_SERVICE_KEY=prod_service_key_here
 CLIENT_URL=https://nido.com
 PORT=3000
@@ -491,7 +491,7 @@ certbot certonly --standalone -d nido.com -d www.nido.com
 ### Database Backups
 ```bash
 # Supabase provides daily automated backups
-# Access at: https://supabase.com/dashboard/project/hoqcfprckuozcsnwzgei/database/backups
+# Access at: https://supabase.com/dashboard/project/your-project-ref/database/backups
 
 # To restore from backup
 1. Go to Backups

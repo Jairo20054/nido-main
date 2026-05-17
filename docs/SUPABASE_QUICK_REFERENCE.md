@@ -8,8 +8,8 @@ import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/backend/types/database'
 
 export const supabase = createClient<Database>(
-  'https://hoqcfprckuozcsnwzgei.supabase.co',
-  'sb_publishable_Q9naTZLx0fUqmqL4ud6wdA_JEOFKHT4'
+  'https://your-project.supabase.co',
+  'your-publishable-key'
 )
 ```
 

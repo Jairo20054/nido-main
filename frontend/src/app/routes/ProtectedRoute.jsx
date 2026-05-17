@@ -5,15 +5,15 @@ import { useAuth } from '../providers/AuthProvider';
 
 /**
  * Componente de uso guard para rutas privadas.
- * Se coloca alrededor de paginas protegidas y decide si debe renderizar el contenido,
- * redirigir al login o enviar al usuario a acceso denegado segun autenticacion y roles.
+ * Se coloca alrededor de páginas protegidas y decide si debe renderizar el contenido,
+ * redirigir al login o enviar al usuario a acceso denegado según autenticación y roles.
  */
 export function ProtectedRoute({ children, roles = [] }) {
   const { hasRole, isAuthenticated, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
-    return <LoadingState label="Verificando sesion..." />;
+    return <LoadingState label="Verificando sesión..." />;
   }
 
   if (!isAuthenticated) {

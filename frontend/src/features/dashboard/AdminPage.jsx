@@ -64,12 +64,12 @@ export function AdminPage() {
     }
   };
 
-  // Elimina una publicacion desde administracion y sincroniza la lista local.
+  // Elimina una publicación desde administración y sincroniza la lista local.
   const handleDelete = async (propertyId) => {
     try {
       await api.delete(`/admin/properties/${propertyId}`);
       setProperties((current) => current.filter((item) => item.id !== propertyId));
-      setMessage('Publicacion eliminada.');
+      setMessage('Publicación eliminada.');
     } catch (requestError) {
       setMessage(requestError.message);
     }
@@ -89,7 +89,7 @@ export function AdminPage() {
         current.map((item) => (item.id === editingProperty.id ? response.data : item))
       );
       setEditingProperty(null);
-      setMessage('Publicacion actualizada por administracion.');
+      setMessage('Publicación actualizada por administración.');
       return true;
     } catch (requestError) {
       setMessage(requestError.message);
@@ -185,7 +185,7 @@ export function AdminPage() {
               ) : null}
 
               {!loading && !properties.length ? (
-                <EmptyState title="No hay propiedades registradas" description="Cuando existan publicaciones apareceran en esta tabla administrativa." />
+                <EmptyState title="No hay propiedades registradas" description="Cuando existan publicaciones aparecerán en esta tabla administrativa." />
               ) : null}
             </div>
 
@@ -227,7 +227,7 @@ export function AdminPage() {
               <div className="section__heading section__heading--tight">
                 <div>
                   <span className="section__eyebrow">Estados</span>
-                  <h2>Resumen por publicacion</h2>
+                  <h2>Resumen por publicación</h2>
                 </div>
               </div>
               <div className="status-summary-list">

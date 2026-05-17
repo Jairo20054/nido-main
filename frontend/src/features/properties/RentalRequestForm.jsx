@@ -91,7 +91,7 @@ export function RentalRequestForm({
         <div>
           <h3>Reserva en pocos pasos</h3>
           <p>
-            Revisa fechas, costos y condiciones sin iniciar sesion. Solo te pediremos acceso cuando
+            Revisa fechas, costos y condiciones sin iniciar sesión. Solo te pediremos acceso cuando
             quieras continuar al pago o formalizar la solicitud.
           </p>
         </div>
@@ -116,7 +116,7 @@ export function RentalRequestForm({
         <div className="form-card__header">
           <h3>Pre-reserva</h3>
           <p>
-            Deja lista tu informacion basica para avanzar mas rapido cuando decidas reservar esta
+            Deja lista tu información básica para avanzar más rápido cuando decidas reservar esta
             propiedad.
           </p>
         </div>
@@ -189,7 +189,7 @@ export function RentalRequestForm({
             />
           </div>
           <div className="field-group">
-            <label htmlFor="phone">Telefono</label>
+            <label htmlFor="phone">Teléfono</label>
             <input
               id="phone"
               value={form.phone}
@@ -217,7 +217,7 @@ export function RentalRequestForm({
             rows="5"
             value={form.message}
             onChange={(event) => setForm((current) => ({ ...current, message: event.target.value }))}
-            placeholder="Cuentale al propietario quien eres, cuando quieres mudarte y por que te interesa esta propiedad."
+            placeholder="Cuéntale al propietario quién eres, cuándo quieres mudarte y por qué te interesa esta propiedad."
           />
         </div>
 
@@ -229,7 +229,7 @@ export function RentalRequestForm({
           <div className="booking-cta">
             <p>
               Tu pre-reserva queda lista. Para continuar al pago o enviar la solicitud formal, te
-              pediremos iniciar sesion.
+              pediremos iniciar sesión.
             </p>
             <div className="booking-cta__actions">
               <Link to="/login" state={loginState} className="button">

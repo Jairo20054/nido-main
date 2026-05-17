@@ -12,7 +12,7 @@ import { useSearchFilters } from './useSearchFilters';
 
 const EXTRA_LABELS = {
   furnished: 'Amoblado',
-  petsAllowed: 'Mascotas OK',
+  petsAllowed: 'Acepta mascotas',
   parking: 'Parqueadero',
   security: 'Vigilancia',
   gatedCommunity: 'Conjunto cerrado',
@@ -30,15 +30,15 @@ const SEARCH_PROPERTY_TYPES = [
   { value: '', label: 'Cualquier tipo' },
   { value: 'apartment', label: 'Apartamento' },
   { value: 'house', label: 'Casa' },
-  { value: 'studio', label: 'Estudio' },
+  { value: 'studio', label: 'Apartaestudio' },
 ];
 
 const QUICK_SEARCH_CHIPS = [
-  { key: 'bogota', label: 'Bogota', field: 'city', value: 'Bogota' },
-  { key: 'medellin', label: 'Medellin', field: 'city', value: 'Medellin' },
+  { key: 'bogota', label: 'Bogotá', field: 'city', value: 'Bogotá' },
+  { key: 'medellin', label: 'Medellín', field: 'city', value: 'Medellín' },
   { key: 'apartment', label: 'Apartamentos', field: 'propertyType', value: 'apartment' },
   { key: 'furnished', label: 'Amoblados', extra: 'furnished' },
-  { key: 'petsAllowed', label: 'Mascotas OK', extra: 'petsAllowed' },
+  { key: 'petsAllowed', label: 'Acepta mascotas', extra: 'petsAllowed' },
 ];
 
 const MAP_PIN_POSITIONS = [
@@ -116,7 +116,7 @@ export function SearchPage() {
 
   const toggleFavorite = async (property) => {
     if (!isAuthenticated) {
-      setError('Explora sin cuenta. Inicia sesion solo si quieres guardar propiedades.');
+      setError('Explora sin cuenta. Inicia sesión solo si quieres guardar propiedades.');
       return;
     }
 
@@ -158,7 +158,7 @@ export function SearchPage() {
       });
     }
     if (filters.bedrooms !== 1) chips.push({ key: 'bedrooms', label: `${filters.bedrooms} hab.` });
-    if (filters.bathrooms !== 1) chips.push({ key: 'bathrooms', label: `${filters.bathrooms} banos` });
+    if (filters.bathrooms !== 1) chips.push({ key: 'bathrooms', label: `${filters.bathrooms} baños` });
     filters.extras.forEach((extra) => chips.push({ key: extra, label: EXTRA_LABELS[extra] }));
 
     return chips;
@@ -190,7 +190,7 @@ export function SearchPage() {
 
   const showPopularResults = () => {
     clearFilters();
-    setFilter('city', 'Bogota');
+    setFilter('city', 'Bogotá');
     setFilter('propertyType', '');
     setFilter('minRent', 1800000);
     setFilter('maxRent', 6500000);
@@ -208,7 +208,7 @@ export function SearchPage() {
           }}
         >
           <label className="search-command__field search-command__field--location">
-            <span>Donde quieres vivir?</span>
+            <span>¿Dónde quieres vivir?</span>
             <input
               type="text"
               placeholder="Ciudad, barrio o zona"
@@ -257,8 +257,8 @@ export function SearchPage() {
             Buscar
           </button>
 
-          <div className="search-command__chips" aria-label="Filtros rapidos">
-            <span>Rapido:</span>
+          <div className="search-command__chips" aria-label="Filtros rápidos">
+            <span>Rápido:</span>
             {QUICK_SEARCH_CHIPS.map((chip) => {
               const active = chip.extra
                 ? filters.extras.includes(chip.extra)
@@ -300,7 +300,7 @@ export function SearchPage() {
                     : `${properties.length} propiedades encontradas`}
                 </h1>
                 <p>
-                  Compara precio, ubicacion y atributos clave sin perder de vista tus filtros.
+                  Compara precio, ubicación y atributos clave sin perder de vista tus filtros.
                 </p>
               </div>
               <div className="search-results__actions">
@@ -309,7 +309,7 @@ export function SearchPage() {
                   <select value={filters.sort} onChange={(event) => setFilter('sort', event.target.value)}>
                     <option value="recommended">Recomendados</option>
                     <option value="rent-asc">Precio menor</option>
-                    <option value="latest">Mas recientes</option>
+                    <option value="latest">Más recientes</option>
                     <option value="rent-desc">Precio mayor</option>
                   </select>
                 </label>

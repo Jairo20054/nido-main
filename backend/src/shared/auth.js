@@ -7,6 +7,21 @@ const { supabaseAdmin } = require('./supabaseAdmin');
 const ALLOWED_SELF_ASSIGNED_ROLES = ['TENANT', 'LANDLORD'];
 const ADMIN_SELECT = ['auth_user_id', 'profile_id'].join(', ');
 const PROFILE_TABLE = 'profiles';
+const PROFILE_SELECT = [
+  'id',
+  'email',
+  'first_name',
+  'last_name',
+  'phone',
+  'bio',
+  'avatar_url',
+  'role',
+  'country_code',
+  'locale',
+  'timezone',
+  'created_at',
+  'updated_at',
+].join(', ');
 
 // Extrae el bearer token desde el header Authorization si existe.
 const extractToken = (req) => {
@@ -78,7 +93,7 @@ const profilePayloadFromAuthUser = (authUser) => {
 
 const requireSupabaseAdmin = () => {
   if (!supabaseAdmin) {
-    throw serviceUnavailable('Supabase de administracion no esta configurado en el servidor');
+    throw serviceUnavailable('Supabase de administración no está configurado en el servidor');
   }
 
   return supabaseAdmin;
@@ -139,7 +154,7 @@ const fetchProfileById = async (profileId) => {
   const client = requireSupabaseAdmin();
   const { data, error } = await client
     .from(PROFILE_TABLE)
-    .select('*')
+    .select(PROFILE_SELECT)
     .eq('id', profileId)
     .maybeSingle();
 
@@ -165,7 +180,7 @@ const ensureProfile = async (authUser) => {
     const { data, error } = await client
       .from(PROFILE_TABLE)
       .insert(profileInsertFromAuthUser(authUser, authPayload))
-      .select('*')
+      .select(PROFILE_SELECT)
       .single();
 
     if (error) {
@@ -211,7 +226,7 @@ const ensureProfile = async (authUser) => {
       updated_at: new Date().toISOString(),
     })
     .eq('id', authUser.id)
-    .select('*')
+    .select(PROFILE_SELECT)
     .single();
 
   if (error) {
@@ -324,7 +339,7 @@ const attachUser = async (req, strict) => {
 
   if (!supabaseAnon) {
     if (strict) {
-      throw unauthorized('Supabase no esta configurado en el servidor');
+      throw unauthorized('Supabase no está configurado en el servidor');
     }
 
     req.user = null;
@@ -335,7 +350,7 @@ const attachUser = async (req, strict) => {
 
   if (error || !data?.user) {
     if (strict) {
-      throw unauthorized('Tu sesion expiro o no es valida');
+      throw unauthorized('Tu sesión expiró o no es válida');
     }
 
     req.user = null;
@@ -405,7 +420,7 @@ const assertOwnershipOrAdmin = (reqUser, ownerId) => {
 
 const deleteAuthUser = async (userId) => {
   if (!supabaseAdmin) {
-    throw badRequest('Supabase de administracion no esta configurado en el servidor');
+    throw badRequest('Supabase de administración no está configurado en el servidor');
   }
 
   const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);

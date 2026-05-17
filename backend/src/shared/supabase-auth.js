@@ -135,10 +135,10 @@ const signIn = async (email, password) => {
     const session = data.session;
     const authUser = data.user;
 
-    // Obtener datos extendidos del usuario desde nuestra tabla
+    // Obtener datos extendidos del usuario desde nuestra tabla.
     const { data: userProfile } = await supabaseAdmin
       .from('profiles')
-      .select('*')
+      .select('id,email,first_name,last_name,phone,bio,avatar_url,role,created_at,updated_at')
       .eq('id', authUser.id)
       .single();
 

@@ -24,13 +24,13 @@ const PROPERTY_TYPE_OPTIONS = [
 
 const EXTRA_OPTIONS = [
   { value: 'furnished', label: 'Amoblado', icon: Sofa },
-  { value: 'petsAllowed', label: 'Mascotas OK', icon: Dog },
+  { value: 'petsAllowed', label: 'Acepta mascotas', icon: Dog },
   { value: 'parking', label: 'Parqueadero', icon: Landmark },
   { value: 'security', label: 'Vigilancia', icon: Shield },
   { value: 'gatedCommunity', label: 'Conjunto cerrado', icon: Trees },
 ];
 
-const RECENT_CITIES = ['Medellin', 'Bogota', 'Cali', 'Barranquilla', 'Chapinero', 'Envigado'];
+const RECENT_CITIES = ['Medellín', 'Bogotá', 'Cali', 'Barranquilla', 'Chapinero', 'Envigado'];
 
 function Stepper({ label, icon: Icon, value, onChange, min = 0 }) {
   return (
@@ -71,7 +71,7 @@ function DualRangeSlider({ min, max, valueMin, valueMax, onChange }) {
           max={max}
           step="100000"
           value={safeMin}
-          aria-label="Canon mensual minimo"
+          aria-label="Canon mensual mínimo"
           onChange={(event) => onChange('min', Math.min(Number(event.target.value), safeMax - 100000))}
         />
         <input
@@ -80,7 +80,7 @@ function DualRangeSlider({ min, max, valueMin, valueMax, onChange }) {
           max={max}
           step="100000"
           value={safeMax}
-          aria-label="Canon mensual maximo"
+          aria-label="Canon mensual máximo"
           onChange={(event) => onChange('max', Math.max(Number(event.target.value), safeMin + 100000))}
         />
       </div>
@@ -129,7 +129,7 @@ export function PropertyFilters({
       <div className="filter-panel__header">
         <div>
           <span className="section__eyebrow">Filtros</span>
-          <h2>Encuentra algo que si te quede bien</h2>
+          <h2>Encuentra una propiedad que se ajuste a ti</h2>
         </div>
         {onDismiss ? (
           <button type="button" className="filter-panel__dismiss" onClick={onDismiss}>
@@ -146,7 +146,7 @@ export function PropertyFilters({
             list="recent-cities"
             value={filters.city}
             onChange={(event) => onChange('city', event.target.value)}
-            placeholder="Ej. Medellin, Chapinero, Envigado"
+            placeholder="Ej. Medellín, Chapinero, Envigado"
           />
           <datalist id="recent-cities">
             {RECENT_CITIES.map((city) => (
@@ -206,9 +206,9 @@ export function PropertyFilters({
         />
       </AccordionSection>
 
-      <AccordionSection icon={Bath} title="Banos">
+      <AccordionSection icon={Bath} title="Baños">
         <Stepper
-          label="Banos"
+          label="Baños"
           icon={Bath}
           value={filters.bathrooms}
           min={1}

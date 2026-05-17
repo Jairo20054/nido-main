@@ -49,9 +49,7 @@ const resolveAdminConfig = (overrides = {}) => {
   const aliases = uniq([
     overrides.alias,
     process.env.ADMIN_LOGIN_ALIAS,
-    process.env.VITE_ADMIN_LOGIN_ALIAS,
     process.env.SUPER_ADMIN_LOGIN_ALIAS,
-    process.env.VITE_SUPER_ADMIN_LOGIN_ALIAS,
     'admin',
   ]);
 
@@ -72,10 +70,8 @@ const resolveAdminConfig = (overrides = {}) => {
     primaryAlias: aliases[0] || 'admin',
     email: cleanLower(
       overrides.email ||
-        process.env.ADMIN_LOGIN_EMAIL ||
-        process.env.VITE_ADMIN_LOGIN_EMAIL ||
+      process.env.ADMIN_LOGIN_EMAIL ||
         process.env.SUPER_ADMIN_LOGIN_EMAIL ||
-        process.env.VITE_SUPER_ADMIN_LOGIN_EMAIL ||
         'admin@nido.local'
     ),
     password: clean(

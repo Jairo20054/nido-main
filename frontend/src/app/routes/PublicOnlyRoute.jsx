@@ -5,14 +5,14 @@ import { useAuth } from '../providers/AuthProvider';
 import { resolvePostAuthDestination } from '../../features/auth/authRedirects';
 
 /**
- * Guard para pantallas publicas de autenticacion.
- * Evita que un usuario con sesion activa vuelva al login o registro.
+ * Guard para pantallas públicas de autenticación.
+ * Evita que un usuario con sesión activa vuelva al login o registro.
  */
 export function PublicOnlyRoute({ children }) {
   const { isAuthenticated, loading, user } = useAuth();
 
   if (loading) {
-    return <LoadingState label="Verificando sesion..." />;
+    return <LoadingState label="Verificando sesión..." />;
   }
 
   if (isAuthenticated) {

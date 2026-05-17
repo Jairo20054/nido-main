@@ -3,13 +3,9 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey =
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY;
-const adminLoginAlias = (import.meta.env.VITE_ADMIN_LOGIN_ALIAS || 'admin').trim().toLowerCase();
-const adminLoginEmail = (import.meta.env.VITE_ADMIN_LOGIN_EMAIL || 'admin@nido.local')
-  .trim()
-  .toLowerCase();
 
 const missingSupabaseConfigMessage =
-  'La autenticacion no esta configurada. Define VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY o VITE_SUPABASE_PUBLISHABLE_KEY.';
+  'La autenticación no está configurada. Define VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY o VITE_SUPABASE_PUBLISHABLE_KEY.';
 const hasPlaceholderConfig =
   /your-project\.supabase\.co/i.test(String(supabaseUrl || '')) ||
   /^your-(anon|publishable|secret|service)/i.test(String(supabaseAnonKey || '').trim());
@@ -27,7 +23,9 @@ const createMissingConfigClient = () => {
     auth: {
       getSession: async () => ({ data: { session: null }, error: null }),
       onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+      exchangeCodeForSession: missing,
       resetPasswordForEmail: missing,
+      setSession: missing,
       signInWithPassword: missing,
       signOut: missing,
       signUp: missing,
@@ -72,21 +70,9 @@ export const getPasswordResetUrl = () =>
   import.meta.env.VITE_SUPABASE_REDIRECT_URL || `${getSiteUrl()}/reset-password`;
 
 export const getEmailConfirmationUrl = () =>
-  import.meta.env.VITE_SUPABASE_EMAIL_CONFIRMATION_URL || `${getSiteUrl()}/login`;
+  import.meta.env.VITE_SUPABASE_EMAIL_CONFIRMATION_URL || `${getSiteUrl()}/email-confirmed`;
 
 export const getOAuthCallbackUrl = () =>
   import.meta.env.VITE_SUPABASE_OAUTH_REDIRECT_URL || `${getSiteUrl()}/auth/callback`;
-
-// Permite iniciar sesion con un alias funcional para el admin sin exponer
-// una UX distinta al resto de usuarios.
-export const resolveAuthEmail = (value) => {
-  const normalized = String(value || '').trim().toLowerCase();
-
-  if (!normalized) {
-    return '';
-  }
-
-  return normalized === adminLoginAlias ? adminLoginEmail : normalized;
-};
 
 export const getSupabaseConfigError = () => missingSupabaseConfigMessage;

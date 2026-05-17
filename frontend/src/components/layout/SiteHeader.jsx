@@ -87,7 +87,7 @@ export function SiteHeader() {
 
         <div className="site-header__actions">
           {!isAuthenticated ? (
-            <span className="site-header__hint">Explora sin iniciar sesion</span>
+            <span className="site-header__hint">Explora sin iniciar sesión</span>
           ) : null}
 
           {isAuthenticated ? (

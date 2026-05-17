@@ -117,7 +117,7 @@ export function AuthCallbackPage() {
       <div className="auth-card">
         <span className="section__eyebrow">Google</span>
         <h1>No pudimos completar tu acceso</h1>
-        <p>Vuelve a intentarlo desde el inicio de sesion para continuar con NIDO.</p>
+        <p>Vuelve a intentarlo desde el inicio de sesión para continuar con NIDO.</p>
         <InlineMessage tone="danger">{error || OAUTH_ERROR_MESSAGE}</InlineMessage>
         <Link className="button" to="/login" replace>
           Volver al ingreso

@@ -11,15 +11,15 @@ export const USER_ROLE_LABELS = {
 export const PROPERTY_TYPE_OPTIONS = [
   { value: 'APARTMENT', label: 'Apartamento' },
   { value: 'HOUSE', label: 'Casa' },
-  { value: 'STUDIO', label: 'Estudio' },
+  { value: 'STUDIO', label: 'Apartaestudio' },
   { value: 'LOFT', label: 'Loft' },
   { value: 'PENTHOUSE', label: 'Penthouse' },
-  { value: 'ROOM', label: 'Habitacion' },
+  { value: 'ROOM', label: 'Habitación' },
 ];
 
 export const RENTAL_TYPE_OPTIONS = [
   { value: 'FULL_HOME', label: 'Vivienda completa' },
-  { value: 'ROOM_ONLY', label: 'Habitacion' },
+  { value: 'ROOM_ONLY', label: 'Habitación' },
   { value: 'SHARED_HOME', label: 'Vivienda compartida' },
 ];
 
@@ -39,9 +39,9 @@ export const PUBLIC_PROPERTY_STATUS_OPTIONS = PROPERTY_STATUS_OPTIONS.filter((it
 
 export const SORT_OPTIONS = [
   { value: 'recommended', label: 'Recomendados' },
-  { value: 'latest', label: 'Mas recientes' },
-  { value: 'rent-asc', label: 'Canon mas bajo' },
-  { value: 'rent-desc', label: 'Canon mas alto' },
+  { value: 'latest', label: 'Más recientes' },
+  { value: 'rent-asc', label: 'Canon más bajo' },
+  { value: 'rent-desc', label: 'Canon más alto' },
 ];
 
 export const REQUEST_STATUS_LABELS = {

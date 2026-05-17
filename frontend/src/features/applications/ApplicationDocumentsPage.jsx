@@ -49,13 +49,13 @@ const validateDocumentFile = (document, file) => {
   if (file.size > 15 * 1024 * 1024) {
     return {
       status: 'requires_correction',
-      validationMessage: 'El archivo supera el maximo recomendado de 15 MB.',
+      validationMessage: 'El archivo supera el máximo recomendado de 15 MB.',
     };
   }
 
   return {
     status: 'uploaded',
-    validationMessage: 'Archivo listo para revision.',
+    validationMessage: 'Archivo listo para revisión.',
   };
 };
 
@@ -105,7 +105,7 @@ export function ApplicationDocumentsPage() {
     return (
       <EmptyState
         title="No pudimos cargar este paso"
-        description={error || 'La propiedad ya no esta disponible.'}
+        description={error || 'La propiedad ya no está disponible.'}
       />
     );
   }
@@ -154,7 +154,7 @@ export function ApplicationDocumentsPage() {
     }
 
     if (!profile.desiredMoveIn || !profile.phone || profile.message.trim().length < 20) {
-      setMessage('Completa fecha de ingreso, telefono y un mensaje claro de al menos 20 caracteres.');
+      setMessage('Completa fecha de ingreso, teléfono y un mensaje claro de al menos 20 caracteres.');
       return;
     }
 
@@ -163,7 +163,7 @@ export function ApplicationDocumentsPage() {
     );
 
     if (missingDocuments.length) {
-      setMessage('Antes de enviar, carga todos los documentos obligatorios y revisa los que pidan correccion.');
+      setMessage('Antes de enviar, carga todos los documentos obligatorios y revisa los que pidan corrección.');
       return;
     }
 
@@ -279,8 +279,8 @@ export function ApplicationDocumentsPage() {
                   <div className="application-banner">
                     <ShieldCheck size={16} />
                     <span>
-                      Esta solicitud puede continuar, pero necesitara respaldo para mantenerse dentro
-                      del flujo estandar.
+                      Esta solicitud puede continuar, pero necesitará respaldo para mantenerse dentro
+                      del flujo estándar.
                     </span>
                   </div>
                 ) : null}
@@ -321,7 +321,7 @@ export function ApplicationDocumentsPage() {
 
                 <div className="field-grid">
                   <div className="field-group">
-                    <label htmlFor="applicationPhone">Telefono</label>
+                    <label htmlFor="applicationPhone">Teléfono</label>
                     <input
                       id="applicationPhone"
                       value={profile.phone}
@@ -384,9 +384,9 @@ export function ApplicationDocumentsPage() {
                   Volver a precalificacion
                 </Link>
                 <button className="button" type="submit" disabled={submitting || !isAuthenticated}>
-                  {submitting ? 'Enviando a revision...' : (
+                  {submitting ? 'Enviando a revisión...' : (
                     <>
-                      Enviar a revision
+                      Enviar a revisión
                       <ArrowRight size={16} />
                     </>
                   )}

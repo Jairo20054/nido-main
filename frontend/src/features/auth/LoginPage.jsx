@@ -7,8 +7,8 @@ import { resolvePostAuthDestination } from './authRedirects';
 
 /**
  * Componente de uso para el ingreso principal.
- * Se utiliza en rutas publicas y decide a donde redirigir al usuario despues del login:
- * la ruta pendiente, su panel operativo o su cuenta segun el rol autenticado.
+ * Se utiliza en rutas públicas y decide a dónde redirigir al usuario después del login:
+ * la ruta pendiente, su panel operativo o su cuenta según el rol autenticado.
  */
 export function LoginPage() {
   const navigate = useNavigate();
@@ -68,7 +68,7 @@ export function LoginPage() {
             onClick={handleGoogleSignIn}
           />
           <div className="auth-divider" aria-hidden="true">
-            <span>o continua con tu correo</span>
+            <span>o continúa con tu correo</span>
           </div>
         </div>
 
@@ -90,7 +90,7 @@ export function LoginPage() {
           </div>
 
           <div className="field-group">
-            <label htmlFor="password">Contrasena</label>
+            <label htmlFor="password">Contraseña</label>
             <input
               id="password"
               type="password"
@@ -105,7 +105,7 @@ export function LoginPage() {
 
           <div className="auth-form__footer">
             <Link to="/forgot-password" className="auth-form__link">
-              Olvidaste tu contrasena?
+              ¿Olvidaste tu contraseña?
             </Link>
             <Link to="/register" className="auth-form__link">
               Crear cuenta

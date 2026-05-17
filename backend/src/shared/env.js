@@ -27,6 +27,9 @@ const isPlaceholder = (value) =>
     /^your-(anon|publishable|secret|service)/i.test(value.trim()));
 
 const clean = (value) => (isPlaceholder(value) ? '' : value);
+const isPublicSupabaseKey = (value) =>
+  typeof value === 'string' &&
+  (/^sb_publishable_/i.test(value.trim()) || /^eyJ/i.test(value.trim()));
 const splitOrigins = (value) =>
   String(value || '')
     .split(',')
@@ -47,10 +50,13 @@ const env = {
   CLIENT_URLS: clientUrls.length ? clientUrls : ['http://localhost:5173'],
   SUPABASE_URL: clean(process.env.SUPABASE_URL) || clean(process.env.VITE_SUPABASE_URL) || '',
   SUPABASE_ANON_KEY:
-    clean(process.env.SUPABASE_PUBLISHABLE_KEY) ||
-    clean(process.env.SUPABASE_ANON_KEY) ||
-    clean(process.env.VITE_SUPABASE_PUBLISHABLE_KEY) ||
-    clean(process.env.VITE_SUPABASE_ANON_KEY) ||
+    (isPublicSupabaseKey(clean(process.env.SUPABASE_PUBLISHABLE_KEY)) &&
+      clean(process.env.SUPABASE_PUBLISHABLE_KEY)) ||
+    (isPublicSupabaseKey(clean(process.env.SUPABASE_ANON_KEY)) && clean(process.env.SUPABASE_ANON_KEY)) ||
+    (isPublicSupabaseKey(clean(process.env.VITE_SUPABASE_PUBLISHABLE_KEY)) &&
+      clean(process.env.VITE_SUPABASE_PUBLISHABLE_KEY)) ||
+    (isPublicSupabaseKey(clean(process.env.VITE_SUPABASE_ANON_KEY)) &&
+      clean(process.env.VITE_SUPABASE_ANON_KEY)) ||
     '',
   SUPABASE_SERVICE_ROLE_KEY:
     clean(process.env.SUPABASE_SECRET_KEY) ||

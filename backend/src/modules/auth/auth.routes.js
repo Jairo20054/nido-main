@@ -16,7 +16,7 @@ const authLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000,
   max: 10,
   keyPrefix: 'auth',
-  message: 'Demasiados intentos de autenticacion. Intenta nuevamente en unos minutos',
+  message: 'Demasiados intentos de autenticación. Intenta nuevamente en unos minutos',
 });
 
 router.post('/register', authLimiter, validate(registerSchema), asyncHandler(controller.register));

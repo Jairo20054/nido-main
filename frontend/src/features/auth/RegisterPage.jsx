@@ -6,8 +6,8 @@ import { GoogleAuthButton } from './GoogleAuthButton';
 import { resolvePostAuthDestination } from './authRedirects';
 
 /**
- * Componente de uso para el registro publico.
- * Permite crear cuentas de arrendatario o arrendador y deja la administracion
+ * Componente de uso para el registro público.
+ * Permite crear cuentas de arrendatario o arrendador y deja la administración
  * fuera del flujo abierto para evitar altas accidentales de usuarios privilegiados.
  */
 export function RegisterPage() {
@@ -45,7 +45,7 @@ export function RegisterPage() {
     setMessage('');
 
     if (form.password !== form.confirmPassword) {
-      setError('Las contrasenas no coinciden.');
+      setError('Las contraseñas no coinciden.');
       setSubmitting(false);
       return;
     }
@@ -61,7 +61,7 @@ export function RegisterPage() {
       });
 
       if (result.requiresEmailConfirmation) {
-        setMessage('Revisa tu correo para activar la cuenta y luego inicia sesion.');
+        setMessage('Revisa tu correo para activar la cuenta y luego inicia sesión.');
         return;
       }
 
@@ -139,7 +139,7 @@ export function RegisterPage() {
               />
             </div>
             <div className="field-group">
-              <label htmlFor="phone">Telefono</label>
+              <label htmlFor="phone">Teléfono</label>
               <input
                 id="phone"
                 value={form.phone}
@@ -150,7 +150,7 @@ export function RegisterPage() {
           </div>
           <div className="field-grid">
             <div className="field-group">
-              <label htmlFor="password">Contrasena</label>
+              <label htmlFor="password">Contraseña</label>
               <input
                 id="password"
                 type="password"
@@ -162,7 +162,7 @@ export function RegisterPage() {
               />
             </div>
             <div className="field-group">
-              <label htmlFor="confirmPassword">Confirmar contrasena</label>
+              <label htmlFor="confirmPassword">Confirmar contraseña</label>
               <input
                 id="confirmPassword"
                 type="password"
@@ -191,7 +191,7 @@ export function RegisterPage() {
           </button>
           <div className="auth-form__footer">
             <Link to="/login" className="auth-form__link">
-              Ya tienes cuenta? Ingresar
+              ¿Ya tienes cuenta? Ingresar
             </Link>
           </div>
         </form>

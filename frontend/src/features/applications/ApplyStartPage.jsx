@@ -19,7 +19,7 @@ export function ApplyStartPage() {
     return (
       <EmptyState
         title="No pudimos abrir este flujo"
-        description={error || 'La propiedad ya no esta disponible para aplicar.'}
+        description={error || 'La propiedad ya no está disponible para aplicar.'}
       />
     );
   }
@@ -68,7 +68,7 @@ export function ApplyStartPage() {
                 </div>
                 <div>
                   <strong>3. Revision y trazabilidad</strong>
-                  <p>Veras el estado del proceso sin arbitrariedad ni pasos ocultos.</p>
+                  <p>Verás el estado del proceso sin arbitrariedad ni pasos ocultos.</p>
                 </div>
               </div>
 

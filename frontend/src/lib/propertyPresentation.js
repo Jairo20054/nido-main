@@ -33,7 +33,7 @@ export const getPropertyTrustLabel = (property) => {
     return 'Lista para mudarte';
   }
 
-  return 'Publicacion activa';
+  return 'Publicación activa';
 };
 
 export const getPropertyReputationLabel = (property) => {
@@ -42,7 +42,7 @@ export const getPropertyReputationLabel = (property) => {
   }
 
   if ((property?.requestCount || 0) > 0) {
-    return 'Con interes';
+    return 'Con interés';
   }
 
   if (property?.furnished || property?.utilitiesIncluded) {

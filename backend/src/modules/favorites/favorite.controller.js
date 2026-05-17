@@ -55,7 +55,7 @@ const addFavorite = async (req, res) => {
   });
 
   if (!property) {
-    throw notFound('La propiedad no esta disponible');
+    throw notFound('La propiedad no está disponible');
   }
 
   await prisma.favorite.upsert({

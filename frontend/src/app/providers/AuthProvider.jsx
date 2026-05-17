@@ -1,4 +1,12 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { api } from '../../lib/apiClient';
 import { clearAuthToken, setAuthToken } from '../../lib/authToken';
 import {
@@ -11,7 +19,7 @@ import { normalizeAuthRedirectPath } from '../../features/auth/authRedirects';
 
 const AuthContext = createContext(null);
 
-const normalizeAuthError = (error, fallback = 'No fue posible completar la autenticacion.') => {
+const normalizeAuthError = (error, fallback = 'No fue posible completar la autenticación.') => {
   const message = error?.message || fallback;
   const normalized = message.toLowerCase();
 
@@ -20,11 +28,11 @@ const normalizeAuthError = (error, fallback = 'No fue posible completar la auten
     normalized.includes('email not confirmed') ||
     normalized.includes('invalid credentials')
   ) {
-    return new Error('Correo o contrasena incorrectos, o la cuenta aun no esta confirmada.');
+    return new Error('Correo o contraseña incorrectos, o la cuenta aún no está confirmada.');
   }
 
   if (normalized.includes('failed to fetch') || normalized.includes('network')) {
-    return new Error('No pudimos conectar con el servicio de autenticacion. Intenta de nuevo.');
+    return new Error('No pudimos conectar con el servicio de autenticación. Intenta nuevamente.');
   }
 
   if (
@@ -32,7 +40,7 @@ const normalizeAuthError = (error, fallback = 'No fue posible completar la auten
     normalized.includes('provider') ||
     normalized.includes('access_denied')
   ) {
-    return new Error('No pudimos completar el ingreso con Google. Intenta de nuevo.');
+    return new Error('No pudimos completar el ingreso con Google. Intenta nuevamente.');
   }
 
   return new Error(message);
@@ -71,11 +79,11 @@ const validateRegisterPayload = (payload) => {
   }
 
   if (!String(payload.password || '').trim()) {
-    throw new Error('Ingresa la contrasena.');
+    throw new Error('Ingresa la contraseña.');
   }
 
   if (String(payload.password || '').length < 8) {
-    throw new Error('La contrasena debe tener al menos 8 caracteres.');
+    throw new Error('La contraseña debe tener al menos 8 caracteres.');
   }
 };
 
@@ -93,7 +101,7 @@ export function AuthProvider({ children }) {
   const authTaskTimers = useRef(new Set());
 
   // Rehidrata el estado local cada vez que cambia la sesion remota.
-  const hydrateSession = async (nextSession, options = {}) => {
+  const hydrateSession = useCallback(async (nextSession, options = {}) => {
     try {
       if (!nextSession?.access_token) {
         clearAuthToken();
@@ -124,15 +132,15 @@ export function AuthProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     const {
       data: { session: currentSession },
     } = await supabase.auth.getSession();
 
     return hydrateSession(currentSession, { keepError: true });
-  };
+  }, [hydrateSession]);
 
   useEffect(() => {
     let mounted = true;
@@ -208,7 +216,7 @@ export function AuthProvider({ children }) {
       authTaskTimers.current.clear();
       subscription.unsubscribe();
     };
-  }, []);
+  }, [hydrateSession]);
 
   const sessionFromApiPayload = (payload) => ({
     access_token: payload?.token || null,
@@ -225,7 +233,7 @@ export function AuthProvider({ children }) {
     }
 
     if (!String(password || '').trim()) {
-      throw new Error('Ingresa la contrasena.');
+      throw new Error('Ingresa la contraseña.');
     }
 
     const response = await api.post(
@@ -239,7 +247,7 @@ export function AuthProvider({ children }) {
     const payload = response.data;
 
     if (!payload?.token || !payload?.refreshToken) {
-      throw new Error('Sesion no pudo ser establecida.');
+      throw new Error('No pudimos establecer la sesión.');
     }
 
     const nextSession = sessionFromApiPayload(payload);
@@ -251,7 +259,7 @@ export function AuthProvider({ children }) {
       });
 
       if (error) {
-        throw normalizeAuthError(error, 'Sesion creada, pero no fue posible persistirla.');
+        throw normalizeAuthError(error, 'Sesión creada, pero no fue posible persistirla.');
       }
 
       if (data.session?.access_token) {
@@ -358,7 +366,7 @@ export function AuthProvider({ children }) {
     });
 
     if (error) {
-      throw normalizeAuthError(error, 'No fue posible enviar el enlace de recuperacion.');
+      throw normalizeAuthError(error, 'No fue posible enviar el enlace de recuperación.');
     }
   };
 
@@ -368,7 +376,7 @@ export function AuthProvider({ children }) {
     });
 
     if (error) {
-      throw normalizeAuthError(error, 'No fue posible actualizar la contrasena.');
+      throw normalizeAuthError(error, 'No fue posible actualizar la contraseña.');
     }
 
     setIsPasswordRecovery(false);
@@ -391,7 +399,7 @@ export function AuthProvider({ children }) {
     return response.data;
   };
 
-  const value = {
+  const value = useMemo(() => ({
     authError,
     devLogin,
     forgotPassword,
@@ -411,7 +419,14 @@ export function AuthProvider({ children }) {
     signInWithGoogle,
     updateProfile,
     user,
-  };
+  }), [
+    authError,
+    isPasswordRecovery,
+    loading,
+    session,
+    user,
+    refreshUser,
+  ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
