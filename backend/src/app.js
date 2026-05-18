@@ -1,6 +1,7 @@
 const cors = require('cors');
 const express = require('express');
 const { env } = require('./shared/env');
+const { buildAllowedOrigins, createCorsOptions, formatAllowedOriginsForLog } = require('./shared/cors');
 const { errorHandler } = require('./shared/errorHandler');
 const routes = require('./routes');
 
@@ -19,18 +20,22 @@ app.use((_req, res, next) => {
   next();
 });
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || env.CLIENT_URLS.includes(origin)) {
-        return callback(null, true);
-      }
+const allowedOrigins = buildAllowedOrigins({
+  nodeEnv: env.NODE_ENV,
+  clientUrl: env.CLIENT_URL,
+  clientUrls: env.CLIENT_URLS,
+  clientOrigin: process.env.CLIENT_ORIGIN,
+});
+const corsOptions = createCorsOptions({
+  allowedOrigins,
+  credentials: true,
+  allowRequestsWithoutOrigin: true,
+});
 
-      return callback(null, false);
-    },
-    credentials: true,
-  })
-);
+console.log(`[CORS] Origenes permitidos (${env.NODE_ENV}): ${formatAllowedOriginsForLog(allowedOrigins)}`);
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 

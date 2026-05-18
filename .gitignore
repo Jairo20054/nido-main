@@ -1,5 +1,9 @@
 node_modules/
+node_modules
 dist/
+dist
+build/
+build
 nido-main/
 .continue/
 skills/
@@ -8,9 +12,14 @@ gh/
 gh.zip
 supabase/.temp/
 .env
+.env.local
 backend/.env
+.codex-artifacts/
+.prisma/
 .DS_Store
 coverage/
+coverage
 backend/prisma/dev.db
 backend/prisma/dev.db-journal
 npm-debug.log*
+*.log

@@ -43,17 +43,23 @@ const splitOrigins = (value) =>
     .map((origin) => origin.replace(/\/$/, ''))
     .filter(Boolean);
 
-const configuredClientOrigins =
-  process.env.CLIENT_URLS || process.env.CLIENT_URL || process.env.CLIENT_ORIGIN || 'http://localhost:5173';
-const clientUrls = splitOrigins(configuredClientOrigins);
+const defaultDevClientUrls = ['http://localhost:5173', 'http://127.0.0.1:5173'];
+const configuredClientOrigins = [
+  ...splitOrigins(process.env.CLIENT_URL),
+  ...splitOrigins(process.env.CLIENT_URLS),
+  ...splitOrigins(process.env.CLIENT_ORIGIN),
+].filter((origin) => origin !== '*');
+const clientUrls = [
+  ...new Set(isProduction ? configuredClientOrigins : [...defaultDevClientUrls, ...configuredClientOrigins]),
+];
 
 const env = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: Number(process.env.PORT || 5000),
   DATABASE_URL: process.env.DATABASE_URL || '',
   DIRECT_URL: process.env.DIRECT_URL || '',
-  CLIENT_URL: clientUrls[0] || 'http://localhost:5173',
-  CLIENT_URLS: clientUrls.length ? clientUrls : ['http://localhost:5173'],
+  CLIENT_URL: clientUrls[0] || defaultDevClientUrls[0],
+  CLIENT_URLS: clientUrls.length ? clientUrls : [...defaultDevClientUrls],
   SUPABASE_URL: clean(process.env.SUPABASE_URL) || clean(process.env.VITE_SUPABASE_URL) || '',
   SUPABASE_ANON_KEY:
     (isPublicSupabaseKey(clean(process.env.SUPABASE_PUBLISHABLE_KEY)) &&
@@ -73,12 +79,19 @@ const env = {
     process.env.SUPABASE_PROPERTY_MEDIA_BUCKET ||
     process.env.VITE_SUPABASE_PROPERTY_MEDIA_BUCKET ||
     'property-media-public',
-  DEEPSEK_API_KEY: process.env.DEEPSEK_API_KEY || process.env.VITE_DEEPSEK_API_KEY || '',
+  DEEPSEK_API_KEY: process.env.DEEPSEK_API_KEY || '',
   DEEPSEK_API_BASE: process.env.DEEPSEK_API_BASE || 'https://api.deepsek.ai',
 };
 
 if (isProduction) {
   const missing = [];
+  const allowedPublicKeys = new Set(['VITE_SUPABASE_ANON_KEY', 'VITE_SUPABASE_PUBLISHABLE_KEY']);
+  const publicSecretEnvNames = Object.keys(process.env).filter(
+    (key) =>
+      key.startsWith('VITE_') &&
+      (/(SERVICE|SECRET|PRIVATE|JWT|PASSWORD|TOKEN)/i.test(key) ||
+        (/KEY/i.test(key) && !allowedPublicKeys.has(key)))
+  );
 
   if (!process.env.DATABASE_URL) missing.push('DATABASE_URL');
   if (!process.env.CLIENT_URL && !process.env.CLIENT_URLS && !process.env.CLIENT_ORIGIN) {
@@ -90,6 +103,10 @@ if (isProduction) {
 
   if (env.CLIENT_URLS.includes('*')) {
     missing.push('CLIENT_URLS no puede contener *');
+  }
+
+  if (publicSecretEnvNames.length) {
+    missing.push(`Variables sensibles no pueden usar prefijo VITE_: ${publicSecretEnvNames.join(', ')}`);
   }
 
   if (missing.length) {
