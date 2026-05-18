@@ -4,7 +4,7 @@
   "private": true,
   "description": "Plataforma minimalista para arrendamiento de propiedades",
   "scripts": {
-    "postinstall": "prisma generate --schema backend/prisma/schema.prisma",
+    "postinstall": "node scripts/prisma-generate-safe.js",
     "prestart": "node scripts/prestart.js",
     "dev": "node scripts/dev.js",
     "predev": "node scripts/prestart.js",
@@ -18,7 +18,8 @@
     "start": "node backend/src/server.js",
     "auth:bootstrap-admin": "node scripts/bootstrap-admin.js",
     "supabase:create-admin": "node backend/scripts/create-supabase-admin.js",
-    "prisma:generate": "prisma generate --schema backend/prisma/schema.prisma",
+    "prisma:doctor": "node scripts/prisma-generate-safe.js --check",
+    "prisma:generate": "node scripts/prisma-generate-safe.js",
     "prisma:push": "prisma db push --schema backend/prisma/schema.prisma",
     "prisma:seed": "prisma db seed"
   },

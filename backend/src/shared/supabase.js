@@ -33,7 +33,9 @@ const createSupabaseClient = (key, authOptions = {}) => {
 };
 
 // Cliente anonimo para operaciones de usuario final y cliente service para tareas administrativas.
-const supabaseAnon = createSupabaseClient(env.SUPABASE_ANON_KEY || supabaseServiceRoleKey);
+// Nunca se usa service_role como reemplazo del anon key: aunque sea backend, mezclar
+// privilegios vuelve peligrosos los flujos de registro/login y dificulta auditar RLS.
+const supabaseAnon = createSupabaseClient(env.SUPABASE_ANON_KEY);
 const supabaseService = createSupabaseClient(supabaseServiceRoleKey);
 
 module.exports = {

@@ -73,12 +73,19 @@ const env = {
     process.env.SUPABASE_PROPERTY_MEDIA_BUCKET ||
     process.env.VITE_SUPABASE_PROPERTY_MEDIA_BUCKET ||
     'property-media-public',
-  DEEPSEK_API_KEY: process.env.DEEPSEK_API_KEY || process.env.VITE_DEEPSEK_API_KEY || '',
+  DEEPSEK_API_KEY: process.env.DEEPSEK_API_KEY || '',
   DEEPSEK_API_BASE: process.env.DEEPSEK_API_BASE || 'https://api.deepsek.ai',
 };
 
 if (isProduction) {
   const missing = [];
+  const allowedPublicKeys = new Set(['VITE_SUPABASE_ANON_KEY', 'VITE_SUPABASE_PUBLISHABLE_KEY']);
+  const publicSecretEnvNames = Object.keys(process.env).filter(
+    (key) =>
+      key.startsWith('VITE_') &&
+      (/(SERVICE|SECRET|PRIVATE|JWT|PASSWORD|TOKEN)/i.test(key) ||
+        (/KEY/i.test(key) && !allowedPublicKeys.has(key)))
+  );
 
   if (!process.env.DATABASE_URL) missing.push('DATABASE_URL');
   if (!process.env.CLIENT_URL && !process.env.CLIENT_URLS && !process.env.CLIENT_ORIGIN) {
@@ -90,6 +97,10 @@ if (isProduction) {
 
   if (env.CLIENT_URLS.includes('*')) {
     missing.push('CLIENT_URLS no puede contener *');
+  }
+
+  if (publicSecretEnvNames.length) {
+    missing.push(`Variables sensibles no pueden usar prefijo VITE_: ${publicSecretEnvNames.join(', ')}`);
   }
 
   if (missing.length) {

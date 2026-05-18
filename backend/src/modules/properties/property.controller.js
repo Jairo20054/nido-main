@@ -7,6 +7,12 @@ const { badRequest, forbidden, notFound } = require('../../shared/errors');
 const { buildPaginationMeta, getPagination } = require('../../shared/pagination');
 const { slugify } = require('../../shared/slugify');
 const { serializeProperty } = require('../../shared/serializers');
+const {
+  assertUserCanCreateProperties,
+  assertValidId,
+  assertValidUuid,
+  getAuthenticatedDatabaseUserOrThrow,
+} = require('../users/user.service');
 
 const PUBLIC_STATUSES = [PropertyStatus.PUBLISHED];
 const ADMIN_VISIBLE_STATUSES = Object.values(PropertyStatus);
@@ -17,6 +23,7 @@ const LANDLORD_ALLOWED_CREATE_STATUSES = [
 ];
 const PROPERTY_MEDIA_BUCKET = env.SUPABASE_PROPERTY_MEDIA_BUCKET || 'property-media-public';
 const PRISMA_UNAVAILABLE_CODES = ['P1000', 'P1001', 'P1012', 'P2021'];
+const MAX_SLUG_CREATE_ATTEMPTS = 5;
 
 // Include reutilizable para las lecturas de propiedades. Agrega favoritos solo cuando
 // hay usuario autenticado para no consultar relaciones innecesarias en publico.
@@ -114,7 +121,7 @@ const normalizePropertyInput = (payload = {}) => ({
 const getCoverImage = (payload, fallback = null) =>
   payload.media.find((item) => item.type === MediaType.IMAGE)?.url || fallback;
 
-// Reconstruye el path interno de Storage para poder limpiar assets huérfanos
+// Reconstruye el path interno de Storage para poder limpiar assets huerfanos
 // despues de editar o eliminar una propiedad.
 const deriveStoragePathFromUrl = (url) => {
   if (!url || typeof url !== 'string') {
@@ -155,11 +162,41 @@ const cleanupPropertyMediaAssets = async (mediaUrls = []) => {
   }
 };
 
-// Genera un slug estable y suficientemente unico para URLs amigables.
-const generateSlug = async (title, city, propertyId = '') => {
-  const base = slugify(`${title}-${city}`);
-  const shortId = propertyId ? propertyId.slice(-6) : randomBytes(4).toString('hex');
-  return `${base}-${shortId}`;
+const slugCollisionPattern = (base) => new RegExp(`^${base.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:-(\\d+))?$`);
+
+// Genera slugs legibles e incrementales. La restriccion unique sigue siendo la
+// proteccion final ante concurrencia; createProperty reintenta si Postgres gana la carrera.
+const generateUniqueSlug = async (tx, title, city) => {
+  const base = slugify(`${title}-${city}`) || `propiedad-${randomBytes(3).toString('hex')}`;
+  const siblings = await tx.property.findMany({
+    where: {
+      slug: {
+        startsWith: base,
+      },
+    },
+    select: {
+      slug: true,
+    },
+  });
+  const taken = new Set(siblings.map((item) => item.slug));
+
+  if (!taken.has(base)) {
+    return base;
+  }
+
+  const pattern = slugCollisionPattern(base);
+  const suffixes = siblings
+    .map((item) => item.slug.match(pattern)?.[1])
+    .filter(Boolean)
+    .map(Number)
+    .filter(Number.isInteger);
+  let next = Math.max(1, ...suffixes) + 1;
+
+  while (taken.has(`${base}-${next}`)) {
+    next += 1;
+  }
+
+  return `${base}-${next}`;
 };
 
 // Reglas de permisos y transicion de estados.
@@ -172,6 +209,37 @@ const assertLandlordOrAdmin = (user) => {
   if (![UserRole.LANDLORD, UserRole.ADMIN].includes(user.role)) {
     throw forbidden('Solo un arrendador o administrador puede gestionar propiedades');
   }
+};
+
+const isUniqueSlugError = (error) =>
+  error instanceof Prisma.PrismaClientKnownRequestError &&
+  error.code === 'P2002' &&
+  (Array.isArray(error.meta?.target)
+    ? error.meta.target.includes('slug')
+    : String(error.meta?.target || '').includes('slug'));
+
+const isRetriablePropertyCreateError = (error) =>
+  isUniqueSlugError(error) ||
+  (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2034');
+
+const validatePropertyRelations = async ({ tx, user }) => {
+  assertValidId(user?.id, 'ownerId');
+  assertValidUuid(user.id, 'ownerId');
+  assertUserCanCreateProperties(user);
+
+  const owner = await tx.user.findUnique({
+    where: { id: user.id },
+  });
+
+  if (!owner) {
+    throw badRequest('El usuario autenticado no existe en la base de datos operacional');
+  }
+
+  assertUserCanCreateProperties(owner);
+
+  return {
+    owner,
+  };
 };
 
 // Controla que un arrendador no pueda autopublicar sin pasar por revision.
@@ -190,6 +258,94 @@ const resolveStatusForCreation = (user, requestedStatus) => {
 
   return requestedStatus || PropertyStatus.DRAFT;
 };
+
+const buildPropertyCreateData = ({ payload, ownerId, slug, finalStatus }) => ({
+  slug,
+  owner: {
+    connect: { id: ownerId },
+  },
+  title: payload.title,
+  summary: payload.summary,
+  description: payload.description,
+  propertyType: payload.propertyType,
+  rentalType: payload.rentalType,
+  status: finalStatus,
+  city: payload.city,
+  department: payload.department,
+  neighborhood: payload.neighborhood,
+  addressLine: payload.addressLine,
+  addressDetail: payload.addressDetail,
+  hideExactAddress: payload.hideExactAddress,
+  zoneReference: payload.zoneReference,
+  monthlyRent: payload.monthlyRent,
+  maintenanceFee: payload.maintenanceFee,
+  administrationIncluded: payload.administrationIncluded,
+  securityDeposit: payload.securityDeposit,
+  depositRequired: payload.depositRequired,
+  servicesIncluded: payload.servicesIncluded,
+  availableImmediately: payload.availableImmediately,
+  availableFrom: payload.availableFrom,
+  bedrooms: payload.bedrooms,
+  bathrooms: payload.bathrooms,
+  areaM2: payload.areaM2,
+  floor: payload.floor,
+  parkingSpots: payload.parkingSpots,
+  strata: payload.strata,
+  maxOccupants: payload.maxOccupants,
+  furnished: payload.furnished,
+  petsAllowed: payload.petsAllowed,
+  utilitiesIncluded: payload.utilitiesIncluded,
+  balcony: payload.balcony,
+  equippedKitchen: payload.equippedKitchen,
+  laundryArea: payload.laundryArea,
+  elevator: payload.elevator,
+  doorman: payload.doorman,
+  security: payload.security,
+  commonAreas: payload.commonAreas,
+  minLeaseMonths: payload.minLeaseMonths,
+  amenities: payload.amenities,
+  rules: payload.rules,
+  requirements: payload.requirements,
+  idealTenantProfile: payload.idealTenantProfile,
+  specialConditions: payload.specialConditions,
+  contactMethod: payload.contactMethod,
+  verificationDetails: payload.verificationDetails,
+  contactName: payload.contactName,
+  contactDocumentType: payload.contactDocumentType,
+  contactDocumentNumber: payload.contactDocumentNumber,
+  contactPhone: payload.contactPhone,
+  contactWhatsapp: payload.contactWhatsapp,
+  contactEmail: payload.contactEmail,
+  contactRelationship: payload.contactRelationship,
+  contactHours: payload.contactHours,
+  contactPreference: payload.contactPreference,
+  publishingAuthorization: payload.publishingAuthorization,
+  acceptsStudents: payload.acceptsStudents,
+  acceptsFamilies: payload.acceptsFamilies,
+  acceptsCosigner: payload.acceptsCosigner,
+  requiresRentalStudy: payload.requiresRentalStudy,
+  visitsAllowed: payload.visitsAllowed,
+  visitHours: payload.visitHours,
+  visitNotes: payload.visitNotes,
+  coverImage: getCoverImage(payload, null),
+  latitude: payload.latitude,
+  longitude: payload.longitude,
+  approvedAt:
+    finalStatus === PropertyStatus.APPROVED || finalStatus === PropertyStatus.PUBLISHED
+      ? new Date()
+      : null,
+  publishedAt: finalStatus === PropertyStatus.PUBLISHED ? new Date() : null,
+  media: {
+    create: payload.media.map((item) => ({
+      type: item.type,
+      url: item.url,
+      alt: item.alt,
+      position: item.position,
+      mimeType: item.mimeType,
+      sizeBytes: item.sizeBytes,
+    })),
+  },
+});
 
 // Controla que ciertas transiciones editoriales sigan siendo exclusivas de administracion.
 const resolveStatusForUpdate = (user, existing, requestedStatus) => {
@@ -220,13 +376,45 @@ const recordApprovalHistory = async ({ tx, propertyId, actorId, fromStatus, toSt
 
   await tx.propertyApprovalHistory.create({
     data: {
-      propertyId,
-      actorId,
+      property: {
+        connect: { id: propertyId },
+      },
+      actor: {
+        connect: { id: actorId },
+      },
       fromStatus,
       toStatus,
       note: note || null,
     },
   });
+};
+
+const createPropertyWithRelations = async ({ tx, authUser, payload }) => {
+  const actor = await getAuthenticatedDatabaseUserOrThrow(authUser, tx);
+  const { owner } = await validatePropertyRelations({ tx, user: actor });
+  const finalStatus = resolveStatusForCreation(owner, payload.status);
+  const slug = await generateUniqueSlug(tx, payload.title, payload.city);
+
+  const created = await tx.property.create({
+    data: buildPropertyCreateData({
+      payload,
+      ownerId: owner.id,
+      slug,
+      finalStatus,
+    }),
+    include: propertyInclude(owner.id),
+  });
+
+  await recordApprovalHistory({
+    tx,
+    propertyId: created.id,
+    actorId: owner.id,
+    fromStatus: null,
+    toStatus: finalStatus,
+    note: payload.reviewNote || (finalStatus === PropertyStatus.PENDING ? 'Enviada para revision' : null),
+  });
+
+  return created;
 };
 
 // Convierte query params del listado en filtros Prisma.
@@ -430,7 +618,7 @@ const getPropertyById = async (req, res) => {
   }
 
   if (!canManageProperty(req.user, property) && !PUBLIC_STATUSES.includes(property.status)) {
-    throw notFound('La propiedad no está disponible');
+    throw notFound('La propiedad no esta disponible');
   }
 
   res.json({
@@ -444,116 +632,31 @@ const createProperty = async (req, res) => {
   assertLandlordOrAdmin(req.user);
 
   const payload = normalizePropertyInput(req.body);
-  const finalStatus = resolveStatusForCreation(req.user, payload.status);
-  const slug = await generateSlug(payload.title, payload.city);
+  let property = null;
 
-  const property = await prisma.$transaction(async (tx) => {
-    const created = await tx.property.create({
-      data: {
-        slug,
-        ownerId: req.user.id,
-        title: payload.title,
-        summary: payload.summary,
-        description: payload.description,
-        propertyType: payload.propertyType,
-        rentalType: payload.rentalType,
-        status: finalStatus,
-        city: payload.city,
-        department: payload.department,
-        neighborhood: payload.neighborhood,
-        addressLine: payload.addressLine,
-        addressDetail: payload.addressDetail,
-        hideExactAddress: payload.hideExactAddress,
-        zoneReference: payload.zoneReference,
-        monthlyRent: payload.monthlyRent,
-        maintenanceFee: payload.maintenanceFee,
-        administrationIncluded: payload.administrationIncluded,
-        securityDeposit: payload.securityDeposit,
-        depositRequired: payload.depositRequired,
-        servicesIncluded: payload.servicesIncluded,
-        availableImmediately: payload.availableImmediately,
-        availableFrom: payload.availableFrom,
-        bedrooms: payload.bedrooms,
-        bathrooms: payload.bathrooms,
-        areaM2: payload.areaM2,
-        floor: payload.floor,
-        parkingSpots: payload.parkingSpots,
-        strata: payload.strata,
-        maxOccupants: payload.maxOccupants,
-        furnished: payload.furnished,
-        petsAllowed: payload.petsAllowed,
-        utilitiesIncluded: payload.utilitiesIncluded,
-        balcony: payload.balcony,
-        equippedKitchen: payload.equippedKitchen,
-        laundryArea: payload.laundryArea,
-        elevator: payload.elevator,
-        doorman: payload.doorman,
-        security: payload.security,
-        commonAreas: payload.commonAreas,
-        minLeaseMonths: payload.minLeaseMonths,
-        amenities: payload.amenities,
-        rules: payload.rules,
-        requirements: payload.requirements,
-        idealTenantProfile: payload.idealTenantProfile,
-        specialConditions: payload.specialConditions,
-        contactMethod: payload.contactMethod,
-        verificationDetails: payload.verificationDetails,
-        contactName: payload.contactName,
-        contactDocumentType: payload.contactDocumentType,
-        contactDocumentNumber: payload.contactDocumentNumber,
-        contactPhone: payload.contactPhone,
-        contactWhatsapp: payload.contactWhatsapp,
-        contactEmail: payload.contactEmail,
-        contactRelationship: payload.contactRelationship,
-        contactHours: payload.contactHours,
-        contactPreference: payload.contactPreference,
-        publishingAuthorization: payload.publishingAuthorization,
-        acceptsStudents: payload.acceptsStudents,
-        acceptsFamilies: payload.acceptsFamilies,
-        acceptsCosigner: payload.acceptsCosigner,
-        requiresRentalStudy: payload.requiresRentalStudy,
-        visitsAllowed: payload.visitsAllowed,
-        visitHours: payload.visitHours,
-        visitNotes: payload.visitNotes,
-        coverImage: getCoverImage(payload, null),
-        latitude: payload.latitude,
-        longitude: payload.longitude,
-        approvedAt:
-          finalStatus === PropertyStatus.APPROVED || finalStatus === PropertyStatus.PUBLISHED
-            ? new Date()
-            : null,
-        publishedAt: finalStatus === PropertyStatus.PUBLISHED ? new Date() : null,
-        media: {
-          create: payload.media.map((item) => ({
-            type: item.type,
-            url: item.url,
-            alt: item.alt,
-            position: item.position,
-            mimeType: item.mimeType,
-            sizeBytes: item.sizeBytes,
-          })),
-        },
-      },
-      include: propertyInclude(req.user.id),
-    });
+  for (let attempt = 0; attempt < MAX_SLUG_CREATE_ATTEMPTS; attempt += 1) {
+    try {
+      property = await prisma.$transaction(
+        (tx) => createPropertyWithRelations({ tx, authUser: req.user, payload }),
+        {
+          isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+        }
+      );
+      break;
+    } catch (error) {
+      if (isRetriablePropertyCreateError(error) && attempt < MAX_SLUG_CREATE_ATTEMPTS - 1) {
+        continue;
+      }
 
-    await recordApprovalHistory({
-      tx,
-      propertyId: created.id,
-      actorId: req.user.id,
-      fromStatus: null,
-      toStatus: finalStatus,
-      note: payload.reviewNote || (finalStatus === PropertyStatus.PENDING ? 'Enviada para revisión' : null),
-    });
-
-    return created;
-  });
+      throw error;
+    }
+  }
 
   res.status(201).json({
     success: true,
     message:
       property.status === PropertyStatus.PENDING
-        ? 'Tu propiedad fue enviada para revisión'
+        ? 'Tu propiedad fue enviada para revision'
         : 'Propiedad guardada correctamente',
     data: serializeProperty(property, req.user.id),
   });

@@ -1,6 +1,7 @@
 const { badRequest, forbidden, serviceUnavailable, unauthorized } = require('./errors');
 const { supabaseAnon } = require('./supabase');
 const { supabaseAdmin } = require('./supabaseAdmin');
+const { ensureDatabaseUserProfile } = require('../modules/users/user.service');
 
 // Capa transversal de autenticacion/autorizacion. Supabase Auth valida la identidad
 // y Supabase Postgres conserva el perfil operativo que usa el resto del dominio.
@@ -150,6 +151,64 @@ const profilePatchToRow = (patch) => {
   return row;
 };
 
+const isMissingSupabaseRelation = (error) =>
+  ['PGRST116', '42P01', '42703'].includes(error?.code) ||
+  /relation .* does not exist|column .* does not exist/i.test(error?.message || '');
+
+const safeSupabaseMutation = async (query, message) => {
+  const { error } = await query;
+
+  if (!error) {
+    return;
+  }
+
+  if (isMissingSupabaseRelation(error)) {
+    console.warn(`[Nido Auth] ${message}: esquema no disponible (${error.message})`);
+    return;
+  }
+
+  throw serviceUnavailable(message);
+};
+
+const ensureSupabaseRoleRows = async (profile) => {
+  if (!profile?.id) {
+    return;
+  }
+
+  const client = requireSupabaseAdmin();
+  const normalizedRole = safeRole(profile.role, 'TENANT');
+
+  if (normalizedRole === 'LANDLORD' || normalizedRole === 'ADMIN') {
+    await safeSupabaseMutation(
+      client
+        .from('landlords')
+        .upsert(
+          {
+            id: profile.id,
+            profile_id: profile.id,
+          },
+          { onConflict: 'profile_id' }
+        ),
+      'No fue posible sincronizar el perfil de arrendador en Supabase'
+    );
+  }
+
+  if (normalizedRole === 'TENANT') {
+    await safeSupabaseMutation(
+      client
+        .from('tenants')
+        .upsert(
+          {
+            id: profile.id,
+            profile_id: profile.id,
+          },
+          { onConflict: 'profile_id' }
+        ),
+      'No fue posible sincronizar el perfil de arrendatario en Supabase'
+    );
+  }
+};
+
 const fetchProfileById = async (profileId) => {
   const client = requireSupabaseAdmin();
   const { data, error } = await client
@@ -185,13 +244,22 @@ const ensureProfile = async (authUser) => {
 
     if (error) {
       if (error.code === '23505') {
-        return fetchProfileById(authUser.id);
+        const existingProfile = await fetchProfileById(authUser.id);
+
+        if (!existingProfile) {
+          throw serviceUnavailable('No fue posible crear tu perfil en Supabase por un conflicto de datos');
+        }
+
+        await ensureSupabaseRoleRows(existingProfile);
+        return existingProfile;
       }
 
       throw serviceUnavailable('No fue posible crear tu perfil en Supabase');
     }
 
-    return profileRowToUser(data);
+    const createdProfile = profileRowToUser(data);
+    await ensureSupabaseRoleRows(createdProfile);
+    return createdProfile;
   }
   const patch = {};
 
@@ -216,6 +284,7 @@ const ensureProfile = async (authUser) => {
   }
 
   if (!Object.keys(patch).length) {
+    await ensureSupabaseRoleRows(syncedProfile);
     return syncedProfile;
   }
 
@@ -233,7 +302,9 @@ const ensureProfile = async (authUser) => {
     throw serviceUnavailable('No fue posible actualizar tu perfil en Supabase');
   }
 
-  return profileRowToUser(data);
+  const updatedProfile = profileRowToUser(data);
+  await ensureSupabaseRoleRows(updatedProfile);
+  return updatedProfile;
 };
 
 const tryAdminQuery = async (query) => {
@@ -379,7 +450,13 @@ const attachUser = async (req, strict) => {
       throw serviceUnavailable('No fue posible cargar tu perfil. Intenta nuevamente en unos minutos.');
     }
 
-    req.user = await decorateProfile(userData.user, profile);
+    const decoratedProfile = await decorateProfile(userData.user, profile);
+    const databaseProfile = await ensureDatabaseUserProfile(decoratedProfile);
+
+    req.user = {
+      ...decoratedProfile,
+      role: databaseProfile.role,
+    };
   } catch (profileError) {
     if (strict) {
       throw profileError?.statusCode

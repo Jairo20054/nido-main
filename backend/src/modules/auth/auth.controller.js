@@ -3,6 +3,7 @@ const { supabaseAnon } = require('../../shared/supabase');
 const { decorateProfile, ensureProfile } = require('../../shared/auth');
 const { serializeUser } = require('../../shared/serializers');
 const { env } = require('../../shared/env');
+const { ensureDatabaseUserProfile } = require('../users/user.service');
 
 // Normaliza la respuesta de autenticacion para que el frontend reciba siempre
 // token, expiracion y perfil bajo la misma estructura.
@@ -81,6 +82,13 @@ const register = async (req, res) => {
 
   const profile = data.user ? await ensureProfile(data.user) : null;
   const decoratedProfile = profile ? await decorateProfile(data.user, profile) : null;
+  const databaseProfile = decoratedProfile ? await ensureDatabaseUserProfile(decoratedProfile) : null;
+  const syncedProfile = decoratedProfile
+    ? {
+        ...decoratedProfile,
+        role: databaseProfile.role,
+      }
+    : null;
 
   res.status(201).json({
     success: true,
@@ -88,7 +96,7 @@ const register = async (req, res) => {
       ? 'Cuenta creada correctamente.'
       : 'Cuenta creada. Revisa tu correo para confirmar el acceso.',
     data: {
-      ...buildAuthPayload(data.session, decoratedProfile),
+      ...buildAuthPayload(data.session, syncedProfile),
       requiresEmailConfirmation: !data.session,
     },
   });
@@ -114,11 +122,16 @@ const login = async (req, res) => {
 
   const profile = await ensureProfile(data.user);
   const decoratedProfile = await decorateProfile(data.user, profile);
+  const databaseProfile = await ensureDatabaseUserProfile(decoratedProfile);
+  const syncedProfile = {
+    ...decoratedProfile,
+    role: databaseProfile.role,
+  };
 
   res.json({
     success: true,
     message: 'Sesión iniciada',
-    data: buildAuthPayload(data.session, decoratedProfile),
+    data: buildAuthPayload(data.session, syncedProfile),
   });
 };
 
