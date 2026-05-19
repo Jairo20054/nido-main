@@ -1,6 +1,6 @@
 import React from 'react';
 
-// Pie de pagina minimalista con contexto de marca y cobertura geografica.
+// Pie de pagina minimalista. con contexto de marca y cobertura geografica.
 export function SiteFooter() {
   return (
     <footer className="site-footer">
