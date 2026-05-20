@@ -6,7 +6,7 @@ import { SelectField, TextField, ToggleField } from './FormControls';
 const CONTACT_PREFERENCE_OPTIONS = [
   { value: 'WHATSAPP', label: 'WhatsApp' },
   { value: 'PHONE', label: 'Llamada' },
-  { value: 'EMAIL', label: 'Correo electronico' },
+  { value: 'EMAIL', label: 'Correo electrónico' },
 ];
 
 const formatCurrency = (value) =>
@@ -18,19 +18,19 @@ export function PreviewStep({ canPublishDirectly, completionChecks, errors, form
 
   const summaryCards = [
     { label: 'Tipo', value: propertyType },
-    { label: 'Operacion', value: 'Arriendo' },
-    { label: 'Ubicacion', value: [form.city, form.department].filter(Boolean).join(', ') || 'Sin definir' },
+    { label: 'Operación', value: 'Arriendo' },
+    { label: 'Ubicación', value: [form.city, form.department].filter(Boolean).join(', ') || 'Sin definir' },
     { label: 'Valor mensual', value: formatCurrency(form.monthlyRent) },
     { label: 'Area', value: form.areaM2 ? `${form.areaM2} m2` : 'Pendiente' },
-    { label: 'Imagenes', value: String(imageCount) },
+    { label: 'Imágenes', value: String(imageCount) },
   ];
 
   return (
     <div className="form-step property-step">
       <div className="property-step__heading">
-        <span>Vista previa y publicacion</span>
+        <span>Vista previa y publicación</span>
         <h3>Revisa antes de enviar</h3>
-        <p>Confirma los datos esenciales y el contacto que usara NIDO para validar la publicacion.</p>
+        <p>Confirma los datos esenciales y el contacto que usará NIDO para validar la publicación.</p>
       </div>
 
       <div className="summary-grid">
@@ -47,13 +47,13 @@ export function PreviewStep({ canPublishDirectly, completionChecks, errors, form
         <div>
           <span className="section__eyebrow">Vista previa</span>
           <h3>{form.title || 'Titulo pendiente'}</h3>
-          <p>{form.summary || 'Agrega una descripcion breve para que la propiedad se entienda rapido.'}</p>
+          <p>{form.summary || 'Agrega una descripción breve para que la propiedad se entienda rápido.'}</p>
           <strong>{formatCurrency(form.monthlyRent)} / mes</strong>
         </div>
       </div>
 
       <div className="publication-checklist">
-        <h4>Estado de la publicacion</h4>
+        <h4>Estado de la publicación</h4>
         <div className="completion-list">
           {completionChecks.map((check) => (
             <div key={check.label} className={check.done ? 'completion-list__item completion-list__item--done' : 'completion-list__item'}>
@@ -66,7 +66,7 @@ export function PreviewStep({ canPublishDirectly, completionChecks, errors, form
 
       <div className="property-step__subsection">
         <div className="property-step__heading property-step__heading--compact">
-          <span>Contacto para revision</span>
+          <span>Contacto para revisión</span>
           <h3>Datos privados del responsable</h3>
         </div>
         <div className="field-grid field-grid--triple">
@@ -80,7 +80,7 @@ export function PreviewStep({ canPublishDirectly, completionChecks, errors, form
           />
           <TextField
             id="contactPhone"
-            label="Telefono"
+            label="Teléfono"
             value={form.contactPhone}
             onChange={(value) => setField('contactPhone', value)}
             error={errors.contactPhone}
@@ -107,8 +107,8 @@ export function PreviewStep({ canPublishDirectly, completionChecks, errors, form
         />
         <ToggleField
           id="publishingAuthorization"
-          label="Tengo autorizacion para publicar esta propiedad"
-          description={canPublishDirectly ? 'La publicacion podra quedar visible directamente.' : 'La publicacion sera enviada a revision.'}
+          label="Tengo autorización para publicar esta propiedad"
+          description={canPublishDirectly ? 'La publicación podrá quedar visible directamente.' : 'La publicación será enviada a revisión.'}
           checked={form.publishingAuthorization}
           onChange={(value) => setField('publishingAuthorization', value)}
         />

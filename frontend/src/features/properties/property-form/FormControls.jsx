@@ -59,7 +59,7 @@ export function SelectField({
   label,
   onChange,
   options,
-  placeholder = 'Selecciona una opcion',
+  placeholder = 'Selecciona una opción',
   required,
   value,
 }) {

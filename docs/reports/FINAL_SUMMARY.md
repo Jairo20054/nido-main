@@ -194,7 +194,7 @@ Bundle Size: Optimized ✅
 
 ### Running Locally
 ```bash
-cd c:\Users\ANDRES\OneDrive\Videos\nido-main
+cd C:\NIDO
 npm start
 # Opens http://localhost:3000
 ```

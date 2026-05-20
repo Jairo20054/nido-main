@@ -16,15 +16,15 @@ import { LocationStep } from './property-form/LocationStep';
 import { PreviewStep } from './property-form/PreviewStep';
 import { PricingStep } from './property-form/PricingStep';
 import { StepProgress } from './property-form/StepProgress';
-import { inferCountryFromLocation } from './property-form/locations';
+import { hasKnownCity, hasKnownCountry, hasKnownDepartment, resolveLocationValues } from './property-form/locations';
 
 const STEPS = [
-  { id: 'basic', label: 'Basica' },
-  { id: 'location', label: 'Ubicacion' },
+  { id: 'basic', label: 'Básica' },
+  { id: 'location', label: 'Ubicación' },
   { id: 'pricing', label: 'Precio' },
-  { id: 'features', label: 'Caracteristicas' },
+  { id: 'features', label: 'Características' },
   { id: 'amenities', label: 'Comodidades' },
-  { id: 'media', label: 'Imagenes' },
+  { id: 'media', label: 'Imágenes' },
   { id: 'preview', label: 'Publicar' },
 ];
 
@@ -125,6 +125,12 @@ const toFormState = (property) => {
     return emptyForm;
   }
 
+  const resolvedLocation = resolveLocationValues({
+    country: property.country,
+    department: property.department,
+    city: property.city,
+  });
+
   return {
     ...emptyForm,
     title: property.title || '',
@@ -133,9 +139,9 @@ const toFormState = (property) => {
     propertyType: property.propertyType || 'APARTMENT',
     rentalType: property.rentalType || 'FULL_HOME',
     status: property.status || 'DRAFT',
-    country: property.country || inferCountryFromLocation(property.department, property.city),
-    city: property.city || '',
-    department: property.department || '',
+    country: resolvedLocation.country,
+    city: resolvedLocation.city,
+    department: resolvedLocation.department,
     neighborhood: property.neighborhood || '',
     addressLine: property.addressLine || '',
     addressDetail: property.addressDetail || '',
@@ -251,41 +257,55 @@ const validateForAction = (form, action, scope = null) => {
   };
 
   if (hasUnsafeText(form)) {
-    add('form', 'No incluyas HTML, scripts ni enlaces potencialmente inseguros en la publicacion.');
+    add('form', 'No incluyas HTML, scripts ni enlaces potencialmente inseguros en la publicación.');
   }
 
-  if (!form.title.trim()) add('title', 'Ingresa un titulo claro para la propiedad.');
-  else if (form.title.trim().length < 8) add('title', 'El titulo debe tener al menos 8 caracteres.');
+  if (!form.title.trim()) add('title', 'Ingresa un título claro para la propiedad.');
+  else if (form.title.trim().length < 8) add('title', 'El título debe tener al menos 8 caracteres.');
 
   if (!form.propertyType) add('propertyType', 'Selecciona el tipo de propiedad.');
 
-  if (!form.summary.trim()) add('summary', 'Agrega una descripcion breve.');
-  else if (form.summary.trim().length < 20) add('summary', 'La descripcion breve debe tener al menos 20 caracteres.');
+  if (!form.summary.trim()) add('summary', 'Agrega una descripción breve.');
+  else if (form.summary.trim().length < 20) add('summary', 'La descripción breve debe tener al menos 20 caracteres.');
 
-  if (!form.description.trim()) add('description', 'Agrega una descripcion completa.');
-  else if (form.description.trim().length < 80) add('description', 'La descripcion completa debe tener al menos 80 caracteres.');
+  if (!form.description.trim()) add('description', 'Agrega una descripción completa.');
+  else if (form.description.trim().length < 80) add('description', 'La descripción completa debe tener al menos 80 caracteres.');
 
-  if (!form.country) add('country', 'Selecciona el pais de la propiedad.');
-  if (!form.department) add('department', 'Selecciona el departamento o estado.');
-  if (!form.city) add('city', 'Selecciona la ciudad.');
+  if (!form.country) {
+    add('country', 'Selecciona el país de la propiedad.');
+  } else if (!hasKnownCountry(form.country)) {
+    add('country', 'Selecciona un país disponible en la lista.');
+  }
+
+  if (!form.department) {
+    add('department', 'Selecciona el departamento o estado.');
+  } else if (!hasKnownDepartment(form.country, form.department)) {
+    add('department', 'Selecciona un departamento o estado disponible para ese país.');
+  }
+
+  if (!form.city) {
+    add('city', 'Selecciona la ciudad.');
+  } else if (!hasKnownCity(form.country, form.department, form.city)) {
+    add('city', 'Selecciona una ciudad disponible para ese departamento.');
+  }
   if (!form.addressLine.trim()) add('addressLine', 'Ingresa una direccion aproximada, barrio o zona.');
 
   if (isMissingNumber(form.monthlyRent) || toNumber(form.monthlyRent) <= 0) {
-    add('monthlyRent', 'Ingresa un valor mensual valido para el arriendo.');
+    add('monthlyRent', 'Ingresa un valor mensual válido para el arriendo.');
   } else if (toNumber(form.monthlyRent) < 100000) {
     add('monthlyRent', 'El valor mensual debe ser de al menos $100.000.');
   }
 
   if (!form.administrationIncluded && form.maintenanceFee !== '' && toNumber(form.maintenanceFee) < 0) {
-    add('maintenanceFee', 'La administracion no puede ser negativa.');
+    add('maintenanceFee', 'La administración no puede ser negativa.');
   }
 
   if (form.depositRequired && (isMissingNumber(form.securityDeposit) || toNumber(form.securityDeposit) <= 0)) {
-    add('securityDeposit', 'Ingresa un valor de deposito valido.');
+    add('securityDeposit', 'Ingresa un valor de depósito válido.');
   }
 
   if (isMissingNumber(form.minLeaseMonths) || toNumber(form.minLeaseMonths) <= 0) {
-    add('minLeaseMonths', 'Ingresa una duracion minima valida.');
+    add('minLeaseMonths', 'Ingresa una duración mínima válida.');
   }
 
   if (!form.availableImmediately && !form.availableFrom) {
@@ -293,13 +313,13 @@ const validateForAction = (form, action, scope = null) => {
   }
 
   if (isMissingNumber(form.areaM2) || toNumber(form.areaM2) <= 0) {
-    add('areaM2', 'Ingresa un area en m2 valida.');
+    add('areaM2', 'Ingresa un área en m² válida.');
   } else if (toNumber(form.areaM2) < 10) {
-    add('areaM2', 'El area debe ser de al menos 10 m2.');
+    add('areaM2', 'El área debe ser de al menos 10 m².');
   }
 
   if (toNumber(form.bedrooms) < 0) add('bedrooms', 'Las habitaciones no pueden ser negativas.');
-  if (toNumber(form.bathrooms) < 1) add('bathrooms', 'Ingresa al menos un bano.');
+  if (toNumber(form.bathrooms) < 1) add('bathrooms', 'Ingresa al menos un baño.');
   if (toNumber(form.parkingSpots) < 0) add('parkingSpots', 'Los parqueaderos no pueden ser negativos.');
   if (form.floor !== '' && toNumber(form.floor) < 0) add('floor', 'El piso no puede ser negativo.');
   if (form.country === 'Colombia' && form.strata !== '' && (toNumber(form.strata) < 1 || toNumber(form.strata) > 6)) {
@@ -316,7 +336,7 @@ const validateForAction = (form, action, scope = null) => {
 
   const imageCount = form.media.filter((item) => item.type === 'IMAGE').length;
   if (action !== 'draft' && imageCount < MIN_IMAGE_COUNT_TO_PUBLISH) {
-    add('media', `Agrega minimo ${MIN_IMAGE_COUNT_TO_PUBLISH} imagenes antes de enviar la propiedad a revision.`);
+    add('media', `Agrega mínimo ${MIN_IMAGE_COUNT_TO_PUBLISH} imágenes antes de enviar la propiedad a revisión.`);
   }
 
   if (action !== 'draft') {
@@ -325,7 +345,7 @@ const validateForAction = (form, action, scope = null) => {
     }
 
     if (form.contactPhone && !PHONE_PATTERN.test(form.contactPhone)) {
-      add('contactPhone', 'Ingresa un telefono de contacto valido.');
+      add('contactPhone', 'Ingresa un teléfono de contacto válido.');
     }
 
     if (form.contactWhatsapp && !PHONE_PATTERN.test(form.contactWhatsapp)) {
@@ -333,15 +353,15 @@ const validateForAction = (form, action, scope = null) => {
     }
 
     if (form.contactEmail && !EMAIL_PATTERN.test(form.contactEmail)) {
-      add('contactEmail', 'Ingresa un correo electronico valido.');
+      add('contactEmail', 'Ingresa un correo electrónico válido.');
     }
 
     if (!form.contactPhone && !form.contactEmail) {
-      add('contactPhone', 'Agrega al menos un telefono o correo de contacto.');
+      add('contactPhone', 'Agrega al menos un teléfono o correo de contacto.');
     }
 
     if (!form.publishingAuthorization) {
-      add('publishingAuthorization', 'Confirma que tienes autorizacion para publicar esta propiedad.');
+      add('publishingAuthorization', 'Confirma que tienes autorización para publicar esta propiedad.');
     }
   }
 
@@ -423,7 +443,7 @@ export function PropertyForm({ property, submitting, onCancel, onSubmit, canPubl
     setDraftStatus('Guardando cambios...');
     const timeout = window.setTimeout(() => {
       localStorage.setItem(PROPERTY_DRAFT_STORAGE_KEY, serializeDraftForm(form));
-      setDraftStatus('Cambios guardados automaticamente');
+      setDraftStatus('Cambios guardados automáticamente');
     }, 250);
 
     return () => window.clearTimeout(timeout);
@@ -436,12 +456,12 @@ export function PropertyForm({ property, submitting, onCancel, onSubmit, canPubl
 
   const completionChecks = useMemo(
     () => [
-      { label: 'Informacion basica completa', done: Boolean(form.title && form.summary && form.description) },
-      { label: 'Ubicacion con pais, departamento y ciudad', done: Boolean(form.country && form.department && form.city) },
+      { label: 'Información básica completa', done: Boolean(form.title && form.summary && form.description) },
+      { label: 'Ubicación con país, departamento y ciudad', done: Boolean(form.country && form.department && form.city) },
       { label: 'Precio y disponibilidad definidos', done: Boolean(form.monthlyRent && (form.availableImmediately || form.availableFrom)) },
-      { label: 'Caracteristicas principales completas', done: Boolean(form.areaM2 && form.bathrooms !== '') },
-      { label: `Minimo ${MIN_IMAGE_COUNT_TO_PUBLISH} imagenes cargadas`, done: imageCount >= MIN_IMAGE_COUNT_TO_PUBLISH },
-      { label: 'Contacto y autorizacion listos', done: Boolean(form.contactName && (form.contactPhone || form.contactEmail) && form.publishingAuthorization) },
+      { label: 'Características principales completas', done: Boolean(form.areaM2 && form.bathrooms !== '') },
+      { label: `Mínimo ${MIN_IMAGE_COUNT_TO_PUBLISH} imágenes cargadas`, done: imageCount >= MIN_IMAGE_COUNT_TO_PUBLISH },
+      { label: 'Contacto y autorización listos', done: Boolean(form.contactName && (form.contactPhone || form.contactEmail) && form.publishingAuthorization) },
     ],
     [form, imageCount]
   );
@@ -540,7 +560,7 @@ export function PropertyForm({ property, submitting, onCancel, onSubmit, canPubl
         localStorage.removeItem(PROPERTY_DRAFT_STORAGE_KEY);
       }
     } catch (requestError) {
-      setError(requestError.message || 'No pudimos guardar la propiedad. Revisa la informacion e intentalo nuevamente.');
+      setError(requestError.message || 'No pudimos guardar la propiedad. Revisa la información e inténtalo nuevamente.');
     }
   };
 
@@ -557,7 +577,7 @@ export function PropertyForm({ property, submitting, onCancel, onSubmit, canPubl
           <div>
             <span className="section__eyebrow">Panel arrendador</span>
             <h2>{title}</h2>
-            <p>Un flujo mas corto para publicar viviendas con datos claros, buenas fotos y validacion simple.</p>
+            <p>Un flujo más corto para publicar viviendas con datos claros, buenas fotos y validación simple.</p>
           </div>
           {draftStatus ? <span className="draft-save-indicator">{draftStatus}</span> : null}
         </div>
@@ -626,9 +646,9 @@ export function PropertyForm({ property, submitting, onCancel, onSubmit, canPubl
                 ? 'Guardando...'
                 : hasPendingUploads
                   ? 'Cargando archivos...'
-                  : canPublishDirectly
-                    ? 'Publicar propiedad'
-                    : 'Enviar a revision'}
+                : canPublishDirectly
+                  ? 'Publicar propiedad'
+                    : 'Enviar a revisión'}
             </button>
             {onCancel ? (
               <button className="button button--ghost-danger" type="button" onClick={onCancel}>

@@ -6,14 +6,14 @@ export function BasicInfoStep({ errors, form, setField }) {
   return (
     <div className="form-step property-step">
       <div className="property-step__heading">
-        <span>Informacion basica</span>
+        <span>Información básica</span>
         <h3>Cuenta lo esencial de la vivienda</h3>
-        <p>Usa un titulo concreto y una descripcion facil de leer. Lo demas lo completaremos por secciones.</p>
+        <p>Usa un título concreto y una descripción fácil de leer. Lo demás lo completaremos por secciones.</p>
       </div>
 
       <TextField
         id="title"
-        label="Titulo de la propiedad"
+        label="Título de la propiedad"
         required
         value={form.title}
         onChange={(value) => setField('title', value)}
@@ -42,7 +42,7 @@ export function BasicInfoStep({ errors, form, setField }) {
         />
         <TextField
           id="operationType"
-          label="Operacion"
+        label="Operación"
           value="Arriendo"
           onChange={() => undefined}
           disabled
@@ -52,27 +52,27 @@ export function BasicInfoStep({ errors, form, setField }) {
 
       <TextField
         id="summary"
-        label="Descripcion breve"
+        label="Descripción breve"
         required
         multiline
         rows={3}
         value={form.summary}
         onChange={(value) => setField('summary', value)}
         error={errors.summary}
-        placeholder="Resume en una frase lo mas atractivo de la vivienda."
+        placeholder="Resume en una frase lo más atractivo de la vivienda."
         maxLength={180}
       />
 
       <TextField
         id="description"
-        label="Descripcion completa"
+        label="Descripción completa"
         required
         multiline
         rows={6}
         value={form.description}
         onChange={(value) => setField('description', value)}
         error={errors.description}
-        placeholder="Describe distribucion, iluminacion, acabados, entorno y beneficios para quien va a vivir alli."
+        placeholder="Describe distribución, iluminación, acabados, entorno y beneficios para quien va a vivir allí."
         maxLength={4000}
       />
     </div>

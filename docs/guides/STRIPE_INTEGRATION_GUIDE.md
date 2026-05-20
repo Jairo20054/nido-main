@@ -53,7 +53,7 @@ REACT_APP_STRIPE_PUBLIC_KEY=pk_test_xxxxxxxxxx...
 
 ### 1. Instalar Dependencias
 ```bash
-cd c:\Users\ANDRES\OneDrive\Videos\nido-main
+cd C:\NIDO
 
 npm install @stripe/react-stripe-js @stripe/stripe-js
 npm install axios  # Para llamadas al backend

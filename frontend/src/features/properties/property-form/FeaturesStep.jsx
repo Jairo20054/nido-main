@@ -7,7 +7,7 @@ export function FeaturesStep({ errors, form, setField }) {
   return (
     <div className="form-step property-step">
       <div className="property-step__heading">
-        <span>Caracteristicas principales</span>
+        <span>Características principales</span>
         <h3>Describe la vivienda con datos comparables</h3>
         <p>Estos campos ayudan a filtrar y comparar propiedades sin sobrecargar la publicacion.</p>
       </div>
@@ -24,7 +24,7 @@ export function FeaturesStep({ errors, form, setField }) {
         />
         <TextField
           id="bathrooms"
-          label="Banos"
+          label="Baños"
           type="number"
           min="1"
           value={form.bathrooms}
@@ -33,7 +33,7 @@ export function FeaturesStep({ errors, form, setField }) {
         />
         <TextField
           id="areaM2"
-          label="Area en m2"
+          label="Área en m²"
           required
           type="number"
           min="1"

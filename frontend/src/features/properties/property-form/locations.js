@@ -4,23 +4,23 @@ export const LOCATIONS = [
     departments: [
       {
         name: 'Antioquia',
-        cities: ['Medellin', 'Envigado', 'Bello', 'Itagui', 'Rionegro', 'Sabaneta', 'La Estrella'],
+        cities: ['Medellín', 'Envigado', 'Bello', 'Itagüí', 'Rionegro', 'Sabaneta', 'La Estrella'],
       },
       {
-        name: 'Atlantico',
+        name: 'Atlántico',
         cities: ['Barranquilla', 'Soledad', 'Puerto Colombia', 'Malambo', 'Galapa'],
       },
       {
-        name: 'Bogota D.C.',
-        cities: ['Bogota'],
+        name: 'Bogotá D.C.',
+        cities: ['Bogotá'],
       },
       {
-        name: 'Bolivar',
+        name: 'Bolívar',
         cities: ['Cartagena', 'Turbaco', 'Arjona', 'Magangue'],
       },
       {
         name: 'Cundinamarca',
-        cities: ['Chia', 'Cajica', 'Zipaquira', 'Soacha', 'Facatativa', 'Mosquera', 'Funza'],
+        cities: ['Chía', 'Cajicá', 'Zipaquirá', 'Soacha', 'Facatativá', 'Mosquera', 'Funza'],
       },
       {
         name: 'Risaralda',
@@ -28,28 +28,28 @@ export const LOCATIONS = [
       },
       {
         name: 'Santander',
-        cities: ['Bucaramanga', 'Floridablanca', 'Giron', 'Piedecuesta'],
+        cities: ['Bucaramanga', 'Floridablanca', 'Girón', 'Piedecuesta'],
       },
       {
         name: 'Valle del Cauca',
-        cities: ['Cali', 'Palmira', 'Jamundi', 'Yumbo', 'Buga', 'Tulua', 'Cartago'],
+        cities: ['Cali', 'Palmira', 'Jamundí', 'Yumbo', 'Buga', 'Tuluá', 'Cartago'],
       },
     ],
   },
   {
-    country: 'Mexico',
+    country: 'México',
     departments: [
       {
-        name: 'Ciudad de Mexico',
-        cities: ['Benito Juarez', 'Cuauhtemoc', 'Miguel Hidalgo', 'Coyoacan', 'Alvaro Obregon'],
+        name: 'Ciudad de México',
+        cities: ['Benito Juárez', 'Cuauhtémoc', 'Miguel Hidalgo', 'Coyoacán', 'Álvaro Obregón'],
       },
       {
         name: 'Jalisco',
-        cities: ['Guadalajara', 'Zapopan', 'Tlaquepaque', 'Tlajomulco de Zuniga'],
+        cities: ['Guadalajara', 'Zapopan', 'Tlaquepaque', 'Tlajomulco de Zúñiga'],
       },
       {
-        name: 'Nuevo Leon',
-        cities: ['Monterrey', 'San Pedro Garza Garcia', 'San Nicolas de los Garza', 'Guadalupe'],
+        name: 'Nuevo León',
+        cities: ['Monterrey', 'San Pedro Garza García', 'San Nicolás de los Garza', 'Guadalupe'],
       },
     ],
   },
@@ -70,27 +70,65 @@ export const LOCATIONS = [
 
 export const getCountryOptions = () => LOCATIONS.map((item) => item.country);
 
+const normalizeLocationValue = (value) =>
+  String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase();
+
+const findCountry = (country) => LOCATIONS.find((item) => normalizeLocationValue(item.country) === normalizeLocationValue(country));
+
 export const getDepartmentsForCountry = (country) =>
-  LOCATIONS.find((item) => item.country === country)?.departments || [];
+  findCountry(country)?.departments || [];
 
 export const getCitiesForDepartment = (country, department) =>
-  getDepartmentsForCountry(country).find((item) => item.name === department)?.cities || [];
+  getDepartmentsForCountry(country).find((item) => normalizeLocationValue(item.name) === normalizeLocationValue(department))?.cities ||
+  [];
 
-export const inferCountryFromLocation = (department, city) => {
-  const normalizedDepartment = String(department || '').trim().toLowerCase();
-  const normalizedCity = String(city || '').trim().toLowerCase();
+export const hasKnownCountry = (country) => Boolean(findCountry(country));
 
-  if (!normalizedDepartment && !normalizedCity) {
-    return '';
+export const hasKnownDepartment = (country, department) =>
+  getDepartmentsForCountry(country).some((item) => normalizeLocationValue(item.name) === normalizeLocationValue(department));
+
+export const hasKnownCity = (country, department, city) =>
+  getCitiesForDepartment(country, department).some((item) => normalizeLocationValue(item) === normalizeLocationValue(city));
+
+export const resolveLocationValues = ({ country, department, city }) => {
+  const explicitCountry = findCountry(country);
+  const inferredCountry =
+    explicitCountry ||
+    LOCATIONS.find((location) =>
+      location.departments.some(
+        (item) =>
+          normalizeLocationValue(item.name) === normalizeLocationValue(department) ||
+          item.cities.some((candidate) => normalizeLocationValue(candidate) === normalizeLocationValue(city))
+      )
+    );
+
+  if (!inferredCountry) {
+    return { country: '', department: '', city: '' };
   }
 
-  const match = LOCATIONS.find((location) =>
-    location.departments.some(
-      (item) =>
-        item.name.toLowerCase() === normalizedDepartment ||
-        item.cities.some((candidate) => candidate.toLowerCase() === normalizedCity)
-    )
-  );
+  const matchedDepartment =
+    inferredCountry.departments.find((item) => normalizeLocationValue(item.name) === normalizeLocationValue(department)) ||
+    inferredCountry.departments.find((item) =>
+      item.cities.some((candidate) => normalizeLocationValue(candidate) === normalizeLocationValue(city))
+    );
 
-  return match?.country || '';
+  if (!matchedDepartment) {
+    return { country: inferredCountry.country, department: '', city: '' };
+  }
+
+  const matchedCity = matchedDepartment.cities.find((candidate) => normalizeLocationValue(candidate) === normalizeLocationValue(city));
+
+  return {
+    country: inferredCountry.country,
+    department: matchedDepartment.name,
+    city: matchedCity || '',
+  };
+};
+
+export const inferCountryFromLocation = (department, city) => {
+  return resolveLocationValues({ department, city }).country;
 };

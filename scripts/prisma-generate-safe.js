@@ -250,7 +250,7 @@ const printDiagnostics = () => {
 const main = async () => {
   if (process.platform === 'win32' && isOneDrivePath(rootDir)) {
     warn(
-      'Este proyecto esta dentro de OneDrive. Para desarrollo continuo con Prisma en Windows, la ubicacion recomendada es una ruta local no sincronizada, por ejemplo C:\\dev\\nido.'
+      'Este proyecto esta dentro de OneDrive. Para desarrollo continuo con Prisma en Windows, la ubicacion recomendada es una ruta local no sincronizada, por ejemplo C:\\NIDO.'
     );
   }
 

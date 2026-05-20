@@ -1,12 +1,12 @@
 import React from 'react';
 import { CheckboxGroup } from './FormControls';
 
-const SERVICE_OPTIONS = ['Agua', 'Energia', 'Gas', 'Internet'];
+const SERVICE_OPTIONS = ['Agua', 'Energía', 'Gas', 'Internet'];
 
 const AMENITY_OPTIONS = [
   { field: 'elevator', label: 'Ascensor' },
-  { field: 'guardedAccess', label: 'Porteria / seguridad' },
-  { field: 'balcony', label: 'Balcon' },
+  { field: 'guardedAccess', label: 'Portería / seguridad' },
+  { field: 'balcony', label: 'Balcón' },
   { field: 'equippedKitchen', label: 'Cocina integral' },
   { field: 'laundryArea', label: 'Zona de ropas' },
 ];
@@ -35,7 +35,7 @@ export function AmenitiesStep({ form, setField, toggleListValue }) {
       <div className="property-step__heading">
         <span>Servicios y comodidades</span>
         <h3>Marca solo lo que realmente ayuda a decidir</h3>
-        <p>Reducimos la lista a servicios basicos y comodidades faciles de verificar.</p>
+        <p>Reducimos la lista a servicios básicos y comodidades fáciles de verificar.</p>
       </div>
 
       <CheckboxGroup

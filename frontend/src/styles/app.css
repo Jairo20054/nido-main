@@ -3039,6 +3039,7 @@
 
 .property-form-wizard {
   display: grid;
+  min-width: 0;
 }
 
 .form-card__header {
@@ -4934,6 +4935,7 @@ h3 {
 .property-form-wizard__card {
   display: grid;
   gap: 22px;
+  min-width: 0;
 }
 
 .property-form-header {
@@ -4962,6 +4964,7 @@ h3 {
 .property-step-progress {
   display: grid;
   gap: 12px;
+  min-width: 0;
 }
 
 .property-step-progress__summary {
@@ -4999,11 +5002,11 @@ h3 {
 
 .property-form-wizard .stepper {
   display: flex;
+  flex-wrap: wrap;
   grid-template-columns: none;
   gap: 8px;
-  overflow-x: auto;
+  overflow-x: visible;
   padding: 2px 0 4px;
-  scrollbar-width: thin;
 }
 
 .property-form-wizard .stepper__item {
@@ -5196,9 +5199,13 @@ h3 {
 }
 
 @media (max-width: 920px) {
-  .property-form-header,
-  .property-step-progress__summary {
+  .property-form-header {
     grid-template-columns: 1fr;
+  }
+
+  .property-step-progress__summary {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .property-form-header {
@@ -5216,6 +5223,17 @@ h3 {
   }
 
   .property-form-wizard .stepper__item strong {
+    display: none;
+  }
+
+  .property-form-wizard .stepper {
+    flex-wrap: nowrap;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .property-form-wizard .stepper::-webkit-scrollbar {
     display: none;
   }
 

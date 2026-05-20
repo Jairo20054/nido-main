@@ -1,30 +1,34 @@
 import React, { useMemo } from 'react';
 import { SelectField, TextField, ToggleField } from './FormControls';
-import { getCitiesForDepartment, getCountryOptions, getDepartmentsForCountry } from './locations';
+import { getCitiesForDepartment, getCountryOptions, getDepartmentsForCountry, hasKnownDepartment } from './locations';
 
 export function LocationStep({ errors, form, onCountryChange, onDepartmentChange, setField }) {
   const countries = useMemo(() => getCountryOptions(), []);
   const departments = useMemo(() => getDepartmentsForCountry(form.country), [form.country]);
-  const cities = useMemo(() => getCitiesForDepartment(form.country, form.department), [form.country, form.department]);
+  const hasValidDepartment = hasKnownDepartment(form.country, form.department);
+  const cities = useMemo(
+    () => (hasValidDepartment ? getCitiesForDepartment(form.country, form.department) : []),
+    [form.country, form.department, hasValidDepartment]
+  );
 
   return (
     <div className="form-step property-step">
       <div className="property-step__heading">
-        <span>Ubicacion</span>
+        <span>Ubicación</span>
         <h3>Guia la busqueda por zona</h3>
-        <p>La direccion exacta puede mantenerse privada. Para publicar basta con una zona clara y verificable.</p>
+        <p>La dirección exacta puede mantenerse privada. Para publicar basta con una zona clara y verificable.</p>
       </div>
 
       <div className="field-grid field-grid--triple">
         <SelectField
           id="country"
-          label="Pais"
+          label="País"
           required
           value={form.country}
           onChange={onCountryChange}
           options={countries}
           error={errors.country}
-          placeholder="Selecciona el pais"
+          placeholder="Selecciona el país"
         />
         <SelectField
           id="department"
@@ -33,9 +37,9 @@ export function LocationStep({ errors, form, onCountryChange, onDepartmentChange
           value={form.department}
           onChange={onDepartmentChange}
           options={departments.map((department) => department.name)}
-          disabled={!form.country}
+          disabled={!departments.length}
           error={errors.department}
-          placeholder={form.country ? 'Selecciona una opcion' : 'Selecciona primero el pais'}
+          placeholder={form.country ? 'Selecciona una opción' : 'Selecciona primero el país'}
         />
         <SelectField
           id="city"
@@ -44,16 +48,16 @@ export function LocationStep({ errors, form, onCountryChange, onDepartmentChange
           value={form.city}
           onChange={(value) => setField('city', value)}
           options={cities}
-          disabled={!form.department}
+          disabled={!hasValidDepartment}
           error={errors.city}
-          placeholder={form.department ? 'Selecciona la ciudad' : 'Selecciona primero el departamento'}
+          placeholder={hasValidDepartment ? 'Selecciona la ciudad' : 'Selecciona primero el departamento'}
         />
       </div>
 
       <div className="field-grid">
         <TextField
           id="addressLine"
-          label="Direccion aproximada o barrio / zona"
+          label="Dirección aproximada o barrio / zona"
           required
           value={form.addressLine}
           onChange={(value) => setField('addressLine', value)}
@@ -82,8 +86,8 @@ export function LocationStep({ errors, form, onCountryChange, onDepartmentChange
         />
         <ToggleField
           id="hideExactAddress"
-          label="Ocultar direccion exacta"
-          description="Solo se mostrara la zona general a los interesados."
+          label="Ocultar dirección exacta"
+          description="Solo se mostrará la zona general a los interesados."
           checked={form.hideExactAddress}
           onChange={(value) => setField('hideExactAddress', value)}
         />

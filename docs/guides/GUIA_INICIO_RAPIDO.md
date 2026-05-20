@@ -8,7 +8,7 @@
 
 ```bash
 # Abre PowerShell en la carpeta del proyecto
-cd c:\Users\ANDRES\OneDrive\Videos\nido-main
+cd C:\NIDO
 
 # Inicia el servidor
 npm start

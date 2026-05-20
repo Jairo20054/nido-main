@@ -25,8 +25,8 @@ export function PricingStep({ errors, form, setField }) {
         />
         <ToggleField
           id="administrationIncluded"
-          label="Administracion incluida"
-          description="Si esta incluida, no pediremos un valor adicional."
+          label="Administración incluida"
+          description="Si está incluida, no pediremos un valor adicional."
           checked={form.administrationIncluded}
           onChange={(value) =>
             setField('administrationIncluded', value, value ? { maintenanceFee: '' } : undefined)
@@ -37,7 +37,7 @@ export function PricingStep({ errors, form, setField }) {
       {!form.administrationIncluded ? (
         <TextField
           id="maintenanceFee"
-          label="Valor de administracion"
+          label="Valor de administración"
           type="number"
           min="0"
           inputMode="numeric"
@@ -52,15 +52,15 @@ export function PricingStep({ errors, form, setField }) {
       <div className="field-grid">
         <ToggleField
           id="depositRequired"
-          label="Requiere deposito"
-          description="Activalo solo si el propietario solicita deposito."
+          label="Requiere depósito"
+          description="Actívalo solo si el propietario solicita depósito."
           checked={form.depositRequired}
           onChange={(value) => setField('depositRequired', value, value ? undefined : { securityDeposit: '' })}
         />
         {form.depositRequired ? (
           <TextField
             id="securityDeposit"
-            label="Valor del deposito"
+            label="Valor del depósito"
             type="number"
             min="0"
             inputMode="numeric"
@@ -75,7 +75,7 @@ export function PricingStep({ errors, form, setField }) {
       <div className="field-grid">
         <TextField
           id="minLeaseMonths"
-          label="Duracion minima del contrato"
+          label="Duración mínima del contrato"
           type="number"
           min="1"
           inputMode="numeric"
@@ -87,7 +87,7 @@ export function PricingStep({ errors, form, setField }) {
         <ToggleField
           id="availableImmediately"
           label="Disponibilidad inmediata"
-          description="Si esta activa, no necesitas indicar fecha."
+          description="Si está activa, no necesitas indicar fecha."
           checked={form.availableImmediately}
           onChange={(value) => setField('availableImmediately', value, value ? { availableFrom: '' } : undefined)}
         />
