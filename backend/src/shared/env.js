@@ -43,12 +43,18 @@ const splitOrigins = (value) =>
     .map((origin) => origin.replace(/\/$/, ''))
     .filter(Boolean);
 
-const defaultDevClientUrls = ['http://localhost:5173', 'http://127.0.0.1:5173'];
-const configuredClientOrigins = [
+const defaultDevClientUrls = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+];
+const rawConfiguredClientOrigins = [
   ...splitOrigins(process.env.CLIENT_URL),
   ...splitOrigins(process.env.CLIENT_URLS),
   ...splitOrigins(process.env.CLIENT_ORIGIN),
-].filter((origin) => origin !== '*');
+];
+const configuredClientOrigins = rawConfiguredClientOrigins.filter((origin) => origin !== '*');
 const clientUrls = [
   ...new Set(isProduction ? configuredClientOrigins : [...defaultDevClientUrls, ...configuredClientOrigins]),
 ];
@@ -101,7 +107,7 @@ if (isProduction) {
   if (!env.SUPABASE_ANON_KEY) missing.push('SUPABASE_ANON_KEY');
   if (!env.SUPABASE_SERVICE_ROLE_KEY) missing.push('SUPABASE_SERVICE_ROLE_KEY');
 
-  if (env.CLIENT_URLS.includes('*')) {
+  if (rawConfiguredClientOrigins.includes('*')) {
     missing.push('CLIENT_URLS no puede contener *');
   }
 
