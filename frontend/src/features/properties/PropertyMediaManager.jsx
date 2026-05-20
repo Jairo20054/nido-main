@@ -375,7 +375,7 @@ export function PropertyMediaManager({ media, onChange }) {
   };
 
   return (
-    <div className="content-card content-card--compact">
+    <div className="media-panel">
       <div className="section__heading section__heading--tight">
         <div>
           <span className="section__eyebrow">Medios visuales</span>
