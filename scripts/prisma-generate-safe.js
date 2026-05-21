@@ -7,7 +7,12 @@ const schemaPath = path.join(rootDir, 'backend', 'prisma', 'schema.prisma');
 const prismaClientDir = path.join(rootDir, 'node_modules', '.prisma', 'client');
 const prismaEngineModuleName = 'query_engine-windows.dll.node';
 const prismaTempPattern = /^query_engine-windows\.dll\.node\.tmp\d+$/u;
-const envPaths = [path.join(rootDir, '.env'), path.join(rootDir, 'backend', '.env')];
+const envPaths = [
+  path.join(rootDir, '.env'),
+  path.join(rootDir, '.env.local'),
+  path.join(rootDir, 'backend', '.env'),
+  path.join(rootDir, 'backend', '.env.local'),
+];
 
 const cliArgs = new Set(process.argv.slice(2));
 const shouldCheckOnly = cliArgs.has('--check');

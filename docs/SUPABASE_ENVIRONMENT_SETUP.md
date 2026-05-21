@@ -148,7 +148,7 @@ supabase db push --remote
 supabase db query
 
 # Or using psql directly
-psql postgresql://postgres:password@db.your-project-ref.supabase.co:5432/postgres
+psql "postgresql://postgres:<password>@db.<project-ref>.supabase.co:5432/postgres"
 ```
 
 **Method 3: Supabase Dashboard**
@@ -197,7 +197,7 @@ psql postgresql://postgres:password@db.your-project-ref.supabase.co:5432/postgre
 ### Connect with psql
 ```bash
 # Via URL
-psql "postgresql://postgres:PASSWORD@db.your-project-ref.supabase.co:5432/postgres"
+psql "postgresql://postgres:<password>@db.<project-ref>.supabase.co:5432/postgres"
 
 # Or individually
 psql -h db.your-project-ref.supabase.co \

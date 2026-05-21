@@ -6,7 +6,9 @@ const readline = require('readline');
 const rootDir = path.resolve(__dirname, '..');
 const viteCliPath = path.join(rootDir, 'node_modules', 'vite', 'bin', 'vite.js');
 const envPath = path.join(rootDir, '.env');
+const envLocalPath = path.join(rootDir, '.env.local');
 const frontendEnvPath = path.join(rootDir, 'frontend', '.env');
+const frontendEnvLocalPath = path.join(rootDir, 'frontend', '.env.local');
 const decodeJwtRole = (value) => {
   if (typeof value !== 'string' || !value.startsWith('eyJ')) {
     return '';
@@ -82,8 +84,14 @@ const loadEnvFile = (targetPath, override = false) => {
 if (fs.existsSync(envPath)) {
   loadEnvFile(envPath, process.env.NODE_ENV !== 'production');
 }
+if (fs.existsSync(envLocalPath)) {
+  loadEnvFile(envLocalPath, process.env.NODE_ENV !== 'production');
+}
 if (fs.existsSync(frontendEnvPath)) {
   loadEnvFile(frontendEnvPath, process.env.NODE_ENV !== 'production');
+}
+if (fs.existsSync(frontendEnvLocalPath)) {
+  loadEnvFile(frontendEnvLocalPath, process.env.NODE_ENV !== 'production');
 }
 
 // Map server-side Supabase env vars to Vite-prefixed vars so the client can access them.

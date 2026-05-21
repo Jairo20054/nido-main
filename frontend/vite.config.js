@@ -7,8 +7,9 @@ import react from '@vitejs/plugin-react';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
 const frontendEnvPath = path.join(__dirname, '.env');
+const frontendLocalEnvPath = path.join(__dirname, '.env.local');
 const placeholderPattern = /your-project\.supabase\.co|^your-(anon|publishable|secret|service)|^replace-with-|<[^>]+>/iu;
-const sensitiveVitePattern = /(SERVICE_ROLE|SERVICE_KEY|SECRET|JWT|DATABASE_URL|DIRECT_URL|PRIVATE|PASSWORD|TOKEN)/iu;
+const sensitiveVitePattern = /(^|_)(SERVICE_ROLE|SERVICE_KEY|SECRET|JWT|DATABASE_URL|DIRECT_URL|PRIVATE|PASSWORD|TOKEN)($|_)/iu;
 const decodeJwtRole = (value) => {
   if (typeof value !== 'string' || !value.startsWith('eyJ')) {
     return '';
@@ -41,7 +42,15 @@ dotenv.config({
   override: process.env.NODE_ENV !== 'production',
 });
 dotenv.config({
+  path: path.join(rootDir, '.env.local'),
+  override: process.env.NODE_ENV !== 'production',
+});
+dotenv.config({
   path: frontendEnvPath,
+  override: process.env.NODE_ENV !== 'production',
+});
+dotenv.config({
+  path: frontendLocalEnvPath,
   override: process.env.NODE_ENV !== 'production',
 });
 

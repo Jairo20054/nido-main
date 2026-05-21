@@ -5,7 +5,9 @@ const { spawnSync } = require('child_process');
 const rootDir = path.resolve(__dirname, '..');
 const cleanupScript = path.join(rootDir, 'scripts', 'cleanup-nido-processes.js');
 const envPath = path.join(rootDir, '.env');
+const envLocalPath = path.join(rootDir, '.env.local');
 const backendEnvPath = path.join(rootDir, 'backend', '.env');
+const backendEnvLocalPath = path.join(rootDir, 'backend', '.env.local');
 const prismaBin = path.join(rootDir, 'node_modules', '.bin', 'prisma');
 const prismaSchemaPath = 'backend/prisma/schema.prisma';
 
@@ -62,8 +64,16 @@ const loadEnvironment = () => {
     loadEnvFile(envPath, false);
   }
 
+  if (fs.existsSync(envLocalPath)) {
+    loadEnvFile(envLocalPath, process.env.NODE_ENV !== 'production');
+  }
+
   if (fs.existsSync(backendEnvPath)) {
     loadEnvFile(backendEnvPath, process.env.NODE_ENV !== 'production');
+  }
+
+  if (fs.existsSync(backendEnvLocalPath)) {
+    loadEnvFile(backendEnvLocalPath, process.env.NODE_ENV !== 'production');
   }
 };
 

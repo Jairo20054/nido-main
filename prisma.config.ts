@@ -5,10 +5,14 @@ import dotenv from 'dotenv';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootEnvPath = path.join(__dirname, '.env');
+const rootLocalEnvPath = path.join(__dirname, '.env.local');
 const backendEnvPath = path.join(__dirname, 'backend', '.env');
+const backendLocalEnvPath = path.join(__dirname, 'backend', '.env.local');
 
 dotenv.config({ path: rootEnvPath, override: process.env.NODE_ENV !== 'production' });
+dotenv.config({ path: rootLocalEnvPath, override: process.env.NODE_ENV !== 'production' });
 dotenv.config({ path: backendEnvPath, override: process.env.NODE_ENV !== 'production' });
+dotenv.config({ path: backendLocalEnvPath, override: process.env.NODE_ENV !== 'production' });
 
 const databaseUrl = process.env.DATABASE_URL;
 const directUrl = process.env.DIRECT_URL;

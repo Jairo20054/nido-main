@@ -5,7 +5,9 @@ const dotenv = require('dotenv');
 const backendDir = path.resolve(__dirname, '..', '..');
 const rootDir = path.resolve(backendDir, '..');
 const rootEnvPath = path.join(rootDir, '.env');
+const rootLocalEnvPath = path.join(rootDir, '.env.local');
 const backendEnvPath = path.join(backendDir, '.env');
+const backendLocalEnvPath = path.join(backendDir, '.env.local');
 
 const isProduction = process.env.NODE_ENV === 'production';
 const isStaging = process.env.NODE_ENV === 'staging';
@@ -19,8 +21,16 @@ if (fs.existsSync(rootEnvPath)) {
   dotenv.config();
 }
 
+if (fs.existsSync(rootLocalEnvPath)) {
+  dotenv.config({ path: rootLocalEnvPath, override: !isProduction });
+}
+
 if (fs.existsSync(backendEnvPath)) {
   dotenv.config({ path: backendEnvPath, override: !isProduction });
+}
+
+if (fs.existsSync(backendLocalEnvPath)) {
+  dotenv.config({ path: backendLocalEnvPath, override: !isProduction });
 }
 
 const isPlaceholder = (value) =>

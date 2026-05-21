@@ -1,5 +1,5 @@
 const PLACEHOLDER_PATTERN = /your-project\.supabase\.co|^your-(anon|publishable|secret|service)|^replace-with-|<[^>]+>/iu;
-const SENSITIVE_VITE_PATTERN = /(SERVICE_ROLE|SERVICE_KEY|SECRET|JWT|DATABASE_URL|DIRECT_URL|PRIVATE|PASSWORD|TOKEN)/iu;
+const SENSITIVE_VITE_PATTERN = /(^|_)(SERVICE_ROLE|SERVICE_KEY|SECRET|JWT|DATABASE_URL|DIRECT_URL|PRIVATE|PASSWORD|TOKEN)($|_)/iu;
 
 const decodeJwtRole = (value) => {
   if (typeof value !== 'string' || !value.startsWith('eyJ')) {

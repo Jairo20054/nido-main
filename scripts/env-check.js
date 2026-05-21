@@ -5,13 +5,16 @@ const dotenv = require('dotenv');
 const rootDir = path.resolve(__dirname, '..');
 const envFiles = [
   path.join(rootDir, '.env'),
+  path.join(rootDir, '.env.local'),
   path.join(rootDir, 'backend', '.env'),
+  path.join(rootDir, 'backend', '.env.local'),
   path.join(rootDir, 'frontend', '.env'),
+  path.join(rootDir, 'frontend', '.env.local'),
 ];
 const placeholderPattern =
   /your-project\.supabase\.co|^your-(anon|publishable|secret|service)|^replace-with-|<[^>]+>/iu;
 const sensitiveVitePattern =
-  /(SERVICE_ROLE|SERVICE_KEY|SECRET|JWT|DATABASE_URL|DIRECT_URL|PRIVATE|PASSWORD|TOKEN)/iu;
+  /(^|_)(SERVICE_ROLE|SERVICE_KEY|SECRET|JWT|DATABASE_URL|DIRECT_URL|PRIVATE|PASSWORD|TOKEN)($|_)/iu;
 
 const decodeJwtRole = (value) => {
   if (typeof value !== 'string' || !value.startsWith('eyJ')) {
@@ -52,11 +55,20 @@ const loadLocalEnv = () => {
 };
 
 const hasAny = (...names) => names.some((name) => Boolean(clean(process.env[name])));
+const firstClean = (...names) => {
+  for (const name of names) {
+    const value = clean(process.env[name]);
+    if (value) {
+      return value;
+    }
+  }
 
-const validateUrl = (name, issues, { allowRelative = false } = {}) => {
-  const value = clean(process.env[name]);
+  return '';
+};
+
+const validateUrlValue = (label, value, issues, { allowRelative = false } = {}) => {
   if (!value) {
-    issues.push(name);
+    issues.push(label);
     return;
   }
 
@@ -67,8 +79,12 @@ const validateUrl = (name, issues, { allowRelative = false } = {}) => {
   try {
     new URL(value);
   } catch (_error) {
-    issues.push(`${name} debe ser una URL valida`);
+    issues.push(`${label} debe ser una URL valida`);
   }
+};
+
+const validateUrl = (name, issues, options) => {
+  validateUrlValue(name, clean(process.env[name]), issues, options);
 };
 
 const validateBackend = ({ productionLike }) => {
@@ -113,18 +129,19 @@ const validateBackend = ({ productionLike }) => {
 
 const validateFrontend = () => {
   const issues = [];
-  const publicKey = clean(
-    process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-      process.env.VITE_SUPABASE_ANON_KEY ||
-      process.env.SUPABASE_PUBLISHABLE_KEY ||
-      process.env.SUPABASE_ANON_KEY
+  const publicKey = firstClean(
+    'VITE_SUPABASE_PUBLISHABLE_KEY',
+    'VITE_SUPABASE_ANON_KEY',
+    'SUPABASE_PUBLISHABLE_KEY',
+    'SUPABASE_ANON_KEY'
   );
+  const supabaseUrl = firstClean('VITE_SUPABASE_URL', 'SUPABASE_URL');
   const sensitiveViteNames = Object.keys(process.env).filter(
     (key) => key.startsWith('VITE_') && sensitiveVitePattern.test(key)
   );
 
   if (!hasAny('VITE_API_URL', 'VITE_API_BASE_URL')) issues.push('VITE_API_URL');
-  validateUrl('VITE_SUPABASE_URL', issues);
+  validateUrlValue('VITE_SUPABASE_URL o SUPABASE_URL', supabaseUrl, issues);
   if (!publicKey) issues.push('VITE_SUPABASE_ANON_KEY o VITE_SUPABASE_PUBLISHABLE_KEY');
   if (publicKey && !isPublicSupabaseKey(publicKey)) {
     issues.push('la clave publica de Supabase no debe ser service_role/secret');

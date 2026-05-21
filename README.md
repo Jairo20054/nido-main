@@ -2,6 +2,8 @@
 
 Aplicacion full stack para publicar, administrar y arrendar propiedades. Combina frontend React + Vite, API Express, PostgreSQL con Prisma y autenticacion delegada a Supabase.
 
+Para configurar NIDO desde casa, trabajo o un equipo nuevo en Windows, empieza por [SETUP.md](SETUP.md).
+
 ## Arquitectura
 
 - `frontend/src/`: frontend React, rutas, paginas de negocio y cliente publico de Supabase en `frontend/src/lib/supabaseClient.js`.
