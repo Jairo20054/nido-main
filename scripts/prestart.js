@@ -8,6 +8,7 @@ const envPath = path.join(rootDir, '.env');
 const exampleEnvPath = path.join(rootDir, '.env.example');
 const prismaBin = path.join(rootDir, 'node_modules', '.bin', 'prisma');
 const prismaSchemaPath = 'backend/prisma/schema.prisma';
+let databaseUrlLoadedFromExample = false;
 
 const loadEnvFile = (targetPath, override = false) => {
   if (!fs.existsSync(targetPath)) {
@@ -64,6 +65,7 @@ const loadEnvironment = () => {
 
   if (process.env.NODE_ENV !== 'production' && !process.env.DATABASE_URL && fs.existsSync(exampleEnvPath)) {
     loadEnvFile(exampleEnvPath, false);
+    databaseUrlLoadedFromExample = Boolean(process.env.DATABASE_URL);
   }
 };
 
@@ -116,8 +118,12 @@ const syncPrismaSchema = () => {
     console.warn('El backend podria fallar si @prisma/client no esta generado.');
   }
 
-  if (!process.env.DATABASE_URL) {
-    console.warn('DATABASE_URL no esta configurada en .env ni .env.example; se omite prisma db push.');
+  if (!process.env.DATABASE_URL || databaseUrlLoadedFromExample) {
+    console.warn(
+      databaseUrlLoadedFromExample
+        ? 'DATABASE_URL proviene de .env.example; se omite prisma db push hasta crear un .env real o levantar PostgreSQL.'
+        : 'DATABASE_URL no esta configurada en .env ni .env.example; se omite prisma db push.'
+    );
     return;
   }
 

@@ -3,26 +3,41 @@ const { env } = require('./env');
 
 const supabaseUrl = env.SUPABASE_URL;
 const supabaseServiceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY;
+let validatedSupabaseUrl = supabaseUrl;
+
+const warnDevSupabaseUnavailable = (message) => {
+  if (env.NODE_ENV === 'production') {
+    throw new Error(message);
+  }
+
+  console.warn(`${message}. Los endpoints de autenticacion responderan 400/401 hasta configurar Supabase.`);
+};
 
 if (!supabaseUrl || !supabaseServiceRoleKey) {
-  throw new Error('[Nido] SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY no están definidas en el .env del backend');
+  warnDevSupabaseUnavailable(
+    '[Nido] SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY no estan definidas en el .env del backend'
+  );
+  validatedSupabaseUrl = '';
 }
 
-try {
-  new URL(supabaseUrl);
-} catch (_error) {
-  throw new Error('[Nido] SUPABASE_URL no es una URL valida de Supabase');
+if (validatedSupabaseUrl) {
+  try {
+    new URL(validatedSupabaseUrl);
+  } catch (_error) {
+    warnDevSupabaseUnavailable('[Nido] SUPABASE_URL no es una URL valida de Supabase');
+    validatedSupabaseUrl = '';
+  }
 }
 
 // Centraliza la creacion de clientes de Supabase para evitar configuraciones
 // inconsistentes entre operaciones anonimas y administrativas.
 // Fabrica clientes de Supabase con configuracion adecuada para uso en backend.
 const createSupabaseClient = (key, authOptions = {}) => {
-  if (!key) {
+  if (!validatedSupabaseUrl || !key) {
     return null;
   }
 
-  return createClient(supabaseUrl, key, {
+  return createClient(validatedSupabaseUrl, key, {
     auth: {
       autoRefreshToken: false,
       detectSessionInUrl: false,
