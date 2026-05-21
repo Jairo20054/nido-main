@@ -7,6 +7,7 @@ const schemaPath = path.join(rootDir, 'backend', 'prisma', 'schema.prisma');
 const prismaClientDir = path.join(rootDir, 'node_modules', '.prisma', 'client');
 const prismaEngineModuleName = 'query_engine-windows.dll.node';
 const prismaTempPattern = /^query_engine-windows\.dll\.node\.tmp\d+$/u;
+const envPaths = [path.join(rootDir, '.env'), path.join(rootDir, 'backend', '.env')];
 
 const cliArgs = new Set(process.argv.slice(2));
 const shouldCheckOnly = cliArgs.has('--check');
@@ -18,6 +19,19 @@ const error = (message) => console.error(`[prisma-safe] ${message}`);
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const isOneDrivePath = (targetPath) => /(^|[\\/])OneDrive([\\/]|$)/iu.test(targetPath);
+
+const loadEnvFiles = () => {
+  try {
+    const dotenv = require('dotenv');
+    for (const envPath of envPaths) {
+      if (fs.existsSync(envPath)) {
+        dotenv.config({ path: envPath, override: process.env.NODE_ENV !== 'production' });
+      }
+    }
+  } catch (_error) {
+    // dotenv may not be available during partial installs; Prisma will report the real issue later.
+  }
+};
 
 const runPowerShellJson = (command) => {
   const output = execFileSync(
@@ -248,6 +262,8 @@ const printDiagnostics = () => {
 };
 
 const main = async () => {
+  loadEnvFiles();
+
   if (process.platform === 'win32' && isOneDrivePath(rootDir)) {
     warn(
       'Este proyecto esta dentro de OneDrive. Para desarrollo continuo con Prisma en Windows, la ubicacion recomendada es una ruta local no sincronizada, por ejemplo C:\\NIDO.'
@@ -256,6 +272,12 @@ const main = async () => {
 
   if (shouldCheckOnly) {
     printDiagnostics();
+    process.exit(0);
+  }
+
+  if (!process.env.DATABASE_URL || !process.env.DIRECT_URL) {
+    warn('DATABASE_URL/DIRECT_URL no estan configuradas; se omite prisma generate en postinstall.');
+    warn('Despues de crear .env desde .env.example ejecuta: npm run prisma:generate');
     process.exit(0);
   }
 

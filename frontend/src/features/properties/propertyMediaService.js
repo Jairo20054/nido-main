@@ -1,7 +1,7 @@
 import { getSupabaseConfigError, supabase } from '../../lib/supabaseClient';
+import { frontendEnv } from '../../lib/env';
 
-export const PROPERTY_MEDIA_BUCKET =
-  import.meta.env.VITE_SUPABASE_PROPERTY_MEDIA_BUCKET || 'property-media-public';
+export const PROPERTY_MEDIA_BUCKET = frontendEnv.VITE_SUPABASE_PROPERTY_MEDIA_BUCKET;
 export const MIN_IMAGE_COUNT_TO_PUBLISH = 3;
 export const MAX_IMAGE_COUNT = 20;
 export const MAX_VIDEO_COUNT = 1;

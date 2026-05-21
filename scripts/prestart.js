@@ -5,10 +5,9 @@ const { spawnSync } = require('child_process');
 const rootDir = path.resolve(__dirname, '..');
 const cleanupScript = path.join(rootDir, 'scripts', 'cleanup-nido-processes.js');
 const envPath = path.join(rootDir, '.env');
-const exampleEnvPath = path.join(rootDir, '.env.example');
+const backendEnvPath = path.join(rootDir, 'backend', '.env');
 const prismaBin = path.join(rootDir, 'node_modules', '.bin', 'prisma');
 const prismaSchemaPath = 'backend/prisma/schema.prisma';
-let databaseUrlLoadedFromExample = false;
 
 const loadEnvFile = (targetPath, override = false) => {
   if (!fs.existsSync(targetPath)) {
@@ -57,15 +56,14 @@ const loadEnvFile = (targetPath, override = false) => {
   }
 };
 
-// Carga primero el entorno real y usa el ejemplo solo como fallback para desarrollo local.
+// Carga solo entorno real. Los archivos .env.example son documentacion, no configuracion ejecutable.
 const loadEnvironment = () => {
   if (fs.existsSync(envPath)) {
     loadEnvFile(envPath, false);
   }
 
-  if (process.env.NODE_ENV !== 'production' && !process.env.DATABASE_URL && fs.existsSync(exampleEnvPath)) {
-    loadEnvFile(exampleEnvPath, false);
-    databaseUrlLoadedFromExample = Boolean(process.env.DATABASE_URL);
+  if (fs.existsSync(backendEnvPath)) {
+    loadEnvFile(backendEnvPath, process.env.NODE_ENV !== 'production');
   }
 };
 
@@ -96,13 +94,9 @@ const run = (command, args, options = {}) => {
   return result;
 };
 
-// Intenta alinear el esquema Prisma antes de levantar el backend sin bloquear el flujo local.
-const syncPrismaSchema = () => {
+// Genera Prisma Client antes de levantar el backend. Las migraciones se ejecutan de forma explicita.
+const generatePrismaClient = () => {
   loadEnvironment();
-
-  if (process.env.NODE_ENV === 'production') {
-    return;
-  }
 
   try {
     const prismaCommand = process.platform === 'win32' ? 'cmd.exe' : prismaBin;
@@ -117,39 +111,12 @@ const syncPrismaSchema = () => {
     console.warn(`Aviso: ${details}`);
     console.warn('El backend podria fallar si @prisma/client no esta generado.');
   }
-
-  if (!process.env.DATABASE_URL || databaseUrlLoadedFromExample) {
-    console.warn(
-      databaseUrlLoadedFromExample
-        ? 'DATABASE_URL proviene de .env.example; se omite prisma db push hasta crear un .env real o levantar PostgreSQL.'
-        : 'DATABASE_URL no esta configurada en .env ni .env.example; se omite prisma db push.'
-    );
-    return;
-  }
-
-  try {
-    const prismaCommand = process.platform === 'win32' ? 'cmd.exe' : prismaBin;
-    const prismaArgs =
-      process.platform === 'win32'
-        ? ['/d', '/c', `npm exec -- prisma db push --schema ${prismaSchemaPath} --skip-generate`]
-        : ['db', 'push', '--schema', prismaSchemaPath, '--skip-generate'];
-
-    run(prismaCommand, prismaArgs, {
-      env: {
-        DATABASE_URL: process.env.DATABASE_URL,
-      },
-    });
-  } catch (error) {
-    const details = error && error.message ? error.message : 'No se pudo ejecutar prisma db push';
-    console.warn(`Aviso: ${details}`);
-    console.warn('El backend continuara arrancando; revisa la conexion a PostgreSQL si necesitas persistencia real.');
-  }
 };
 
-// El prestart limpia procesos colgados y luego sincroniza la base para reducir friccion local.
+// El prestart limpia procesos colgados y genera el cliente, sin mutar la base automaticamente.
 const main = () => {
   run(process.execPath, [cleanupScript], { stdio: 'inherit' });
-  syncPrismaSchema();
+  generatePrismaClient();
 };
 
 main();

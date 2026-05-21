@@ -6,6 +6,31 @@ const readline = require('readline');
 const rootDir = path.resolve(__dirname, '..');
 const viteCliPath = path.join(rootDir, 'node_modules', 'vite', 'bin', 'vite.js');
 const envPath = path.join(rootDir, '.env');
+const frontendEnvPath = path.join(rootDir, 'frontend', '.env');
+const decodeJwtRole = (value) => {
+  if (typeof value !== 'string' || !value.startsWith('eyJ')) {
+    return '';
+  }
+
+  try {
+    const [, payload] = value.trim().split('.');
+    if (!payload) {
+      return '';
+    }
+
+    const normalizedPayload = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const paddedPayload = normalizedPayload.padEnd(
+      normalizedPayload.length + ((4 - (normalizedPayload.length % 4)) % 4),
+      '='
+    );
+    return JSON.parse(Buffer.from(paddedPayload, 'base64').toString('utf8'))?.role || '';
+  } catch (_error) {
+    return '';
+  }
+};
+const isPublicSupabaseKey = (value) =>
+  typeof value === 'string' &&
+  (/^sb_publishable_/i.test(value.trim()) || decodeJwtRole(value) === 'anon');
 
 const loadEnvFile = (targetPath, override = false) => {
   if (!fs.existsSync(targetPath)) {
@@ -57,14 +82,23 @@ const loadEnvFile = (targetPath, override = false) => {
 if (fs.existsSync(envPath)) {
   loadEnvFile(envPath, process.env.NODE_ENV !== 'production');
 }
+if (fs.existsSync(frontendEnvPath)) {
+  loadEnvFile(frontendEnvPath, process.env.NODE_ENV !== 'production');
+}
 
 // Map server-side Supabase env vars to Vite-prefixed vars so the client can access them.
 // This allows using SUPABASE_URL / SUPABASE_ANON_KEY in .env while still exposing VITE_* to the frontend.
 if (!process.env.VITE_SUPABASE_URL && process.env.SUPABASE_URL) {
   process.env.VITE_SUPABASE_URL = process.env.SUPABASE_URL;
 }
-if (!process.env.VITE_SUPABASE_ANON_KEY && process.env.SUPABASE_ANON_KEY) {
+if (!process.env.VITE_SUPABASE_ANON_KEY && isPublicSupabaseKey(process.env.SUPABASE_ANON_KEY)) {
   process.env.VITE_SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+}
+if (!process.env.VITE_SUPABASE_PUBLISHABLE_KEY && isPublicSupabaseKey(process.env.SUPABASE_PUBLISHABLE_KEY)) {
+  process.env.VITE_SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+}
+if (!process.env.VITE_API_URL && process.env.VITE_API_BASE_URL) {
+  process.env.VITE_API_URL = process.env.VITE_API_BASE_URL;
 }
 
 let backendProcess = null;

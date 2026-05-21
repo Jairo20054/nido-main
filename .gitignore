@@ -1,25 +1,38 @@
-node_modules/
-node_modules
-dist/
-dist
-build/
-build
-nido-main/
-.continue/
-skills/
-.venv/
-gh/
-gh.zip
-supabase/.temp/
+# Secrets and local environment files
 .env
-.env.local
+.env.*
 backend/.env
-.codex-artifacts/
-.prisma/
-.DS_Store
-coverage/
+backend/.env.*
+frontend/.env
+frontend/.env.*
+!.env.example
+!.env.local.example
+!backend/.env.example
+!frontend/.env.example
+
+# Dependencies and generated output
+node_modules
+dist
+build
+.prisma
 coverage
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Local tools, caches and OS files
+nido-main
+.continue
+skills
+.venv
+gh
+gh.zip
+supabase/.temp
+.codex-artifacts
+.DS_Store
+
+# Local databases
 backend/prisma/dev.db
 backend/prisma/dev.db-journal
-npm-debug.log*
-*.log

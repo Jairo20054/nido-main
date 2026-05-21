@@ -17,25 +17,30 @@ API REST construida con Express para soportar autenticacion, perfiles, propiedad
 - `src/routes.js`: router raiz de la API.
 - `src/modules/`: modulos por dominio (`auth`, `properties`, `favorites`, `requests`, `users`, `admin`).
 - `src/shared/`: utilidades comunes de auth, errores, Prisma, validacion y serializacion.
+- `src/lib/supabaseAdmin.js`: export canonico server-only para operaciones administrativas de Supabase.
 
 ## Variables de entorno
 
-Estas variables se definen en el `.env` de la raiz del proyecto:
+Estas variables se definen en el `.env` de la raiz del proyecto o en `backend/.env` como override local:
 
 - `DATABASE_URL`: cadena de conexion a PostgreSQL.
+- `DIRECT_URL`: conexion directa usada por Prisma para migraciones.
 - `PORT`: puerto preferido para la API. Si esta ocupado, el servidor intenta usar el siguiente disponible.
-- `CLIENT_URL`: origen autorizado por CORS.
+- `CLIENT_URLS`: origenes autorizados por CORS separados por coma.
 - `SUPABASE_URL`: URL del proyecto Supabase.
 - `SUPABASE_ANON_KEY`: clave publica usada para validar sesiones y operaciones de usuario.
 - `SUPABASE_SERVICE_ROLE_KEY`: clave administrativa usada para tareas privilegiadas de backend.
+- `JWT_SECRET`: obligatorio en staging/production.
 
 ## Arranque local
 
 Desde la raiz del proyecto:
 
 ```bash
-npm install
-npm run prisma:push
+npm ci
+npm run env:check
+npm run prisma:generate
+npm run prisma:migrate
 npm start
 ```
 
@@ -73,6 +78,6 @@ npm run dev:server
 
 ## Operacion y soporte
 
-- Si `SUPABASE_URL` o las llaves no estan configuradas, los endpoints de auth fallaran de forma explicita.
-- Si `DATABASE_URL` no existe en desarrollo, `scripts/prestart.js` omite `prisma db push` y permite levantar el proceso para tareas de interfaz.
+- Si una variable critica falta o es insegura, el proceso falla al iniciar con un mensaje explicito.
+- `scripts/prestart.js` solo genera Prisma Client; no ejecuta `db push` ni muta la base automaticamente.
 - El servidor publica logs de excepciones no manejadas y realiza cierre ordenado en `SIGTERM` y `SIGINT`.

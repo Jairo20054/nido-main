@@ -1,129 +1,147 @@
 # NIDO
 
-Aplicacion full stack para publicar, administrar y arrendar propiedades. El proyecto combina un cliente React + Vite con una API en Express, persistencia en PostgreSQL mediante Prisma y autenticacion delegada a Supabase.
+Aplicacion full stack para publicar, administrar y arrendar propiedades. Combina frontend React + Vite, API Express, PostgreSQL con Prisma y autenticacion delegada a Supabase.
 
 ## Arquitectura
 
-- `frontend/src/`: frontend React, rutas, paginas de negocio y componentes reutilizables.
-- `backend/src/`: API REST, modulos por dominio, middlewares compartidos y capa de seguridad.
-- `backend/prisma/`: modelo de datos, generacion del cliente y seed de demo.
-- `frontend/public/`: assets estaticos servidos por el frontend.
-- `scripts/`: utilidades de arranque, limpieza de procesos y verificaciones locales.
-- `supabase/`: configuracion y artefactos auxiliares para la integracion con Supabase.
-
-## Funcionalidades principales
-
-- Registro, inicio de sesion, recuperacion de contrasena y perfil de usuario.
-- Roles de negocio para arrendatario, arrendador y administrador.
-- Busqueda de propiedades con detalle, favoritos y solicitudes de arriendo.
-- Publicacion y edicion de inmuebles con estados editoriales.
-- Panel administrativo para moderacion, metricas y gestion de arrendadores.
-- Carga real de imagenes y video de propiedades sobre Supabase Storage con previsualizacion inmediata.
-
-## Stack tecnico
-
-- Frontend: React 19, React Router, Vite.
-- Backend: Node.js, Express.
-- Datos: PostgreSQL + Prisma ORM.
-- Auth: Supabase Auth.
-- UI: CSS propio y `lucide-react` para iconografia.
+- `frontend/src/`: frontend React, rutas, paginas de negocio y cliente publico de Supabase en `frontend/src/lib/supabaseClient.js`.
+- `backend/src/`: API REST, modulos por dominio, middlewares, CORS y seguridad.
+- `backend/src/lib/supabaseAdmin.js`: export server-only del cliente administrativo de Supabase.
+- `backend/prisma/`: schema, migraciones Prisma y seed demo.
+- `supabase/migrations/`: migraciones SQL/RLS/Storage de Supabase.
+- `scripts/`: arranque, validacion de entorno y utilidades Prisma.
 
 ## Requisitos
 
-- Node.js 18 o superior.
-- npm 9 o superior.
-- PostgreSQL disponible localmente o remotamente.
-- Proyecto de Supabase con Auth habilitado si deseas usar autenticacion real.
+- Node.js `22.14.0` (`nvm use` lee `.nvmrc`).
+- npm `10.x`.
+- PostgreSQL local, Supabase local CLI o Supabase remoto.
+- Variables reales guardadas en un gestor seguro, nunca en Git.
 
-## Puesta en marcha
+## Configuracion Local De NIDO
 
-1. Instala dependencias:
+1. Clona o actualiza el repositorio:
 
 ```bash
-npm install
+git clone <repo-url>
+cd nido-main
+git pull
 ```
 
-2. Crea tu archivo de entorno a partir del ejemplo:
+2. Usa la version correcta de Node e instala dependencias:
+
+```bash
+nvm use
+npm ci
+```
+
+Si es la primera vez y aun no existe `.env`, `postinstall` puede omitir `prisma generate`. Es normal: crea `.env` y luego ejecuta `npm run prisma:generate`.
+
+3. Crea archivos de entorno desde examples:
 
 ```bash
 cp .env.example .env
 ```
 
-En Windows PowerShell:
+PowerShell:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-3. Ajusta las variables de entorno de base de datos y Supabase.
+Tambien puedes copiar `backend/.env.example` a `backend/.env` o `frontend/.env.example` a `frontend/.env` si necesitas overrides por capa. La configuracion recomendada para casa y trabajo es un solo `.env` en la raiz.
 
-4. Sincroniza el esquema con la base de datos:
+4. Copia los valores reales desde tu gestor seguro. No inventes secretos ni reutilices production en development.
 
-```bash
-npm run prisma:push
-```
-
-5. Carga datos de demostracion opcionales:
+5. Valida el entorno:
 
 ```bash
-npm run prisma:seed
+npm run env:check
 ```
 
-6. Inicia el entorno local:
+6. Prepara Prisma:
+
+```bash
+npm run prisma:generate
+npm run prisma:migrate
+```
+
+Usa `npm run prisma:seed` solo si quieres datos demo. En production usa `npm run prisma:migrate:deploy`; no uses `db push` salvo una prueba local descartable.
+
+7. Ejecuta la app:
 
 ```bash
 npm run dev
 ```
 
-El cliente se sirve por defecto en `http://localhost:5173` y la API en `http://localhost:5000` o en el siguiente puerto libre disponible.
+Frontend: `http://localhost:5173`. Backend: `http://localhost:5000` o el siguiente puerto libre. Supabase local CLI suele exponer Auth en `http://127.0.0.1:54321` y Postgres en `127.0.0.1:54322`.
 
-## Variables de entorno
+8. Verifica Google Login:
 
-Las variables base viven en `.env.example`:
+- En Supabase Dashboard, habilita Google provider.
+- En Supabase, configura Google Client ID y Client Secret.
+- En Google Cloud, Authorized JavaScript origins:
+  - `http://localhost:5173`
+  - `http://127.0.0.1:5173`
+  - tu dominio de staging/production
+- En Google Cloud, Authorized redirect URIs:
+  - `https://<SUPABASE_PROJECT_REF>.supabase.co/auth/v1/callback`
+  - `http://127.0.0.1:54321/auth/v1/callback` si usas Supabase local CLI
+- En `.env`, ajusta `VITE_SITE_URL` y `VITE_SUPABASE_OAUTH_REDIRECT_URL`. El frontend usa `redirectTo` desde esas variables, sin URLs hardcodeadas.
 
-- `DATABASE_URL`: conexion PostgreSQL consumida por Prisma.
-- `PORT`: puerto preferido para la API.
-- `CLIENT_URL`: origen permitido por CORS.
-- `SUPABASE_URL`: URL del proyecto Supabase.
-- `SUPABASE_ANON_KEY`: clave publica usada por frontend y backend para operaciones autenticadas de usuario.
-- `SUPABASE_SERVICE_ROLE_KEY`: clave administrativa usada solo en backend.
-- `VITE_API_BASE_URL`: base relativa o absoluta para el cliente HTTP del frontend.
-- `VITE_SUPABASE_URL`: URL expuesta al cliente para Auth.
-- `VITE_SUPABASE_ANON_KEY`: clave publica expuesta al cliente.
-- `VITE_SUPABASE_PROPERTY_MEDIA_BUCKET`: bucket publico usado para imagenes y videos de propiedades.
-- `VITE_SUPABASE_REDIRECT_URL`: URL de retorno del flujo de recuperacion de contrasena.
+## Ambientes
 
-## Scripts utiles
+- `development/local`: usa `.env` local con Supabase dev/local, DB dev y `CLIENT_URLS` localhost.
+- `staging`: usa proyecto Supabase y DB propios de staging. `NODE_ENV=staging`, dominios reales y secretos separados.
+- `production`: usa solo secretos de production en el proveedor de despliegue. No debe contener localhost ni claves de development.
 
-- `npm run dev`: levanta frontend y backend para desarrollo.
-- `npm run dev:client`: inicia solo Vite.
-- `npm run dev:server`: inicia solo la API con recarga automatica.
-- `npm run build`: genera el build de produccion del frontend.
-- `npm start`: arranca la API.
-- `npm run prisma:generate`: regenera el cliente de Prisma.
-- `npm run prisma:push`: aplica el esquema actual a la base de datos.
-- `npm run prisma:seed`: inserta datos demo.
+## Variables
 
-## Flujo de autenticacion
+| Nombre | Ambiente | Obligatoria | Capa | Descripcion | Ejemplo seguro |
+| --- | --- | --- | --- | --- | --- |
+| `NODE_ENV` | Todos | Si | Backend | `development`, `staging` o `production`. | `development` |
+| `PORT` | Todos | Si | Backend | Puerto preferido de la API. | `5000` |
+| `DATABASE_URL` | Todos | Si | Backend/Prisma | URL operativa de PostgreSQL. | `postgresql://postgres:<password>@127.0.0.1:54322/postgres?schema=public` |
+| `DIRECT_URL` | Todos | Si | Backend/Prisma | Conexion directa para migraciones Prisma. | `postgresql://postgres:<password>@127.0.0.1:54322/postgres?schema=public` |
+| `JWT_SECRET` | Staging/Prod | Si | Backend | Secreto largo para futuras firmas JWT internas. | `replace-with-a-long-random-secret` |
+| `CLIENT_URLS` | Todos | Si | Backend | Origenes CORS separados por coma. | `http://localhost:5173,http://127.0.0.1:5173` |
+| `SUPABASE_URL` | Todos | Si | Backend | URL del proyecto Supabase. | `https://<project-ref>.supabase.co` |
+| `SUPABASE_ANON_KEY` | Todos | Si | Backend | Clave publica anon/publishable. | `replace-with-supabase-anon-key` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Todos | Si | Backend | Clave administrativa server-only. | `replace-with-service-role-key` |
+| `SUPABASE_PROPERTY_MEDIA_BUCKET` | Todos | Si | Backend | Bucket de media de propiedades. | `property-media-public` |
+| `VITE_API_URL` | Todos | Si | Frontend | Base URL del backend; localmente puede ser relativa. | `/api` |
+| `VITE_SITE_URL` | Todos | Si | Frontend | Origen publico del frontend. | `http://localhost:5173` |
+| `VITE_SUPABASE_URL` | Todos | Si | Frontend | URL publica Supabase. | `https://<project-ref>.supabase.co` |
+| `VITE_SUPABASE_ANON_KEY` | Todos | Si | Frontend | Clave publica. Nunca service role. | `replace-with-supabase-anon-key` |
+| `VITE_SUPABASE_OAUTH_REDIRECT_URL` | Todos | Si | Frontend | Callback local de la app tras OAuth. | `http://localhost:5173/auth/callback` |
 
-1. El frontend inicia sesion con Supabase.
-2. El token de acceso se mantiene en memoria y se adjunta al cliente API.
-3. El backend valida el token usando Supabase y garantiza la existencia del perfil operativo en Prisma `user`.
-4. La API devuelve un perfil enriquecido con rol efectivo y permisos administrativos.
+## Scripts
 
-Este diseno evita duplicar contrasenas en la aplicacion y centraliza la autorizacion de negocio en el backend.
+- `npm run env:check`: valida backend/frontend sin imprimir secretos.
+- `npm run dev`: levanta backend y frontend.
+- `npm run build`: build frontend.
+- `npm start`: arranca API.
+- `npm run prisma:generate`: genera Prisma Client.
+- `npm run prisma:migrate`: crea/aplica migraciones en development.
+- `npm run prisma:migrate:deploy`: aplica migraciones en staging/production.
+- `npm run prisma:studio`: abre Prisma Studio.
+- `npm run prisma:seed`: carga datos demo.
 
-## Modulos backend
+## Seguridad
 
-- `auth`: registro, login, recuperacion y perfil autenticado.
-- `properties`: CRUD de propiedades, filtros, estados y detalle.
-- `favorites`: favoritos por usuario.
-- `requests`: solicitudes de arriendo.
-- `users`: actualizacion de perfil y datos propios.
-- `admin`: moderacion, listados administrativos y metricas.
+- `.env`, `.env.*`, `backend/.env*` y `frontend/.env*` estan ignorados por Git; solo se versionan examples.
+- El frontend solo puede usar `VITE_SUPABASE_ANON_KEY` o `VITE_SUPABASE_PUBLISHABLE_KEY`.
+- El validador falla si detecta `VITE_*` con `SERVICE_ROLE`, `SECRET`, `JWT`, `DATABASE_URL`, `DIRECT_URL`, `PASSWORD`, `TOKEN` o similares.
+- El backend usa `SUPABASE_SERVICE_ROLE_KEY` solo server-side.
+- CORS se controla con `CLIENT_URLS`; en staging/production no uses `*` ni localhost.
+- No registres tokens, URLs completas con password ni claves en logs.
+- Si alguna clave real estuvo en GitHub, rotala inmediatamente en Supabase/Google y actualiza el gestor seguro.
+- Revisa RLS al cambiar tablas en schemas expuestos. Las migraciones actuales viven en `supabase/migrations/`; cualquier tabla nueva en `public` debe tener RLS y politicas concretas.
 
-## Verificacion realizada
+## Errores Comunes
 
-- `npm run build` ejecuta correctamente en el estado actual del repositorio.
-
-Observacion: Vite reporta un bundle principal mayor a `500 kB`, por lo que conviene considerar code splitting cuando entremos a una ronda de optimizacion.
+- `Supabase no esta configurado`: faltan `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `VITE_SUPABASE_URL` o `VITE_SUPABASE_ANON_KEY`.
+- `Google Auth no esta configurado`: Google provider no esta habilitado en Supabase o faltan origins/redirect URIs en Google Cloud.
+- `DATABASE_URL no esta configurada`: crea `.env`, copia valores reales y ejecuta `npm run env:check`.
+- Prisma falla entre casa y trabajo: no uses `db push` como flujo normal; commitea migraciones y aplica `npm run prisma:migrate`.
+- CORS bloqueado: agrega el origen exacto del frontend a `CLIENT_URLS`, sin slash final.

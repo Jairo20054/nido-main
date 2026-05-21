@@ -1,15 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
+import { frontendEnv } from './env';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey =
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = frontendEnv.VITE_SUPABASE_URL;
+const supabaseAnonKey = frontendEnv.VITE_SUPABASE_ANON_KEY;
 
 const missingSupabaseConfigMessage =
   'La autenticación no está configurada. Define VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY o VITE_SUPABASE_PUBLISHABLE_KEY.';
-const hasPlaceholderConfig =
-  /your-project\.supabase\.co/i.test(String(supabaseUrl || '')) ||
-  /^your-(anon|publishable|secret|service)/i.test(String(supabaseAnonKey || '').trim());
-export const hasSupabaseConfig = Boolean(supabaseUrl && supabaseAnonKey && !hasPlaceholderConfig);
+export const hasSupabaseConfig = Boolean(supabaseUrl && supabaseAnonKey);
 
 // Punto unico de integracion del cliente web con Supabase Auth.
 // Cliente de respaldo para no romper la aplicacion en entornos donde faltan variables
@@ -59,7 +56,7 @@ export const getSiteUrl = () => {
   const runtimeOrigin =
     typeof window !== 'undefined' && window.location?.origin ? window.location.origin : '';
   const configuredOrigin = withProtocol(
-    import.meta.env.VITE_SITE_URL || import.meta.env.VITE_VERCEL_URL || runtimeOrigin
+    frontendEnv.VITE_SITE_URL || frontendEnv.VITE_VERCEL_URL || runtimeOrigin
   );
 
   return configuredOrigin.replace(/\/$/, '');
@@ -67,12 +64,12 @@ export const getSiteUrl = () => {
 
 // URL de retorno usada por el flujo de restablecimiento de contrasena.
 export const getPasswordResetUrl = () =>
-  import.meta.env.VITE_SUPABASE_REDIRECT_URL || `${getSiteUrl()}/reset-password`;
+  frontendEnv.VITE_SUPABASE_REDIRECT_URL || `${getSiteUrl()}/reset-password`;
 
 export const getEmailConfirmationUrl = () =>
-  import.meta.env.VITE_SUPABASE_EMAIL_CONFIRMATION_URL || `${getSiteUrl()}/email-confirmed`;
+  frontendEnv.VITE_SUPABASE_EMAIL_CONFIRMATION_URL || `${getSiteUrl()}/email-confirmed`;
 
 export const getOAuthCallbackUrl = () =>
-  import.meta.env.VITE_SUPABASE_OAUTH_REDIRECT_URL || `${getSiteUrl()}/auth/callback`;
+  frontendEnv.VITE_SUPABASE_OAUTH_REDIRECT_URL || `${getSiteUrl()}/auth/callback`;
 
 export const getSupabaseConfigError = () => missingSupabaseConfigMessage;
