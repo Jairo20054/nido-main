@@ -19,11 +19,11 @@ const EXTRA_LABELS = {
 };
 
 const SEARCH_BUDGET_OPTIONS = [
+  { value: 1500000, label: 'Hasta $1.5M' },
+  { value: 2000000, label: 'Hasta $2M' },
   { value: 2500000, label: 'Hasta $2.5M' },
   { value: 3500000, label: 'Hasta $3.5M' },
-  { value: 4500000, label: 'Hasta $4.5M' },
-  { value: 6500000, label: 'Hasta $6.5M' },
-  { value: 9000000, label: 'Hasta $9M' },
+  { value: 9000000, label: 'Sin limite cercano' },
 ];
 
 const SEARCH_PROPERTY_TYPES = [
@@ -31,6 +31,8 @@ const SEARCH_PROPERTY_TYPES = [
   { value: 'apartment', label: 'Apartamento' },
   { value: 'house', label: 'Casa' },
   { value: 'studio', label: 'Apartaestudio' },
+  { value: 'room', label: 'Habitacion' },
+  { value: 'loft', label: 'Loft' },
 ];
 
 const QUICK_SEARCH_CHIPS = [
@@ -73,14 +75,14 @@ export function SearchPage() {
       const response = await api.get('/properties', {
         auth: isAuthenticated,
         query: {
-          city: activeFilters.city || undefined,
+          q: activeFilters.city || undefined,
           propertyType: activeFilters.propertyType
             ? activeFilters.propertyType.toUpperCase()
             : undefined,
-          minRent: activeFilters.minRent,
-          maxRent: activeFilters.maxRent,
-          bedrooms: activeFilters.bedrooms,
-          bathrooms: activeFilters.bathrooms,
+          minRent: activeFilters.minRent || undefined,
+          maxRent: activeFilters.maxRent || undefined,
+          bedrooms: activeFilters.bedrooms || undefined,
+          bathrooms: activeFilters.bathrooms || undefined,
           furnished: activeFilters.extras.includes('furnished') || undefined,
           petsAllowed: activeFilters.extras.includes('petsAllowed') || undefined,
           sort: activeFilters.sort,
@@ -151,14 +153,14 @@ export function SearchPage() {
       });
     }
     if (filters.city) chips.push({ key: 'city', label: filters.city });
-    if (filters.minRent !== 1800000 || filters.maxRent !== 4500000) {
+    if (filters.minRent !== 0 || filters.maxRent !== 9000000) {
       chips.push({
         key: 'rent',
         label: `${formatCurrency(filters.minRent)} - ${formatCurrency(filters.maxRent)}`,
       });
     }
-    if (filters.bedrooms !== 1) chips.push({ key: 'bedrooms', label: `${filters.bedrooms} hab.` });
-    if (filters.bathrooms !== 1) chips.push({ key: 'bathrooms', label: `${filters.bathrooms} baños` });
+    if (filters.bedrooms !== 0) chips.push({ key: 'bedrooms', label: `${filters.bedrooms} hab.` });
+    if (filters.bathrooms !== 0) chips.push({ key: 'bathrooms', label: `${filters.bathrooms} banos` });
     filters.extras.forEach((extra) => chips.push({ key: extra, label: EXTRA_LABELS[extra] }));
 
     return chips;
@@ -168,12 +170,12 @@ export function SearchPage() {
     if (key === 'propertyType') return setFilter('propertyType', '');
     if (key === 'city') return setFilter('city', '');
     if (key === 'rent') {
-      setFilter('minRent', 1800000);
-      setFilter('maxRent', 4500000);
+      setFilter('minRent', 0);
+      setFilter('maxRent', 9000000);
       return;
     }
-    if (key === 'bedrooms') return setFilter('bedrooms', 1);
-    if (key === 'bathrooms') return setFilter('bathrooms', 1);
+    if (key === 'bedrooms') return setFilter('bedrooms', 0);
+    if (key === 'bathrooms') return setFilter('bathrooms', 0);
     toggleExtra(key);
   };
 
@@ -192,10 +194,10 @@ export function SearchPage() {
     clearFilters();
     setFilter('city', 'Bogotá');
     setFilter('propertyType', '');
-    setFilter('minRent', 1800000);
-    setFilter('maxRent', 6500000);
-    setFilter('bedrooms', 1);
-    setFilter('bathrooms', 1);
+    setFilter('minRent', 0);
+    setFilter('maxRent', 9000000);
+    setFilter('bedrooms', 0);
+    setFilter('bathrooms', 0);
   };
 
   return (

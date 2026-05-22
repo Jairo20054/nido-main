@@ -14,6 +14,8 @@ export function PropertyCard({
   onToggleFavorite,
   disabledFavorite = false,
   variant = 'default',
+  proximityLabel,
+  distanceLabel,
 }) {
   const features = [];
   if (property.furnished) features.push('Amoblado');
@@ -23,12 +25,14 @@ export function PropertyCard({
   if (property.maintenanceFee) features.push(`Adm. ${formatCurrency(property.maintenanceFee)}`);
 
   const isCompact = variant === 'compact';
+  const isHome = variant === 'home';
   const area = property.areaM2 || property.area || 0;
   const typeLabel = getPropertyTypeLabel(property.propertyType);
   const trustLabel = getPropertyTrustLabel(property);
   const reputationLabel = getPropertyReputationLabel(property);
   const totalMonthly = (property.monthlyRent || 0) + (property.maintenanceFee || 0);
   const visibleFeatures = features.slice(0, isCompact ? 2 : 4);
+  const title = isHome ? `${typeLabel || 'Vivienda'} en arriendo` : property.title;
 
   const handleToggleFavorite = (event) => {
     event.preventDefault();
@@ -45,8 +49,10 @@ export function PropertyCard({
         <PropertyImage property={property} alt={property.title} className="property-card__image" />
 
         <div className="property-card__badge-row">
-          <span className="property-card__badge">{typeLabel}</span>
-          {!isCompact ? (
+          <span className="property-card__badge">
+            {isHome ? proximityLabel || 'Cerca de ti' : typeLabel}
+          </span>
+          {!isCompact && !isHome ? (
             <span className="property-card__badge property-card__badge--trust">
               <ShieldCheck size={13} />
               {trustLabel}
@@ -57,7 +63,9 @@ export function PropertyCard({
         {onToggleFavorite ? (
           <button
             type="button"
-            className={`property-card__favorite ${property.isFavorite ? 'property-card__favorite--active' : ''}`}
+            className={`property-card__favorite ${
+              property.isFavorite ? 'property-card__favorite--active' : ''
+            }`}
             onClick={handleToggleFavorite}
             disabled={disabledFavorite}
             aria-label={property.isFavorite ? 'Quitar de guardados' : 'Guardar propiedad'}
@@ -65,38 +73,56 @@ export function PropertyCard({
             <Heart size={16} />
           </button>
         ) : null}
+
+        {isHome && distanceLabel ? (
+          <span className="property-card__distance">
+            <MapPin size={13} />
+            {distanceLabel}
+          </span>
+        ) : null}
       </div>
 
       <div className="property-card__body">
         <div className="property-card__headline">
           <div>
-            <p className="property-card__price">{formatCurrency(property.monthlyRent)} / mes</p>
-            {property.maintenanceFee ? (
-              <p className="property-card__price-note">Total estimado: {formatCurrency(totalMonthly)}</p>
+            <p className="property-card__price">
+              {formatCurrency(property.monthlyRent)}
+              {isHome ? ' COP' : ' / mes'}
+            </p>
+            {property.maintenanceFee && !isHome ? (
+              <p className="property-card__price-note">
+                Total estimado: {formatCurrency(totalMonthly)}
+              </p>
             ) : null}
           </div>
-          {!isCompact ? (
+          {!isCompact && !isHome ? (
             <span className="property-card__signal">
-            <BadgeCheck size={14} />
-            {reputationLabel}
+              <BadgeCheck size={14} />
+              {reputationLabel}
             </span>
           ) : null}
         </div>
 
-        <h3 className="property-card__title">{property.title}</h3>
+        <h3 className="property-card__title">{title}</h3>
         <p className="property-card__location">
           <MapPin size={14} />
           {getPropertyLocationLabel(property)}
         </p>
-        {!isCompact ? <p className="property-card__summary">{property.summary}</p> : null}
+        {!isCompact && !isHome ? <p className="property-card__summary">{property.summary}</p> : null}
 
         <div className="property-card__stats">
-          <span><BedDouble size={14} /> {property.bedrooms} hab.</span>
-          <span><Bath size={14} /> {property.bathrooms} baños</span>
-          <span><Ruler size={14} /> {area} m²</span>
+          <span>
+            <BedDouble size={14} /> {property.bedrooms ?? 0} hab.
+          </span>
+          <span>
+            <Bath size={14} /> {property.bathrooms ?? 0} banos
+          </span>
+          <span>
+            <Ruler size={14} /> {area || '--'} m2
+          </span>
         </div>
 
-        {visibleFeatures.length > 0 ? (
+        {!isHome && visibleFeatures.length > 0 ? (
           <div className="property-card__tags">
             {visibleFeatures.map((feature) => (
               <span key={feature} className="property-card__tag">
@@ -106,12 +132,14 @@ export function PropertyCard({
           </div>
         ) : null}
 
-        <div className="property-card__footer">
-          <span className="property-card__footer-badge">
-            {property.availableImmediately ? 'Disponible ahora' : 'Agenda visita'}
-          </span>
-          <span className="property-card__cta">Ver detalles</span>
-        </div>
+        {!isHome ? (
+          <div className="property-card__footer">
+            <span className="property-card__footer-badge">
+              {property.availableImmediately ? 'Disponible ahora' : 'Agenda visita'}
+            </span>
+            <span className="property-card__cta">Ver detalles</span>
+          </div>
+        ) : null}
       </div>
     </Link>
   );

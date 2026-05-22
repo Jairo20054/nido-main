@@ -19,7 +19,9 @@ import { formatCurrency } from '../../lib/formatters';
 const PROPERTY_TYPE_OPTIONS = [
   { value: 'apartment', label: 'Apartamento', icon: Building2 },
   { value: 'house', label: 'Casa', icon: Home },
-  { value: 'studio', label: 'Estudio', icon: Sofa },
+  { value: 'studio', label: 'Apartaestudio', icon: Sofa },
+  { value: 'room', label: 'Habitacion', icon: BedDouble },
+  { value: 'loft', label: 'Loft', icon: Building2 },
 ];
 
 const EXTRA_OPTIONS = [
@@ -170,7 +172,7 @@ export function PropertyFilters({
 
       <AccordionSection icon={Landmark} title="Canon mensual">
         <DualRangeSlider
-          min={500000}
+          min={0}
           max={9000000}
           valueMin={filters.minRent}
           valueMax={filters.maxRent}
@@ -206,12 +208,12 @@ export function PropertyFilters({
         />
       </AccordionSection>
 
-      <AccordionSection icon={Bath} title="Baños">
+      <AccordionSection icon={Bath} title="Banos">
         <Stepper
-          label="Baños"
+          label="Banos"
           icon={Bath}
           value={filters.bathrooms}
-          min={1}
+          min={0}
           onChange={(value) => onChange('bathrooms', value)}
         />
       </AccordionSection>

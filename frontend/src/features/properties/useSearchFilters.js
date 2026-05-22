@@ -4,10 +4,10 @@ import { useSearchParams } from 'react-router-dom';
 const DEFAULT_FILTERS = {
   city: '',
   propertyType: '',
-  minRent: 1800000,
-  maxRent: 4500000,
-  bedrooms: 1,
-  bathrooms: 1,
+  minRent: 0,
+  maxRent: 9000000,
+  bedrooms: 0,
+  bathrooms: 0,
   extras: [],
   sort: 'recommended',
 };
@@ -63,10 +63,21 @@ const serializeFilters = (filters) => {
     params.set('tipo', filters.propertyType.toLowerCase());
   }
 
-  params.set('min', String(filters.minRent));
-  params.set('max', String(filters.maxRent));
-  params.set('hab', String(filters.bedrooms));
-  params.set('banos', String(filters.bathrooms));
+  if (filters.minRent !== DEFAULT_FILTERS.minRent) {
+    params.set('min', String(filters.minRent));
+  }
+
+  if (filters.maxRent !== DEFAULT_FILTERS.maxRent) {
+    params.set('max', String(filters.maxRent));
+  }
+
+  if (filters.bedrooms !== DEFAULT_FILTERS.bedrooms) {
+    params.set('hab', String(filters.bedrooms));
+  }
+
+  if (filters.bathrooms !== DEFAULT_FILTERS.bathrooms) {
+    params.set('banos', String(filters.bathrooms));
+  }
 
   if (filters.extras.length) {
     params.set('extras', filters.extras.join(','));
