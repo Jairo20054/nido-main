@@ -160,7 +160,7 @@ export function ApplicationReviewPage() {
                 </div>
 
                 {request.status === 'REJECTED' ? (
-                  <Link to="/properties" className="button">
+                  <Link to="/#buscar" className="button">
                     Ver otras propiedades
                   </Link>
                 ) : (

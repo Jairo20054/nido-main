@@ -420,7 +420,7 @@ export function PropertyDetailPage() {
               <Link className="button" to={`/properties/${property.id}/apply/start`}>
                 Arrendar
               </Link>
-              <Link className="button button--secondary" to="/properties">
+              <Link className="button button--secondary" to="/#buscar">
                 Comparar opciones
               </Link>
             </div>

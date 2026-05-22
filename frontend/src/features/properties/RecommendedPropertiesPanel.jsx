@@ -60,7 +60,7 @@ export function RecommendedPropertiesPanel({ location, properties, onViewMap }) 
       <section className="recommended-mini-list">
         <div className="recommended-mini-list__heading">
           <h2>Recomendaciones para ti</h2>
-          <Link to="/properties">Ver todas</Link>
+          <Link to="/#buscar">Ver todas</Link>
         </div>
         {recommendations.length ? (
           recommendations.map((property) => (

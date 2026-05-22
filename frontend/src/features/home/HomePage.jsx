@@ -1,448 +1,600 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  ArrowRight,
   Bath,
   BedDouble,
-  Compass,
+  Building2,
+  Car,
+  CheckCircle2,
+  ChevronDown,
   HeartHandshake,
   Home,
-  KeyRound,
   MapPin,
+  PawPrint,
+  RotateCcw,
   Search,
   ShieldCheck,
+  SlidersHorizontal,
+  Sofa,
   Sparkles,
-  Tag,
-  UsersRound,
   WalletCards,
+  X,
 } from 'lucide-react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { EmptyState } from '../../components/ui/EmptyState';
+import { useLocation } from 'react-router-dom';
 import { InlineMessage } from '../../components/ui/InlineMessage';
-import { useAuth } from '../../app/providers/useAuth';
-import { api } from '../../lib/apiClient';
+import { formatCurrency } from '../../lib/formatters';
 import { PropertyCard } from '../properties/PropertyCard';
 import { PropertyCardSkeleton } from '../properties/PropertyCardSkeleton';
-
-const POPULAR_CITIES = ['Bogota', 'Medellin', 'Cali', 'Barranquilla', 'Envigado'];
+import { useHomePropertySearch } from './useHomePropertySearch';
 
 const BUDGET_OPTIONS = [
-  { value: '', label: 'Sin limite' },
-  { value: 1500000, label: 'Hasta $1.5M' },
-  { value: 2000000, label: 'Hasta $2M' },
-  { value: 2500000, label: 'Hasta $2.5M' },
-  { value: 3500000, label: 'Hasta $3.5M' },
-  { value: 'over-3500000', label: 'Mas de $3.5M' },
+  { value: 'all', label: 'Sin limite', minRent: 0, maxRent: 9000000 },
+  { value: '0-1500000', label: 'Hasta $1.5M', minRent: 0, maxRent: 1500000 },
+  { value: '1500000-2500000', label: '$1.5M - $2.5M', minRent: 1500000, maxRent: 2500000 },
+  { value: '2500000-4000000', label: '$2.5M - $4M', minRent: 2500000, maxRent: 4000000 },
+  { value: '4000000-9000000', label: 'Mas de $4M', minRent: 4000000, maxRent: 9000000 },
 ];
 
 const PROPERTY_TYPES = [
-  { value: '', label: 'Cualquier tipo' },
-  { value: 'apartment', label: 'Apartamento' },
-  { value: 'house', label: 'Casa' },
-  { value: 'studio', label: 'Apartaestudio' },
-  { value: 'room', label: 'Habitacion' },
-  { value: 'loft', label: 'Loft' },
+  { value: '', label: 'Cualquier tipo', icon: Home },
+  { value: 'apartment', label: 'Apartamento', icon: Building2 },
+  { value: 'house', label: 'Casa', icon: Home },
+  { value: 'studio', label: 'Apartaestudio', icon: Sofa },
+  { value: 'room', label: 'Habitacion', icon: BedDouble },
 ];
 
 const ROOM_OPTIONS = [
-  { value: '', label: 'Cualquiera' },
+  { value: 0, label: 'Cualquiera' },
   { value: 1, label: '1 habitacion' },
   { value: 2, label: '2 habitaciones' },
   { value: 3, label: '3 habitaciones' },
-  { value: 4, label: '4 o mas habitaciones' },
+  { value: 4, label: '4+ habitaciones' },
+];
+
+const BATHROOM_OPTIONS = [
+  { value: 0, label: 'Cualquiera' },
+  { value: 1, label: '1 bano' },
+  { value: 2, label: '2 banos' },
+  { value: 3, label: '3+ banos' },
+];
+
+const SORT_OPTIONS = [
+  { value: 'recommended', label: 'Recomendadas' },
+  { value: 'rent-asc', label: 'Menor precio' },
+  { value: 'rent-desc', label: 'Mayor precio' },
+  { value: 'latest', label: 'Mas recientes' },
+  { value: 'area-desc', label: 'Mayor area' },
+];
+
+const QUICK_FILTERS = [
+  { label: 'Bogota', patch: { location: 'Bogota' }, isActive: (filters) => filters.location === 'Bogota' },
+  { label: 'Medellin', patch: { location: 'Medellin' }, isActive: (filters) => filters.location === 'Medellin' },
+  { label: 'Cali', patch: { location: 'Cali' }, isActive: (filters) => filters.location === 'Cali' },
+  { label: 'Apartamentos', patch: { propertyType: 'apartment' }, isActive: (filters) => filters.propertyType === 'apartment' },
+  { label: 'Casas', patch: { propertyType: 'house' }, isActive: (filters) => filters.propertyType === 'house' },
+  { label: 'Amoblados', extra: 'furnished' },
+  { label: 'Mascotas', extra: 'petsAllowed' },
+];
+
+const EXTRA_FILTERS = [
+  { value: 'furnished', label: 'Amoblado', icon: Sofa },
+  { value: 'petsAllowed', label: 'Mascotas', icon: PawPrint },
+  { value: 'parking', label: 'Parqueadero', icon: Car },
+  { value: 'elevator', label: 'Ascensor', icon: ChevronDown },
+  { value: 'balcony', label: 'Balcon', icon: Home },
+  { value: 'security', label: 'Vigilancia', icon: ShieldCheck },
 ];
 
 const BENEFITS = [
   {
     icon: ShieldCheck,
     title: 'Propiedades verificadas',
-    description: 'Revisamos cada anuncio',
+    description: 'Anuncios revisados antes de llegar a ti.',
   },
   {
     icon: WalletCards,
     title: 'Costos claros',
-    description: 'Sin cobros ocultos',
+    description: 'Arriendo, administracion y condiciones visibles.',
   },
   {
-    icon: UsersRound,
-    title: 'Opciones para familias',
-    description: 'Espacios para cada etapa',
+    icon: Search,
+    title: 'Busqueda simple',
+    description: 'Filtra y compara sin salir del inicio.',
   },
   {
-    icon: Compass,
-    title: 'Explora sin complicaciones',
-    description: 'Busqueda rapida y simple',
+    icon: HeartHandshake,
+    title: 'Atencion confiable',
+    description: 'Procesos guiados para arrendar con calma.',
   },
 ];
 
-const DEFAULT_FILTERS = {
-  location: '',
-  budget: '',
-  propertyType: '',
-  rooms: '',
+const getBudgetValue = (filters) => {
+  const match = BUDGET_OPTIONS.find(
+    (option) => option.minRent === filters.minRent && option.maxRent === filters.maxRent
+  );
+
+  return match?.value || 'custom';
 };
 
-const COLOMBIA_CENTER = { latitude: 4.711, longitude: -74.0721 };
-
-const removeAccents = (value) =>
-  value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-
-const formatDistance = (distanceKm) =>
-  Number.isFinite(distanceKm) ? `${distanceKm.toFixed(1)} km` : '';
-
-const toRadians = (value) => (value * Math.PI) / 180;
-
-const getDistanceKm = (origin, property) => {
-  const latitude = Number(property?.latitude);
-  const longitude = Number(property?.longitude);
-
-  if (!origin || !Number.isFinite(latitude) || !Number.isFinite(longitude)) {
-    return null;
-  }
-
-  const earthRadiusKm = 6371;
-  const deltaLatitude = toRadians(latitude - origin.latitude);
-  const deltaLongitude = toRadians(longitude - origin.longitude);
-  const startLatitude = toRadians(origin.latitude);
-  const endLatitude = toRadians(latitude);
-  const haversine =
-    Math.sin(deltaLatitude / 2) ** 2 +
-    Math.cos(startLatitude) * Math.cos(endLatitude) * Math.sin(deltaLongitude / 2) ** 2;
-
-  return earthRadiusKm * 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+const scrollToResults = (resultsRef) => {
+  window.setTimeout(() => {
+    resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 80);
 };
 
 export function HomePage() {
-  const navigate = useNavigate();
+  const resultsRef = useRef(null);
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
-  const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [savingFavorite, setSavingFavorite] = useState('');
-  const [locationStatus, setLocationStatus] = useState('idle');
-  const [userCoordinates, setUserCoordinates] = useState(null);
-  const [searchFilters, setSearchFilters] = useState(DEFAULT_FILTERS);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const {
+    filters,
+    appliedFilters,
+    results,
+    totalCount,
+    loading,
+    error,
+    savingFavorite,
+    activeCount,
+    hasActiveSearch,
+    defaultFilters,
+    setFilter,
+    patchFilters,
+    toggleExtra,
+    clearFilters,
+    runSearch,
+    toggleFavorite,
+  } = useHomePropertySearch();
 
   useEffect(() => {
-    let active = true;
-
-    setLoading(true);
-    api
-      .get('/properties/featured', { auth: isAuthenticated })
-      .then((response) => {
-        if (!active) return;
-        setProperties(response.data || []);
-        setError('');
-      })
-      .catch((requestError) => {
-        if (!active) return;
-        setProperties([]);
-        setError(requestError.message || 'No pudimos cargar las propiedades recomendadas.');
-      })
-      .finally(() => {
-        if (active) {
-          setLoading(false);
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [isAuthenticated]);
-
-  const buildSearchPath = (filters = searchFilters) => {
-    const params = new URLSearchParams();
-    const locationValue = removeAccents(filters.location || '');
-
-    if (locationValue) params.set('ciudad', locationValue);
-    if (filters.budget === 'over-3500000') {
-      params.set('min', '3500000');
-    } else if (filters.budget) {
-      params.set('max', String(filters.budget));
+    if (location.hash === '#buscar') {
+      window.setTimeout(() => {
+        document.getElementById('buscar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 120);
     }
-    if (filters.propertyType) params.set('tipo', filters.propertyType);
-    if (filters.rooms) params.set('hab', String(filters.rooms));
+  }, [location.hash]);
 
-    const query = params.toString();
-    return query ? `/properties?${query}` : '/properties';
-  };
-
-  const handleSearch = (event) => {
+  const submitSearch = (event) => {
     event.preventDefault();
-    navigate(buildSearchPath());
+    runSearch(filters);
+    scrollToResults(resultsRef);
   };
 
-  const handleCitySearch = (city) => {
-    const nextFilters = { ...searchFilters, location: city };
-    setSearchFilters(nextFilters);
-    navigate(buildSearchPath(nextFilters));
-  };
-
-  const requestUserLocation = () => {
-    if (!navigator.geolocation) {
-      setLocationStatus('unavailable');
+  const applyQuickFilter = (quickFilter) => {
+    if (quickFilter.extra) {
+      const nextExtras = filters.extras.includes(quickFilter.extra)
+        ? filters.extras.filter((extra) => extra !== quickFilter.extra)
+        : [...filters.extras, quickFilter.extra];
+      patchFilters({ extras: nextExtras }, true);
+      scrollToResults(resultsRef);
       return;
     }
 
-    setLocationStatus('requesting');
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setUserCoordinates({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        });
-        setLocationStatus('ready');
-      },
-      () => {
-        setUserCoordinates(null);
-        setLocationStatus('denied');
-      },
-      { enableHighAccuracy: false, maximumAge: 1000 * 60 * 10, timeout: 8000 }
-    );
+    patchFilters(quickFilter.patch, true);
+    scrollToResults(resultsRef);
   };
 
-  const toggleFavorite = async (property) => {
-    if (!isAuthenticated) {
-      navigate('/login', { state: { from: location.pathname } });
-      return;
-    }
-
-    setSavingFavorite(property.id);
-
-    try {
-      if (property.isFavorite) {
-        await api.delete(`/favorites/${property.id}`);
-      } else {
-        await api.post(`/favorites/${property.id}`, {});
-      }
-
-      setProperties((current) =>
-        current.map((item) =>
-          item.id === property.id ? { ...item, isFavorite: !item.isFavorite } : item
-        )
-      );
-    } catch (requestError) {
-      setError(requestError.message);
-    } finally {
-      setSavingFavorite('');
-    }
+  const applyFilters = () => {
+    runSearch(filters);
+    setFiltersOpen(false);
+    scrollToResults(resultsRef);
   };
 
-  const recommendedProperties = useMemo(() => {
-    const origin = userCoordinates || COLOMBIA_CENTER;
-
-    return properties
-      .map((property) => ({
-        ...property,
-        distanceKm: getDistanceKm(origin, property),
-      }))
-      .sort((left, right) => {
-        if (left.distanceKm === null && right.distanceKm === null) return 0;
-        if (left.distanceKm === null) return 1;
-        if (right.distanceKm === null) return -1;
-        return left.distanceKm - right.distanceKm;
-      })
-      .slice(0, 4);
-  }, [properties, userCoordinates]);
+  const resetFilters = () => {
+    clearFilters(true);
+    scrollToResults(resultsRef);
+  };
 
   return (
     <div className="home-page home-page--nido">
-      <HomeHero
-        filters={searchFilters}
-        onFilterChange={setSearchFilters}
-        onSearch={handleSearch}
-        onCitySearch={handleCitySearch}
-      />
-
-      <BenefitHighlights />
-
-      <section className="home-recommended" aria-labelledby="recommended-title">
-        <div className="home-recommended__heading">
-          <div>
-            <span className="section__eyebrow home-recommended__eyebrow">
-              <MapPin size={14} />
-              Basado en tu ubicacion
+      <section className="home-hero home-hero--image" id="buscar">
+        <div className="home-hero__content">
+          <div className="home-hero__intro">
+            <span className="hero-kicker">
+              <Sparkles size={14} aria-hidden="true" />
+              Arriendos claros en Colombia
             </span>
-            <h2 id="recommended-title">Viviendas recomendadas cerca de ti</h2>
+            <h1 className="home-hero__title">Tu proximo hogar, sin complicaciones</h1>
+            <p className="home-hero__subtitle">
+              Encuentra arriendos confiables con informacion clara, propiedades verificadas y
+              procesos simples.
+            </p>
           </div>
-          <div className="home-recommended__actions">
-            <button
-              type="button"
-              className="home-location-button"
-              onClick={requestUserLocation}
-              disabled={locationStatus === 'requesting'}
-            >
-              <Compass size={16} />
-              {locationStatus === 'requesting' ? 'Ubicando...' : 'Usar mi ubicacion'}
-            </button>
-            <button type="button" className="hero-inline-link" onClick={() => navigate('/properties')}>
-              Ver todas las propiedades
-              <ArrowRight size={17} />
-            </button>
+
+          <HomeSearchForm
+            filters={filters}
+            activeCount={activeCount}
+            onChange={setFilter}
+            onSearch={submitSearch}
+            onOpenMoreFilters={() => setFiltersOpen(true)}
+          />
+
+          <QuickSearches filters={filters} onSelect={applyQuickFilter} />
+        </div>
+      </section>
+
+      <section className="home-results" ref={resultsRef} aria-labelledby="home-results-title">
+        <div className="home-results__heading">
+          <div>
+            <span className="section__eyebrow home-results__eyebrow">
+              <MapPin size={14} aria-hidden="true" />
+              {hasActiveSearch ? 'Busqueda activa' : 'Recomendadas'}
+            </span>
+            <h2 id="home-results-title">
+              {hasActiveSearch ? 'Propiedades encontradas' : 'Propiedades recomendadas cerca de ti'}
+            </h2>
+            <p>
+              {hasActiveSearch
+                ? `${totalCount || results.length} opciones segun tus filtros${appliedFilters.location ? ` en ${appliedFilters.location}` : ''}.`
+                : 'Explora viviendas publicadas recientemente y ajusta filtros sin cambiar de pantalla.'}
+            </p>
+          </div>
+          <div className="home-results__actions">
+            <label className="home-sort-control" htmlFor="home-sort">
+              <span>Ordenar</span>
+              <select id="home-sort" value={filters.sort} onChange={(event) => patchFilters({ sort: event.target.value }, true)}>
+                {SORT_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {hasActiveSearch ? (
+              <button type="button" className="home-clear-button" onClick={resetFilters}>
+                <RotateCcw size={16} aria-hidden="true" />
+                Limpiar filtros
+              </button>
+            ) : null}
           </div>
         </div>
 
         <InlineMessage tone="danger">{error}</InlineMessage>
-        {locationStatus === 'denied' ? (
-          <InlineMessage tone="neutral">
-            Seguimos mostrando opciones destacadas aunque no compartas tu ubicacion.
-          </InlineMessage>
-        ) : null}
 
         {loading ? (
           <div className="property-grid property-grid--home">
-            <PropertyCardSkeleton count={4} variant="compact" />
+            <PropertyCardSkeleton count={8} variant="home" />
           </div>
-        ) : recommendedProperties.length > 0 ? (
+        ) : results.length > 0 ? (
           <div className="property-grid property-grid--home">
-            {recommendedProperties.map((property) => (
+            {results.map((property) => (
               <PropertyCard
                 key={property.id}
                 property={property}
                 variant="home"
-                proximityLabel={property.distanceKm ? 'Cerca de ti' : 'Recomendada'}
-                distanceLabel={formatDistance(property.distanceKm)}
+                proximityLabel={property.verificationDetails ? 'Verificada' : 'Recomendada'}
                 onToggleFavorite={toggleFavorite}
                 disabledFavorite={savingFavorite === property.id}
               />
             ))}
           </div>
         ) : (
-          <EmptyState
-            title="Aun no hay propiedades publicadas"
-            description="Cuando haya viviendas disponibles las veras aqui. Mientras tanto puedes abrir el catalogo para ajustar filtros."
-            actionLabel="Explorar catalogo"
-            onAction={() => navigate('/properties')}
-          />
+          <HomeEmptyState hasFilters={hasActiveSearch} onClear={resetFilters} />
         )}
       </section>
+
+      <BenefitHighlights />
+
+      <MoreFiltersModal
+        open={filtersOpen}
+        filters={filters}
+        defaultFilters={defaultFilters}
+        activeCount={activeCount}
+        onChange={setFilter}
+        onToggleExtra={toggleExtra}
+        onClear={() => clearFilters(false)}
+        onDismiss={() => setFiltersOpen(false)}
+        onApply={applyFilters}
+      />
     </div>
   );
 }
 
-function HomeHero({ filters, onFilterChange, onSearch, onCitySearch }) {
-  const updateFilter = (field, value) => {
-    onFilterChange((current) => ({ ...current, [field]: value }));
-  };
+function HomeSearchForm({ filters, activeCount, onChange, onSearch, onOpenMoreFilters }) {
+  const budgetValue = getBudgetValue(filters);
 
-  return (
-    <section className="home-hero home-hero--image">
-      <div className="home-hero__content">
-        <div className="home-hero__intro">
-          <span className="hero-kicker">
-            <Sparkles size={14} />
-            Arriendos claros en Colombia
-          </span>
-          <h1 className="home-hero__title">Donde quieres vivir hoy?</h1>
-          <p className="home-hero__subtitle">
-            Encuentra arriendos confiables con informacion clara, propiedades verificadas y
-            procesos sin complicaciones.
-          </p>
-        </div>
-
-        <SearchFilters filters={filters} onFilterChange={updateFilter} onSearch={onSearch} />
-        <PopularCities selectedCity={filters.location} onSelect={onCitySearch} />
-      </div>
-    </section>
-  );
-}
-
-function SearchFilters({ filters, onFilterChange, onSearch }) {
   return (
     <form className="home-search" onSubmit={onSearch}>
-      <label className="home-search__field home-search__field--location">
+      <label className="home-search__field home-search__field--location" htmlFor="home-location">
         <span className="home-search__icon">
-          <MapPin size={20} />
+          <MapPin size={20} aria-hidden="true" />
         </span>
         <span className="home-search__label">Ciudad o zona</span>
         <input
+          id="home-location"
           type="text"
           list="home-popular-cities"
-          placeholder="Ej: Bogota, Chapinero"
+          placeholder="Ciudad, barrio o zona"
           value={filters.location}
-          onChange={(event) => onFilterChange('location', event.target.value)}
+          onChange={(event) => onChange('location', event.target.value)}
         />
       </label>
 
-      <label className="home-search__field">
+      <label className="home-search__field" htmlFor="home-budget">
         <span className="home-search__icon">
-          <WalletCards size={20} />
+          <WalletCards size={20} aria-hidden="true" />
         </span>
         <span className="home-search__label">Presupuesto</span>
         <select
-          value={filters.budget}
-          onChange={(event) => onFilterChange('budget', event.target.value)}
+          id="home-budget"
+          value={budgetValue}
+          onChange={(event) => {
+            const option = BUDGET_OPTIONS.find((item) => item.value === event.target.value);
+            if (!option) return;
+            onChange('minRent', option.minRent);
+            onChange('maxRent', option.maxRent);
+          }}
         >
+          {budgetValue === 'custom' ? <option value="custom">Rango personalizado</option> : null}
           {BUDGET_OPTIONS.map((option) => (
-            <option key={option.label} value={option.value}>
+            <option key={option.value} value={option.value}>
               {option.label}
             </option>
           ))}
         </select>
       </label>
 
-      <label className="home-search__field">
+      <label className="home-search__field" htmlFor="home-property-type">
         <span className="home-search__icon">
-          <Home size={20} />
+          <Home size={20} aria-hidden="true" />
         </span>
         <span className="home-search__label">Tipo de vivienda</span>
         <select
+          id="home-property-type"
           value={filters.propertyType}
-          onChange={(event) => onFilterChange('propertyType', event.target.value)}
+          onChange={(event) => onChange('propertyType', event.target.value)}
         >
           {PROPERTY_TYPES.map((option) => (
-            <option key={option.label} value={option.value}>
+            <option key={option.value || 'all'} value={option.value}>
               {option.label}
             </option>
           ))}
         </select>
       </label>
 
-      <label className="home-search__field">
+      <label className="home-search__field" htmlFor="home-rooms">
         <span className="home-search__icon">
-          <BedDouble size={20} />
+          <BedDouble size={20} aria-hidden="true" />
         </span>
         <span className="home-search__label">Habitaciones</span>
-        <select value={filters.rooms} onChange={(event) => onFilterChange('rooms', event.target.value)}>
+        <select id="home-rooms" value={filters.rooms} onChange={(event) => onChange('rooms', event.target.value)}>
           {ROOM_OPTIONS.map((option) => (
-            <option key={option.label} value={option.value}>
+            <option key={option.value} value={option.value}>
               {option.label}
             </option>
           ))}
         </select>
       </label>
 
+      <button
+        type="button"
+        className="home-search__more"
+        onClick={onOpenMoreFilters}
+        aria-label="Abrir mas filtros"
+      >
+        <SlidersHorizontal size={18} aria-hidden="true" />
+        <span>Mas filtros</span>
+        {activeCount ? <strong>{activeCount}</strong> : null}
+      </button>
+
       <button type="submit" className="home-search__button">
-        <Search size={20} />
+        <Search size={20} aria-hidden="true" />
         Buscar
       </button>
 
       <datalist id="home-popular-cities">
-        {POPULAR_CITIES.map((city) => (
-          <option key={city} value={city} />
-        ))}
+        <option value="Bogota" />
+        <option value="Medellin" />
+        <option value="Cali" />
+        <option value="Barranquilla" />
+        <option value="Envigado" />
       </datalist>
     </form>
   );
 }
 
-function PopularCities({ selectedCity, onSelect }) {
+function QuickSearches({ filters, onSelect }) {
   return (
-    <div className="home-quick-row" aria-label="Ciudades populares">
-      <span>Ciudades populares:</span>
-      {POPULAR_CITIES.map((city) => (
-        <button
-          key={city}
-          type="button"
-          className={`home-city-chip ${
-            selectedCity === city ? 'home-city-chip--active' : ''
-          }`}
-          onClick={() => onSelect(city)}
-        >
-          {city}
-        </button>
-      ))}
+    <div className="home-quick-row" aria-label="Busquedas rapidas">
+      <span>Busquedas rapidas:</span>
+      {QUICK_FILTERS.map((quickFilter) => {
+        const active = quickFilter.extra
+          ? filters.extras.includes(quickFilter.extra)
+          : quickFilter.isActive(filters);
+
+        return (
+          <button
+            key={quickFilter.label}
+            type="button"
+            className={`home-city-chip ${active ? 'home-city-chip--active' : ''}`}
+            onClick={() => onSelect(quickFilter)}
+            aria-pressed={active}
+          >
+            {quickFilter.label}
+          </button>
+        );
+      })}
     </div>
+  );
+}
+
+function MoreFiltersModal({
+  open,
+  filters,
+  defaultFilters,
+  activeCount,
+  onChange,
+  onToggleExtra,
+  onClear,
+  onDismiss,
+  onApply,
+}) {
+  if (!open) return null;
+
+  return (
+    <div className="home-filter-modal" role="dialog" aria-modal="true" aria-labelledby="home-filter-title">
+      <button type="button" className="home-filter-modal__backdrop" onClick={onDismiss} aria-label="Cerrar filtros" />
+      <div className="home-filter-modal__panel">
+        <div className="home-filter-modal__header">
+          <div>
+            <span className="section__eyebrow">{activeCount ? `${activeCount} activos` : 'Ajusta tu busqueda'}</span>
+            <h2 id="home-filter-title">Mas filtros</h2>
+          </div>
+          <button type="button" className="home-filter-modal__close" onClick={onDismiss} aria-label="Cerrar filtros">
+            <X size={19} />
+          </button>
+        </div>
+
+        <div className="home-filter-modal__content">
+          <section className="home-filter-group">
+            <h3>Rango de precio</h3>
+            <div className="home-filter-grid home-filter-grid--two">
+              <label className="home-filter-input" htmlFor="home-min-rent">
+                <span>Minimo</span>
+                <input
+                  id="home-min-rent"
+                  type="number"
+                  min="0"
+                  step="100000"
+                  value={filters.minRent || ''}
+                  placeholder="$0"
+                  onChange={(event) => onChange('minRent', event.target.value || defaultFilters.minRent)}
+                />
+              </label>
+              <label className="home-filter-input" htmlFor="home-max-rent">
+                <span>Maximo</span>
+                <input
+                  id="home-max-rent"
+                  type="number"
+                  min="0"
+                  step="100000"
+                  value={filters.maxRent === defaultFilters.maxRent ? '' : filters.maxRent}
+                  placeholder="$9.000.000+"
+                  onChange={(event) => onChange('maxRent', event.target.value || defaultFilters.maxRent)}
+                />
+              </label>
+            </div>
+            <p className="home-filter-summary">
+              {formatCurrency(filters.minRent)} -{' '}
+              {filters.maxRent >= defaultFilters.maxRent ? '$9.000.000+' : formatCurrency(filters.maxRent)}
+            </p>
+          </section>
+
+          <section className="home-filter-group">
+            <h3>Tipo de propiedad</h3>
+            <div className="home-option-grid">
+              {PROPERTY_TYPES.filter((option) => option.value).map(({ value, label, icon: Icon }) => (
+                <button
+                  key={value}
+                  type="button"
+                  className={filters.propertyType === value ? 'is-active' : ''}
+                  onClick={() => onChange('propertyType', filters.propertyType === value ? '' : value)}
+                  aria-pressed={filters.propertyType === value}
+                >
+                  <Icon size={18} aria-hidden="true" />
+                  {label}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="home-filter-group">
+            <h3>Espacios</h3>
+            <div className="home-filter-grid home-filter-grid--two">
+              <label className="home-filter-input" htmlFor="home-filter-rooms">
+                <span>Habitaciones</span>
+                <select id="home-filter-rooms" value={filters.rooms} onChange={(event) => onChange('rooms', event.target.value)}>
+                  {ROOM_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="home-filter-input" htmlFor="home-filter-bathrooms">
+                <span>Banos</span>
+                <select id="home-filter-bathrooms" value={filters.bathrooms} onChange={(event) => onChange('bathrooms', event.target.value)}>
+                  {BATHROOM_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="home-filter-input" htmlFor="home-filter-area">
+                <span>Area aproximada desde</span>
+                <input
+                  id="home-filter-area"
+                  type="number"
+                  min="0"
+                  step="5"
+                  value={filters.area || ''}
+                  placeholder="Ej: 60 m2"
+                  onChange={(event) => onChange('area', event.target.value || defaultFilters.area)}
+                />
+              </label>
+              <label className="home-filter-input" htmlFor="home-filter-date">
+                <span>Disponible desde</span>
+                <input
+                  id="home-filter-date"
+                  type="date"
+                  value={filters.availableFrom}
+                  onChange={(event) => onChange('availableFrom', event.target.value)}
+                />
+              </label>
+            </div>
+          </section>
+
+          <section className="home-filter-group">
+            <h3>Comodidades</h3>
+            <div className="home-amenity-grid">
+              {EXTRA_FILTERS.map(({ value, label, icon: Icon }) => (
+                <label key={value} className="home-amenity-check">
+                  <input
+                    type="checkbox"
+                    checked={filters.extras.includes(value)}
+                    onChange={() => onToggleExtra(value)}
+                  />
+                  <span aria-hidden="true">
+                    <Icon size={16} />
+                  </span>
+                  {label}
+                </label>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        <div className="home-filter-modal__footer">
+          <button type="button" className="home-clear-button" onClick={onClear}>
+            <RotateCcw size={16} aria-hidden="true" />
+            Limpiar filtros
+          </button>
+          <button type="button" className="home-filter-modal__apply" onClick={onApply}>
+            Aplicar filtros
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HomeEmptyState({ hasFilters, onClear }) {
+  return (
+    <section className="home-empty-state" aria-live="polite">
+      <span className="home-empty-state__icon">
+        <Home size={30} aria-hidden="true" />
+      </span>
+      <h2>{hasFilters ? 'No encontramos viviendas con estos filtros' : 'Aun no hay propiedades publicadas'}</h2>
+      <p>
+        {hasFilters
+          ? 'Prueba ampliar el presupuesto, cambiar la zona o quitar alguna comodidad.'
+          : 'Cuando haya viviendas disponibles las veras aqui sin tener que cambiar de pagina.'}
+      </p>
+      {hasFilters ? (
+        <button type="button" className="home-filter-modal__apply" onClick={onClear}>
+          Limpiar y ver recomendadas
+        </button>
+      ) : null}
+    </section>
   );
 }
 
@@ -452,7 +604,7 @@ function BenefitHighlights() {
       {BENEFITS.map(({ icon: Icon, title, description }) => (
         <article key={title} className="home-benefit">
           <span className="home-benefit__icon">
-            <Icon size={22} />
+            <Icon size={22} aria-hidden="true" />
           </span>
           <div>
             <h2>{title}</h2>
@@ -461,10 +613,9 @@ function BenefitHighlights() {
         </article>
       ))}
       <div className="home-benefits__trust" aria-hidden="true">
-        <HeartHandshake size={18} />
-        <KeyRound size={18} />
+        <CheckCircle2 size={18} />
         <Bath size={18} />
-        <Tag size={18} />
+        <BedDouble size={18} />
       </div>
     </section>
   );
