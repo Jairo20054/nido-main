@@ -11,6 +11,7 @@ const toNumber = (value, fallback) => {
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
 export function NumberStepper({
+  allowEmpty = false,
   disabled = false,
   error,
   help,
@@ -26,16 +27,20 @@ export function NumberStepper({
   const describedBy = [help ? `${id}-help` : '', error ? `${id}-error` : ''].filter(Boolean).join(' ') || undefined;
   const numericValue = toNumber(value, min);
   const displayValue = isEmpty(value) ? '' : String(value);
-  const isAtMin = disabled || numericValue <= min;
+  const isAtMin = disabled || isEmpty(value) || numericValue <= min;
   const isAtMax = disabled || numericValue >= max;
 
   const updateValue = (nextValue) => {
     onChange(clamp(nextValue, min, max));
   };
 
+  const stepFromEmpty = () => {
+    onChange(min);
+  };
+
   const handleInputChange = (event) => {
     if (event.target.value === '') {
-      onChange(min);
+      onChange(allowEmpty ? '' : min);
       return;
     }
 
@@ -73,7 +78,7 @@ export function NumberStepper({
           type="button"
           aria-label={`Aumentar ${label}`}
           disabled={isAtMax}
-          onClick={() => updateValue(numericValue + step)}
+          onClick={() => (isEmpty(value) ? stepFromEmpty() : updateValue(numericValue + step))}
         >
           +
         </button>

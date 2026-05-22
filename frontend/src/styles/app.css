@@ -7757,3 +7757,242 @@ body,
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* NIDO production UI pass: responsive forms, filters, and publication flow. */
+.field-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+}
+
+.field-grid--triple {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+}
+
+.field-grid--quad {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 158px), 1fr));
+}
+
+.summary-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 158px), 1fr));
+}
+
+.field-group,
+.property-field,
+.number-stepper-field {
+  min-width: 0;
+}
+
+.field-group label,
+.number-stepper-field > label {
+  line-height: 1.25;
+}
+
+.field-group input,
+.field-group select,
+.field-group textarea,
+.number-stepper input {
+  min-width: 0;
+  outline: 0;
+}
+
+.field-group input[aria-invalid='true'],
+.field-group select[aria-invalid='true'],
+.field-group textarea[aria-invalid='true'] {
+  border-color: rgba(180, 35, 24, 0.48);
+  box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.08);
+}
+
+.property-form-wizard {
+  width: 100%;
+  max-width: 100%;
+}
+
+.property-form-wizard__card {
+  overflow: hidden;
+}
+
+.property-step {
+  display: grid;
+}
+
+.property-step__heading,
+.property-step__subsection,
+.publication-checklist,
+.review-summary,
+.media-panel {
+  min-width: 0;
+}
+
+.property-step__heading h3,
+.property-form-header h2,
+.property-card__title,
+.properties-results-header h1 {
+  overflow-wrap: anywhere;
+}
+
+.property-type-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 172px), 1fr));
+}
+
+.property-type-card {
+  min-width: 0;
+}
+
+.property-type-card span,
+.field-help,
+.field-error {
+  overflow-wrap: anywhere;
+}
+
+.number-stepper-field {
+  display: grid;
+  gap: 10px;
+}
+
+.number-stepper {
+  min-height: 48px;
+}
+
+.number-stepper input::-webkit-outer-spin-button,
+.number-stepper input::-webkit-inner-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.number-stepper input[type='number'] {
+  appearance: textfield;
+}
+
+.property-filters .number-stepper {
+  grid-template-columns: 40px minmax(0, 1fr) 40px;
+}
+
+.property-filters .number-stepper button {
+  width: 40px;
+  height: 40px;
+}
+
+.form-card__actions {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  align-items: center;
+}
+
+.form-card__actions-right {
+  justify-content: end;
+}
+
+.media-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+}
+
+.media-dropzone,
+.video-link-row,
+.property-card,
+.properties-search-bar__field,
+.property-filters {
+  min-width: 0;
+}
+
+.property-card__badge-row {
+  max-width: calc(100% - 68px);
+}
+
+.property-card__badge {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-city-chip,
+.properties-search-bar__chip,
+.filter-chip,
+.active-filter-chip,
+.select-chip {
+  min-height: 42px;
+}
+
+.properties-search-bar__quick {
+  flex-wrap: wrap;
+  overflow-x: visible;
+}
+
+.home-page--nido .home-city-chip {
+  min-height: 42px;
+}
+
+.properties-view-toggle {
+  min-height: 42px;
+  grid-template-columns: repeat(2, minmax(42px, 1fr));
+}
+
+.properties-view-toggle button {
+  min-height: 42px;
+}
+
+.amenity-more summary {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+}
+
+.zone-summary__heading button,
+.recommended-mini-list__heading a {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+}
+
+@media (max-width: 1280px) {
+  .dashboard-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 834px) {
+  .property-form-wizard .stepper {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scroll-snap-type: x proximity;
+  }
+
+  .property-form-wizard .stepper__item {
+    scroll-snap-align: start;
+  }
+
+  .form-card__actions {
+    grid-template-columns: 1fr;
+  }
+
+  .form-card__actions-left,
+  .form-card__actions-right {
+    width: 100%;
+    justify-content: stretch;
+  }
+}
+
+@media (max-width: 414px) {
+  .property-form-wizard .stepper__item {
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  .property-step__subsection,
+  .publication-checklist,
+  .media-panel {
+    gap: 14px;
+    padding-top: 16px;
+  }
+
+  .chip-group,
+  .active-properties-filters {
+    gap: 7px;
+  }
+
+  .select-chip,
+  .active-filter-chip {
+    max-width: 100%;
+  }
+}

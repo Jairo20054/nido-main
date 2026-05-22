@@ -40,7 +40,7 @@ const STEPS = [
 
 const STEP_FIELDS = {
   location: ['propertyType', 'department', 'city', 'addressLine', 'summary'],
-  details: ['areaM2', 'bedrooms', 'bathrooms', 'floor', 'strata', 'parkingSpots'],
+  details: ['areaM2', 'bedrooms', 'bathrooms', 'floor', 'strata', 'parkingSpots', 'maxOccupants'],
   pricing: ['monthlyRent', 'maintenanceFee', 'securityDeposit', 'minLeaseMonths', 'availableFrom'],
   review: ['contactName', 'contactPhone', 'contactEmail', 'publishingAuthorization', 'media'],
 };
@@ -365,8 +365,12 @@ const validateForm = (form, { action = 'publish', scope = null } = {}) => {
   if (toNumber(form.bedrooms) < 0) add('bedrooms', 'Las habitaciones no pueden ser negativas.');
   if (toNumber(form.bathrooms) < 1) add('bathrooms', 'Ingresa al menos un bano.');
   if (form.floor !== '' && toNumber(form.floor) < 0) add('floor', 'El piso no puede ser negativo.');
+  if (toNumber(form.parkingSpots) < 0) add('parkingSpots', 'Los parqueaderos no pueden ser negativos.');
   if (form.strata !== '' && (toNumber(form.strata) < 1 || toNumber(form.strata) > 6)) {
     add('strata', 'El estrato debe estar entre 1 y 6.');
+  }
+  if (isMissingNumber(form.maxOccupants) || toNumber(form.maxOccupants) < 1) {
+    add('maxOccupants', 'La capacidad debe ser de al menos una persona.');
   }
 
   if (isMissingNumber(form.monthlyRent) || toNumber(form.monthlyRent) <= 0) {
@@ -475,7 +479,11 @@ function Field({ children, error, help, id, label, required = false }) {
         {required ? <span aria-hidden="true"> *</span> : null}
       </label>
       {children}
-      {help ? <small className="field-help">{help}</small> : null}
+      {help ? (
+        <small className="field-help" id={`${id}-help`}>
+          {help}
+        </small>
+      ) : null}
       {error ? (
         <small className="field-error" id={`${id}-error`}>
           {error}
@@ -486,12 +494,13 @@ function Field({ children, error, help, id, label, required = false }) {
 }
 
 function TextInput({ error, help, id, label, multiline = false, onChange, required, rows = 4, value, ...props }) {
+  const describedBy = [help ? `${id}-help` : '', error ? `${id}-error` : ''].filter(Boolean).join(' ') || undefined;
   const inputProps = {
     id,
     value,
     onChange: (event) => onChange(event.target.value),
     'aria-invalid': Boolean(error),
-    'aria-describedby': error ? `${id}-error` : undefined,
+    'aria-describedby': describedBy,
     ...props,
   };
 
@@ -503,6 +512,8 @@ function TextInput({ error, help, id, label, multiline = false, onChange, requir
 }
 
 function SelectInput({ disabled = false, error, help, id, label, onChange, options, placeholder, required, value }) {
+  const describedBy = [help ? `${id}-help` : '', error ? `${id}-error` : ''].filter(Boolean).join(' ') || undefined;
+
   return (
     <Field error={error} help={help} id={id} label={label} required={required}>
       <select
@@ -511,7 +522,7 @@ function SelectInput({ disabled = false, error, help, id, label, onChange, optio
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
         aria-invalid={Boolean(error)}
-        aria-describedby={error ? `${id}-error` : undefined}
+        aria-describedby={describedBy}
       >
         <option value="">{placeholder}</option>
         {options.map((option) => (
@@ -567,6 +578,8 @@ function StepIndicator({ currentStepIndex, onStepChange, steps }) {
               index < currentStepIndex ? 'stepper__item--done' : ''
             }`}
             type="button"
+            aria-current={index === currentStepIndex ? 'step' : undefined}
+            aria-label={`Ir a ${step.label}. ${step.helper}`}
             onClick={() => onStepChange(index)}
           >
             <span>{index < currentStepIndex ? <CheckCircle2 size={14} /> : index + 1}</span>
@@ -719,8 +732,24 @@ function DetailsStep({ errors, form, setField }) {
       description="Usa datos concretos. Esto mejora filtros, comparacion y confianza."
     >
       <div className="field-grid field-grid--quad">
-        <NumberStepper id="bedrooms" label="Habitaciones" min={0} max={20} value={form.bedrooms} onChange={(value) => setField('bedrooms', value)} error={errors.bedrooms} />
-        <NumberStepper id="bathrooms" label="Banos" min={1} max={12} value={form.bathrooms} onChange={(value) => setField('bathrooms', value)} error={errors.bathrooms} />
+        <NumberStepper
+          id="bedrooms"
+          label="Habitaciones"
+          min={0}
+          max={20}
+          value={form.bedrooms}
+          onChange={(value) => setField('bedrooms', value)}
+          error={errors.bedrooms}
+        />
+        <NumberStepper
+          id="bathrooms"
+          label="Banos"
+          min={1}
+          max={12}
+          value={form.bathrooms}
+          onChange={(value) => setField('bathrooms', value)}
+          error={errors.bathrooms}
+        />
         <TextInput
           id="areaM2"
           label="Area en m2"
@@ -736,6 +765,7 @@ function DetailsStep({ errors, form, setField }) {
         <NumberStepper
           id="floor"
           label="Piso"
+          allowEmpty
           min={0}
           max={80}
           value={form.floor}
@@ -749,6 +779,7 @@ function DetailsStep({ errors, form, setField }) {
         <NumberStepper
           id="strata"
           label="Estrato"
+          allowEmpty
           min={1}
           max={6}
           value={form.strata}
@@ -763,6 +794,17 @@ function DetailsStep({ errors, form, setField }) {
           max={10}
           value={form.parkingSpots}
           onChange={(value) => setField('parkingSpots', value)}
+          error={errors.parkingSpots}
+        />
+        <NumberStepper
+          id="maxOccupants"
+          label="Capacidad"
+          min={1}
+          max={30}
+          value={form.maxOccupants}
+          onChange={(value) => setField('maxOccupants', value)}
+          error={errors.maxOccupants}
+          help="Numero maximo de residentes sugerido."
         />
       </div>
 
