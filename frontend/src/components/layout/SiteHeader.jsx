@@ -43,7 +43,7 @@ export function SiteHeader() {
         Guardados
       </Link>
       <a href="/#para-propietarios" onClick={closeMobileMenu}>
-        Para propietarios
+        Propietarios
       </a>
     </>
   );
@@ -86,10 +86,6 @@ export function SiteHeader() {
         </nav>
 
         <div className="site-header__actions">
-          {!isAuthenticated ? (
-            <span className="site-header__hint">Explora sin iniciar sesión</span>
-          ) : null}
-
           {isAuthenticated ? (
             renderAuthenticatedLinks()
           ) : (

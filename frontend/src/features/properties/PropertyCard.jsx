@@ -18,9 +18,18 @@ export function PropertyCard({
   distanceLabel,
 }) {
   const features = [];
+  const amenityText = (property.amenities || []).join(' ').toLowerCase();
   if (property.furnished) features.push('Amoblado');
-  if (property.petsAllowed) features.push('Acepta mascotas');
   if (property.parkingSpots) features.push('Parqueadero');
+  if (property.balcony || amenityText.includes('balcon') || amenityText.includes('balcón')) {
+    features.push('Balcon');
+  }
+  if (property.elevator || amenityText.includes('ascensor')) features.push('Ascensor');
+  if (amenityText.includes('gimnasio') || amenityText.includes('gym')) features.push('Gimnasio');
+  if (property.petsAllowed) features.push('Acepta mascotas');
+  if (amenityText.includes('conjunto cerrado') || amenityText.includes('unidad cerrada')) {
+    features.push('Conjunto cerrado');
+  }
   if (property.utilitiesIncluded) features.push('Servicios incluidos');
   if (property.maintenanceFee) features.push(`Adm. ${formatCurrency(property.maintenanceFee)}`);
 
@@ -33,6 +42,11 @@ export function PropertyCard({
   const totalMonthly = (property.monthlyRent || 0) + (property.maintenanceFee || 0);
   const visibleFeatures = features.slice(0, isCompact ? 2 : 4);
   const title = isHome ? `${typeLabel || 'Vivienda'} en arriendo` : property.title;
+  const badgeLabel = (() => {
+    if ((property.requestCount || 0) >= 3) return 'Destacado';
+    if (property.verificationDetails || property.availableImmediately) return 'Recomendado';
+    return 'Nuevo';
+  })();
 
   const handleToggleFavorite = (event) => {
     event.preventDefault();
@@ -50,7 +64,7 @@ export function PropertyCard({
 
         <div className="property-card__badge-row">
           <span className="property-card__badge">
-            {isHome ? proximityLabel || 'Cerca de ti' : typeLabel}
+            {isHome ? proximityLabel || 'Cerca de ti' : badgeLabel}
           </span>
           {!isCompact && !isHome ? (
             <span className="property-card__badge property-card__badge--trust">

@@ -3,16 +3,28 @@ import { useSearchParams } from 'react-router-dom';
 
 const DEFAULT_FILTERS = {
   city: '',
-  propertyType: '',
+  propertyTypes: [],
   minRent: 0,
   maxRent: 9000000,
   bedrooms: 0,
   bathrooms: 0,
   extras: [],
   sort: 'recommended',
+  radius: 2,
 };
 
-const EXTRA_KEYS = ['furnished', 'petsAllowed', 'parking', 'security', 'gatedCommunity'];
+const EXTRA_KEYS = [
+  'furnished',
+  'petsAllowed',
+  'parking',
+  'elevator',
+  'balcony',
+  'gym',
+  'security',
+  'gatedCommunity',
+];
+
+const PROPERTY_TYPE_KEYS = ['apartment', 'house', 'studio', 'room', 'loft', 'penthouse'];
 
 const parseNumber = (value, fallback) => {
   if (value === null || value === undefined || value === '') return fallback;
@@ -24,13 +36,18 @@ const parseNumber = (value, fallback) => {
 const uniqueExtras = (value) =>
   [...new Set((value || []).filter((item) => EXTRA_KEYS.includes(item)))];
 
+const uniquePropertyTypes = (value) =>
+  [...new Set((value || []).map((item) => item.toLowerCase()).filter((item) => PROPERTY_TYPE_KEYS.includes(item)))];
+
 export const readSearchFilters = (searchParams) => {
   const extras = searchParams.get('extras')?.split(',').filter(Boolean) || [];
+  const propertyTypes =
+    searchParams.get('tipos')?.split(',').filter(Boolean) ||
+    [searchParams.get('tipo') || searchParams.get('propertyType')].filter(Boolean);
 
   return {
     city: searchParams.get('ciudad') || searchParams.get('city') || DEFAULT_FILTERS.city,
-    propertyType:
-      searchParams.get('tipo') || searchParams.get('propertyType') || DEFAULT_FILTERS.propertyType,
+    propertyTypes: uniquePropertyTypes(propertyTypes),
     minRent: parseNumber(
       searchParams.get('min') || searchParams.get('minRent'),
       DEFAULT_FILTERS.minRent
@@ -49,6 +66,7 @@ export const readSearchFilters = (searchParams) => {
     ),
     extras: uniqueExtras(extras),
     sort: searchParams.get('orden') || searchParams.get('sort') || DEFAULT_FILTERS.sort,
+    radius: parseNumber(searchParams.get('radio') || searchParams.get('radius'), DEFAULT_FILTERS.radius),
   };
 };
 
@@ -59,8 +77,10 @@ const serializeFilters = (filters) => {
     params.set('ciudad', filters.city);
   }
 
-  if (filters.propertyType) {
-    params.set('tipo', filters.propertyType.toLowerCase());
+  if (filters.propertyTypes.length === 1) {
+    params.set('tipo', filters.propertyTypes[0]);
+  } else if (filters.propertyTypes.length > 1) {
+    params.set('tipos', filters.propertyTypes.join(','));
   }
 
   if (filters.minRent !== DEFAULT_FILTERS.minRent) {
@@ -85,6 +105,10 @@ const serializeFilters = (filters) => {
 
   if (filters.sort !== DEFAULT_FILTERS.sort) {
     params.set('orden', filters.sort);
+  }
+
+  if (filters.radius !== DEFAULT_FILTERS.radius) {
+    params.set('radio', String(filters.radius));
   }
 
   return params;
@@ -126,8 +150,22 @@ export function useSearchFilters() {
         return { ...current, [field]: Number.isFinite(nextValue) ? nextValue : current[field] };
       }
 
+      if (field === 'radius' || field === 'bedrooms' || field === 'bathrooms') {
+        const nextValue = Number(value);
+        return { ...current, [field]: Number.isFinite(nextValue) ? nextValue : current[field] };
+      }
+
       return { ...current, [field]: value };
     });
+  };
+
+  const togglePropertyType = (propertyType) => {
+    setFilters((current) => ({
+      ...current,
+      propertyTypes: current.propertyTypes.includes(propertyType)
+        ? current.propertyTypes.filter((item) => item !== propertyType)
+        : [...current.propertyTypes, propertyType],
+    }));
   };
 
   const toggleExtra = (extra) => {
@@ -147,13 +185,14 @@ export function useSearchFilters() {
     let count = 0;
 
     if (filters.city) count += 1;
-    if (filters.propertyType) count += 1;
+    if (filters.propertyTypes.length) count += filters.propertyTypes.length;
     if (filters.minRent !== DEFAULT_FILTERS.minRent || filters.maxRent !== DEFAULT_FILTERS.maxRent) {
       count += 1;
     }
     if (filters.bedrooms !== DEFAULT_FILTERS.bedrooms) count += 1;
     if (filters.bathrooms !== DEFAULT_FILTERS.bathrooms) count += 1;
     if (filters.sort !== DEFAULT_FILTERS.sort) count += 1;
+    if (filters.radius !== DEFAULT_FILTERS.radius) count += 1;
 
     return count + filters.extras.length;
   }, [filters]);
@@ -162,6 +201,7 @@ export function useSearchFilters() {
     filters,
     debouncedFilters,
     setFilter,
+    togglePropertyType,
     toggleExtra,
     clearFilters,
     activeCount,

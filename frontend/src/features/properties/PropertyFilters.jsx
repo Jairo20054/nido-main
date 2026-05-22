@@ -1,114 +1,94 @@
-import React, { useMemo, useState } from 'react';
-import {
-  Bath,
-  BedDouble,
-  Building2,
-  ChevronDown,
-  Dog,
-  Home,
-  Landmark,
-  MapPin,
-  Shield,
-  Sofa,
-  Sparkles,
-  Trees,
-} from 'lucide-react';
-import { SORT_OPTIONS } from '../../lib/constants';
+import React, { useState } from 'react';
+import { ChevronDown, MapPin, SlidersHorizontal, X } from 'lucide-react';
 import { formatCurrency } from '../../lib/formatters';
+import {
+  AMENITY_OPTIONS,
+  BATHROOM_OPTIONS,
+  BEDROOM_OPTIONS,
+  PROPERTY_TYPE_OPTIONS,
+  RADIUS_OPTIONS,
+} from './propertySearchConfig';
 
-const PROPERTY_TYPE_OPTIONS = [
-  { value: 'apartment', label: 'Apartamento', icon: Building2 },
-  { value: 'house', label: 'Casa', icon: Home },
-  { value: 'studio', label: 'Apartaestudio', icon: Sofa },
-  { value: 'room', label: 'Habitacion', icon: BedDouble },
-  { value: 'loft', label: 'Loft', icon: Building2 },
-];
-
-const EXTRA_OPTIONS = [
-  { value: 'furnished', label: 'Amoblado', icon: Sofa },
-  { value: 'petsAllowed', label: 'Acepta mascotas', icon: Dog },
-  { value: 'parking', label: 'Parqueadero', icon: Landmark },
-  { value: 'security', label: 'Vigilancia', icon: Shield },
-  { value: 'gatedCommunity', label: 'Conjunto cerrado', icon: Trees },
-];
-
-const RECENT_CITIES = ['Medellín', 'Bogotá', 'Cali', 'Barranquilla', 'Chapinero', 'Envigado'];
-
-function Stepper({ label, icon: Icon, value, onChange, min = 0 }) {
-  return (
-    <div className="stepper">
-      <div className="stepper__label">
-        <Icon size={16} />
-        <span>{label}</span>
-      </div>
-      <div className="stepper__controls" role="group" aria-label={label}>
-        <button type="button" onClick={() => onChange(Math.max(min, value - 1))} aria-label={`Reducir ${label}`}>
-          -
-        </button>
-        <span aria-live="polite">{value}</span>
-        <button type="button" onClick={() => onChange(value + 1)} aria-label={`Aumentar ${label}`}>
-          +
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function DualRangeSlider({ min, max, valueMin, valueMax, onChange }) {
-  const safeMin = Math.min(valueMin, valueMax - 100000);
-  const safeMax = Math.max(valueMax, safeMin + 100000);
-  const range = max - min;
-  const left = ((safeMin - min) / range) * 100;
-  const right = ((safeMax - min) / range) * 100;
-
-  return (
-    <div className="dual-range">
-      <div className="dual-range__values">{formatCurrency(safeMin)} - {formatCurrency(safeMax)}</div>
-      <div className="dual-range__track">
-        <span className="dual-range__rail" />
-        <span className="dual-range__fill" style={{ left: `${left}%`, width: `${right - left}%` }} />
-        <input
-          type="range"
-          min={min}
-          max={max}
-          step="100000"
-          value={safeMin}
-          aria-label="Canon mensual mínimo"
-          onChange={(event) => onChange('min', Math.min(Number(event.target.value), safeMax - 100000))}
-        />
-        <input
-          type="range"
-          min={min}
-          max={max}
-          step="100000"
-          value={safeMax}
-          aria-label="Canon mensual máximo"
-          onChange={(event) => onChange('max', Math.max(Number(event.target.value), safeMin + 100000))}
-        />
-      </div>
-    </div>
-  );
-}
-
-function AccordionSection({ icon: Icon, title, defaultOpen = true, children }) {
+function FilterSection({ title, children, defaultOpen = true }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <section className={`filter-accordion ${isOpen ? 'filter-accordion--open' : ''}`}>
+    <section className={`property-filter-section ${isOpen ? 'property-filter-section--open' : ''}`}>
       <button
         type="button"
-        className="filter-accordion__trigger"
+        className="property-filter-section__trigger"
         onClick={() => setIsOpen((current) => !current)}
         aria-expanded={isOpen}
       >
-        <span>
-          <Icon size={16} />
-          {title}
-        </span>
-        <ChevronDown size={16} />
+        {title}
+        <ChevronDown size={15} aria-hidden="true" />
       </button>
-      <div className="filter-accordion__content">{children}</div>
+      <div className="property-filter-section__content">{children}</div>
     </section>
+  );
+}
+
+function PriceInput({ id, label, value, onChange }) {
+  return (
+    <label className="price-filter-input" htmlFor={id}>
+      <span>{label}</span>
+      <input
+        id={id}
+        inputMode="numeric"
+        type="number"
+        min="0"
+        step="100000"
+        value={value || ''}
+        onChange={(event) => onChange(Number(event.target.value || 0))}
+        placeholder="$0"
+      />
+    </label>
+  );
+}
+
+function PriceRange({ filters, onChange }) {
+  const rawMax = filters.maxRent > 0 ? filters.maxRent : 9000000;
+  const maxValue = Math.min(9000000, Math.max(rawMax, 100000));
+  const minValue = Math.min(Math.max(filters.minRent, 0), maxValue - 100000);
+  const left = (minValue / 9000000) * 100;
+  const right = (maxValue / 9000000) * 100;
+
+  const setMin = (value) => onChange('minRent', Math.max(0, Math.min(value, maxValue - 100000)));
+  const setMax = (value) => onChange('maxRent', Math.min(9000000, Math.max(value, minValue + 100000)));
+
+  return (
+    <div className="price-filter">
+      <div className="price-filter__summary">
+        <span>{formatCurrency(filters.minRent)}</span>
+        <span>{filters.maxRent >= 9000000 ? '$9.000.000+' : formatCurrency(filters.maxRent)}</span>
+      </div>
+      <div className="price-filter__inputs">
+        <PriceInput id="minRent" label="Minimo" value={filters.minRent} onChange={setMin} />
+        <PriceInput id="maxRent" label="Maximo" value={filters.maxRent} onChange={setMax} />
+      </div>
+      <div className="price-filter__track">
+        <span className="price-filter__rail" />
+        <span className="price-filter__fill" style={{ left: `${left}%`, width: `${right - left}%` }} />
+        <input
+          type="range"
+          min="0"
+          max="9000000"
+          step="100000"
+          value={minValue}
+          aria-label="Presupuesto minimo"
+          onChange={(event) => setMin(Number(event.target.value))}
+        />
+        <input
+          type="range"
+          min="0"
+          max="9000000"
+          step="100000"
+          value={maxValue}
+          aria-label="Presupuesto maximo"
+          onChange={(event) => setMax(Number(event.target.value))}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -117,149 +97,177 @@ export function PropertyFilters({
   activeCount,
   onChange,
   onToggleExtra,
+  onTogglePropertyType,
   onClear,
   onDismiss,
   resultCount = 0,
 }) {
-  const sortLabel = useMemo(
-    () => SORT_OPTIONS.find((option) => option.value === filters.sort)?.label || 'Recomendados',
-    [filters.sort]
-  );
-
   return (
-    <form className="filter-panel" onSubmit={(event) => event.preventDefault()}>
-      <div className="filter-panel__header">
+    <form className="property-filters" onSubmit={(event) => event.preventDefault()}>
+      <div className="property-filters__header">
         <div>
-          <span className="section__eyebrow">Filtros</span>
-          <h2>Encuentra una propiedad que se ajuste a ti</h2>
+          <h2>Filtros</h2>
+          <p>{activeCount ? `${activeCount} activos` : 'Ajusta tu busqueda'}</p>
+        </div>
+        <div className="property-filters__header-actions">
+          <button type="button" className="property-filters__clear" onClick={onClear}>
+            Limpiar todo
+          </button>
+          {onDismiss ? (
+            <button
+              type="button"
+              className="property-filters__dismiss"
+              onClick={onDismiss}
+              aria-label="Cerrar filtros"
+            >
+              <X size={18} />
+            </button>
+          ) : null}
+        </div>
+      </div>
+
+      <FilterSection title="Ubicacion">
+        <div className="selected-location">
+          <MapPin size={15} aria-hidden="true" />
+          <span>{filters.city || 'Elige ciudad, barrio o zona'}</span>
+          {filters.city ? (
+            <button type="button" onClick={() => onChange('city', '')} aria-label="Limpiar ubicacion">
+              <X size={14} />
+            </button>
+          ) : null}
+        </div>
+        <label className="property-filter-field" htmlFor="filter-city">
+          <span>Ciudad / zona seleccionada</span>
+          <input
+            id="filter-city"
+            value={filters.city}
+            onChange={(event) => onChange('city', event.target.value)}
+            placeholder="Medellin, Chapinero, El Poblado"
+          />
+        </label>
+        <div className="radius-selector" aria-label="Radio de busqueda">
+          <div className="radius-selector__label">
+            <span>Radio de busqueda</span>
+            <strong>{filters.radius === 0.5 ? '500 m' : `${filters.radius} km`}</strong>
+          </div>
+          <div className="radius-selector__options">
+            {RADIUS_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                className={filters.radius === option.value ? 'is-active' : ''}
+                onClick={() => onChange('radius', option.value)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+          <small>Preparado para busqueda geografica real cuando el backend exponga coordenadas por radio.</small>
+        </div>
+      </FilterSection>
+
+      <FilterSection title="Presupuesto mensual">
+        <PriceRange filters={filters} onChange={onChange} />
+      </FilterSection>
+
+      <FilterSection title="Tipo de propiedad">
+        <div className="property-filter-card-grid">
+          {PROPERTY_TYPE_OPTIONS.map(({ value, label, icon: Icon }) => {
+            const active = filters.propertyTypes.includes(value);
+
+            return (
+              <button
+                key={value}
+                type="button"
+                className={active ? 'is-active' : ''}
+                onClick={() => onTogglePropertyType(value)}
+                aria-pressed={active}
+              >
+                <Icon size={17} aria-hidden="true" />
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </FilterSection>
+
+      <FilterSection title="Habitaciones">
+        <div className="segmented-options" role="group" aria-label="Habitaciones">
+          {BEDROOM_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              className={filters.bedrooms === option.value ? 'is-active' : ''}
+              onClick={() => onChange('bedrooms', filters.bedrooms === option.value ? 0 : option.value)}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </FilterSection>
+
+      <FilterSection title="Banos">
+        <div className="segmented-options" role="group" aria-label="Banos">
+          {BATHROOM_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              className={filters.bathrooms === option.value ? 'is-active' : ''}
+              onClick={() => onChange('bathrooms', filters.bathrooms === option.value ? 0 : option.value)}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </FilterSection>
+
+      <FilterSection title="Amenidades">
+        <div className="amenity-checklist">
+          {AMENITY_OPTIONS.slice(0, 7).map(({ value, label, icon: Icon }) => (
+            <label key={value} className="amenity-check">
+              <input
+                type="checkbox"
+                checked={filters.extras.includes(value)}
+                onChange={() => onToggleExtra(value)}
+              />
+              <span aria-hidden="true">
+                <Icon size={15} />
+              </span>
+              {label}
+            </label>
+          ))}
+        </div>
+        <details className="amenity-more">
+          <summary>Ver mas</summary>
+          <div className="amenity-checklist">
+            {AMENITY_OPTIONS.slice(7).map(({ value, label, icon: Icon }) => (
+              <label key={value} className="amenity-check">
+                <input
+                  type="checkbox"
+                  checked={filters.extras.includes(value)}
+                  onChange={() => onToggleExtra(value)}
+                />
+                <span aria-hidden="true">
+                  <Icon size={15} />
+                </span>
+                {label}
+              </label>
+            ))}
+          </div>
+        </details>
+      </FilterSection>
+
+      <div className="property-filters__footer">
+        <div>
+          <SlidersHorizontal size={15} aria-hidden="true" />
+          {resultCount} propiedades visibles
         </div>
         {onDismiss ? (
-          <button type="button" className="filter-panel__dismiss" onClick={onDismiss}>
-            Cerrar
+          <button className="property-filters__apply" type="button" onClick={onDismiss}>
+            Ver resultados
           </button>
         ) : null}
       </div>
-
-      <AccordionSection icon={MapPin} title="Ciudad / Zona">
-        <div className="field-group">
-          <label htmlFor="city">Busca por ciudad o zona</label>
-          <input
-            id="city"
-            list="recent-cities"
-            value={filters.city}
-            onChange={(event) => onChange('city', event.target.value)}
-            placeholder="Ej. Medellín, Chapinero, Envigado"
-          />
-          <datalist id="recent-cities">
-            {RECENT_CITIES.map((city) => (
-              <option key={city} value={city} />
-            ))}
-          </datalist>
-        </div>
-        <div className="filter-chip-row">
-          {RECENT_CITIES.map((city) => (
-            <button
-              key={city}
-              type="button"
-              className={`filter-chip ${filters.city === city ? 'filter-chip--active' : ''}`}
-              onClick={() => onChange('city', city)}
-            >
-              {city}
-            </button>
-          ))}
-        </div>
-      </AccordionSection>
-
-      <AccordionSection icon={Landmark} title="Canon mensual">
-        <DualRangeSlider
-          min={0}
-          max={9000000}
-          valueMin={filters.minRent}
-          valueMax={filters.maxRent}
-          onChange={(field, value) =>
-            onChange(field === 'min' ? 'minRent' : 'maxRent', value)
-          }
-        />
-      </AccordionSection>
-
-      <AccordionSection icon={Building2} title="Tipo de propiedad">
-        <div className="filter-icon-grid">
-          {PROPERTY_TYPE_OPTIONS.map(({ value, label, icon: Icon }) => (
-            <button
-              key={value}
-              type="button"
-              className={`property-type-pill ${filters.propertyType === value ? 'property-type-pill--active' : ''}`}
-              onClick={() => onChange('propertyType', filters.propertyType === value ? '' : value)}
-            >
-              <Icon size={18} />
-              {label}
-            </button>
-          ))}
-        </div>
-      </AccordionSection>
-
-      <AccordionSection icon={BedDouble} title="Habitaciones">
-        <Stepper
-          label="Habitaciones"
-          icon={BedDouble}
-          value={filters.bedrooms}
-          min={0}
-          onChange={(value) => onChange('bedrooms', value)}
-        />
-      </AccordionSection>
-
-      <AccordionSection icon={Bath} title="Banos">
-        <Stepper
-          label="Banos"
-          icon={Bath}
-          value={filters.bathrooms}
-          min={0}
-          onChange={(value) => onChange('bathrooms', value)}
-        />
-      </AccordionSection>
-
-      <AccordionSection icon={Sparkles} title="Extras">
-        <div className="filter-chip-row">
-          {EXTRA_OPTIONS.map(({ value, label, icon: Icon }) => (
-            <button
-              key={value}
-              type="button"
-              className={`filter-chip filter-chip--icon ${filters.extras.includes(value) ? 'filter-chip--active-accent' : ''}`}
-              onClick={() => onToggleExtra(value)}
-            >
-              <Icon size={15} />
-              {label}
-            </button>
-          ))}
-        </div>
-      </AccordionSection>
-
-      <div className="field-group">
-        <label htmlFor="sort">Ordenar por</label>
-        <select id="sort" value={filters.sort} onChange={(event) => onChange('sort', event.target.value)}>
-          {SORT_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <small className="field-help">Actual: {sortLabel}</small>
-      </div>
-
-      <div className="filter-panel__actions">
-        <button className="ghost-link" type="button" onClick={onClear}>
-          Limpiar filtros
-        </button>
-        {onDismiss ? (
-          <button className="button button--accent" type="button" onClick={onDismiss}>
-            Ver {resultCount} propiedades
-          </button>
-        ) : (
-          <div className="filter-panel__result-pill">{resultCount} propiedades visibles</div>
-        )}
-      </div>
-
-      <div className="filter-panel__footer-note">{activeCount} filtros activos</div>
     </form>
   );
 }
