@@ -405,8 +405,12 @@ export function PropertyMediaManager({ media, onChange }) {
         onDrop={handleImageDrop}
       >
         <UploadCloud size={24} />
-        <strong>Aún no has agregado imágenes</strong>
-        <span>Arrastra tus fotos aquí o usa el botón para seleccionarlas desde tu equipo.</span>
+        <strong>{imageItems.length ? `${imageItems.length} imagenes cargadas` : 'Aun no has agregado imagenes'}</strong>
+        <span>
+          {imageItems.length
+            ? 'Puedes arrastrar mas fotos o agregarlas desde tu equipo.'
+            : 'Arrastra tus fotos aqui o usa el boton para seleccionarlas desde tu equipo.'}
+        </span>
         <button className="button button--secondary" type="button" onClick={() => imageInputRef.current?.click()}>
           <ImagePlus size={16} />
           Seleccionar imágenes

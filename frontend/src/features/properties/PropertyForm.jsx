@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../app/providers/useAuth';
 import { InlineMessage } from '../../components/ui/InlineMessage';
+import { NumberStepper } from '../../components/ui/NumberStepper';
 import { PROPERTY_DRAFT_STORAGE_KEY } from '../../lib/constants';
 import {
   MIN_IMAGE_COUNT_TO_PUBLISH,
@@ -39,7 +40,7 @@ const STEPS = [
 
 const STEP_FIELDS = {
   location: ['propertyType', 'department', 'city', 'addressLine', 'summary'],
-  details: ['areaM2', 'bedrooms', 'bathrooms', 'floor', 'strata'],
+  details: ['areaM2', 'bedrooms', 'bathrooms', 'floor', 'strata', 'parkingSpots', 'maxOccupants'],
   pricing: ['monthlyRent', 'maintenanceFee', 'securityDeposit', 'minLeaseMonths', 'availableFrom'],
   review: ['contactName', 'contactPhone', 'contactEmail', 'publishingAuthorization', 'media'],
 };
@@ -364,8 +365,12 @@ const validateForm = (form, { action = 'publish', scope = null } = {}) => {
   if (toNumber(form.bedrooms) < 0) add('bedrooms', 'Las habitaciones no pueden ser negativas.');
   if (toNumber(form.bathrooms) < 1) add('bathrooms', 'Ingresa al menos un bano.');
   if (form.floor !== '' && toNumber(form.floor) < 0) add('floor', 'El piso no puede ser negativo.');
+  if (toNumber(form.parkingSpots) < 0) add('parkingSpots', 'Los parqueaderos no pueden ser negativos.');
   if (form.strata !== '' && (toNumber(form.strata) < 1 || toNumber(form.strata) > 6)) {
     add('strata', 'El estrato debe estar entre 1 y 6.');
+  }
+  if (isMissingNumber(form.maxOccupants) || toNumber(form.maxOccupants) < 1) {
+    add('maxOccupants', 'La capacidad debe ser de al menos una persona.');
   }
 
   if (isMissingNumber(form.monthlyRent) || toNumber(form.monthlyRent) <= 0) {
@@ -475,7 +480,11 @@ function Field({ children, className = '', error, help, id, label, required = fa
       </label>
       {children}
       <div className="field-messages">
-        {help ? <small className="field-help">{help}</small> : null}
+        {help ? (
+          <small className="field-help" id={`${id}-help`}>
+            {help}
+          </small>
+        ) : null}
         {error ? (
           <small className="field-error" id={`${id}-error`}>
             {error}
@@ -491,12 +500,13 @@ function Field({ children, className = '', error, help, id, label, required = fa
 }
 
 function TextInput({ className = '', error, help, id, label, multiline = false, onChange, required, rows = 4, value, ...props }) {
+  const describedBy = [help ? `${id}-help` : '', error ? `${id}-error` : ''].filter(Boolean).join(' ') || undefined;
   const inputProps = {
     id,
     value,
     onChange: (event) => onChange(event.target.value),
     'aria-invalid': Boolean(error),
-    'aria-describedby': error ? `${id}-error` : undefined,
+    'aria-describedby': describedBy,
     ...props,
   };
 
@@ -508,6 +518,8 @@ function TextInput({ className = '', error, help, id, label, multiline = false, 
 }
 
 function SelectInput({ disabled = false, error, help, id, label, onChange, options, placeholder, required, value }) {
+  const describedBy = [help ? `${id}-help` : '', error ? `${id}-error` : ''].filter(Boolean).join(' ') || undefined;
+
   return (
     <Field error={error} help={help} id={id} label={label} required={required}>
       <select
@@ -516,7 +528,7 @@ function SelectInput({ disabled = false, error, help, id, label, onChange, optio
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
         aria-invalid={Boolean(error)}
-        aria-describedby={error ? `${id}-error` : undefined}
+        aria-describedby={describedBy}
       >
         <option value="">{placeholder}</option>
         {options.map((option) => (
@@ -547,33 +559,6 @@ function Toggle({ checked, description, id, label, onChange }) {
         {description ? <small>{description}</small> : null}
       </span>
     </label>
-  );
-}
-
-function NumberStepper({ className = '', error, help, id, label, min = 0, onChange, required = false, value }) {
-  const numericValue = isMissingNumber(value) ? min : Number(value);
-  const updateValue = (nextValue) => onChange(String(Math.max(min, nextValue)));
-
-  return (
-    <Field className={`property-field--counter ${className}`.trim()} error={error} help={help} id={id} label={label} required={required}>
-      <div className="number-stepper">
-        <button type="button" aria-label={`Disminuir ${label}`} onClick={() => updateValue(numericValue - 1)}>
-          -
-        </button>
-        <input
-          id={id}
-          type="number"
-          min={min}
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          aria-invalid={Boolean(error)}
-          aria-describedby={error ? `${id}-error` : undefined}
-        />
-        <button type="button" aria-label={`Aumentar ${label}`} onClick={() => updateValue(numericValue + 1)}>
-          +
-        </button>
-      </div>
-    </Field>
   );
 }
 
@@ -608,6 +593,7 @@ function StepIndicator({ currentStepIndex, onStepChange, steps }) {
               }`}
               type="button"
               aria-current={isCurrent ? 'step' : undefined}
+              aria-label={`Ir a ${step.label}. ${step.helper}`}
               data-step-state={isDone ? 'Completado' : isCurrent ? 'Actual' : 'Pendiente'}
               onClick={() => onStepChange(index)}
             >
@@ -638,9 +624,14 @@ function TypeLocationStep({ cities, departments, errors, form, onDepartmentChang
   return (
     <FormSection
       eyebrow="Paso 1"
-      title="Tipo de propiedad y ubicacion"
-      description="Empecemos con lo que el arrendatario usa para decidir si una vivienda esta en su zona."
+      title="Informacion basica y ubicacion"
+      description="Primero define que se publica y donde esta. Esta informacion alimenta busqueda, filtros y revision operativa."
     >
+      <div className="property-step__subsection property-step__subsection--first">
+        <div className="property-step__heading property-step__heading--compact">
+          <span>Informacion basica</span>
+          <h3>Tipo de vivienda</h3>
+        </div>
       <div className="property-type-grid" role="group" aria-label="Tipo de propiedad">
         {PROPERTY_TYPE_OPTIONS.map((option) => {
           const Icon = option.icon;
@@ -666,7 +657,13 @@ function TypeLocationStep({ cities, departments, errors, form, onDepartmentChang
         })}
       </div>
       {errors.propertyType ? <small className="field-error">{errors.propertyType}</small> : null}
+      </div>
 
+      <div className="property-step__subsection">
+        <div className="property-step__heading property-step__heading--compact">
+          <span>Ubicacion</span>
+          <h3>Zona visible para los interesados</h3>
+        </div>
       <div className="field-grid field-grid--triple">
         <SelectInput
           id="department"
@@ -710,7 +707,13 @@ function TypeLocationStep({ cities, departments, errors, form, onDepartmentChang
         help="Puedes mantener privada la direccion exacta. La zona debe ser suficiente para validar la publicacion."
         maxLength={160}
       />
+      </div>
 
+      <div className="property-step__subsection">
+        <div className="property-step__heading property-step__heading--compact">
+          <span>Descripcion</span>
+          <h3>Mensaje corto de publicacion</h3>
+        </div>
       <TextInput
         id="summary"
         label="Descripcion corta"
@@ -723,6 +726,7 @@ function TypeLocationStep({ cities, departments, errors, form, onDepartmentChang
         placeholder="Cuenta en una frase que hace especial esta vivienda."
         maxLength={180}
       />
+      </div>
     </FormSection>
   );
 }
@@ -744,8 +748,24 @@ function DetailsStep({ errors, form, setField }) {
       description="Usa datos concretos. Esto mejora filtros, comparacion y confianza."
     >
       <div className="field-grid details-field-grid">
-        <NumberStepper id="bedrooms" label="Habitaciones" min={0} value={form.bedrooms} onChange={(value) => setField('bedrooms', value)} error={errors.bedrooms} />
-        <NumberStepper id="bathrooms" label="Banos" min={1} value={form.bathrooms} onChange={(value) => setField('bathrooms', value)} error={errors.bathrooms} />
+        <NumberStepper
+          id="bedrooms"
+          label="Habitaciones"
+          min={0}
+          max={20}
+          value={form.bedrooms}
+          onChange={(value) => setField('bedrooms', value)}
+          error={errors.bedrooms}
+        />
+        <NumberStepper
+          id="bathrooms"
+          label="Banos"
+          min={1}
+          max={12}
+          value={form.bathrooms}
+          onChange={(value) => setField('bathrooms', value)}
+          error={errors.bathrooms}
+        />
         <TextInput
           id="areaM2"
           label="Area en m2"
@@ -759,40 +779,51 @@ function DetailsStep({ errors, form, setField }) {
           error={errors.areaM2}
           placeholder="64"
         />
-        <TextInput
+        <NumberStepper
           id="floor"
           label="Piso"
           className="property-field--short"
-          type="number"
-          min="0"
-          inputMode="numeric"
+          allowEmpty
+          min={0}
+          max={80}
           value={form.floor}
           onChange={(value) => setField('floor', value)}
           error={errors.floor}
-          placeholder="Opcional"
+          help="Usa 0 para primer piso o nivel de acceso."
         />
       </div>
 
       <div className="field-grid details-field-grid details-field-grid--secondary">
-        <TextInput
+        <NumberStepper
           id="strata"
           label="Estrato"
           className="property-field--short"
-          type="number"
-          min="1"
-          max="6"
-          inputMode="numeric"
+          allowEmpty
+          min={1}
+          max={6}
           value={form.strata}
           onChange={(value) => setField('strata', value)}
           error={errors.strata}
-          placeholder="Opcional"
+          help="Rango valido en Colombia: 1 a 6."
         />
         <NumberStepper
           id="parkingSpots"
           label="Parqueaderos"
           min={0}
+          max={10}
           value={form.parkingSpots}
           onChange={(value) => setField('parkingSpots', value)}
+          error={errors.parkingSpots}
+        />
+        <NumberStepper
+          id="maxOccupants"
+          label="Capacidad"
+          min={1}
+          max={30}
+          value={form.maxOccupants}
+          onChange={(value) => setField('maxOccupants', value)}
+          error={errors.maxOccupants}
+          help="Numero maximo de residentes sugerido."
         />
       </div>
 
@@ -845,6 +876,7 @@ function PricingStep({ errors, form, setField, toggleListValue }) {
             label="Duracion minima del contrato"
             className="property-field--lease"
             min={1}
+            max={60}
             value={form.minLeaseMonths}
             onChange={(value) => setField('minLeaseMonths', value)}
             error={errors.minLeaseMonths}

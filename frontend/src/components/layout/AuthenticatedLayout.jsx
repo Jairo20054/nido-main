@@ -22,7 +22,7 @@ import { getRoleLabel } from '../../lib/formatters';
 const roleNavItems = {
   TENANT: [
     { label: 'Inicio', href: '/dashboard', icon: Home },
-    { label: 'Buscar propiedades', href: '/properties', icon: Search },
+    { label: 'Buscar propiedades', href: '/#buscar', icon: Search },
     { label: 'Favoritos', href: '/saved', icon: Heart },
     { label: 'Mis postulaciones', href: '/applications', icon: ClipboardList },
     { label: 'Documentos', href: '/documents', icon: FileText },
@@ -39,7 +39,7 @@ const roleNavItems = {
   ],
   ADMIN: [
     { label: 'Inicio', href: '/dashboard', icon: Home },
-    { label: 'Buscar propiedades', href: '/properties', icon: Search },
+    { label: 'Buscar propiedades', href: '/#buscar', icon: Search },
     { label: 'Mis propiedades', href: '/admin', icon: Building2 },
     { label: 'Solicitudes recibidas', href: '/requests', icon: ClipboardList },
     { label: 'Estadisticas', href: '/stats', icon: BarChart3 },

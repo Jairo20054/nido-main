@@ -35,7 +35,7 @@ const dashboardCopy = {
     eyebrow: 'Arrendatario',
     title: 'Encuentra y gestiona tu próximo hogar.',
     description: 'Sigue postulaciones, revisa favoritos y prepara tus documentos sin perder el hilo.',
-    action: { label: 'Buscar propiedades', href: '/properties' },
+    action: { label: 'Buscar propiedades', href: '/#buscar' },
   },
   LANDLORD: {
     eyebrow: 'Arrendador',

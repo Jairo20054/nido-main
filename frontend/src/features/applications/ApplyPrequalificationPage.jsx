@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { LoadingState } from '../../components/ui/LoadingState';
+import { NumberStepper } from '../../components/ui/NumberStepper';
 import { useAuth } from '../../app/providers/useAuth';
 import { api } from '../../lib/apiClient';
 import { ApplicationStepper } from './components/ApplicationStepper';
@@ -177,21 +178,22 @@ export function ApplyPrequalificationPage() {
                     required
                   />
                 </div>
-                <div className="field-group">
+                <div className="field-group field-group--nested-stepper">
                   <label htmlFor="occupants">Cuántas personas vivirán aquí</label>
-                  <input
+                  <NumberStepper
                     id="occupants"
-                    type="number"
-                    min="1"
+                    label="Personas"
+                    min={1}
                     max={property.maxOccupants || 12}
                     value={form.occupants}
-                    onChange={(event) =>
+                    onChange={(value) =>
                       setForm((current) => ({
                         ...current,
-                        occupants: event.target.value,
+                        occupants: value,
                       }))
                     }
                     required
+                    help={`Maximo permitido: ${property.maxOccupants || 12}.`}
                   />
                 </div>
               </div>
@@ -290,7 +292,7 @@ export function ApplyPrequalificationPage() {
 
                   {result.prequalification.result === 'not_eligible' ? (
                     <div className="application-actions">
-                      <Link to="/properties" className="button button--secondary">
+                      <Link to="/#buscar" className="button button--secondary">
                         Ver otros inmuebles
                       </Link>
                       <button

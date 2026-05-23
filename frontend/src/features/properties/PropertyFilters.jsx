@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { ChevronDown, MapPin, SlidersHorizontal, X } from 'lucide-react';
+import { NumberStepper } from '../../components/ui/NumberStepper';
 import { formatCurrency } from '../../lib/formatters';
 import {
   AMENITY_OPTIONS,
-  BATHROOM_OPTIONS,
-  BEDROOM_OPTIONS,
   PROPERTY_TYPE_OPTIONS,
   RADIUS_OPTIONS,
 } from './propertySearchConfig';
@@ -192,33 +191,27 @@ export function PropertyFilters({
       </FilterSection>
 
       <FilterSection title="Habitaciones">
-        <div className="segmented-options" role="group" aria-label="Habitaciones">
-          {BEDROOM_OPTIONS.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              className={filters.bedrooms === option.value ? 'is-active' : ''}
-              onClick={() => onChange('bedrooms', filters.bedrooms === option.value ? 0 : option.value)}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
+        <NumberStepper
+          id="filterBedrooms"
+          label="Habitaciones minimas"
+          min={0}
+          max={10}
+          value={filters.bedrooms}
+          onChange={(value) => onChange('bedrooms', value)}
+          help="Usa 0 para ver cualquier cantidad."
+        />
       </FilterSection>
 
       <FilterSection title="Banos">
-        <div className="segmented-options" role="group" aria-label="Banos">
-          {BATHROOM_OPTIONS.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              className={filters.bathrooms === option.value ? 'is-active' : ''}
-              onClick={() => onChange('bathrooms', filters.bathrooms === option.value ? 0 : option.value)}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
+        <NumberStepper
+          id="filterBathrooms"
+          label="Banos minimos"
+          min={0}
+          max={8}
+          value={filters.bathrooms}
+          onChange={(value) => onChange('bathrooms', value)}
+          help="Usa 0 para ver cualquier cantidad."
+        />
       </FilterSection>
 
       <FilterSection title="Amenidades">

@@ -11,7 +11,11 @@ export function FormField({ children, className = '', error, help, id, label, re
         {required ? <span aria-hidden="true"> *</span> : null}
       </label>
       {children}
-      {help ? <small className="field-help">{help}</small> : null}
+      {help ? (
+        <small className="field-help" id={`${id}-help`}>
+          {help}
+        </small>
+      ) : null}
       {error ? (
         <small className="field-error" id={`${id}-error`}>
           {error}
@@ -34,12 +38,13 @@ export function TextField({
   value,
   ...props
 }) {
+  const describedBy = [help ? `${id}-help` : '', error ? `${id}-error` : ''].filter(Boolean).join(' ') || undefined;
   const sharedProps = {
     id,
     value,
     onChange: (event) => onChange(event.target.value),
     'aria-invalid': Boolean(error),
-    'aria-describedby': error ? `${id}-error` : undefined,
+    'aria-describedby': describedBy,
     ...props,
   };
 
@@ -63,6 +68,8 @@ export function SelectField({
   required,
   value,
 }) {
+  const describedBy = [help ? `${id}-help` : '', error ? `${id}-error` : ''].filter(Boolean).join(' ') || undefined;
+
   return (
     <FormField className={className} error={error} help={help} id={id} label={label} required={required}>
       <select
@@ -71,7 +78,7 @@ export function SelectField({
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
         aria-invalid={Boolean(error)}
-        aria-describedby={error ? `${id}-error` : undefined}
+        aria-describedby={describedBy}
       >
         <option value="">{placeholder}</option>
         {options.map((option) => (

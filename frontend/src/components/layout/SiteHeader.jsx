@@ -36,7 +36,7 @@ export function SiteHeader() {
 
   const renderNavLinks = () => (
     <>
-      <Link to="/properties" onClick={closeMobileMenu}>
+      <Link to="/#buscar" onClick={closeMobileMenu}>
         Buscar
       </Link>
       <Link to="/saved" onClick={closeMobileMenu}>
