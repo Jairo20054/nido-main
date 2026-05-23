@@ -466,25 +466,31 @@ function FormSection({ children, eyebrow, title, description }) {
   );
 }
 
-function Field({ children, error, help, id, label, required = false }) {
+function Field({ children, className = '', error, help, id, label, required = false }) {
   return (
-    <div className="field-group property-field">
+    <div className={`field-group property-field ${className}`.trim()}>
       <label htmlFor={id}>
         {label}
         {required ? <span aria-hidden="true"> *</span> : null}
       </label>
       {children}
-      {help ? <small className="field-help">{help}</small> : null}
-      {error ? (
-        <small className="field-error" id={`${id}-error`}>
-          {error}
-        </small>
-      ) : null}
+      <div className="field-messages">
+        {help ? <small className="field-help">{help}</small> : null}
+        {error ? (
+          <small className="field-error" id={`${id}-error`}>
+            {error}
+          </small>
+        ) : (
+          <small className="field-error field-error--empty" aria-hidden="true">
+            &nbsp;
+          </small>
+        )}
+      </div>
     </div>
   );
 }
 
-function TextInput({ error, help, id, label, multiline = false, onChange, required, rows = 4, value, ...props }) {
+function TextInput({ className = '', error, help, id, label, multiline = false, onChange, required, rows = 4, value, ...props }) {
   const inputProps = {
     id,
     value,
@@ -495,7 +501,7 @@ function TextInput({ error, help, id, label, multiline = false, onChange, requir
   };
 
   return (
-    <Field error={error} help={help} id={id} label={label} required={required}>
+    <Field className={className} error={error} help={help} id={id} label={label} required={required}>
       {multiline ? <textarea rows={rows} {...inputProps} /> : <input {...inputProps} />}
     </Field>
   );
@@ -544,12 +550,12 @@ function Toggle({ checked, description, id, label, onChange }) {
   );
 }
 
-function NumberStepper({ error, help, id, label, min = 0, onChange, required = false, value }) {
+function NumberStepper({ className = '', error, help, id, label, min = 0, onChange, required = false, value }) {
   const numericValue = isMissingNumber(value) ? min : Number(value);
   const updateValue = (nextValue) => onChange(String(Math.max(min, nextValue)));
 
   return (
-    <Field error={error} help={help} id={id} label={label} required={required}>
+    <Field className={`property-field--counter ${className}`.trim()} error={error} help={help} id={id} label={label} required={required}>
       <div className="number-stepper">
         <button type="button" aria-label={`Disminuir ${label}`} onClick={() => updateValue(numericValue - 1)}>
           -
@@ -573,6 +579,7 @@ function NumberStepper({ error, help, id, label, min = 0, onChange, required = f
 
 function StepIndicator({ currentStepIndex, onStepChange, steps }) {
   const progress = ((currentStepIndex + 1) / steps.length) * 100;
+  const currentStep = steps[currentStepIndex];
 
   return (
     <div className="property-step-progress" aria-label="Progreso del formulario">
@@ -580,26 +587,36 @@ function StepIndicator({ currentStepIndex, onStepChange, steps }) {
         <span>
           Paso {currentStepIndex + 1} de {steps.length}
         </span>
-        <strong>{steps[currentStepIndex].label}</strong>
+        <strong>{currentStep.label}</strong>
       </div>
       <div className="property-step-progress__bar" aria-hidden="true">
         <span style={{ width: `${progress}%` }} />
       </div>
+      <div className="property-step-progress__mobile-current">
+        Paso {currentStepIndex + 1} de {steps.length} - {currentStep.label}
+      </div>
       <div className="stepper">
-        {steps.map((step, index) => (
-          <button
-            key={step.id}
-            className={`stepper__item ${index === currentStepIndex ? 'stepper__item--active' : ''} ${
-              index < currentStepIndex ? 'stepper__item--done' : ''
-            }`}
-            type="button"
-            onClick={() => onStepChange(index)}
-          >
-            <span>{index < currentStepIndex ? <CheckCircle2 size={14} /> : index + 1}</span>
-            <strong>{step.label}</strong>
-            <small>{step.helper}</small>
-          </button>
-        ))}
+        {steps.map((step, index) => {
+          const isCurrent = index === currentStepIndex;
+          const isDone = index < currentStepIndex;
+
+          return (
+            <button
+              key={step.id}
+              className={`stepper__item ${isCurrent ? 'stepper__item--active' : ''} ${
+                isDone ? 'stepper__item--done' : ''
+              }`}
+              type="button"
+              aria-current={isCurrent ? 'step' : undefined}
+              data-step-state={isDone ? 'Completado' : isCurrent ? 'Actual' : 'Pendiente'}
+              onClick={() => onStepChange(index)}
+            >
+              <span>{isDone ? <CheckCircle2 size={14} /> : index + 1}</span>
+              <strong>{step.label}</strong>
+              <small>{step.helper}</small>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -726,12 +743,13 @@ function DetailsStep({ errors, form, setField }) {
       title="Detalles fisicos de la vivienda"
       description="Usa datos concretos. Esto mejora filtros, comparacion y confianza."
     >
-      <div className="field-grid field-grid--quad">
+      <div className="field-grid details-field-grid">
         <NumberStepper id="bedrooms" label="Habitaciones" min={0} value={form.bedrooms} onChange={(value) => setField('bedrooms', value)} error={errors.bedrooms} />
         <NumberStepper id="bathrooms" label="Banos" min={1} value={form.bathrooms} onChange={(value) => setField('bathrooms', value)} error={errors.bathrooms} />
         <TextInput
           id="areaM2"
           label="Area en m2"
+          className="property-field--area"
           required
           type="number"
           min="10"
@@ -744,6 +762,7 @@ function DetailsStep({ errors, form, setField }) {
         <TextInput
           id="floor"
           label="Piso"
+          className="property-field--short"
           type="number"
           min="0"
           inputMode="numeric"
@@ -754,10 +773,11 @@ function DetailsStep({ errors, form, setField }) {
         />
       </div>
 
-      <div className="field-grid">
+      <div className="field-grid details-field-grid details-field-grid--secondary">
         <TextInput
           id="strata"
           label="Estrato"
+          className="property-field--short"
           type="number"
           min="1"
           max="6"
@@ -767,15 +787,12 @@ function DetailsStep({ errors, form, setField }) {
           error={errors.strata}
           placeholder="Opcional"
         />
-        <TextInput
+        <NumberStepper
           id="parkingSpots"
           label="Parqueaderos"
-          type="number"
-          min="0"
-          inputMode="numeric"
+          min={0}
           value={form.parkingSpots}
           onChange={(value) => setField('parkingSpots', value)}
-          placeholder="0"
         />
       </div>
 
@@ -803,90 +820,107 @@ function PricingStep({ errors, form, setField, toggleListValue }) {
       title="Precio, servicios y disponibilidad"
       description="Haz que el costo total sea facil de entender desde el primer contacto."
     >
-      <div className="field-grid">
-        <TextInput
-          id="monthlyRent"
-          label="Precio mensual"
-          required
-          type="number"
-          min="100000"
-          inputMode="numeric"
-          value={form.monthlyRent}
-          onChange={(value) => setField('monthlyRent', value)}
-          error={errors.monthlyRent}
-          placeholder="2500000"
-        />
-        <TextInput
-          id="minLeaseMonths"
-          label="Duracion minima del contrato"
-          type="number"
-          min="1"
-          inputMode="numeric"
-          value={form.minLeaseMonths}
-          onChange={(value) => setField('minLeaseMonths', value)}
-          error={errors.minLeaseMonths}
-          help="En meses."
-        />
-      </div>
-
-      <div className="toggle-panel">
-        <Toggle
-          id="administrationIncluded"
-          label="Administracion incluida"
-          description="Si esta activa, el canon ya incluye administracion."
-          checked={form.administrationIncluded}
-          onChange={(value) => setField('administrationIncluded', value, value ? { maintenanceFee: '' } : undefined)}
-        />
-        {!form.administrationIncluded ? (
+      <div className="pricing-section">
+        <div className="pricing-section__header">
+          <h4>Precio y contrato</h4>
+          <p>Define el canon base y el compromiso minimo para orientar mejor al arrendatario.</p>
+        </div>
+        <div className="field-grid pricing-primary-grid">
           <TextInput
-            id="maintenanceFee"
-            label="Valor de administracion"
+            id="monthlyRent"
+            label="Precio mensual"
+            className="property-field--money"
+            required
             type="number"
-            min="0"
+            min="100000"
             inputMode="numeric"
-            value={form.maintenanceFee}
-            onChange={(value) => setField('maintenanceFee', value)}
-            error={errors.maintenanceFee}
-            placeholder="350000"
-          />
-        ) : null}
-      </div>
-
-      <div className="toggle-panel">
-        <Toggle
-          id="depositRequired"
-          label="Deposito requerido"
-          description="Activalo solo si el propietario solicita deposito."
-          checked={form.depositRequired}
-          onChange={(value) => setField('depositRequired', value, value ? undefined : { securityDeposit: '' })}
-        />
-        {form.depositRequired ? (
-          <TextInput
-            id="securityDeposit"
-            label="Valor del deposito"
-            type="number"
-            min="0"
-            inputMode="numeric"
-            value={form.securityDeposit}
-            onChange={(value) => setField('securityDeposit', value)}
-            error={errors.securityDeposit}
+            value={form.monthlyRent}
+            onChange={(value) => setField('monthlyRent', value)}
+            error={errors.monthlyRent}
             placeholder="2500000"
+            help="Valor del canon mensual antes de descuentos o acuerdos especiales."
           />
-        ) : null}
-      </div>
-
-      <div className="field-group property-field">
-        <span className="property-field__label">Servicios incluidos</span>
-        <div className="chip-group">
-          {SERVICE_OPTIONS.map((service) => (
-            <Chip key={service} active={form.servicesIncluded.includes(service)} onClick={() => toggleListValue('servicesIncluded', service)}>
-              {service}
-            </Chip>
-          ))}
+          <NumberStepper
+            id="minLeaseMonths"
+            label="Duracion minima del contrato"
+            className="property-field--lease"
+            min={1}
+            value={form.minLeaseMonths}
+            onChange={(value) => setField('minLeaseMonths', value)}
+            error={errors.minLeaseMonths}
+            help="En meses."
+          />
         </div>
       </div>
 
-      <div className="toggle-panel">
+      <div className="pricing-option-grid">
+        <div className="toggle-panel pricing-subcard">
+          <Toggle
+            id="administrationIncluded"
+            label="Administracion incluida"
+            description="Si esta activa, el canon ya incluye administracion."
+            checked={form.administrationIncluded}
+            onChange={(value) => setField('administrationIncluded', value, value ? { maintenanceFee: '' } : undefined)}
+          />
+          {!form.administrationIncluded ? (
+            <TextInput
+              id="maintenanceFee"
+              label="Valor de administracion"
+              className="property-field--money"
+              type="number"
+              min="0"
+              inputMode="numeric"
+              value={form.maintenanceFee}
+              onChange={(value) => setField('maintenanceFee', value)}
+              error={errors.maintenanceFee}
+              placeholder="350000"
+            />
+          ) : null}
+        </div>
+
+        <div className="toggle-panel pricing-subcard">
+          <Toggle
+            id="depositRequired"
+            label="Deposito requerido"
+            description="Activalo solo si el propietario solicita deposito."
+            checked={form.depositRequired}
+            onChange={(value) => setField('depositRequired', value, value ? undefined : { securityDeposit: '' })}
+          />
+          {form.depositRequired ? (
+            <TextInput
+              id="securityDeposit"
+              label="Valor del deposito"
+              className="property-field--money"
+              type="number"
+              min="0"
+              inputMode="numeric"
+              value={form.securityDeposit}
+              onChange={(value) => setField('securityDeposit', value)}
+              error={errors.securityDeposit}
+              placeholder="2500000"
+            />
+          ) : null}
+        </div>
+      </div>
+
+      <div className="pricing-section pricing-section--compact">
+        <div className="pricing-section__header">
+          <h4>Servicios incluidos</h4>
+          <p>Selecciona solo los servicios que el canon cubre de forma clara.</p>
+        </div>
+        <div className="field-group property-field property-field--chips">
+          <span className="property-field__label">Servicios incluidos</span>
+          <div className="chip-group">
+            {SERVICE_OPTIONS.map((service) => (
+              <Chip key={service} active={form.servicesIncluded.includes(service)} onClick={() => toggleListValue('servicesIncluded', service)}>
+                {service}
+              </Chip>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="toggle-panel pricing-subcard">
         <Toggle
           id="availableImmediately"
           label="Disponibilidad inmediata"
@@ -1256,12 +1290,6 @@ export function PropertyForm({ property, submitting, onCancel, onSubmit, canPubl
                 Atras
               </button>
             ) : null}
-            {stepIndex < STEPS.length - 1 ? (
-              <button className="button" type="button" onClick={handleNext}>
-                Siguiente
-                <ArrowRight size={16} />
-              </button>
-            ) : null}
           </div>
 
           <div className="form-card__actions-right">
@@ -1269,6 +1297,17 @@ export function PropertyForm({ property, submitting, onCancel, onSubmit, canPubl
               <Save size={16} />
               {hasPendingUploads ? 'Cargando fotos...' : 'Guardar borrador'}
             </button>
+            {onCancel ? (
+              <button className="button button--ghost-danger" type="button" onClick={onCancel}>
+                Cancelar
+              </button>
+            ) : null}
+            {stepIndex < STEPS.length - 1 ? (
+              <button className="button" type="button" onClick={handleNext}>
+                Siguiente
+                <ArrowRight size={16} />
+              </button>
+            ) : null}
             {stepIndex === STEPS.length - 1 ? (
               <button
                 className="button"
@@ -1279,11 +1318,6 @@ export function PropertyForm({ property, submitting, onCancel, onSubmit, canPubl
               >
                 <Send size={16} />
                 {submitting ? 'Guardando...' : canPublishDirectly ? 'Publicar propiedad' : 'Enviar a revision'}
-              </button>
-            ) : null}
-            {onCancel ? (
-              <button className="button button--ghost-danger" type="button" onClick={onCancel}>
-                Cancelar
               </button>
             ) : null}
           </div>

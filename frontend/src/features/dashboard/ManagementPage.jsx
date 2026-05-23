@@ -134,7 +134,7 @@ export function ManagementPage() {
   }
 
   return (
-    <div className="page">
+    <div className="page page--publish">
       <section className="section">
         <div className="section__heading">
           <div>
@@ -143,7 +143,7 @@ export function ManagementPage() {
           </div>
         </div>
 
-        <div className="stats-row stats-row--four">
+        <div className="stats-row stats-row--four publish-stats">
           {dashboardStats.map((item) => (
             <div className="stats-card" key={item.label}>
               <strong>{item.value}</strong>
@@ -158,8 +158,8 @@ export function ManagementPage() {
           {message}
         </InlineMessage>
 
-        <div className="dashboard-layout">
-          <div className="dashboard-layout__form">
+        <div className="dashboard-layout publish-layout">
+          <div className="dashboard-layout__form publish-layout__form">
             <PropertyForm
               property={editingProperty}
               submitting={submitting}
@@ -168,8 +168,34 @@ export function ManagementPage() {
             />
           </div>
 
-          <div className="dashboard-layout__content">
-            <div className="content-card">
+          <aside className="dashboard-layout__content publish-layout__aside" aria-label="Resumen del panel arrendador">
+            <div className="content-card publish-status-card">
+              <div>
+                <span className="section__eyebrow">Estado</span>
+                <h2>{editingProperty ? 'Editando publicacion' : 'Nueva publicacion'}</h2>
+                <p>
+                  {editingProperty
+                    ? 'Estas actualizando una propiedad existente. Guarda los cambios cuando termines.'
+                    : 'Completa los pasos del formulario y guarda un borrador o envia la propiedad a revision.'}
+                </p>
+              </div>
+              <div className="publish-status-card__metrics">
+                <span>
+                  <strong>{properties.length}</strong>
+                  Publicaciones
+                </span>
+                <span>
+                  <strong>{properties.filter((item) => item.status === 'PENDING').length}</strong>
+                  En revision
+                </span>
+                <span>
+                  <strong>{requests.length}</strong>
+                  Postulaciones
+                </span>
+              </div>
+            </div>
+
+            <div className="content-card publish-side-card">
               <div className="section__heading section__heading--tight">
                 <div>
                   <span className="section__eyebrow">Inventario</span>
@@ -231,7 +257,7 @@ export function ManagementPage() {
               )}
             </div>
 
-            <div className="content-card">
+            <div className="content-card publish-side-card">
               <div className="section__heading section__heading--tight">
                 <div>
                   <span className="section__eyebrow">Postulaciones</span>
@@ -283,7 +309,7 @@ export function ManagementPage() {
                 />
               )}
             </div>
-          </div>
+          </aside>
         </div>
       </section>
     </div>
