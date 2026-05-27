@@ -8958,7 +8958,7 @@ body,
 
 .page--publish .details-field-grid,
 .page--publish .details-field-grid--secondary {
-  grid-template-columns: repeat(4, minmax(140px, 1fr));
+  grid-template-columns: repeat(3, minmax(150px, 1fr));
 }
 
 .page--publish .pricing-primary-grid {
