@@ -1,6 +1,6 @@
 // Catalogos y constantes reutilizables para mantener consistente la UI y la traduccion
 // de enums compartidos entre frontend y backend.
-export const PROPERTY_DRAFT_STORAGE_KEY = 'nido_property_draft';
+export const PROPERTY_DRAFT_STORAGE_KEY = 'nido_publish_draft';
 
 export const USER_ROLE_LABELS = {
   ADMIN: 'Administrador',

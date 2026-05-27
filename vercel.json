@@ -15,9 +15,6 @@
       "dest": "/index.html"
     }
   ],
-  "env": {
-    "VITE_API_BASE_URL": "@vite_api_base_url"
-  },
   "functions": {},
   "regions": ["iad1"],
   "outputDirectory": "dist"

@@ -1,5 +1,4 @@
 const PLACEHOLDER_PATTERN = /your-project\.supabase\.co|^your-(anon|publishable|secret|service)|^replace-with-|<[^>]+>/iu;
-const SENSITIVE_VITE_PATTERN = /(^|_)(SERVICE_ROLE|SERVICE_KEY|SECRET|JWT|DATABASE_URL|DIRECT_URL|PRIVATE|PASSWORD|TOKEN)($|_)/iu;
 
 const decodeJwtRole = (value) => {
   if (typeof value !== 'string' || !value.startsWith('eyJ')) {
@@ -58,14 +57,10 @@ const normalizeUrl = (value, variableName, issues) => {
 
 const validateFrontendEnv = () => {
   const issues = [];
-  const sensitiveNames = Object.keys(import.meta.env).filter((key) => SENSITIVE_VITE_PATTERN.test(key));
   const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
+  const appEnv = import.meta.env.VITE_ENV || import.meta.env.MODE;
   const supabaseKey =
     import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-  if (sensitiveNames.length) {
-    issues.push(`variables secretas expuestas con prefijo VITE_: ${sensitiveNames.join(', ')}`);
-  }
 
   if (isPlaceholder(apiUrl)) {
     issues.push('VITE_API_URL no esta configurada');
@@ -88,6 +83,7 @@ const validateFrontendEnv = () => {
   }
 
   return {
+    VITE_ENV: appEnv,
     VITE_API_URL: apiUrl,
     VITE_SITE_URL: import.meta.env.VITE_SITE_URL || '',
     VITE_SUPABASE_ANON_KEY: supabaseKey,

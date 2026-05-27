@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { LoadingState } from '../../components/ui/LoadingState';
@@ -17,6 +18,7 @@ import { PropertyForm } from '../properties/PropertyForm';
  */
 export function ManagementPage() {
   const { isAdmin, user } = useAuth();
+  const location = useLocation();
   const [properties, setProperties] = useState([]);
   const [requests, setRequests] = useState([]);
   const [editingProperty, setEditingProperty] = useState(null);
@@ -115,7 +117,7 @@ export function ManagementPage() {
     }
   };
 
-  if (isAdmin) {
+  if (isAdmin && location.pathname !== '/publish') {
     // El rol admin tiene un panel dedicado para evitar mezclar responsabilidades.
     return (
       <div className="page">
@@ -165,6 +167,7 @@ export function ManagementPage() {
               submitting={submitting}
               onCancel={() => setEditingProperty(null)}
               onSubmit={handleSubmitProperty}
+              canPublishDirectly={isAdmin}
             />
           </div>
 

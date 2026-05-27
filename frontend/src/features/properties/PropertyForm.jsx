@@ -124,9 +124,9 @@ const emptyForm = {
   bedrooms: 1,
   bathrooms: 1,
   areaM2: '',
-  floor: '',
+  floor: 0,
   parkingSpots: 0,
-  strata: '',
+  strata: 1,
   maxOccupants: 2,
   furnished: false,
   petsAllowed: false,
@@ -165,6 +165,14 @@ const emptyForm = {
   visitNotes: '',
   media: [],
 };
+
+const clampStepIndex = (value) => {
+  const numericValue = Number(value);
+  if (!Number.isInteger(numericValue)) return 0;
+  return Math.min(STEPS.length - 1, Math.max(0, numericValue));
+};
+
+const canUseSessionStorage = () => typeof window !== 'undefined' && Boolean(window.sessionStorage);
 
 const buildEmptyForm = (user) => ({
   ...emptyForm,
@@ -215,9 +223,9 @@ const toFormState = (property) => {
     bedrooms: property.bedrooms ?? 1,
     bathrooms: property.bathrooms ?? 1,
     areaM2: property.areaM2 ?? '',
-    floor: property.floor ?? '',
+    floor: property.floor ?? 0,
     parkingSpots: property.parkingSpots ?? 0,
-    strata: property.strata ?? '',
+    strata: property.strata ?? 1,
     maxOccupants: property.maxOccupants ?? 2,
     furnished: Boolean(property.furnished),
     petsAllowed: Boolean(property.petsAllowed),
@@ -258,18 +266,72 @@ const toFormState = (property) => {
   };
 };
 
-const serializeDraftForm = (form) =>
-  JSON.stringify({
-    ...form,
-    media: form.media
-      .filter((item) => item.uploadStatus !== 'uploading' && item.uploadStatus !== 'error')
-      .map(({ sourceFile: _sourceFile, ...item }, index) => ({
-        ...item,
-        position: index,
-        uploadStatus: 'uploaded',
-        isPersisted: true,
-      })),
-  });
+const sanitizeDraftForm = (form) => ({
+  ...form,
+  media: form.media
+    .filter((item) => item.uploadStatus !== 'uploading' && item.uploadStatus !== 'error')
+    .map(({ sourceFile: _sourceFile, ...item }, index) => ({
+      ...item,
+      position: index,
+      uploadStatus: 'uploaded',
+      isPersisted: true,
+    })),
+});
+
+const serializeDraftForm = (draft) => JSON.stringify(draft);
+
+const readPublishDraft = (user) => {
+  if (!canUseSessionStorage()) {
+    return {
+      currentStep: 0,
+      error: '',
+      fieldErrors: {},
+      form: buildEmptyForm(user),
+    };
+  }
+
+  try {
+    const stored = window.sessionStorage.getItem(PROPERTY_DRAFT_STORAGE_KEY);
+    if (!stored) {
+      return {
+        currentStep: 0,
+        error: '',
+        fieldErrors: {},
+        form: buildEmptyForm(user),
+      };
+    }
+
+    const parsed = JSON.parse(stored);
+    const draftForm = parsed?.form || parsed;
+
+    return {
+      currentStep: clampStepIndex(parsed?.currentStep),
+      error: typeof parsed?.error === 'string' ? parsed.error : '',
+      fieldErrors: parsed?.fieldErrors && typeof parsed.fieldErrors === 'object' ? parsed.fieldErrors : {},
+      form: {
+        ...buildEmptyForm(user),
+        ...draftForm,
+        country: draftForm.country || DEFAULT_COUNTRY,
+        media: (draftForm.media || []).map(normalizeExistingMediaItem),
+      },
+    };
+  } catch (_error) {
+    window.sessionStorage.removeItem(PROPERTY_DRAFT_STORAGE_KEY);
+    return {
+      currentStep: 0,
+      error: '',
+      fieldErrors: {},
+      form: buildEmptyForm(user),
+    };
+  }
+};
+
+const createDraftPayload = ({ error, fieldErrors, form, stepIndex }) => ({
+  currentStep: clampStepIndex(stepIndex),
+  error,
+  fieldErrors,
+  form: sanitizeDraftForm(form),
+});
 
 const parseList = (value) =>
   String(value || '')
@@ -284,6 +346,12 @@ const firstMessage = (errors) => Object.values(errors).find(Boolean) || '';
 const toNumber = (value) => Number(value);
 const isMissingNumber = (value) => value === '' || value === null || value === undefined || Number.isNaN(Number(value));
 const normalizeNumber = (value, fallback = 0) => (isMissingNumber(value) ? fallback : Number(value));
+const parseCOP = (value) => String(value ?? '').replace(/\D/g, '');
+const formatCOP = (value) => {
+  const digits = parseCOP(value);
+  if (!digits) return '';
+  return new Intl.NumberFormat('es-CO').format(Number(digits));
+};
 
 const getPropertyTypeLabel = (value) =>
   PROPERTY_TYPE_OPTIONS.find((option) => option.value === value)?.label || 'Vivienda';
@@ -362,7 +430,7 @@ const validateForm = (form, { action = 'publish', scope = null } = {}) => {
     add('areaM2', 'El area debe ser de al menos 10 m2.');
   }
 
-  if (toNumber(form.bedrooms) < 0) add('bedrooms', 'Las habitaciones no pueden ser negativas.');
+  if (toNumber(form.bedrooms) < 1) add('bedrooms', 'Ingresa al menos una habitacion.');
   if (toNumber(form.bathrooms) < 1) add('bathrooms', 'Ingresa al menos un bano.');
   if (form.floor !== '' && toNumber(form.floor) < 0) add('floor', 'El piso no puede ser negativo.');
   if (toNumber(form.parkingSpots) < 0) add('parkingSpots', 'Los parqueaderos no pueden ser negativos.');
@@ -377,9 +445,11 @@ const validateForm = (form, { action = 'publish', scope = null } = {}) => {
     add('monthlyRent', 'Ingresa el precio mensual.');
   } else if (toNumber(form.monthlyRent) < 100000) {
     add('monthlyRent', 'El valor mensual debe ser de al menos $100.000.');
+  } else if (toNumber(form.monthlyRent) > 50000000) {
+    add('monthlyRent', 'El valor mensual no debe superar $50.000.000.');
   }
 
-  if (!form.administrationIncluded && form.maintenanceFee !== '' && toNumber(form.maintenanceFee) < 0) {
+  if (form.administrationIncluded && form.maintenanceFee !== '' && toNumber(form.maintenanceFee) < 0) {
     add('maintenanceFee', 'La administracion no puede ser negativa.');
   }
 
@@ -437,7 +507,7 @@ const normalizePayload = (form, targetStatus) => {
     description: description.length >= 80 ? description : `${description} Informacion verificada para una publicacion clara y confiable en NIDO.`,
     status: targetStatus,
     monthlyRent: Number(form.monthlyRent),
-    maintenanceFee: form.administrationIncluded ? 0 : normalizeNumber(form.maintenanceFee, 0),
+    maintenanceFee: form.administrationIncluded ? normalizeNumber(form.maintenanceFee, 0) : 0,
     securityDeposit: form.depositRequired ? normalizeNumber(form.securityDeposit, 0) : 0,
     bedrooms: normalizedBedrooms,
     bathrooms: Number(form.bathrooms),
@@ -517,6 +587,29 @@ function TextInput({ className = '', error, help, id, label, multiline = false, 
   );
 }
 
+function MoneyInput({ className = '', error, help, id, label, maxWidth = 'money-input--compact', onChange, required, value }) {
+  const describedBy = [help ? `${id}-help` : '', error ? `${id}-error` : ''].filter(Boolean).join(' ') || undefined;
+
+  return (
+    <Field className={`${className} money-field ${maxWidth}`.trim()} error={error} help={help} id={id} label={label} required={required}>
+      <div className="money-input">
+        <span aria-hidden="true">$</span>
+        <input
+          id={id}
+          type="text"
+          inputMode="numeric"
+          autoComplete="off"
+          value={formatCOP(value)}
+          onChange={(event) => onChange(parseCOP(event.target.value))}
+          aria-invalid={Boolean(error)}
+          aria-describedby={describedBy}
+          placeholder="1.500.000"
+        />
+      </div>
+    </Field>
+  );
+}
+
 function SelectInput({ disabled = false, error, help, id, label, onChange, options, placeholder, required, value }) {
   const describedBy = [help ? `${id}-help` : '', error ? `${id}-error` : ''].filter(Boolean).join(' ') || undefined;
 
@@ -549,6 +642,26 @@ function Chip({ active, children, onClick }) {
   );
 }
 
+function FeatureChip({ label, selected, onToggle }) {
+  return (
+    <Chip active={selected} onClick={onToggle}>
+      {label}
+    </Chip>
+  );
+}
+
+function ServiceChip({ label, selected, onToggle }) {
+  return (
+    <Chip active={selected} onClick={onToggle}>
+      {label}
+    </Chip>
+  );
+}
+
+function StepperControl(props) {
+  return <NumberStepper {...props} />;
+}
+
 function Toggle({ checked, description, id, label, onChange }) {
   return (
     <label className="form-toggle" htmlFor={id}>
@@ -559,6 +672,15 @@ function Toggle({ checked, description, id, label, onChange }) {
         {description ? <small>{description}</small> : null}
       </span>
     </label>
+  );
+}
+
+function ToggleCard({ checked, children, description, id, label, onChange, showChildren = checked }) {
+  return (
+    <div className={`toggle-card ${checked ? 'toggle-card--active' : ''}`}>
+      <Toggle checked={checked} description={description} id={id} label={label} onChange={onChange} />
+      {showChildren ? <div className="toggle-card__body">{children}</div> : null}
+    </div>
   );
 }
 
@@ -584,6 +706,7 @@ function StepIndicator({ currentStepIndex, onStepChange, steps }) {
         {steps.map((step, index) => {
           const isCurrent = index === currentStepIndex;
           const isDone = index < currentStepIndex;
+          const isFuture = index > currentStepIndex;
 
           return (
             <button
@@ -592,6 +715,7 @@ function StepIndicator({ currentStepIndex, onStepChange, steps }) {
                 isDone ? 'stepper__item--done' : ''
               }`}
               type="button"
+              disabled={isFuture}
               aria-current={isCurrent ? 'step' : undefined}
               aria-label={`Ir a ${step.label}. ${step.helper}`}
               data-step-state={isDone ? 'Completado' : isCurrent ? 'Actual' : 'Pendiente'}
@@ -748,44 +872,43 @@ function DetailsStep({ errors, form, setField }) {
       description="Usa datos concretos. Esto mejora filtros, comparacion y confianza."
     >
       <div className="field-grid details-field-grid">
-        <NumberStepper
+        <StepperControl
           id="bedrooms"
           label="Habitaciones"
-          min={0}
+          min={1}
           max={20}
           value={form.bedrooms}
           onChange={(value) => setField('bedrooms', value)}
           error={errors.bedrooms}
         />
-        <NumberStepper
+        <StepperControl
           id="bathrooms"
           label="Banos"
           min={1}
-          max={12}
+          max={20}
           value={form.bathrooms}
           onChange={(value) => setField('bathrooms', value)}
           error={errors.bathrooms}
         />
         <TextInput
           id="areaM2"
-          label="Area en m2"
+          label="Area en m²"
           className="property-field--area"
           required
-          type="number"
-          min="10"
+          type="text"
           inputMode="numeric"
           value={form.areaM2}
-          onChange={(value) => setField('areaM2', value)}
+          onChange={(value) => setField('areaM2', parseCOP(value))}
           error={errors.areaM2}
           placeholder="64"
+          help="Solo numeros. Usa el area privada aproximada."
         />
-        <NumberStepper
+        <StepperControl
           id="floor"
           label="Piso"
           className="property-field--short"
-          allowEmpty
           min={0}
-          max={80}
+          max={99}
           value={form.floor}
           onChange={(value) => setField('floor', value)}
           error={errors.floor}
@@ -794,11 +917,10 @@ function DetailsStep({ errors, form, setField }) {
       </div>
 
       <div className="field-grid details-field-grid details-field-grid--secondary">
-        <NumberStepper
+        <StepperControl
           id="strata"
           label="Estrato"
           className="property-field--short"
-          allowEmpty
           min={1}
           max={6}
           value={form.strata}
@@ -806,20 +928,20 @@ function DetailsStep({ errors, form, setField }) {
           error={errors.strata}
           help="Rango valido en Colombia: 1 a 6."
         />
-        <NumberStepper
+        <StepperControl
           id="parkingSpots"
           label="Parqueaderos"
           min={0}
-          max={10}
+          max={20}
           value={form.parkingSpots}
           onChange={(value) => setField('parkingSpots', value)}
           error={errors.parkingSpots}
         />
-        <NumberStepper
+        <StepperControl
           id="maxOccupants"
           label="Capacidad"
           min={1}
-          max={30}
+          max={50}
           value={form.maxOccupants}
           onChange={(value) => setField('maxOccupants', value)}
           error={errors.maxOccupants}
@@ -833,9 +955,7 @@ function DetailsStep({ errors, form, setField }) {
           {FEATURE_OPTIONS.map((option) => {
             const active = option.numeric ? Number(form[option.field] || 0) > 0 : Boolean(form[option.field]);
             return (
-              <Chip key={option.label} active={active} onClick={() => toggleFeature(option)}>
-                {option.label}
-              </Chip>
+              <FeatureChip key={option.label} label={option.label} selected={active} onToggle={() => toggleFeature(option)} />
             );
           })}
         </div>
@@ -857,21 +977,17 @@ function PricingStep({ errors, form, setField, toggleListValue }) {
           <p>Define el canon base y el compromiso minimo para orientar mejor al arrendatario.</p>
         </div>
         <div className="field-grid pricing-primary-grid">
-          <TextInput
+          <MoneyInput
             id="monthlyRent"
             label="Precio mensual"
             className="property-field--money"
             required
-            type="number"
-            min="100000"
-            inputMode="numeric"
             value={form.monthlyRent}
             onChange={(value) => setField('monthlyRent', value)}
             error={errors.monthlyRent}
-            placeholder="2500000"
             help="Valor del canon mensual antes de descuentos o acuerdos especiales."
           />
-          <NumberStepper
+          <StepperControl
             id="minLeaseMonths"
             label="Duracion minima del contrato"
             className="property-field--lease"
@@ -886,53 +1002,40 @@ function PricingStep({ errors, form, setField, toggleListValue }) {
       </div>
 
       <div className="pricing-option-grid">
-        <div className="toggle-panel pricing-subcard">
-          <Toggle
-            id="administrationIncluded"
-            label="Administracion incluida"
-            description="Si esta activa, el canon ya incluye administracion."
-            checked={form.administrationIncluded}
-            onChange={(value) => setField('administrationIncluded', value, value ? { maintenanceFee: '' } : undefined)}
+        <ToggleCard
+          id="administrationIncluded"
+          label="Administracion incluida"
+          description="Activa esta opcion si el canon ya contempla administracion."
+          checked={form.administrationIncluded}
+          onChange={(value) => setField('administrationIncluded', value, value ? undefined : { maintenanceFee: '' })}
+        >
+          <MoneyInput
+            id="maintenanceFee"
+            label="Valor de administracion"
+            className="property-field--money"
+            value={form.maintenanceFee}
+            onChange={(value) => setField('maintenanceFee', value)}
+            error={errors.maintenanceFee}
+            help="Guarda solo numeros; se mostrara en pesos colombianos."
           />
-          {!form.administrationIncluded ? (
-            <TextInput
-              id="maintenanceFee"
-              label="Valor de administracion"
-              className="property-field--money"
-              type="number"
-              min="0"
-              inputMode="numeric"
-              value={form.maintenanceFee}
-              onChange={(value) => setField('maintenanceFee', value)}
-              error={errors.maintenanceFee}
-              placeholder="350000"
-            />
-          ) : null}
-        </div>
+        </ToggleCard>
 
-        <div className="toggle-panel pricing-subcard">
-          <Toggle
-            id="depositRequired"
-            label="Deposito requerido"
-            description="Activalo solo si el propietario solicita deposito."
-            checked={form.depositRequired}
-            onChange={(value) => setField('depositRequired', value, value ? undefined : { securityDeposit: '' })}
+        <ToggleCard
+          id="depositRequired"
+          label="Deposito requerido"
+          description="Activalo solo si el propietario solicita deposito."
+          checked={form.depositRequired}
+          onChange={(value) => setField('depositRequired', value, value ? undefined : { securityDeposit: '' })}
+        >
+          <MoneyInput
+            id="securityDeposit"
+            label="Valor del deposito"
+            className="property-field--money"
+            value={form.securityDeposit}
+            onChange={(value) => setField('securityDeposit', value)}
+            error={errors.securityDeposit}
           />
-          {form.depositRequired ? (
-            <TextInput
-              id="securityDeposit"
-              label="Valor del deposito"
-              className="property-field--money"
-              type="number"
-              min="0"
-              inputMode="numeric"
-              value={form.securityDeposit}
-              onChange={(value) => setField('securityDeposit', value)}
-              error={errors.securityDeposit}
-              placeholder="2500000"
-            />
-          ) : null}
-        </div>
+        </ToggleCard>
       </div>
 
       <div className="pricing-section pricing-section--compact">
@@ -944,23 +1047,25 @@ function PricingStep({ errors, form, setField, toggleListValue }) {
           <span className="property-field__label">Servicios incluidos</span>
           <div className="chip-group">
             {SERVICE_OPTIONS.map((service) => (
-              <Chip key={service} active={form.servicesIncluded.includes(service)} onClick={() => toggleListValue('servicesIncluded', service)}>
-                {service}
-              </Chip>
+              <ServiceChip
+                key={service}
+                label={service}
+                selected={form.servicesIncluded.includes(service)}
+                onToggle={() => toggleListValue('servicesIncluded', service)}
+              />
             ))}
           </div>
         </div>
       </div>
 
-      <div className="toggle-panel pricing-subcard">
-        <Toggle
-          id="availableImmediately"
-          label="Disponibilidad inmediata"
-          description="Si esta activa, no necesitas indicar fecha."
-          checked={form.availableImmediately}
-          onChange={(value) => setField('availableImmediately', value, value ? { availableFrom: '' } : undefined)}
-        />
-        {!form.availableImmediately ? (
+      <ToggleCard
+        id="availableImmediately"
+        label="Disponibilidad inmediata"
+        description="Si esta activa, no necesitas indicar fecha."
+        checked={form.availableImmediately}
+        showChildren={!form.availableImmediately}
+        onChange={(value) => setField('availableImmediately', value, value ? { availableFrom: '' } : undefined)}
+      >
           <TextInput
             id="availableFrom"
             label="Fecha disponible"
@@ -969,8 +1074,7 @@ function PricingStep({ errors, form, setField, toggleListValue }) {
             onChange={(value) => setField('availableFrom', value)}
             error={errors.availableFrom}
           />
-        ) : null}
-      </div>
+      </ToggleCard>
     </FormSection>
   );
 }
@@ -1094,52 +1198,47 @@ function ReviewStep({ canPublishDirectly, completionChecks, errors, form, imageC
 
 export function PropertyForm({ property, submitting, onCancel, onSubmit, canPublishDirectly = false }) {
   const { user } = useAuth();
-  const [stepIndex, setStepIndex] = useState(0);
-  const [form, setForm] = useState(emptyForm);
-  const [error, setError] = useState('');
-  const [fieldErrors, setFieldErrors] = useState({});
+  const initialDraftState = useMemo(
+    () => (property ? { currentStep: 0, error: '', fieldErrors: {}, form: toFormState(property) } : readPublishDraft(user)),
+    []
+  );
+  const [stepIndex, setStepIndex] = useState(initialDraftState.currentStep);
+  const [form, setForm] = useState(initialDraftState.form);
+  const [error, setError] = useState(initialDraftState.error);
+  const [fieldErrors, setFieldErrors] = useState(initialDraftState.fieldErrors);
   const [draftStatus, setDraftStatus] = useState('');
 
   useEffect(() => {
-    setFieldErrors({});
-    setError('');
-    setStepIndex(0);
-
     if (property) {
+      setFieldErrors({});
+      setError('');
+      setStepIndex(0);
       setForm(toFormState(property));
       setDraftStatus('');
       return;
     }
 
-    const stored = localStorage.getItem(PROPERTY_DRAFT_STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        setForm({
-          ...buildEmptyForm(user),
-          ...parsed,
-          country: parsed.country || DEFAULT_COUNTRY,
-          media: (parsed.media || []).map(normalizeExistingMediaItem),
-        });
-      } catch (_error) {
-        setForm(buildEmptyForm(user));
-      }
-    } else {
-      setForm(buildEmptyForm(user));
-    }
-  }, [property, user]);
+    const draft = readPublishDraft(user);
+    setStepIndex(draft.currentStep);
+    setForm(draft.form);
+    setFieldErrors(draft.fieldErrors);
+    setError(draft.error);
+  }, [property]);
 
   useEffect(() => {
     if (property) return undefined;
 
     setDraftStatus('Guardando cambios...');
+    window.sessionStorage.setItem(
+      PROPERTY_DRAFT_STORAGE_KEY,
+      serializeDraftForm(createDraftPayload({ error, fieldErrors, form, stepIndex }))
+    );
     const timeout = window.setTimeout(() => {
-      localStorage.setItem(PROPERTY_DRAFT_STORAGE_KEY, serializeDraftForm(form));
       setDraftStatus('Cambios guardados automaticamente');
     }, 250);
 
     return () => window.clearTimeout(timeout);
-  }, [form, property]);
+  }, [error, fieldErrors, form, property, stepIndex]);
 
   const currentStep = STEPS[stepIndex];
   const departments = useMemo(() => getDepartmentsForCountry(form.country || DEFAULT_COUNTRY), [form.country]);
@@ -1150,6 +1249,11 @@ export function PropertyForm({ property, submitting, onCancel, onSubmit, canPubl
   const imageCount = form.media.filter((item) => item.type === 'IMAGE').length;
   const hasPendingUploads = form.media.some((item) => item.uploadStatus === 'uploading');
   const publishValidation = useMemo(() => validateForm(form, { action: 'publish' }), [form]);
+  const currentStepValidation = useMemo(
+    () => validateForm(form, { action: 'draft', scope: currentStep.id }),
+    [currentStep.id, form]
+  );
+  const isCurrentStepValid = !currentStepValidation.message;
   const isPublishReady = !publishValidation.message && !hasPendingUploads;
   const title = property ? 'Editar propiedad' : 'Publicar propiedad';
 
@@ -1184,6 +1288,18 @@ export function PropertyForm({ property, submitting, onCancel, onSubmit, canPubl
       return next;
     });
   }, []);
+
+  const clearDraft = useCallback(() => {
+    if (canUseSessionStorage()) {
+      window.sessionStorage.removeItem(PROPERTY_DRAFT_STORAGE_KEY);
+    }
+
+    setStepIndex(0);
+    setForm(buildEmptyForm(user));
+    setFieldErrors({});
+    setError('');
+    setDraftStatus('');
+  }, [user]);
 
   const toggleListValue = useCallback((field, value) => {
     setForm((current) => {
@@ -1252,17 +1368,20 @@ export function PropertyForm({ property, submitting, onCancel, onSubmit, canPubl
         await onSubmit(normalizePayload(form, targetStatus));
 
         if (!property && targetStatus === 'DRAFT') {
-          localStorage.setItem(PROPERTY_DRAFT_STORAGE_KEY, serializeDraftForm(form));
+          window.sessionStorage.setItem(
+            PROPERTY_DRAFT_STORAGE_KEY,
+            serializeDraftForm(createDraftPayload({ error: '', fieldErrors: {}, form, stepIndex }))
+          );
         }
 
         if (!property && targetStatus !== 'DRAFT') {
-          localStorage.removeItem(PROPERTY_DRAFT_STORAGE_KEY);
+          clearDraft();
         }
       } catch (requestError) {
         setError(requestError.message || 'No pudimos guardar la propiedad. Revisa la informacion e intentalo nuevamente.');
       }
     },
-    [applyValidation, form, onSubmit, property]
+    [applyValidation, clearDraft, form, onSubmit, property, stepIndex]
   );
 
   const handleSaveDraft = useCallback(() => persistProperty('DRAFT'), [persistProperty]);
@@ -1271,6 +1390,14 @@ export function PropertyForm({ property, submitting, onCancel, onSubmit, canPubl
     const targetStatus = canPublishDirectly ? 'PUBLISHED' : 'PENDING';
     return persistProperty(targetStatus);
   }, [canPublishDirectly, persistProperty]);
+
+  const handleCancel = useCallback(() => {
+    if (!property) {
+      clearDraft();
+    }
+
+    onCancel?.();
+  }, [clearDraft, onCancel, property]);
 
   const stepProps = {
     errors: fieldErrors,
@@ -1330,12 +1457,18 @@ export function PropertyForm({ property, submitting, onCancel, onSubmit, canPubl
               {hasPendingUploads ? 'Cargando fotos...' : 'Guardar borrador'}
             </button>
             {onCancel ? (
-              <button className="button button--ghost-danger" type="button" onClick={onCancel}>
+              <button className="button button--ghost-danger" type="button" onClick={handleCancel}>
                 Cancelar
               </button>
             ) : null}
             {stepIndex < STEPS.length - 1 ? (
-              <button className="button" type="button" onClick={handleNext}>
+              <button
+                className="button"
+                type="button"
+                disabled={!isCurrentStepValid}
+                title={!isCurrentStepValid ? currentStepValidation.message : undefined}
+                onClick={handleNext}
+              >
                 Siguiente
                 <ArrowRight size={16} />
               </button>
