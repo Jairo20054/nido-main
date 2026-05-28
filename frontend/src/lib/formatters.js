@@ -31,8 +31,11 @@ export const formatCurrency = (value) => {
 };
 export const formatDate = (value) => (value ? dateFormatter.format(new Date(value)) : '');
 
-export const getPropertyTypeLabel = (value) =>
-  PROPERTY_TYPE_OPTIONS.find((option) => option.value === value)?.label || value;
+export const getPropertyTypeLabel = (value) => {
+  const normalizedValue = typeof value === 'string' ? value.toUpperCase() : value;
+
+  return PROPERTY_TYPE_OPTIONS.find((option) => option.value === normalizedValue)?.label || value;
+};
 
 export const getRentalTypeLabel = (value) =>
   RENTAL_TYPE_OPTIONS.find((option) => option.value === value)?.label || value;

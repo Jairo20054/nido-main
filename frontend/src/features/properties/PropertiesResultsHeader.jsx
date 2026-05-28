@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid2X2, List, Map } from 'lucide-react';
+import { Grid2X2, List, Map, RotateCcw } from 'lucide-react';
 import { SORT_OPTIONS } from './propertySearchConfig';
 
 export function PropertiesResultsHeader({
@@ -7,7 +7,9 @@ export function PropertiesResultsHeader({
   totalCount,
   filters,
   viewMode,
+  activeCount = 0,
   onSortChange,
+  onClear,
   onToggleMap,
   onViewModeChange,
 }) {
@@ -33,6 +35,12 @@ export function PropertiesResultsHeader({
             ))}
           </select>
         </label>
+        {activeCount ? (
+          <button type="button" className="properties-clear-button" onClick={onClear}>
+            <RotateCcw size={16} aria-hidden="true" />
+            Limpiar filtros
+          </button>
+        ) : null}
         <button type="button" className="properties-map-button" onClick={onToggleMap}>
           <Map size={17} aria-hidden="true" />
           Ver en mapa

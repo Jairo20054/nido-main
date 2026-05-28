@@ -42,7 +42,7 @@ export function PropertyCard({
   const amenityText = (property.amenities || []).join(' ').toLowerCase();
   if (property.furnished) features.push('Amoblado');
   if (property.parkingSpots) features.push(`${property.parkingSpots} parqueadero${property.parkingSpots > 1 ? 's' : ''}`);
-  if (property.balcony || amenityText.includes('balcon') || amenityText.includes('balcón')) {
+  if (property.balcony || amenityText.includes('balcon')) {
     features.push('Balcon');
   }
   if (property.elevator || amenityText.includes('ascensor')) features.push('Ascensor');
@@ -62,19 +62,19 @@ export function PropertyCard({
   const reputationLabel = getPropertyReputationLabel(property);
   const totalMonthly = (property.monthlyRent || 0) + (property.maintenanceFee || 0);
   const visibleFeatures = features.slice(0, isCompact ? 2 : 4);
-  const title = isHome
-    ? `${typeLabel || 'Vivienda'} en arriendo`
-    : safeText(property.title, `${typeLabel || 'Vivienda'} en arriendo`);
+  const title = safeText(property.title, `${typeLabel || 'Vivienda'} en arriendo`);
   const summary = safeText(property.summary || property.description);
   const rating = Number(property.rating || property.averageRating);
   const hasRating = Number.isFinite(rating);
   const commentsCount = property.commentsCount || property.commentCount || property.reviewsCount;
   const badgeLabel = (() => {
+    if (property.isExample) return 'Ejemplo';
     if (property.availableImmediately) return 'Disponible';
     if ((property.requestCount || 0) >= 3) return 'Destacado';
     if (property.verificationDetails) return 'Verificada';
     return 'Nuevo';
   })();
+  const cardTarget = `/properties/${property.id}`;
 
   const handleToggleFavorite = (event) => {
     event.preventDefault();
@@ -86,7 +86,11 @@ export function PropertyCard({
   };
 
   return (
-    <Link to={`/properties/${property.id}`} className={`property-card property-card--${variant}`}>
+    <Link
+      to={cardTarget}
+      className={`property-card property-card--${variant}`}
+      aria-label={`Ver detalle de ${title}`}
+    >
       <div className="property-card__media">
         <PropertyImage property={property} alt={title} className="property-card__image" />
 

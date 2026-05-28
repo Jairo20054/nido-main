@@ -6,8 +6,11 @@ import {
   BriefcaseBusiness,
   CalendarDays,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   Heart,
   Home,
+  Images,
   MapPin,
   MessageCircle,
   PawPrint,
@@ -28,9 +31,12 @@ import { api } from '../../lib/apiClient';
 import { formatCurrency, formatDate, getPropertyTypeLabel } from '../../lib/formatters';
 import {
   getFallbackPropertyImage,
+  getPropertyImageUrls,
   getPropertyLocationLabel,
   getPropertyPrimaryImage,
 } from '../../lib/propertyPresentation';
+import { findExamplePropertyById, getSimilarExampleProperties } from './exampleProperties';
+import { PropertyCard } from './PropertyCard';
 
 const isPresent = (value) => {
   if (Array.isArray(value)) return value.length > 0;
@@ -91,22 +97,57 @@ function DetailSection({ title, description, children }) {
   );
 }
 
-function PropertyGallery({ galleryImages, property, selectedImage, onSelectImage }) {
+function RatingStars({ value }) {
+  const rating = Math.max(0, Math.min(5, Math.round(Number(value) || 0)));
+
+  return (
+    <span className="rating-stars" aria-label={`${Number(value || 0).toFixed(1)} de 5`}>
+      {[1, 2, 3, 4, 5].map((item) => (
+        <Star
+          key={item}
+          size={15}
+          fill={item <= rating ? 'currentColor' : 'none'}
+          className={item <= rating ? 'rating-stars__icon rating-stars__icon--active' : 'rating-stars__icon'}
+        />
+      ))}
+    </span>
+  );
+}
+
+function PropertyGallery({ galleryImages, property, selectedImage, onSelectImage, onPrevious, onNext }) {
   const fallbackImage = getFallbackPropertyImage(property.propertyType);
   const images = galleryImages.length ? galleryImages : [fallbackImage];
+  const selected = selectedImage || images[0];
+  const selectedIndex = Math.max(0, images.indexOf(selected));
+  const canNavigate = images.length > 1;
 
   return (
     <section className="property-hero" aria-label="Galeria de imagenes">
       <div className="property-hero__gallery property-hero__gallery--enhanced">
         <div className="property-hero__main">
           <img
-            src={selectedImage || images[0]}
+            src={selected}
             alt={property.title || 'Propiedad NIDO'}
             className="property-hero__cover"
+            decoding="async"
             onError={(event) => {
               event.currentTarget.src = fallbackImage;
             }}
           />
+          {canNavigate ? (
+            <div className="property-hero__controls" aria-label="Cambiar imagen">
+              <button type="button" onClick={onPrevious} aria-label="Ver imagen anterior">
+                <ChevronLeft size={20} />
+              </button>
+              <span>
+                <Images size={15} />
+                {selectedIndex + 1} / {images.length}
+              </span>
+              <button type="button" onClick={onNext} aria-label="Ver imagen siguiente">
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          ) : null}
           <div className="property-hero__floating-card">
             <span className="section__eyebrow">{getPropertyTypeLabel(property.propertyType)}</span>
             <strong>{formatCurrency(property.monthlyRent)} / mes</strong>
@@ -126,6 +167,7 @@ function PropertyGallery({ galleryImages, property, selectedImage, onSelectImage
               <img
                 src={image}
                 alt={`${property.title || 'Propiedad NIDO'} vista ${index + 1}`}
+                loading="lazy"
                 onError={(event) => {
                   event.currentTarget.src = fallbackImage;
                 }}
@@ -213,9 +255,19 @@ function PropertyAmenities({ property }) {
   );
 }
 
-function PropertyOwnerInfo({ property }) {
+function getInitials(name) {
+  return String(name || 'NIDO')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase();
+}
+
+function PropertyOwnerInfo({ property, onContact, onToggleFavorite }) {
   const owner = property.owner || {};
-  const ownerName = safeText(owner.fullName, 'Arrendador NIDO');
+  const ownerName = safeText(owner.fullName || owner.name, 'Arrendador NIDO');
   const ownerSince = owner.createdAt ? formatDate(owner.createdAt) : '';
 
   return (
@@ -225,9 +277,19 @@ function PropertyOwnerInfo({ property }) {
         <h2>{ownerName}</h2>
         <p>{safeText(owner.bio, 'Informacion publica limitada para proteger la privacidad del arrendador.')}</p>
         <div className="owner-card__facts">
-          {property.verificationDetails ? (
+          {property.verificationDetails || owner.verified ? (
             <span>
               <ShieldCheck size={15} /> Verificado por NIDO
+            </span>
+          ) : null}
+          {owner.responseRate ? (
+            <span>
+              <MessageCircle size={15} /> {owner.responseRate} tasa de respuesta
+            </span>
+          ) : null}
+          {owner.responseTime ? (
+            <span>
+              <CalendarDays size={15} /> {owner.responseTime}
             </span>
           ) : null}
           {ownerSince ? (
@@ -241,12 +303,25 @@ function PropertyOwnerInfo({ property }) {
             </span>
           ) : null}
         </div>
+        <div className="owner-card__actions">
+          <button type="button" className="button" onClick={() => onContact('owner')}>
+            Contactar propietario
+          </button>
+          <button
+            type="button"
+            className={`button button--secondary ${property.isFavorite ? 'button--saved' : ''}`}
+            onClick={onToggleFavorite}
+          >
+            <Heart size={16} />
+            {property.isFavorite ? 'Guardada' : 'Guardar propiedad'}
+          </button>
+        </div>
       </div>
       {owner.avatarUrl ? (
         <img src={owner.avatarUrl} alt={ownerName} />
       ) : (
         <span className="owner-card__avatar" aria-hidden="true">
-          <UserRound size={34} />
+          {ownerName ? getInitials(ownerName) : <UserRound size={34} />}
         </span>
       )}
     </div>
@@ -289,24 +364,24 @@ function PropertyComments({ property }) {
     <DetailSection title="Comentarios y valoraciones" description="Experiencias visibles cuando el backend las expone para esta propiedad.">
       {hasRating ? (
         <div className="rating-summary">
-          <Star size={17} />
+          <RatingStars value={rating} />
           <strong>{rating.toFixed(1)}</strong>
-          <span>calificacion promedio</span>
+          <span>{comments.length || property.reviewsCount || property.commentsCount || 0} resenas verificadas</span>
         </div>
       ) : null}
       {comments.length ? (
         <div className="comments-list">
           {comments.map((comment) => (
-            <article key={comment.id || `${comment.userName}-${comment.createdAt}`} className="comment-card">
+            <article key={comment.id || `${comment.userName}-${comment.createdAt || comment.date}`} className="comment-card">
               <div className="comment-card__header">
                 {comment.avatarUrl ? <img src={comment.avatarUrl} alt={comment.userName || 'Usuario'} /> : null}
                 <div>
                   <strong>{safeText(comment.userName || comment.authorName, 'Usuario NIDO')}</strong>
-                  <span>{formatDate(comment.createdAt) || 'Fecha no disponible'}</span>
+                  <span>{formatDate(comment.createdAt || comment.date) || 'Fecha no disponible'}</span>
                 </div>
                 {Number.isFinite(Number(comment.rating)) ? (
                   <span className="comment-card__rating">
-                    <Star size={14} /> {Number(comment.rating).toFixed(1)}
+                    <RatingStars value={comment.rating} /> {Number(comment.rating).toFixed(1)}
                   </span>
                 ) : null}
               </div>
@@ -317,6 +392,20 @@ function PropertyComments({ property }) {
       ) : (
         <DetailEmpty>Esta propiedad aun no tiene comentarios.</DetailEmpty>
       )}
+    </DetailSection>
+  );
+}
+
+function SimilarProperties({ properties }) {
+  if (!properties.length) return null;
+
+  return (
+    <DetailSection title="Propiedades similares" description="Opciones de referencia con ciudad, tipo o presupuesto cercano.">
+      <div className="similar-property-grid">
+        {properties.map((item) => (
+          <PropertyCard key={item.id} property={item} variant="compact" />
+        ))}
+      </div>
     </DetailSection>
   );
 }
@@ -337,6 +426,17 @@ export function PropertyDetailPage() {
 
     setLoading(true);
     setError('');
+    setPageMessage('');
+
+    const exampleProperty = findExamplePropertyById(propertyId);
+
+    if (exampleProperty) {
+      setProperty(exampleProperty);
+      setLoading(false);
+      return () => {
+        active = false;
+      };
+    }
 
     api
       .get(`/properties/${propertyId}`, { auth: isAuthenticated })
@@ -371,14 +471,28 @@ export function PropertyDetailPage() {
   const galleryImages = useMemo(() => {
     if (!property) return [];
 
-    const allImages = property.images?.length
-      ? property.images.map((image) => image.url).filter(Boolean)
-      : getPropertyPrimaryImage(property)
-        ? [getPropertyPrimaryImage(property)]
-        : [];
-
-    return [...new Set(allImages)];
+    return getPropertyImageUrls(property);
   }, [property]);
+
+  const selectedImageIndex = useMemo(() => {
+    if (!galleryImages.length) return 0;
+
+    return Math.max(0, galleryImages.indexOf(selectedImage));
+  }, [galleryImages, selectedImage]);
+
+  const selectPreviousImage = () => {
+    if (!galleryImages.length) return;
+
+    const nextIndex = selectedImageIndex === 0 ? galleryImages.length - 1 : selectedImageIndex - 1;
+    setSelectedImage(galleryImages[nextIndex]);
+  };
+
+  const selectNextImage = () => {
+    if (!galleryImages.length) return;
+
+    const nextIndex = selectedImageIndex === galleryImages.length - 1 ? 0 : selectedImageIndex + 1;
+    setSelectedImage(galleryImages[nextIndex]);
+  };
 
   const detailFacts = useMemo(
     () =>
@@ -461,11 +575,43 @@ export function PropertyDetailPage() {
     ];
   }, [property]);
 
+  const detailBadges = useMemo(() => {
+    if (!property) return [];
+
+    return [
+      property.verificationDetails || property.owner?.verified ? 'Verificada' : '',
+      property.availableImmediately ? 'Disponible' : 'Disponible pronto',
+      property.petsAllowed ? 'Acepta mascotas' : '',
+      property.furnished ? 'Amoblado' : '',
+    ].filter(Boolean);
+  }, [property]);
+
+  const similarProperties = useMemo(() => getSimilarExampleProperties(property), [property]);
+
   const description = safeText(property?.description, property?.summary || '');
   const shortDescription =
     description.length > 420 && !descriptionExpanded ? `${description.slice(0, 420).trim()}...` : description;
 
+  const handleContact = (action = 'contact') => {
+    const actionCopy =
+      action === 'visit'
+        ? 'Listo. Dejamos preparada la solicitud de visita para continuar desde NIDO.'
+        : 'Listo. Te conectaremos con el propietario dentro del flujo seguro de NIDO.';
+
+    setPageMessage(actionCopy);
+  };
+
   const toggleFavorite = async () => {
+    if (property.isExample) {
+      setProperty((current) => ({ ...current, isFavorite: !current.isFavorite }));
+      setPageMessage(
+        property.isFavorite
+          ? 'Quitamos esta propiedad de tus guardados de ejemplo.'
+          : 'Guardamos esta propiedad como referencia en esta demo.'
+      );
+      return;
+    }
+
     if (!isAuthenticated) {
       setPageMessage('Puedes explorar libremente. Inicia sesion para guardar o continuar una postulacion.');
       return;
@@ -493,6 +639,8 @@ export function PropertyDetailPage() {
       <EmptyState
         title="No encontramos esta propiedad"
         description={error || 'Puede que ya no este publicada o que el enlace haya cambiado.'}
+        actionLabel="Volver a buscar propiedades"
+        onAction={() => navigate('/properties')}
       />
     );
   }
@@ -504,10 +652,18 @@ export function PropertyDetailPage() {
           <ArrowLeft size={16} />
           Volver
         </button>
-        <div>
+        <div className="property-detail-topbar__copy">
           <span className="section__eyebrow">Ficha de propiedad</span>
           <h1>{safeText(property.title, `${getPropertyTypeLabel(property.propertyType)} en arriendo`)}</h1>
-          <p>{joinLocation(property)}</p>
+          <p>
+            {joinLocation(property)} - {getPropertyTypeLabel(property.propertyType)} -{' '}
+            {formatCurrency(property.monthlyRent)} al mes
+          </p>
+          <div className="property-detail-badges">
+            {detailBadges.map((badge) => (
+              <span key={badge}>{badge}</span>
+            ))}
+          </div>
         </div>
       </header>
 
@@ -516,6 +672,8 @@ export function PropertyDetailPage() {
         property={property}
         selectedImage={selectedImage}
         onSelectImage={setSelectedImage}
+        onPrevious={selectPreviousImage}
+        onNext={selectNextImage}
       />
 
       <section className="section property-layout">
@@ -608,14 +766,30 @@ export function PropertyDetailPage() {
           <PropertyAmenities property={property} />
           <PropertyReferences property={property} />
           <PropertyComments property={property} />
-          <PropertyOwnerInfo property={property} />
+          <PropertyOwnerInfo
+            property={property}
+            onContact={handleContact}
+            onToggleFavorite={toggleFavorite}
+          />
+          <SimilarProperties properties={similarProperties} />
         </div>
 
         <aside className="property-layout__aside">
-          <div className="price-card price-card--booking">
+          <div className="price-card price-card--booking price-card--contact">
             <div className="price-card__header">
               <strong>{formatCurrency(property.monthlyRent)}</strong>
               <span>canon mensual</span>
+            </div>
+            <div className="price-card__quick-facts">
+              <span>
+                <BedDouble size={15} /> {property.bedrooms ?? '--'} hab.
+              </span>
+              <span>
+                <Bath size={15} /> {property.bathrooms ?? '--'} banos
+              </span>
+              <span>
+                <Ruler size={15} /> {property.areaM2 || property.area || '--'} m2
+              </span>
             </div>
             <div className="price-card__rows">
               <div>
@@ -631,38 +805,50 @@ export function PropertyDetailPage() {
                 <span>{formatCurrency((property.monthlyRent || 0) + (property.maintenanceFee || 0))}</span>
               </div>
             </div>
+            <div className="price-card__actions">
+              <button type="button" className="button" onClick={() => handleContact('contact')}>
+                Contactar
+              </button>
+              <button type="button" className="button button--secondary" onClick={() => handleContact('visit')}>
+                Agendar visita
+              </button>
+            </div>
+            <p className="price-card__trust">
+              <ShieldCheck size={15} />
+              Propiedad verificada por NIDO. Tus datos se comparten solo dentro del proceso.
+            </p>
           </div>
 
-          <InlineMessage tone={pageMessage.includes('explorar') ? 'neutral' : 'danger'}>
+          <InlineMessage tone="neutral">
             {pageMessage}
           </InlineMessage>
 
           <div className="content-card apply-sidebar-card">
             <div className="apply-sidebar-card__header">
               <span className="section__eyebrow">Arrendar con NIDO</span>
-              <h3>Solicita una visita o inicia tu aplicacion</h3>
-              <p>El flujo actual usa aplicacion guiada para proteger tus datos y los del arrendador.</p>
+              <h3>Proceso claro antes de aplicar</h3>
+              <p>Contacto, visitas y documentos se mantienen dentro de un flujo guiado para proteger a ambas partes.</p>
             </div>
 
             <div className="application-trust-list">
               <div>
                 <CheckCircle2 size={16} />
-                <span>Direccion exacta y contacto privado se manejan dentro del proceso.</span>
+                <span>Direccion exacta y contacto privado se comparten solo cuando avance la visita.</span>
               </div>
               <div>
                 <MessageCircle size={16} />
-                <span>Comentarios y referencias se muestran solo si existen en backend.</span>
+                <span>El propietario recibe tu interes con contexto de la vivienda.</span>
               </div>
               <div>
                 <ShieldCheck size={16} />
-                <span>No mostramos cedula, correo privado ni telefono privado del propietario.</span>
+                <span>NIDO evita exponer telefonos o correos privados en la publicacion.</span>
               </div>
             </div>
 
             <div className="application-actions">
-              <Link className="button" to={`/properties/${property.id}/apply/start`}>
+              <button type="button" className="button" onClick={() => handleContact('visit')}>
                 Solicitar visita
-              </Link>
+              </button>
               <Link className="button button--secondary" to="/properties">
                 Comparar opciones
               </Link>

@@ -7,14 +7,32 @@ const FALLBACK_IMAGES = {
   ROOM: '/images/properties/room-a.svg',
 };
 
-export const getFallbackPropertyImage = (propertyType) =>
-  FALLBACK_IMAGES[propertyType] || FALLBACK_IMAGES.APARTMENT;
+export const getFallbackPropertyImage = (propertyType) => {
+  const normalizedType = typeof propertyType === 'string' ? propertyType.toUpperCase() : propertyType;
+
+  return FALLBACK_IMAGES[normalizedType] || FALLBACK_IMAGES.APARTMENT;
+};
+
+const getImageUrl = (item) => {
+  if (!item) return '';
+  if (typeof item === 'string') return item;
+  return item.url || item.src || '';
+};
+
+export const getPropertyImageUrls = (property) => {
+  const imageUrls = [
+    property?.coverImage,
+    ...(property?.images || []).map(getImageUrl),
+    ...(property?.media || [])
+      .filter((item) => !item.type || item.type === 'IMAGE')
+      .map(getImageUrl),
+  ].filter(Boolean);
+
+  return [...new Set(imageUrls)];
+};
 
 export const getPropertyPrimaryImage = (property) =>
-  property?.coverImage ||
-  property?.images?.[0]?.url ||
-  property?.media?.find((item) => item.type === 'IMAGE')?.url ||
-  getFallbackPropertyImage(property?.propertyType);
+  getPropertyImageUrls(property)[0] || getFallbackPropertyImage(property?.propertyType);
 
 export const getPropertyLocationLabel = (property) => {
   if (!property) {
@@ -25,7 +43,7 @@ export const getPropertyLocationLabel = (property) => {
 };
 
 export const getPropertyTrustLabel = (property) => {
-  if (property?.status === 'PUBLISHED' || property?.verificationDetails) {
+  if (property?.status === 'PUBLISHED' || property?.verificationDetails || property?.owner?.verified) {
     return 'Verificada';
   }
 
@@ -33,7 +51,7 @@ export const getPropertyTrustLabel = (property) => {
     return 'Lista para mudarte';
   }
 
-  return 'Publicación activa';
+  return 'Publicacion activa';
 };
 
 export const getPropertyReputationLabel = (property) => {
@@ -42,12 +60,12 @@ export const getPropertyReputationLabel = (property) => {
   }
 
   if ((property?.requestCount || 0) > 0) {
-    return 'Con interés';
+    return 'Con interes';
   }
 
   if (property?.furnished || property?.utilitiesIncluded) {
     return 'Buena propuesta';
   }
 
-  return 'Nueva en Nido';
+  return 'Nueva en NIDO';
 };

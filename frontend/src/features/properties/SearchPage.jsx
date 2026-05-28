@@ -7,6 +7,7 @@ import { formatCurrency, getPropertyTypeLabel } from '../../lib/formatters';
 import { sortPropertiesByLocationRelevance } from '../../utils/locationUtils';
 import { ActiveFilterChips } from './ActiveFilterChips';
 import { EmptyPropertiesState } from './EmptyPropertiesState';
+import { EXAMPLE_PROPERTIES } from './exampleProperties';
 import { MobileFiltersDrawer } from './MobileFiltersDrawer';
 import { PropertiesGrid } from './PropertiesGrid';
 import { PropertiesResultsHeader } from './PropertiesResultsHeader';
@@ -22,6 +23,12 @@ const getAmenityText = (property) => (property.amenities || []).join(' ').toLowe
 
 const includesAny = (text, words) => words.some((word) => text.includes(word));
 
+const getSearchText = (property) =>
+  [property.city, property.department, property.neighborhood, property.title, property.summary]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
 const matchesExtra = (property, extra) => {
   const amenityText = getAmenityText(property);
 
@@ -29,7 +36,7 @@ const matchesExtra = (property, extra) => {
   if (extra === 'petsAllowed') return Boolean(property.petsAllowed);
   if (extra === 'parking') return Number(property.parkingSpots || 0) > 0;
   if (extra === 'elevator') return Boolean(property.elevator) || includesAny(amenityText, ['ascensor']);
-  if (extra === 'balcony') return Boolean(property.balcony) || includesAny(amenityText, ['balcon', 'balcón']);
+  if (extra === 'balcony') return Boolean(property.balcony) || includesAny(amenityText, ['balcon']);
   if (extra === 'gym') return includesAny(amenityText, ['gimnasio', 'gym']);
   if (extra === 'security') return Boolean(property.security) || includesAny(amenityText, ['vigil', 'seguridad']);
   if (extra === 'gatedCommunity') return includesAny(amenityText, ['conjunto cerrado', 'unidad cerrada']);
@@ -95,7 +102,39 @@ export function SearchPage() {
         },
       });
 
-      const refinedProperties = (response.data || []).filter((property) => {
+      const backendProperties = response.data || [];
+      const sourceProperties = backendProperties.length ? backendProperties : EXAMPLE_PROPERTIES;
+      const refinedProperties = sourceProperties.filter((property) => {
+        const rent = Number(property.monthlyRent || 0);
+        const area = Number(property.areaM2 || property.area || 0);
+
+        if (
+          activeFilters.city &&
+          !getSearchText(property).includes(activeFilters.city.trim().toLowerCase())
+        ) {
+          return false;
+        }
+
+        if (rent < activeFilters.minRent) {
+          return false;
+        }
+
+        if (activeFilters.maxRent !== defaultFilters.maxRent && rent > activeFilters.maxRent) {
+          return false;
+        }
+
+        if (activeFilters.bedrooms && Number(property.bedrooms || 0) < activeFilters.bedrooms) {
+          return false;
+        }
+
+        if (activeFilters.bathrooms && Number(property.bathrooms || 0) < activeFilters.bathrooms) {
+          return false;
+        }
+
+        if (activeFilters.sort === 'area-desc' && !area) {
+          return false;
+        }
+
         if (
           activeFilters.propertyTypes.length > 0 &&
           !activeFilters.propertyTypes.includes(String(property.propertyType || '').toLowerCase())
@@ -112,11 +151,39 @@ export function SearchPage() {
           : sortProperties(refinedProperties, activeFilters.sort);
 
       setProperties(sortedProperties);
-      setTotalCount(response.meta?.total || refinedProperties.length);
+      setTotalCount(backendProperties.length ? response.meta?.total || refinedProperties.length : refinedProperties.length);
     } catch (requestError) {
-      setError(requestError.message);
-      setProperties([]);
-      setTotalCount(0);
+      const exampleResults = EXAMPLE_PROPERTIES.filter((property) => {
+        const rent = Number(property.monthlyRent || 0);
+
+        if (
+          activeFilters.city &&
+          !getSearchText(property).includes(activeFilters.city.trim().toLowerCase())
+        ) {
+          return false;
+        }
+
+        if (rent < activeFilters.minRent) return false;
+        if (activeFilters.maxRent !== defaultFilters.maxRent && rent > activeFilters.maxRent) return false;
+        if (activeFilters.bedrooms && Number(property.bedrooms || 0) < activeFilters.bedrooms) return false;
+        if (activeFilters.bathrooms && Number(property.bathrooms || 0) < activeFilters.bathrooms) return false;
+        if (
+          activeFilters.propertyTypes.length > 0 &&
+          !activeFilters.propertyTypes.includes(String(property.propertyType || '').toLowerCase())
+        ) {
+          return false;
+        }
+
+        return activeFilters.extras.every((extra) => matchesExtra(property, extra));
+      });
+      const sortedExamples =
+        activeFilters.sort === 'recommended'
+          ? sortPropertiesByLocationRelevance(exampleResults, {}, activeFilters)
+          : sortProperties(exampleResults, activeFilters.sort);
+
+      setProperties(sortedExamples);
+      setTotalCount(sortedExamples.length);
+      setError(sortedExamples.length ? '' : requestError.message);
     } finally {
       setLoading(false);
     }
@@ -240,7 +307,9 @@ export function SearchPage() {
             totalCount={totalCount}
             filters={filters}
             viewMode={viewMode}
+            activeCount={activeCount}
             onSortChange={(value) => setFilter('sort', value)}
+            onClear={clearFilters}
             onToggleMap={() => setShowMapPanel((current) => !current)}
             onViewModeChange={setViewMode}
           />

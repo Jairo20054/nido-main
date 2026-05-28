@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { LoadingState } from '../../components/ui/LoadingState';
@@ -25,6 +25,7 @@ export function ManagementPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
+  const [publicationSuccess, setPublicationSuccess] = useState(false);
 
   // Carga en paralelo inventario y solicitudes para reducir el tiempo de espera del dashboard.
   const loadDashboard = async () => {
@@ -66,8 +67,11 @@ export function ManagementPage() {
   const handleSubmitProperty = async (payload) => {
     setSubmitting(true);
     setMessage('');
+    setPublicationSuccess(false);
 
     try {
+      const isPublicationSubmit = payload.status && payload.status !== 'DRAFT';
+
       if (editingProperty) {
         await api.patch(`/properties/${editingProperty.id}`, payload);
         setMessage('Publicación actualizada correctamente.');
@@ -76,10 +80,12 @@ export function ManagementPage() {
         setMessage(response.message || 'Publicación guardada correctamente.');
       }
 
+      setPublicationSuccess(Boolean(isPublicationSubmit));
       setEditingProperty(null);
       await loadDashboard();
       return true;
     } catch (requestError) {
+      setPublicationSuccess(false);
       setMessage(requestError.message);
       throw requestError;
     } finally {
@@ -159,6 +165,22 @@ export function ManagementPage() {
         >
           {message}
         </InlineMessage>
+        {publicationSuccess ? (
+          <div className="publish-success-actions" role="status" aria-live="polite">
+            <div>
+              <strong>Publicacion enviada correctamente.</strong>
+              <span>Puedes volver al inicio del arrendador o revisar tu inventario.</span>
+            </div>
+            <div>
+              <Link className="button" to="/dashboard">
+                Volver al home
+              </Link>
+              <Link className="button button--secondary" to="/manage">
+                Ver mis propiedades
+              </Link>
+            </div>
+          </div>
+        ) : null}
 
         <div className="dashboard-layout publish-layout">
           <div className="dashboard-layout__form publish-layout__form">

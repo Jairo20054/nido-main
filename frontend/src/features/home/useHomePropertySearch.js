@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../app/providers/useAuth';
 import { api } from '../../lib/apiClient';
 import { sortPropertiesByLocationRelevance } from '../../utils/locationUtils';
+import { HOME_EXAMPLE_PROPERTIES } from './homeExampleProperties';
 
 const DEFAULT_FILTERS = {
   location: '',
@@ -62,6 +63,19 @@ const serializeFilters = (filters) => {
 
 const isSameFilters = (left, right) => JSON.stringify(left) === JSON.stringify(right);
 
+const hasMeaningfulFilters = (filters) =>
+  Boolean(
+    filters.location ||
+      filters.propertyType ||
+      filters.minRent !== DEFAULT_FILTERS.minRent ||
+      filters.maxRent !== DEFAULT_FILTERS.maxRent ||
+      filters.rooms !== DEFAULT_FILTERS.rooms ||
+      filters.bathrooms !== DEFAULT_FILTERS.bathrooms ||
+      filters.area !== DEFAULT_FILTERS.area ||
+      filters.availableFrom ||
+      filters.extras.length
+  );
+
 const getAmenityText = (property) => (property.amenities || []).join(' ').toLowerCase();
 
 const includesAny = (text, words) => words.some((word) => text.includes(word));
@@ -73,7 +87,7 @@ const matchesExtra = (property, extra) => {
   if (extra === 'petsAllowed') return Boolean(property.petsAllowed);
   if (extra === 'parking') return Number(property.parkingSpots || 0) > 0;
   if (extra === 'elevator') return Boolean(property.elevator) || includesAny(amenityText, ['ascensor']);
-  if (extra === 'balcony') return Boolean(property.balcony) || includesAny(amenityText, ['balcon', 'balcón']);
+  if (extra === 'balcony') return Boolean(property.balcony) || includesAny(amenityText, ['balcon']);
   if (extra === 'security') return Boolean(property.security) || includesAny(amenityText, ['vigil', 'seguridad']);
 
   return true;
@@ -158,18 +172,30 @@ export function useHomePropertySearch() {
           auth: isAuthenticated,
           query: buildPropertyQuery(nextFilters),
         });
-        const refined = refineProperties(response.data || [], nextFilters);
+        const backendProperties = response.data || [];
+        const sourceProperties = backendProperties.length ? backendProperties : HOME_EXAMPLE_PROPERTIES;
+        const refined = refineProperties(sourceProperties, nextFilters);
         const sorted =
           nextFilters.sort === 'recommended'
             ? sortPropertiesByLocationRelevance(refined, {}, nextFilters)
             : sortProperties(refined, nextFilters.sort);
+        const visibleResults =
+          sorted.length || hasMeaningfulFilters(nextFilters) ? sorted : HOME_EXAMPLE_PROPERTIES;
 
-        setResults(sorted);
-        setTotalCount(response.meta?.total || sorted.length);
+        setResults(visibleResults);
+        setTotalCount(backendProperties.length ? response.meta?.total || visibleResults.length : visibleResults.length);
       } catch (requestError) {
-        setResults([]);
-        setTotalCount(0);
-        setError(requestError.message || 'No pudimos cargar propiedades en este momento.');
+        const refinedExamples = refineProperties(HOME_EXAMPLE_PROPERTIES, nextFilters);
+        const sortedExamples =
+          nextFilters.sort === 'recommended'
+            ? sortPropertiesByLocationRelevance(refinedExamples, {}, nextFilters)
+            : sortProperties(refinedExamples, nextFilters.sort);
+        const visibleExamples =
+          sortedExamples.length || hasMeaningfulFilters(nextFilters) ? sortedExamples : HOME_EXAMPLE_PROPERTIES;
+
+        setResults(visibleExamples);
+        setTotalCount(visibleExamples.length);
+        setError(visibleExamples.length ? '' : requestError.message || 'No pudimos cargar propiedades en este momento.');
       } finally {
         setLoading(false);
       }

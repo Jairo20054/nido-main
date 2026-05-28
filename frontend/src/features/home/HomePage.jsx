@@ -52,16 +52,16 @@ const ROOM_OPTIONS = [
 
 const BATHROOM_OPTIONS = [
   { value: 0, label: 'Cualquiera' },
-  { value: 1, label: '1 bano' },
-  { value: 2, label: '2 banos' },
-  { value: 3, label: '3+ banos' },
+  { value: 1, label: '1 baño' },
+  { value: 2, label: '2 baños' },
+  { value: 3, label: '3+ baños' },
 ];
 
 const SORT_OPTIONS = [
   { value: 'recommended', label: 'Recomendadas' },
   { value: 'rent-asc', label: 'Menor precio' },
   { value: 'rent-desc', label: 'Mayor precio' },
-  { value: 'latest', label: 'Mas recientes' },
+  { value: 'latest', label: 'Más recientes' },
   { value: 'area-desc', label: 'Mayor area' },
 ];
 
@@ -260,8 +260,8 @@ export function HomePage() {
                 key={property.id}
                 property={property}
                 variant="home"
-                proximityLabel={property.verificationDetails ? 'Verificada' : 'Recomendada'}
-                onToggleFavorite={toggleFavorite}
+                proximityLabel={property.isExample ? 'Ejemplo' : property.verificationDetails ? 'Verificada' : 'Recomendada'}
+                onToggleFavorite={property.isExample ? undefined : toggleFavorite}
                 disabledFavorite={savingFavorite === property.id}
               />
             ))}
