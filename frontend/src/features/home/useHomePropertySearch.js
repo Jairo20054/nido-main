@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../app/providers/useAuth';
 import { api } from '../../lib/apiClient';
+import { sortPropertiesByLocationRelevance } from '../../utils/locationUtils';
 
 const DEFAULT_FILTERS = {
   location: '',
@@ -158,7 +159,10 @@ export function useHomePropertySearch() {
           query: buildPropertyQuery(nextFilters),
         });
         const refined = refineProperties(response.data || [], nextFilters);
-        const sorted = sortProperties(refined, nextFilters.sort);
+        const sorted =
+          nextFilters.sort === 'recommended'
+            ? sortPropertiesByLocationRelevance(refined, {}, nextFilters)
+            : sortProperties(refined, nextFilters.sort);
 
         setResults(sorted);
         setTotalCount(response.meta?.total || sorted.length);

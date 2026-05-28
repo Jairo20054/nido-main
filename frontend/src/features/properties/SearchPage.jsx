@@ -4,6 +4,7 @@ import { InlineMessage } from '../../components/ui/InlineMessage';
 import { useAuth } from '../../app/providers/useAuth';
 import { api } from '../../lib/apiClient';
 import { formatCurrency, getPropertyTypeLabel } from '../../lib/formatters';
+import { sortPropertiesByLocationRelevance } from '../../utils/locationUtils';
 import { ActiveFilterChips } from './ActiveFilterChips';
 import { EmptyPropertiesState } from './EmptyPropertiesState';
 import { MobileFiltersDrawer } from './MobileFiltersDrawer';
@@ -105,7 +106,12 @@ export function SearchPage() {
         return activeFilters.extras.every((extra) => matchesExtra(property, extra));
       });
 
-      setProperties(sortProperties(refinedProperties, activeFilters.sort));
+      const sortedProperties =
+        activeFilters.sort === 'recommended'
+          ? sortPropertiesByLocationRelevance(refinedProperties, {}, activeFilters)
+          : sortProperties(refinedProperties, activeFilters.sort);
+
+      setProperties(sortedProperties);
       setTotalCount(response.meta?.total || refinedProperties.length);
     } catch (requestError) {
       setError(requestError.message);

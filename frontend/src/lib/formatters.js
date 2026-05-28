@@ -20,7 +20,15 @@ const dateFormatter = new Intl.DateTimeFormat('es-CO', {
   year: 'numeric',
 });
 
-export const formatCurrency = (value) => currencyFormatter.format(value || 0);
+export const formatCurrency = (value) => {
+  const number = Number(value);
+
+  if (value === null || value === undefined || Number.isNaN(number)) {
+    return 'Precio no disponible';
+  }
+
+  return currencyFormatter.format(number);
+};
 export const formatDate = (value) => (value ? dateFormatter.format(new Date(value)) : '');
 
 export const getPropertyTypeLabel = (value) =>

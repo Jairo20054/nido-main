@@ -21,7 +21,7 @@ export const getPropertyLocationLabel = (property) => {
     return '';
   }
 
-  return [property.neighborhood, property.city].filter(Boolean).join(', ') || 'Colombia';
+  return [property.neighborhood, property.city, property.department].filter(Boolean).join(', ') || 'Colombia';
 };
 
 export const getPropertyTrustLabel = (property) => {

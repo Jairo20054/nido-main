@@ -1,5 +1,16 @@
 import React from 'react';
-import { BadgeCheck, Bath, BedDouble, Heart, MapPin, Ruler, ShieldCheck } from 'lucide-react';
+import {
+  BadgeCheck,
+  Bath,
+  BedDouble,
+  Car,
+  Heart,
+  MapPin,
+  MessageCircle,
+  Ruler,
+  ShieldCheck,
+  Star,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PropertyImage } from '../../components/ui/PropertyImage';
 import { formatCurrency, getPropertyTypeLabel } from '../../lib/formatters';
@@ -17,10 +28,20 @@ export function PropertyCard({
   proximityLabel,
   distanceLabel,
 }) {
+  const safeText = (value, fallback = '') => {
+    if (value === null || value === undefined) return fallback;
+
+    const text = String(value).trim();
+    return text && text !== '[object Object]' ? text : fallback;
+  };
+  const formatCount = (value, fallback = '--') => {
+    const number = Number(value);
+    return Number.isFinite(number) ? number : fallback;
+  };
   const features = [];
   const amenityText = (property.amenities || []).join(' ').toLowerCase();
   if (property.furnished) features.push('Amoblado');
-  if (property.parkingSpots) features.push('Parqueadero');
+  if (property.parkingSpots) features.push(`${property.parkingSpots} parqueadero${property.parkingSpots > 1 ? 's' : ''}`);
   if (property.balcony || amenityText.includes('balcon') || amenityText.includes('balcón')) {
     features.push('Balcon');
   }
@@ -35,16 +56,23 @@ export function PropertyCard({
 
   const isCompact = variant === 'compact';
   const isHome = variant === 'home';
-  const area = property.areaM2 || property.area || 0;
+  const area = property.areaM2 || property.area;
   const typeLabel = getPropertyTypeLabel(property.propertyType);
   const trustLabel = getPropertyTrustLabel(property);
   const reputationLabel = getPropertyReputationLabel(property);
   const totalMonthly = (property.monthlyRent || 0) + (property.maintenanceFee || 0);
   const visibleFeatures = features.slice(0, isCompact ? 2 : 4);
-  const title = isHome ? `${typeLabel || 'Vivienda'} en arriendo` : property.title;
+  const title = isHome
+    ? `${typeLabel || 'Vivienda'} en arriendo`
+    : safeText(property.title, `${typeLabel || 'Vivienda'} en arriendo`);
+  const summary = safeText(property.summary || property.description);
+  const rating = Number(property.rating || property.averageRating);
+  const hasRating = Number.isFinite(rating);
+  const commentsCount = property.commentsCount || property.commentCount || property.reviewsCount;
   const badgeLabel = (() => {
+    if (property.availableImmediately) return 'Disponible';
     if ((property.requestCount || 0) >= 3) return 'Destacado';
-    if (property.verificationDetails || property.availableImmediately) return 'Recomendado';
+    if (property.verificationDetails) return 'Verificada';
     return 'Nuevo';
   })();
 
@@ -60,7 +88,7 @@ export function PropertyCard({
   return (
     <Link to={`/properties/${property.id}`} className={`property-card property-card--${variant}`}>
       <div className="property-card__media">
-        <PropertyImage property={property} alt={property.title} className="property-card__image" />
+        <PropertyImage property={property} alt={title} className="property-card__image" />
 
         <div className="property-card__badge-row">
           <span className="property-card__badge">
@@ -122,19 +150,39 @@ export function PropertyCard({
           <MapPin size={14} />
           {getPropertyLocationLabel(property)}
         </p>
-        {!isCompact && !isHome ? <p className="property-card__summary">{property.summary}</p> : null}
+        {!isHome && summary ? <p className="property-card__summary">{summary}</p> : null}
 
         <div className="property-card__stats">
           <span>
-            <BedDouble size={14} /> {property.bedrooms ?? 0} hab.
+            <BedDouble size={14} /> {formatCount(property.bedrooms)} hab.
           </span>
           <span>
-            <Bath size={14} /> {property.bathrooms ?? 0} banos
+            <Bath size={14} /> {formatCount(property.bathrooms)} banos
           </span>
           <span>
-            <Ruler size={14} /> {area || '--'} m2
+            <Ruler size={14} /> {formatCount(area)} m2
           </span>
+          {!isHome ? (
+            <span>
+              <Car size={14} /> {Number(property.parkingSpots || 0) > 0 ? `${property.parkingSpots}` : 'Sin'} parq.
+            </span>
+          ) : null}
         </div>
+
+        {!isHome && (hasRating || commentsCount) ? (
+          <div className="property-card__social-proof">
+            {hasRating ? (
+              <span>
+                <Star size={14} /> {rating.toFixed(1)}
+              </span>
+            ) : null}
+            {commentsCount ? (
+              <span>
+                <MessageCircle size={14} /> {commentsCount} comentarios
+              </span>
+            ) : null}
+          </div>
+        ) : null}
 
         {!isHome && visibleFeatures.length > 0 ? (
           <div className="property-card__tags">
