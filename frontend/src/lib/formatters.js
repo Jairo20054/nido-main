@@ -9,8 +9,6 @@ import {
 // Formateadores compartidos para mantener la misma representacion de fechas, dinero
 // y etiquetas de negocio en toda la interfaz.
 const currencyFormatter = new Intl.NumberFormat('es-CO', {
-  style: 'currency',
-  currency: 'COP',
   maximumFractionDigits: 0,
 });
 
@@ -27,7 +25,7 @@ export const formatCurrency = (value) => {
     return 'Precio no disponible';
   }
 
-  return currencyFormatter.format(number);
+  return `$ ${currencyFormatter.format(number)} COP`;
 };
 export const formatDate = (value) => (value ? dateFormatter.format(new Date(value)) : '');
 

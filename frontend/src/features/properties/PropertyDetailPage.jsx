@@ -3,8 +3,6 @@ import {
   ArrowLeft,
   Bath,
   BedDouble,
-  BriefcaseBusiness,
-  CalendarDays,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
@@ -15,12 +13,12 @@ import {
   MessageCircle,
   PawPrint,
   Ruler,
+  Share2,
   ShieldCheck,
   Sparkles,
   SquareParking,
   Star,
   UserRound,
-  Users,
 } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../app/providers/useAuth';
@@ -56,6 +54,12 @@ const joinLocation = (property) =>
 
 const formatBoolean = (value, yes = 'Si', no = 'No') => (value ? yes : no);
 
+const splitListText = (value) =>
+  safeText(value)
+    .split(/[,;]+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
 const getApproximateAddress = (property) => {
   if (property.hideExactAddress) {
     return property.zoneReference || property.neighborhood || property.city || 'Se comparte durante el proceso';
@@ -68,18 +72,37 @@ function DetailEmpty({ children }) {
   return <p className="detail-empty">{children}</p>;
 }
 
-function DetailList({ items }) {
+function DetailDataGroup({ title, items }) {
   const visibleItems = items.filter((item) => isPresent(item.value));
 
   if (!visibleItems.length) return null;
 
   return (
-    <div className="practical-list">
-      {visibleItems.map((item) => (
-        <div key={item.label} className="practical-list__row">
-          <span>{item.label}</span>
-          <strong>{item.value}</strong>
-        </div>
+    <article className="detail-data-group">
+      <h3>{title}</h3>
+      <div className="detail-data-group__rows">
+        {visibleItems.map((item) => (
+          <div key={item.label} className="detail-data-group__row">
+            <span>{item.label}</span>
+            <strong>{item.value}</strong>
+          </div>
+        ))}
+      </div>
+    </article>
+  );
+}
+
+function DetailGroupGrid({ groups }) {
+  const visibleGroups = groups.filter((group) => group.items.some((item) => isPresent(item.value)));
+
+  if (!visibleGroups.length) {
+    return <DetailEmpty>Esta propiedad aun no tiene informacion detallada registrada.</DetailEmpty>;
+  }
+
+  return (
+    <div className="detail-group-grid">
+      {visibleGroups.map((group) => (
+        <DetailDataGroup key={group.title} title={group.title} items={group.items} />
       ))}
     </div>
   );
@@ -87,13 +110,13 @@ function DetailList({ items }) {
 
 function DetailSection({ title, description, children }) {
   return (
-    <div className="content-card detail-section">
+    <section className="detail-section">
       <div className="detail-section__header">
         <h2>{title}</h2>
         {description ? <p>{description}</p> : null}
       </div>
       {children}
-    </div>
+    </section>
   );
 }
 
@@ -120,16 +143,18 @@ function PropertyGallery({ galleryImages, property, selectedImage, onSelectImage
   const selected = selectedImage || images[0];
   const selectedIndex = Math.max(0, images.indexOf(selected));
   const canNavigate = images.length > 1;
+  const thumbSlots = [0, 1, 2, 3].map((index) => images[index + 1] || images[index] || fallbackImage);
 
   return (
-    <section className="property-hero" aria-label="Galeria de imagenes">
-      <div className="property-hero__gallery property-hero__gallery--enhanced">
+    <section className="property-hero property-hero--nido" aria-label="Galeria de imagenes">
+      <div className="property-hero__gallery property-hero__gallery--premium">
         <div className="property-hero__main">
           <img
             src={selected}
             alt={property.title || 'Propiedad NIDO'}
             className="property-hero__cover"
             decoding="async"
+            loading="eager"
             onError={(event) => {
               event.currentTarget.src = fallbackImage;
             }}
@@ -148,15 +173,14 @@ function PropertyGallery({ galleryImages, property, selectedImage, onSelectImage
               </button>
             </div>
           ) : null}
-          <div className="property-hero__floating-card">
-            <span className="section__eyebrow">{getPropertyTypeLabel(property.propertyType)}</span>
-            <strong>{formatCurrency(property.monthlyRent)} / mes</strong>
-            <p>{getPropertyLocationLabel(property)}</p>
-          </div>
+          <button type="button" className="property-hero__all-photos" onClick={() => onSelectImage(images[0])}>
+            <Images size={16} />
+            <span className="property-hero__all-photos-label">Ver todas las fotos</span>
+          </button>
         </div>
 
         <div className="property-hero__grid property-hero__thumbs">
-          {images.slice(0, 4).map((image, index) => (
+          {thumbSlots.map((image, index) => (
             <button
               key={`${image}-${index}`}
               type="button"
@@ -181,41 +205,70 @@ function PropertyGallery({ galleryImages, property, selectedImage, onSelectImage
 }
 
 function PropertyConditions({ property }) {
-  const conditions = [
-    { label: 'Contrato minimo', value: property.minLeaseMonths ? `${property.minLeaseMonths} meses` : '' },
-    { label: 'Deposito', value: property.depositRequired ? formatCurrency(property.securityDeposit) : '' },
+  const requirementChips = [...new Set([
+    ...splitListText(property.requirements),
+    property.requiresRentalStudy ? 'Estudio de arriendo' : '',
+  ].filter(Boolean))];
+  const groups = [
     {
-      label: 'Administracion',
-      value: property.administrationIncluded
-        ? 'Incluida en el canon'
-        : property.maintenanceFee
-          ? formatCurrency(property.maintenanceFee)
-          : '',
+      title: 'Contrato',
+      items: [
+        { label: 'Contrato minimo', value: property.minLeaseMonths ? `${property.minLeaseMonths} meses` : '' },
+        {
+          label: 'Disponibilidad',
+          value: property.availableImmediately ? 'Inmediata' : formatDate(property.availableFrom),
+        },
+        { label: 'Estudio de arriendo', value: property.requiresRentalStudy ? 'Requerido' : 'No registrado' },
+        { label: 'Codeudor', value: property.acceptsCosigner ? 'Acepta codeudor' : 'Por confirmar' },
+      ],
     },
     {
-      label: 'Servicios incluidos',
-      value: property.servicesIncluded?.length ? property.servicesIncluded.join(', ') : '',
+      title: 'Reglas',
+      items: [
+        { label: 'Mascotas', value: isPresent(property.petsAllowed) ? formatBoolean(property.petsAllowed) : '' },
+        { label: 'Estudiantes', value: isPresent(property.acceptsStudents) ? formatBoolean(property.acceptsStudents) : '' },
+        { label: 'Familias', value: isPresent(property.acceptsFamilies) ? formatBoolean(property.acceptsFamilies) : '' },
+        { label: 'Convivencia', value: property.rules },
+      ],
     },
-    { label: 'Acepta mascotas', value: isPresent(property.petsAllowed) ? formatBoolean(property.petsAllowed) : '' },
-    { label: 'Acepta estudiantes', value: isPresent(property.acceptsStudents) ? formatBoolean(property.acceptsStudents) : '' },
-    { label: 'Acepta familias', value: isPresent(property.acceptsFamilies) ? formatBoolean(property.acceptsFamilies) : '' },
-    { label: 'Codeudor', value: property.acceptsCosigner ? 'Acepta codeudor' : '' },
-    { label: 'Estudio de arriendo', value: property.requiresRentalStudy ? 'Requerido' : '' },
     {
-      label: 'Disponibilidad',
-      value: property.availableImmediately ? 'Inmediata' : formatDate(property.availableFrom),
+      title: 'Pagos y servicios',
+      items: [
+        { label: 'Deposito', value: property.depositRequired ? formatCurrency(property.securityDeposit) : 'Por confirmar' },
+        {
+          label: 'Administracion',
+          value: property.administrationIncluded
+            ? 'Incluida en el canon'
+            : property.maintenanceFee
+              ? formatCurrency(property.maintenanceFee)
+              : 'No registrada',
+        },
+        {
+          label: 'Servicios incluidos',
+          value: property.servicesIncluded?.length ? property.servicesIncluded.join(', ') : '',
+        },
+        { label: 'Condiciones especiales', value: property.specialConditions },
+      ],
     },
-    { label: 'Documentos requeridos', value: property.requirements },
-    { label: 'Reglas de convivencia', value: property.rules },
-    { label: 'Condiciones especiales', value: property.specialConditions },
   ];
-
-  const hasConditions = conditions.some((item) => isPresent(item.value));
+  const hasConditions = groups.some((group) => group.items.some((item) => isPresent(item.value))) || requirementChips.length;
 
   return (
     <DetailSection title="Condiciones de arriendo" description="Datos de contrato y convivencia registrados por el arrendador.">
       {hasConditions ? (
-        <DetailList items={conditions} />
+        <>
+          <DetailGroupGrid groups={groups} />
+          {requirementChips.length ? (
+            <div className="document-chip-row" aria-label="Documentos requeridos">
+              {requirementChips.map((item) => (
+                <span key={item} className="document-chip">
+                  <CheckCircle2 size={14} />
+                  {item}
+                </span>
+              ))}
+            </div>
+          ) : null}
+        </>
       ) : (
         <DetailEmpty>Esta propiedad aun no tiene condiciones detalladas registradas.</DetailEmpty>
       )}
@@ -271,37 +324,41 @@ function PropertyOwnerInfo({ property, onContact, onToggleFavorite }) {
   const ownerSince = owner.createdAt ? formatDate(owner.createdAt) : '';
 
   return (
-    <div className="content-card owner-card owner-card--safe">
-      <div>
-        <span className="section__eyebrow">Arrendador</span>
-        <h2>{ownerName}</h2>
+    <div className="content-card owner-card owner-profile-card">
+      {owner.avatarUrl ? (
+        <img src={owner.avatarUrl} alt={ownerName} />
+      ) : (
+        <span className="owner-card__avatar" aria-hidden="true">
+          {ownerName ? getInitials(ownerName) : <UserRound size={34} />}
+        </span>
+      )}
+      <div className="owner-profile-card__content">
+        <div className="owner-profile-card__heading">
+          <span className="section__eyebrow">Arrendador</span>
+          <h2>{ownerName}</h2>
+          <p className="owner-profile-card__status">
+            <ShieldCheck size={16} />
+            {property.verificationDetails || owner.verified ? 'Arrendador verificado' : 'Identidad en revision'}
+          </p>
+        </div>
         <p>{safeText(owner.bio, 'Informacion publica limitada para proteger la privacidad del arrendador.')}</p>
-        <div className="owner-card__facts">
-          {property.verificationDetails || owner.verified ? (
-            <span>
-              <ShieldCheck size={15} /> Verificado por NIDO
-            </span>
-          ) : null}
-          {owner.responseRate ? (
-            <span>
-              <MessageCircle size={15} /> {owner.responseRate} tasa de respuesta
-            </span>
-          ) : null}
-          {owner.responseTime ? (
-            <span>
-              <CalendarDays size={15} /> {owner.responseTime}
-            </span>
-          ) : null}
-          {ownerSince ? (
-            <span>
-              <CalendarDays size={15} /> En la plataforma desde {ownerSince}
-            </span>
-          ) : null}
-          {property.requestCount ? (
-            <span>
-              <Users size={15} /> {property.requestCount} solicitudes o intereses
-            </span>
-          ) : null}
+        <div className="owner-metric-grid">
+          <div>
+            <strong>{owner.responseRate || 'Por confirmar'}</strong>
+            <span>Tasa de respuesta</span>
+          </div>
+          <div>
+            <strong>{owner.responseTime || 'Durante el proceso'}</strong>
+            <span>Tiempo promedio</span>
+          </div>
+          <div>
+            <strong>{ownerSince || 'Fecha privada'}</strong>
+            <span>En NIDO desde</span>
+          </div>
+          <div>
+            <strong>{property.requestCount || 'Activo'}</strong>
+            <span>Interes reciente</span>
+          </div>
         </div>
         <div className="owner-card__actions">
           <button type="button" className="button" onClick={() => onContact('owner')}>
@@ -317,13 +374,6 @@ function PropertyOwnerInfo({ property, onContact, onToggleFavorite }) {
           </button>
         </div>
       </div>
-      {owner.avatarUrl ? (
-        <img src={owner.avatarUrl} alt={ownerName} />
-      ) : (
-        <span className="owner-card__avatar" aria-hidden="true">
-          {ownerName ? getInitials(ownerName) : <UserRound size={34} />}
-        </span>
-      )}
     </div>
   );
 }
@@ -359,14 +409,23 @@ function PropertyComments({ property }) {
   const comments = property.comments || property.reviews || [];
   const rating = Number(property.rating || property.averageRating);
   const hasRating = Number.isFinite(rating);
+  const reviewCount = comments.length || property.reviewsCount || property.commentsCount || 0;
 
   return (
     <DetailSection title="Comentarios y valoraciones" description="Experiencias visibles cuando el backend las expone para esta propiedad.">
-      {hasRating ? (
-        <div className="rating-summary">
-          <RatingStars value={rating} />
-          <strong>{rating.toFixed(1)}</strong>
-          <span>{comments.length || property.reviewsCount || property.commentsCount || 0} resenas verificadas</span>
+      {hasRating || reviewCount ? (
+        <div className="rating-summary rating-summary--premium">
+          {hasRating ? (
+            <>
+              <strong>{rating.toFixed(1)}</strong>
+              <RatingStars value={rating} />
+            </>
+          ) : null}
+          <span>{reviewCount} resenas verificadas</span>
+          <span className="verified-pill">
+            <ShieldCheck size={14} />
+            Verificadas por NIDO
+          </span>
         </div>
       ) : null}
       {comments.length ? (
@@ -386,6 +445,10 @@ function PropertyComments({ property }) {
                 ) : null}
               </div>
               <p>{safeText(comment.comment || comment.body || comment.text, 'Comentario sin texto registrado.')}</p>
+              <span className="comment-card__verified">
+                <ShieldCheck size={14} />
+                Resena verificada
+              </span>
             </article>
           ))}
         </div>
@@ -498,54 +561,73 @@ export function PropertyDetailPage() {
     () =>
       property
         ? [
+            { icon: Home, label: 'Tipo', value: getPropertyTypeLabel(property.propertyType) || '--' },
             { icon: BedDouble, label: 'Habitaciones', value: property.bedrooms ?? '--' },
             { icon: Bath, label: 'Banos', value: property.bathrooms ?? '--' },
             { icon: Ruler, label: 'Area', value: property.areaM2 ? `${property.areaM2} m2` : '--' },
             {
-              icon: SquareParking,
-              label: 'Parqueadero',
-              value: property.parkingSpots ? `${property.parkingSpots}` : 'No registrado',
+              icon: Home,
+              label: 'Piso',
+              value: isPresent(property.floor) ? property.floor : 'Por confirmar',
             },
             {
-              icon: BriefcaseBusiness,
-              label: 'Contrato minimo',
-              value: property.minLeaseMonths ? `${property.minLeaseMonths} meses` : 'Por confirmar',
+              icon: ShieldCheck,
+              label: 'Estrato',
+              value: isPresent(property.strata) ? property.strata : 'Por confirmar',
             },
             {
-              icon: CalendarDays,
-              label: 'Disponible',
-              value: property.availableImmediately ? 'Inmediata' : formatDate(property.availableFrom) || 'Por confirmar',
+              icon: PawPrint,
+              label: 'Mascotas',
+              value: isPresent(property.petsAllowed) ? formatBoolean(property.petsAllowed) : 'Por confirmar',
             },
           ]
         : [],
     [property]
   );
 
-  const practicalDetails = useMemo(
+  const practicalGroups = useMemo(
     () =>
       property
         ? [
-            { label: 'Canon mensual', value: formatCurrency(property.monthlyRent) },
-            { label: 'Administracion', value: property.maintenanceFee ? formatCurrency(property.maintenanceFee) : 'No registrada' },
-            { label: 'Deposito', value: property.securityDeposit ? formatCurrency(property.securityDeposit) : 'No registrado' },
             {
-              label: 'Costo mensual estimado',
-              value:
-                property.monthlyRent || property.maintenanceFee
-                  ? formatCurrency((property.monthlyRent || 0) + (property.maintenanceFee || 0))
-                  : 'Precio no disponible',
+              title: 'Costos',
+              items: [
+                { label: 'Canon mensual', value: formatCurrency(property.monthlyRent) },
+                { label: 'Administracion', value: property.maintenanceFee ? formatCurrency(property.maintenanceFee) : 'No registrada' },
+                { label: 'Deposito', value: property.securityDeposit ? formatCurrency(property.securityDeposit) : 'No registrado' },
+                {
+                  label: 'Costo mensual estimado',
+                  value:
+                    property.monthlyRent || property.maintenanceFee
+                      ? formatCurrency((property.monthlyRent || 0) + (property.maintenanceFee || 0))
+                      : 'Precio no disponible',
+                },
+              ],
             },
-            { label: 'Tipo de propiedad', value: getPropertyTypeLabel(property.propertyType) },
-            { label: 'Departamento', value: property.department },
-            { label: 'Ciudad', value: property.city },
-            { label: 'Barrio', value: property.neighborhood },
-            { label: 'Zona o direccion aproximada', value: getApproximateAddress(property) },
-            { label: 'Piso', value: isPresent(property.floor) ? property.floor : '' },
-            { label: 'Estrato', value: isPresent(property.strata) ? property.strata : '' },
-            { label: 'Amoblado', value: formatBoolean(property.furnished) },
-            { label: 'Mascotas', value: formatBoolean(property.petsAllowed) },
-            { label: 'Capacidad maxima', value: property.maxOccupants ? `${property.maxOccupants} personas` : '' },
-            { label: 'Estado', value: property.availableImmediately ? 'Disponible ahora' : 'Disponibilidad programada' },
+            {
+              title: 'Ubicacion',
+              items: [
+                { label: 'Departamento', value: property.department },
+                { label: 'Ciudad', value: property.city },
+                { label: 'Barrio', value: property.neighborhood },
+                { label: 'Zona o direccion aproximada', value: getApproximateAddress(property) },
+              ],
+            },
+            {
+              title: 'Caracteristicas',
+              items: [
+                { label: 'Tipo de propiedad', value: getPropertyTypeLabel(property.propertyType) },
+                { label: 'Piso', value: isPresent(property.floor) ? property.floor : '' },
+                { label: 'Estrato', value: isPresent(property.strata) ? property.strata : '' },
+                { label: 'Habitaciones', value: property.bedrooms },
+                { label: 'Banos', value: property.bathrooms },
+                { label: 'Area', value: property.areaM2 ? `${property.areaM2} m2` : '' },
+                { label: 'Amoblado', value: isPresent(property.furnished) ? formatBoolean(property.furnished) : '' },
+                { label: 'Mascotas', value: isPresent(property.petsAllowed) ? formatBoolean(property.petsAllowed) : '' },
+                { label: 'Capacidad maxima', value: property.maxOccupants ? `${property.maxOccupants} personas` : '' },
+                { label: 'Estado', value: property.availableImmediately ? 'Disponible ahora' : 'Disponibilidad programada' },
+              ],
+            },
           ]
         : [],
     [property]
@@ -630,6 +712,28 @@ export function PropertyDetailPage() {
     }
   };
 
+  const handleShare = async () => {
+    const title = safeText(property?.title, 'Propiedad NIDO');
+    const url = window.location.href;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, url });
+        return;
+      }
+
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+        setPageMessage('Enlace copiado para compartir esta propiedad.');
+        return;
+      }
+
+      setPageMessage('Copia el enlace del navegador para compartir esta propiedad.');
+    } catch {
+      setPageMessage('No pudimos abrir el panel de compartir. El enlace sigue disponible en el navegador.');
+    }
+  };
+
   if (loading) {
     return <LoadingState label="Cargando detalle..." />;
   }
@@ -648,22 +752,46 @@ export function PropertyDetailPage() {
   return (
     <div className="page property-detail-page">
       <header className="property-detail-topbar">
-        <button type="button" className="button button--secondary" onClick={() => navigate(-1)}>
-          <ArrowLeft size={16} />
-          Volver
-        </button>
         <div className="property-detail-topbar__copy">
           <span className="section__eyebrow">Ficha de propiedad</span>
           <h1>{safeText(property.title, `${getPropertyTypeLabel(property.propertyType)} en arriendo`)}</h1>
-          <p>
-            {joinLocation(property)} - {getPropertyTypeLabel(property.propertyType)} -{' '}
-            {formatCurrency(property.monthlyRent)} al mes
-          </p>
+          <div className="property-detail-meta">
+            <span>
+              <MapPin size={16} />
+              {property.city || 'Ciudad por confirmar'} - {property.department || 'Colombia'} -{' '}
+              {property.neighborhood || 'Barrio por confirmar'}
+            </span>
+            {Number.isFinite(Number(property.rating || property.averageRating)) ? (
+              <span>
+                <Star size={16} fill="currentColor" />
+                {Number(property.rating || property.averageRating).toFixed(1)} -{' '}
+                {property.reviewsCount || property.commentsCount || 0} resenas verificadas
+              </span>
+            ) : null}
+          </div>
           <div className="property-detail-badges">
             {detailBadges.map((badge) => (
               <span key={badge}>{badge}</span>
             ))}
           </div>
+        </div>
+        <div className="property-detail-topbar__actions">
+          <button type="button" className="button button--secondary" onClick={() => navigate(-1)}>
+            <ArrowLeft size={16} />
+            Volver
+          </button>
+          <button type="button" className="button button--secondary" onClick={handleShare}>
+            <Share2 size={16} />
+            Compartir
+          </button>
+          <button
+            type="button"
+            className={`button button--secondary ${property.isFavorite ? 'button--saved' : ''}`}
+            onClick={toggleFavorite}
+          >
+            <Heart size={16} />
+            {property.isFavorite ? 'Guardada' : 'Guardar'}
+          </button>
         </div>
       </header>
 
@@ -759,7 +887,7 @@ export function PropertyDetailPage() {
           </DetailSection>
 
           <DetailSection title="Detalles practicos" description="Valores, ubicacion aproximada y caracteristicas visibles.">
-            <DetailList items={practicalDetails} />
+            <DetailGroupGrid groups={practicalGroups} />
           </DetailSection>
 
           <PropertyConditions property={property} />
@@ -807,11 +935,22 @@ export function PropertyDetailPage() {
             </div>
             <div className="price-card__actions">
               <button type="button" className="button" onClick={() => handleContact('contact')}>
-                Contactar
+                Contactar propietario
               </button>
-              <button type="button" className="button button--secondary" onClick={() => handleContact('visit')}>
-                Agendar visita
+              <button
+                type="button"
+                className={`button button--secondary ${property.isFavorite ? 'button--saved' : ''}`}
+                onClick={toggleFavorite}
+              >
+                <Heart size={16} />
+                {property.isFavorite ? 'Guardada' : 'Guardar propiedad'}
               </button>
+            </div>
+            <div className="price-card__availability">
+              <CheckCircle2 size={16} />
+              {property.availableImmediately
+                ? 'Disponible para mudanza inmediata'
+                : `Disponible desde ${formatDate(property.availableFrom) || 'fecha por confirmar'}`}
             </div>
             <p className="price-card__trust">
               <ShieldCheck size={15} />

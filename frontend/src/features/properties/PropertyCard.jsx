@@ -133,7 +133,7 @@ export function PropertyCard({
           <div>
             <p className="property-card__price">
               {formatCurrency(property.monthlyRent)}
-              {isHome ? ' COP' : ' / mes'}
+              {isHome ? '' : ' / mes'}
             </p>
             {property.maintenanceFee && !isHome ? (
               <p className="property-card__price-note">
