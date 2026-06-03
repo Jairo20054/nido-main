@@ -23,6 +23,24 @@ logs
 *.log
 npm-debug.log*
 
+# Sensitive material and local exports
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets.*
+secret.*
+credentials.*
+credential.*
+keys.*
+keyring.*
+env.txt
+*.backup
+*.bak
+*.old
+* copia*
+
 # Local tools, caches and OS files
 nido-main
 .continue

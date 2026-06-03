@@ -276,7 +276,8 @@ const updatePassword = async (accessToken, newPassword) => {
       error: null,
     };
   } catch (error) {
-    console.error('Update password error:', error);
+    // [SECURITY FIX] No registrar objetos completos de auth para evitar exponer tokens · Audit 2026
+    console.error('Update password error:', error?.message || 'Supabase auth error');
     return {
       success: false,
       error: error.message,
@@ -311,7 +312,8 @@ const resetPassword = async (email) => {
       error: null,
     };
   } catch (error) {
-    console.error('Reset password error:', error);
+    // [SECURITY FIX] No registrar objetos completos de auth para evitar exponer datos sensibles · Audit 2026
+    console.error('Reset password error:', error?.message || 'Supabase auth error');
     return {
       success: false,
       error: error.message,
@@ -348,7 +350,8 @@ const updatePasswordAfterReset = async (accessToken, newPassword) => {
       error: null,
     };
   } catch (error) {
-    console.error('Update password after reset error:', error);
+    // [SECURITY FIX] No registrar objetos completos de auth para evitar exponer tokens · Audit 2026
+    console.error('Update password after reset error:', error?.message || 'Supabase auth error');
     return {
       success: false,
       error: error.message,

@@ -1,5 +1,6 @@
 const cors = require('cors');
 const express = require('express');
+const helmet = require('helmet');
 const { env } = require('./shared/env');
 const { buildAllowedOrigins, createCorsOptions, formatAllowedOriginsForLog } = require('./shared/cors');
 const { errorHandler } = require('./shared/errorHandler');
@@ -12,10 +13,36 @@ app.disable('x-powered-by');
 if (env.NODE_ENV === 'production') {
   app.set('trust proxy', 1);
 }
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        baseUri: ["'self'"],
+        frameAncestors: ["'none'"],
+        objectSrc: ["'none'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'blob:', 'https://*.supabase.co'],
+        connectSrc: ["'self'", 'https://*.supabase.co'],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+    hsts:
+      env.NODE_ENV === 'production'
+        ? {
+            maxAge: 31536000,
+            includeSubDomains: true,
+            preload: true,
+          }
+        : false,
+    referrerPolicy: {
+      policy: 'strict-origin-when-cross-origin',
+    },
+  })
+);
 app.use((_req, res, next) => {
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  // [SECURITY FIX] Limita permisos de navegador que la API no necesita · Audit 2026
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   next();
 });
