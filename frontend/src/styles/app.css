@@ -7614,6 +7614,668 @@ h3 {
   box-shadow: 0 0 0 4px rgba(23, 76, 58, 0.08);
 }
 
+/* NIDO property detail redesign */
+.nido-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+  align-items: start;
+  gap: 34px;
+  padding-top: 10px;
+}
+
+.nido-detail-main {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+  background: #fff;
+  border: 1px solid rgba(229, 229, 229, 0.9);
+  border-radius: 8px;
+}
+
+.nido-stats-strip {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  overflow-x: auto;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--nido-gray-100);
+  scrollbar-width: thin;
+}
+
+.nido-stat-chip {
+  display: flex;
+  flex: 0 0 auto;
+  min-width: 104px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 18px;
+  text-align: center;
+  border-right: 1px solid var(--nido-gray-100);
+}
+
+.nido-stat-chip:first-child {
+  padding-left: 0;
+}
+
+.nido-stat-chip:last-child {
+  border-right: 0;
+}
+
+.nido-stat-chip svg,
+.nido-info-card header svg,
+.nido-location-copy svg {
+  color: var(--nido-green);
+}
+
+.nido-stat-chip strong {
+  color: #171717;
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.nido-stat-chip span {
+  color: var(--nido-gray-500);
+  font-size: 0.74rem;
+  font-weight: 650;
+}
+
+.nido-detail-section {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+  padding: 30px;
+  border-bottom: 1px solid var(--nido-gray-100);
+}
+
+.nido-detail-section:last-child {
+  border-bottom: 0;
+}
+
+.nido-detail-section h2 {
+  margin: 0;
+  color: var(--nido-gray-800);
+  font-family: var(--font-display);
+  font-size: clamp(1.42rem, 2.5vw, 1.85rem);
+  font-weight: 750;
+  letter-spacing: 0;
+  line-height: 1.15;
+}
+
+.nido-detail-section h3,
+.nido-highlight-card h3,
+.nido-process-card h3 {
+  margin: 0;
+  color: #171717;
+  font-size: 0.96rem;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.nido-detail-empty,
+.nido-description p,
+.nido-highlight-card p,
+.nido-payment-card p,
+.nido-location-copy p,
+.nido-process-card p,
+.nido-verified-note p {
+  margin: 0;
+  color: var(--nido-gray-500);
+}
+
+.nido-description {
+  position: relative;
+  max-height: 5.2rem;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.nido-description--expanded {
+  max-height: 28rem;
+}
+
+.nido-description p {
+  color: #3f3f46;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.nido-description__fade {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2.4rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), #fff);
+  pointer-events: none;
+}
+
+.nido-text-button {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--nido-green);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.nido-text-button:hover {
+  text-decoration: underline;
+}
+
+.nido-text-button--right {
+  justify-self: end;
+}
+
+.nido-text-button__icon--up {
+  transform: rotate(180deg);
+}
+
+.nido-highlight-grid,
+.nido-conditions-grid,
+.nido-practical-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.nido-practical-grid,
+.nido-conditions-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.nido-highlight-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--nido-gray-100);
+  border-radius: 8px;
+  background: #fff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nido-highlight-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(27, 67, 50, 0.08);
+}
+
+.nido-highlight-card__icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--nido-cream);
+  color: var(--nido-green);
+}
+
+.nido-highlight-card p {
+  margin-top: 4px;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.nido-amenities-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.nido-amenity-group h3 {
+  margin: 0 0 10px;
+  color: #8a8a8a;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.nido-amenity-pills,
+.nido-document-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.nido-amenity-pill,
+.nido-document-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--nido-gray-100);
+  border-radius: 999px;
+  background: var(--nido-cream);
+  color: var(--nido-gray-800);
+  font-size: 0.86rem;
+  font-weight: 650;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.nido-amenity-pill:hover {
+  border-color: var(--nido-green);
+  background: var(--nido-green);
+  color: #fff;
+}
+
+.nido-info-card,
+.nido-location-card,
+.nido-process-card,
+.nido-pricing-card {
+  min-width: 0;
+  border: 1px solid var(--nido-gray-100);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.nido-info-card {
+  display: grid;
+  gap: 10px;
+  padding: 22px;
+}
+
+.nido-info-card header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.nido-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-width: 0;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--nido-gray-100);
+}
+
+.nido-detail-row:last-child {
+  border-bottom: 0;
+}
+
+.nido-detail-row span,
+.nido-condition-row span {
+  color: var(--nido-gray-500);
+  font-size: 0.88rem;
+}
+
+.nido-detail-row strong,
+.nido-condition-row strong {
+  min-width: 0;
+  color: #171717;
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.nido-detail-row--total {
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 2px solid var(--nido-gray-200);
+  border-bottom: 0;
+}
+
+.nido-detail-row--total strong {
+  color: var(--nido-green);
+  font-size: 1rem;
+}
+
+.nido-condition-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.nido-condition-row--yes svg {
+  color: #16a34a;
+}
+
+.nido-condition-row--no svg {
+  color: #ef4444;
+}
+
+.nido-payment-card {
+  margin-top: -4px;
+}
+
+.nido-payment-card p {
+  color: #3f3f46;
+  line-height: 1.65;
+}
+
+.nido-document-chip {
+  border-color: rgba(27, 67, 50, 0.18);
+  color: var(--nido-green);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.nido-location-card {
+  overflow: hidden;
+}
+
+.nido-location-map {
+  display: flex;
+  min-height: 190px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background:
+    linear-gradient(135deg, rgba(27, 67, 50, 0.08) 25%, transparent 25%) 0 0 / 28px 28px,
+    linear-gradient(225deg, rgba(196, 98, 45, 0.08) 25%, transparent 25%) 0 0 / 28px 28px,
+    var(--nido-cream);
+  color: var(--nido-green);
+  text-align: center;
+}
+
+.nido-location-map strong {
+  margin-top: 4px;
+  color: var(--nido-gray-800);
+  font-size: 1rem;
+}
+
+.nido-location-map span {
+  color: var(--nido-gray-500);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.nido-location-copy {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+}
+
+.nido-location-copy h3,
+.nido-location-copy span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.nido-location-copy span {
+  color: #8a8a8a;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.nido-detail-sidebar {
+  position: sticky;
+  top: 96px;
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+}
+
+.nido-pricing-card,
+.nido-process-card {
+  display: grid;
+  gap: 16px;
+  padding: 22px;
+  box-shadow: 0 14px 36px rgba(27, 67, 50, 0.08);
+}
+
+.nido-pricing-card__price strong {
+  display: block;
+  color: #171717;
+  font-family: var(--font-display);
+  font-size: clamp(1.72rem, 3vw, 2.15rem);
+  font-weight: 800;
+  line-height: 1.05;
+}
+
+.nido-pricing-card__price span {
+  display: block;
+  margin-top: 4px;
+  color: var(--nido-gray-500);
+  font-size: 0.88rem;
+  font-weight: 650;
+}
+
+.nido-pricing-card__rows {
+  display: grid;
+  gap: 0;
+  padding: 4px 0;
+  border-top: 1px solid var(--nido-gray-100);
+  border-bottom: 1px solid var(--nido-gray-100);
+}
+
+.nido-pricing-card__rows div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  color: var(--nido-gray-500);
+  font-size: 0.9rem;
+}
+
+.nido-pricing-card__rows strong {
+  color: #171717;
+  text-align: right;
+}
+
+.nido-pricing-card__total strong {
+  color: var(--nido-green);
+}
+
+.nido-pricing-card__actions,
+.nido-process-card__actions {
+  display: grid;
+  gap: 10px;
+}
+
+.nido-primary-button,
+.nido-secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 800;
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.nido-primary-button {
+  border: 1px solid var(--nido-green);
+  background: var(--nido-green);
+  color: #fff;
+}
+
+.nido-primary-button:hover {
+  background: var(--nido-green-light);
+  border-color: var(--nido-green-light);
+}
+
+.nido-primary-button:active,
+.nido-secondary-button:active {
+  transform: scale(0.98);
+}
+
+.nido-secondary-button {
+  border: 1px solid var(--nido-gray-200);
+  background: #fff;
+  color: var(--nido-gray-800);
+}
+
+.nido-secondary-button:hover,
+.nido-secondary-button--saved {
+  background: var(--nido-gray-50);
+  border-color: rgba(27, 67, 50, 0.28);
+  color: var(--nido-green);
+}
+
+.nido-availability-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #ecfdf3;
+  color: #15803d;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.nido-verified-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--nido-gray-50);
+}
+
+.nido-verified-note svg,
+.nido-process-card__list svg {
+  flex: 0 0 auto;
+  color: var(--nido-green);
+}
+
+.nido-verified-note p {
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.nido-process-card > span {
+  color: var(--nido-terracotta);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.nido-process-card__list {
+  display: grid;
+  gap: 10px;
+}
+
+.nido-process-card__list div {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--nido-gray-500);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 1080px) {
+  .nido-detail-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 320px);
+    gap: 24px;
+  }
+
+  .nido-detail-sidebar {
+    top: 86px;
+  }
+
+  .nido-highlight-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 860px) {
+  .nido-detail-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .nido-detail-sidebar {
+    position: static;
+    order: 2;
+  }
+
+  .nido-detail-main {
+    order: 1;
+  }
+
+  .nido-practical-grid,
+  .nido-conditions-grid,
+  .nido-amenities-groups {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .nido-detail-layout {
+    padding-top: 0;
+  }
+
+  .nido-detail-main {
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
+  }
+
+  .nido-detail-section {
+    padding: 24px 16px;
+  }
+
+  .nido-stats-strip {
+    padding: 14px 12px;
+  }
+
+  .nido-stat-chip {
+    min-width: 92px;
+    padding: 0 14px;
+  }
+
+  .nido-amenity-pills {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .nido-amenity-pill {
+    justify-content: flex-start;
+    border-radius: 8px;
+  }
+
+  .nido-detail-row,
+  .nido-pricing-card__rows div {
+    align-items: flex-start;
+  }
+
+  .nido-detail-row strong,
+  .nido-pricing-card__rows strong {
+    max-width: 52%;
+  }
+
+  .nido-info-card,
+  .nido-pricing-card,
+  .nido-process-card {
+    padding: 18px;
+  }
+
+  .nido-pricing-card,
+  .nido-process-card {
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
+  }
+}
+
 /* Property discovery and detail polish */
 .home-results__heading,
 .properties-results-header {

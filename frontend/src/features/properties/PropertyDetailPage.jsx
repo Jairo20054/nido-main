@@ -22,6 +22,14 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../app/providers/useAuth';
+import DetailAmenities from '../../components/property/PropertyAmenities';
+import PropertyDescription from '../../components/property/PropertyDescription';
+import PropertyHighlights from '../../components/property/PropertyHighlights';
+import PropertyLocation from '../../components/property/PropertyLocation';
+import PropertyPracticalDetails from '../../components/property/PropertyPracticalDetails';
+import PropertyRentalConditions from '../../components/property/PropertyRentalConditions';
+import PropertySidebar from '../../components/property/PropertySidebar';
+import PropertyStatsStrip from '../../components/property/PropertyStatsStrip';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { LoadingState } from '../../components/ui/LoadingState';
@@ -804,196 +812,23 @@ export function PropertyDetailPage() {
         onNext={selectNextImage}
       />
 
-      <section className="section property-layout">
-        <div className="property-layout__main">
-          <div className="property-header">
-            <div>
-              <span className="section__eyebrow">Informacion principal</span>
-              <h2>{safeText(property.title, 'Propiedad en arriendo')}</h2>
-              <p>{safeText(property.summary, 'Informacion resumida pendiente por registrar.')}</p>
-              <div className="property-header__meta">
-                <span>
-                  <MapPin size={16} />
-                  {joinLocation(property)}
-                </span>
-                <span>
-                  <ShieldCheck size={16} />
-                  {property.verificationDetails ? 'Verificada' : 'Publicacion activa'}
-                </span>
-              </div>
-            </div>
-            <button
-              className={`favorite-chip favorite-chip--large ${property.isFavorite ? 'favorite-chip--active' : ''}`}
-              type="button"
-              onClick={toggleFavorite}
-              aria-label={property.isFavorite ? 'Quitar de guardados' : 'Guardar propiedad'}
-            >
-              <Heart size={16} />
-              Guardar
-            </button>
-          </div>
-
-          <div className="fact-grid fact-grid--expanded">
-            {detailFacts.map((fact) => {
-              const Icon = fact.icon;
-              return (
-                <div key={fact.label} className="fact-card">
-                  <Icon size={18} />
-                  <div>
-                    <strong>{fact.value}</strong>
-                    <span>{fact.label}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <DetailSection title="Lo que mas destaca" description="Resumen rapido para comparar esta opcion.">
-            <div className="highlight-grid">
-              {stayHighlights.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <article key={item.title} className="highlight-card">
-                    <div className="highlight-card__icon">
-                      <Icon size={18} />
-                    </div>
-                    <div>
-                      <strong>{item.title}</strong>
-                      <p>{item.description}</p>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          </DetailSection>
-
-          <DetailSection title="Descripcion" description="Informacion registrada por el arrendador.">
-            {description ? (
-              <>
-                <p>{shortDescription}</p>
-                {description.length > 420 ? (
-                  <button
-                    type="button"
-                    className="detail-text-toggle"
-                    onClick={() => setDescriptionExpanded((current) => !current)}
-                  >
-                    {descriptionExpanded ? 'Ver menos' : 'Ver mas'}
-                  </button>
-                ) : null}
-              </>
-            ) : (
-              <DetailEmpty>Esta propiedad aun no tiene descripcion completa.</DetailEmpty>
-            )}
-          </DetailSection>
-
-          <DetailSection title="Detalles practicos" description="Valores, ubicacion aproximada y caracteristicas visibles.">
-            <DetailGroupGrid groups={practicalGroups} />
-          </DetailSection>
-
-          <PropertyConditions property={property} />
-          <PropertyAmenities property={property} />
-          <PropertyReferences property={property} />
-          <PropertyComments property={property} />
-          <PropertyOwnerInfo
-            property={property}
-            onContact={handleContact}
-            onToggleFavorite={toggleFavorite}
-          />
-          <SimilarProperties properties={similarProperties} />
+      <section className="section nido-detail-layout" aria-label="Detalle organizado de la propiedad">
+        <div className="nido-detail-main">
+          <PropertyStatsStrip property={property} />
+          <PropertyDescription property={property} />
+          <PropertyHighlights property={property} />
+          <DetailAmenities property={property} />
+          <PropertyPracticalDetails property={property} />
+          <PropertyRentalConditions property={property} />
+          <PropertyLocation property={property} />
         </div>
 
-        <aside className="property-layout__aside">
-          <div className="price-card price-card--booking price-card--contact">
-            <div className="price-card__header">
-              <strong>{formatCurrency(property.monthlyRent)}</strong>
-              <span>canon mensual</span>
-            </div>
-            <div className="price-card__quick-facts">
-              <span>
-                <BedDouble size={15} /> {property.bedrooms ?? '--'} hab.
-              </span>
-              <span>
-                <Bath size={15} /> {property.bathrooms ?? '--'} banos
-              </span>
-              <span>
-                <Ruler size={15} /> {property.areaM2 || property.area || '--'} m2
-              </span>
-            </div>
-            <div className="price-card__rows">
-              <div>
-                <span>Administracion</span>
-                <span>{property.maintenanceFee ? formatCurrency(property.maintenanceFee) : 'No registrada'}</span>
-              </div>
-              <div>
-                <span>Deposito</span>
-                <span>{property.securityDeposit ? formatCurrency(property.securityDeposit) : 'No registrado'}</span>
-              </div>
-              <div>
-                <span>Total mensual estimado</span>
-                <span>{formatCurrency((property.monthlyRent || 0) + (property.maintenanceFee || 0))}</span>
-              </div>
-            </div>
-            <div className="price-card__actions">
-              <button type="button" className="button" onClick={() => handleContact('contact')}>
-                Contactar propietario
-              </button>
-              <button
-                type="button"
-                className={`button button--secondary ${property.isFavorite ? 'button--saved' : ''}`}
-                onClick={toggleFavorite}
-              >
-                <Heart size={16} />
-                {property.isFavorite ? 'Guardada' : 'Guardar propiedad'}
-              </button>
-            </div>
-            <div className="price-card__availability">
-              <CheckCircle2 size={16} />
-              {property.availableImmediately
-                ? 'Disponible para mudanza inmediata'
-                : `Disponible desde ${formatDate(property.availableFrom) || 'fecha por confirmar'}`}
-            </div>
-            <p className="price-card__trust">
-              <ShieldCheck size={15} />
-              Propiedad verificada por NIDO. Tus datos se comparten solo dentro del proceso.
-            </p>
-          </div>
-
-          <InlineMessage tone="neutral">
-            {pageMessage}
-          </InlineMessage>
-
-          <div className="content-card apply-sidebar-card">
-            <div className="apply-sidebar-card__header">
-              <span className="section__eyebrow">Arrendar con NIDO</span>
-              <h3>Proceso claro antes de aplicar</h3>
-              <p>Contacto, visitas y documentos se mantienen dentro de un flujo guiado para proteger a ambas partes.</p>
-            </div>
-
-            <div className="application-trust-list">
-              <div>
-                <CheckCircle2 size={16} />
-                <span>Direccion exacta y contacto privado se comparten solo cuando avance la visita.</span>
-              </div>
-              <div>
-                <MessageCircle size={16} />
-                <span>El propietario recibe tu interes con contexto de la vivienda.</span>
-              </div>
-              <div>
-                <ShieldCheck size={16} />
-                <span>NIDO evita exponer telefonos o correos privados en la publicacion.</span>
-              </div>
-            </div>
-
-            <div className="application-actions">
-              <button type="button" className="button" onClick={() => handleContact('visit')}>
-                Solicitar visita
-              </button>
-              <Link className="button button--secondary" to="/properties">
-                Comparar opciones
-              </Link>
-            </div>
-          </div>
-        </aside>
+        <PropertySidebar
+          property={property}
+          pageMessage={pageMessage}
+          onContact={handleContact}
+          onToggleFavorite={toggleFavorite}
+        />
       </section>
     </div>
   );
