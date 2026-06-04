@@ -569,6 +569,16 @@ function Field({ children, className = '', error, help, id, label, required = fa
   );
 }
 
+function ReservedFieldError({ children, className = '' }) {
+  return children ? (
+    <small className={`field-error ${className}`.trim()}>{children}</small>
+  ) : (
+    <small className={`field-error field-error--empty ${className}`.trim()} aria-hidden="true">
+      &nbsp;
+    </small>
+  );
+}
+
 function TextInput({ className = '', error, help, id, label, multiline = false, onChange, required, rows = 4, value, ...props }) {
   const describedBy = [help ? `${id}-help` : '', error ? `${id}-error` : ''].filter(Boolean).join(' ') || undefined;
   const inputProps = {
@@ -679,7 +689,13 @@ function ToggleCard({ checked, children, description, id, label, onChange, showC
   return (
     <div className={`toggle-card ${checked ? 'toggle-card--active' : ''}`}>
       <Toggle checked={checked} description={description} id={id} label={label} onChange={onChange} />
-      {showChildren ? <div className="toggle-card__body">{children}</div> : null}
+      <div
+        className={`toggle-card__body ${showChildren ? '' : 'toggle-card__body--hidden'}`.trim()}
+        aria-disabled={!showChildren}
+        inert={showChildren ? undefined : ''}
+      >
+        {children}
+      </div>
     </div>
   );
 }
@@ -780,7 +796,7 @@ function TypeLocationStep({ cities, departments, errors, form, onDepartmentChang
           );
         })}
       </div>
-      {errors.propertyType ? <small className="field-error">{errors.propertyType}</small> : null}
+      <ReservedFieldError>{errors.propertyType}</ReservedFieldError>
       </div>
 
       <div className="property-step__subsection">
@@ -1123,7 +1139,7 @@ function ReviewStep({ canPublishDirectly, completionChecks, errors, form, imageC
           <p>El backend actual solicita minimo {MIN_IMAGE_COUNT_TO_PUBLISH} imagenes para publicar o enviar a revision.</p>
         </div>
         <PropertyMediaManager media={form.media} onChange={(value) => setField('media', value)} />
-        {errors.media ? <small className="field-error">{errors.media}</small> : null}
+        <ReservedFieldError>{errors.media}</ReservedFieldError>
       </div>
 
       <div className="publication-checklist">
@@ -1136,7 +1152,7 @@ function ReviewStep({ canPublishDirectly, completionChecks, errors, form, imageC
             </div>
           ))}
         </div>
-        {publishMessage ? <small className="field-error">{publishMessage}</small> : null}
+        <ReservedFieldError>{publishMessage}</ReservedFieldError>
       </div>
 
       <div className="property-step__subsection">
@@ -1190,7 +1206,7 @@ function ReviewStep({ canPublishDirectly, completionChecks, errors, form, imageC
           checked={form.publishingAuthorization}
           onChange={(value) => setField('publishingAuthorization', value)}
         />
-        {errors.publishingAuthorization ? <small className="field-error">{errors.publishingAuthorization}</small> : null}
+        <ReservedFieldError>{errors.publishingAuthorization}</ReservedFieldError>
       </div>
     </FormSection>
   );
@@ -1414,12 +1430,19 @@ export function PropertyForm({ property, submitting, onCancel, onSubmit, canPubl
             <h2>{title}</h2>
             <p>Publica una vivienda con un flujo guiado, datos verificables y una revision final clara antes de enviarla.</p>
           </div>
-          {draftStatus ? <span className="draft-save-indicator">{draftStatus}</span> : null}
+          <span
+            className={`draft-save-indicator ${draftStatus ? '' : 'draft-save-indicator--empty'}`.trim()}
+            aria-hidden={!draftStatus}
+          >
+            {draftStatus || 'Cambios guardados automaticamente'}
+          </span>
         </div>
 
         <StepIndicator currentStepIndex={stepIndex} onStepChange={goToStep} steps={STEPS} />
 
-        <InlineMessage tone="danger">{error}</InlineMessage>
+        <InlineMessage className="property-form-message" tone="danger" reserveSpace>
+          {error}
+        </InlineMessage>
 
         {currentStep.id === 'location' ? (
           <TypeLocationStep

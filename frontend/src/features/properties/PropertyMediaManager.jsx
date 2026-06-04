@@ -391,8 +391,12 @@ export function PropertyMediaManager({ media, onChange }) {
         Recomendamos subir al menos 5 imágenes: fachada, sala, cocina, habitaciones y baños. Para
         enviar la publicación necesitas mínimo {MIN_IMAGE_COUNT_TO_PUBLISH}.
       </p>
-      <InlineMessage tone="danger">{error}</InlineMessage>
-      <InlineMessage tone="success">{message}</InlineMessage>
+      <InlineMessage className="media-panel__message" tone="danger" reserveSpace>
+        {error}
+      </InlineMessage>
+      <InlineMessage className="media-panel__message" tone="success" reserveSpace>
+        {message}
+      </InlineMessage>
 
       <div
         className={`media-dropzone ${isDragging ? 'media-dropzone--active' : ''}`}

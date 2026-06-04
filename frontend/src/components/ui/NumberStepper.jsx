@@ -84,16 +84,22 @@ export function NumberStepper({
           +
         </button>
       </div>
-      {help ? (
-        <small className="field-help" id={`${id}-help`}>
-          {help}
-        </small>
-      ) : null}
-      {error ? (
-        <small className="field-error" id={`${id}-error`}>
-          {error}
-        </small>
-      ) : null}
+      <div className="field-messages">
+        {help ? (
+          <small className="field-help" id={`${id}-help`}>
+            {help}
+          </small>
+        ) : null}
+        {error ? (
+          <small className="field-error" id={`${id}-error`}>
+            {error}
+          </small>
+        ) : (
+          <small className="field-error field-error--empty" aria-hidden="true">
+            &nbsp;
+          </small>
+        )}
+      </div>
     </div>
   );
 }

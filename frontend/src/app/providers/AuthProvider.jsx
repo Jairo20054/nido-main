@@ -43,6 +43,8 @@ const normalizeAuthError = (error, fallback = 'No fue posible completar la auten
   return new Error(message);
 };
 
+const normalizeEmail = (email) => String(email || '').trim().toLowerCase();
+
 // Sincroniza el token recibido desde Supabase con el cliente HTTP y recupera
 // el perfil enriquecido desde el backend para unificar permisos y datos de usuario.
 const applySessionProfile = async (session, { silent = false } = {}) => {
@@ -281,11 +283,19 @@ export function AuthProvider({ children }) {
     validateRegisterPayload(payload);
 
     const role = payload.role === 'LANDLORD' ? 'LANDLORD' : 'TENANT';
+    const email = normalizeEmail(payload.email);
+    const emailRedirectTo = getEmailConfirmationUrl();
+
+    if (import.meta.env.DEV) {
+      console.info('[Auth Debug] signup email:', email);
+      console.info('[Auth Debug] redirectTo:', emailRedirectTo);
+    }
+
     const { data, error } = await supabase.auth.signUp({
-      email: String(payload.email || '').trim().toLowerCase(),
+      email,
       password: payload.password,
       options: {
-        emailRedirectTo: getEmailConfirmationUrl(),
+        emailRedirectTo,
         data: {
           first_name: String(payload.firstName || '').trim(),
           last_name: String(payload.lastName || '').trim(),
@@ -299,11 +309,30 @@ export function AuthProvider({ children }) {
       throw normalizeAuthError(error, 'No fue posible crear la cuenta.');
     }
 
+    const isRepeatedSignup =
+      Array.isArray(data.user?.identities) && data.user.identities.length === 0;
+
+    if (isRepeatedSignup) {
+      clearAuthToken();
+      setSession(null);
+      setUser(null);
+      setAuthError('');
+
+      return {
+        alreadyRegistered: true,
+        email,
+        profile: null,
+        requiresEmailConfirmation: false,
+        session: null,
+      };
+    }
+
     if (data.session) {
       try {
         const profile = await hydrateSession(data.session, { keepError: true });
         setAuthError('');
         return {
+          email,
           profile,
           requiresEmailConfirmation: false,
           session: data.session,
@@ -319,6 +348,7 @@ export function AuthProvider({ children }) {
     setAuthError('');
 
     return {
+      email,
       profile: null,
       requiresEmailConfirmation: true,
       session: null,
@@ -357,8 +387,39 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const resendSignupConfirmation = async (email) => {
+    const normalizedEmail = normalizeEmail(email);
+
+    if (!normalizedEmail) {
+      throw new Error('Ingresa el correo.');
+    }
+
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: normalizedEmail,
+      options: {
+        emailRedirectTo: getEmailConfirmationUrl(),
+      },
+    });
+
+    if (error) {
+      throw normalizeAuthError(
+        error,
+        'No pudimos reenviar el correo de confirmacion en este momento.'
+      );
+    }
+
+    return true;
+  };
+
   const forgotPassword = async (email) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    const normalizedEmail = normalizeEmail(email);
+
+    if (!normalizedEmail) {
+      throw new Error('Ingresa el correo.');
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
       redirectTo: getPasswordResetUrl(),
     });
 
@@ -411,6 +472,7 @@ export function AuthProvider({ children }) {
     logout,
     refreshUser,
     register,
+    resendSignupConfirmation,
     resetPassword,
     session,
     signInWithGoogle,

@@ -1,10 +1,21 @@
 import React from 'react';
 
 // Mensaje inline para errores, confirmaciones o advertencias dentro de formularios y paneles.
-export function InlineMessage({ tone = 'neutral', children }) {
+export function InlineMessage({ className = '', reserveSpace = false, tone = 'neutral', children }) {
   if (!children) {
-    return null;
+    if (!reserveSpace) return null;
+
+    return (
+      <div
+        className={`inline-message inline-message--${tone} inline-message--reserved ${className}`.trim()}
+        aria-hidden="true"
+      />
+    );
   }
 
-  return <div className={`inline-message inline-message--${tone}`}>{children}</div>;
+  return (
+    <div className={`inline-message inline-message--${tone} ${className}`.trim()} role="status" aria-live="polite">
+      {children}
+    </div>
+  );
 }

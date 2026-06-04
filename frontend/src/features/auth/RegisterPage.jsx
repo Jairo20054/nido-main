@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { InlineMessage } from '../../components/ui/InlineMessage';
 import { useAuth } from '../../app/providers/useAuth';
@@ -13,7 +13,7 @@ import { resolvePostAuthDestination } from './authRedirects';
 export function RegisterPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, register, signInWithGoogle, user } = useAuth();
+  const { isAuthenticated, register, resendSignupConfirmation, signInWithGoogle, user } = useAuth();
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
@@ -27,12 +27,27 @@ export function RegisterPage() {
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [googleSubmitting, setGoogleSubmitting] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
+  const [resending, setResending] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   const updateField = (field) => (event) =>
     setForm((current) => ({
       ...current,
       [field]: event.target.value,
     }));
+
+  useEffect(() => {
+    if (!resendCooldown) {
+      return undefined;
+    }
+
+    const timerId = window.setTimeout(() => {
+      setResendCooldown((current) => Math.max(current - 1, 0));
+    }, 1000);
+
+    return () => window.clearTimeout(timerId);
+  }, [resendCooldown]);
 
   if (isAuthenticated) {
     return <Navigate to={resolvePostAuthDestination(null, user)} replace />;
@@ -43,6 +58,7 @@ export function RegisterPage() {
     setSubmitting(true);
     setError('');
     setMessage('');
+    setRegisteredEmail('');
 
     if (form.password !== form.confirmPassword) {
       setError('Las contraseñas no coinciden.');
@@ -60,8 +76,19 @@ export function RegisterPage() {
         role: form.role,
       });
 
+      if (result.alreadyRegistered) {
+        setMessage(
+          'Si el correo ya tiene una cuenta, inicia sesion o recupera tu contrasena. Si era un registro nuevo, verifica que escribiste el correo correcto.'
+        );
+        return;
+      }
+
       if (result.requiresEmailConfirmation) {
-        setMessage('Revisa tu correo para confirmar la cuenta y luego inicia sesión.');
+        setRegisteredEmail(result.email);
+        setResendCooldown(60);
+        setMessage(
+          'Te enviamos un correo de confirmacion. Revisa tu bandeja de entrada y tambien spam o correo no deseado.'
+        );
         return;
       }
 
@@ -70,6 +97,30 @@ export function RegisterPage() {
       setError(requestError.message);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    if (!registeredEmail || resendCooldown || resending) {
+      return;
+    }
+
+    setResending(true);
+    setError('');
+    setMessage('');
+
+    try {
+      await resendSignupConfirmation(registeredEmail);
+      setResendCooldown(60);
+      setMessage(
+        'Si el correo esta registrado y pendiente de confirmar, enviaremos un nuevo enlace de confirmacion.'
+      );
+    } catch (_requestError) {
+      setError(
+        'No pudimos enviar el correo en este momento. Intentalo nuevamente o verifica que el correo este bien escrito.'
+      );
+    } finally {
+      setResending(false);
     }
   };
 
@@ -189,6 +240,20 @@ export function RegisterPage() {
           <button className="button" type="submit" disabled={submitting || googleSubmitting}>
             {submitting ? 'Creando cuenta...' : 'Crear cuenta'}
           </button>
+          {registeredEmail ? (
+            <button
+              className="button button--secondary"
+              type="button"
+              disabled={resending || resendCooldown > 0}
+              onClick={handleResendConfirmation}
+            >
+              {resending
+                ? 'Reenviando...'
+                : resendCooldown > 0
+                  ? `Reenviar correo en ${resendCooldown}s`
+                  : 'Reenviar correo de confirmacion'}
+            </button>
+          ) : null}
           <div className="auth-form__footer">
             <Link to="/login" className="auth-form__link">
               ¿Ya tienes cuenta? Ingresar

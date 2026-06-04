@@ -28,14 +28,25 @@ const { env } = require('./env');
  */
 const signUp = async (email, password, userData) => {
   try {
+    const normalizedEmail = String(email || '').trim().toLowerCase();
+
+    if (!normalizedEmail) {
+      return {
+        success: false,
+        user: null,
+        error: 'Email requerido',
+      };
+    }
+
     // ========================================================================
     // PASO 1: Crear usuario en Supabase Auth
     // ========================================================================
     // Supabase Auth manejará la encriptación de la contraseña automáticamente
     const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
+      email: normalizedEmail,
       password,
       options: {
+        emailRedirectTo: `${env.CLIENT_URL}/email-confirmed`,
         // Datos que se guardarán en user_metadata
         data: {
           firstName: userData?.firstName || '',

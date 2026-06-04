@@ -22,6 +22,7 @@ const createMissingConfigClient = () => {
       onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
       exchangeCodeForSession: missing,
       resetPasswordForEmail: missing,
+      resend: missing,
       setSession: missing,
       signInWithPassword: missing,
       signOut: missing,
