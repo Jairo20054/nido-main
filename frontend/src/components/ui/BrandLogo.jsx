@@ -7,7 +7,7 @@ export function BrandLogo({ className = '', label = 'NIDO', size = 'default' }) 
 
   return (
     <span className={classes}>
-      <img className="brand-logo__image" src={NIDO_LOGO_PATH} alt={label} loading="eager" />
+      <img className="brand-logo__image" src={NIDO_LOGO_PATH} alt={label} width="1305" height="367" loading="eager" />
     </span>
   );
 }

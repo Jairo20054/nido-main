@@ -33,6 +33,12 @@ En la app desplegada se publica como:
 /brand/nido-logo.png
 ```
 
+En produccion queda disponible en:
+
+```txt
+https://nido-main.vercel.app/brand/nido-logo.png
+```
+
 Las plantillas usan:
 
 ```html
@@ -40,6 +46,8 @@ Las plantillas usan:
 ```
 
 Eso produce una URL absoluta cuando Supabase renderiza el correo. Para produccion, Supabase Auth `Site URL` debe ser el dominio HTTPS publico de NIDO. No uses rutas locales de Windows, `localhost`, ni rutas relativas en plantillas reales enviadas a usuarios.
+
+El asset actual del logo horizontal mide `1305x367`. En HTML de correo usa `width="188"` y `height:auto`; no declares un `height` fijo ni un contenedor cuadrado porque deformaria la marca.
 
 Si prefieres fijar una URL explicita, reemplaza el `src` por el valor final de:
 

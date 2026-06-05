@@ -9574,20 +9574,21 @@ body {
 .brand-logo {
   display: inline-flex;
   align-items: center;
+  line-height: 0;
   min-width: 0;
 }
 
 .brand-logo__image {
   display: block;
-  width: 150px;
+  width: 164px;
   max-width: 100%;
-  height: 96px;
+  height: auto;
+  aspect-ratio: 1305 / 367;
   object-fit: contain;
 }
 
 .brand-logo--sidebar .brand-logo__image {
-  width: 78px;
-  height: 74px;
+  width: 128px;
 }
 
 .brand-logo--auth {
@@ -9597,8 +9598,7 @@ body {
 }
 
 .brand-logo--auth .brand-logo__image {
-  width: 176px;
-  height: 168px;
+  width: 214px;
 }
 
 .auth-card__logo + .section__eyebrow {
@@ -9607,12 +9607,10 @@ body {
 
 @media (max-width: 760px) {
   .brand-logo__image {
-    width: 112px;
-    height: 76px;
+    width: 124px;
   }
 
   .brand-logo--auth .brand-logo__image {
-    width: 144px;
-    height: 138px;
+    width: 176px;
   }
 }
