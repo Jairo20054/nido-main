@@ -11,6 +11,7 @@ Para configurar NIDO desde casa, trabajo o un equipo nuevo en Windows, empieza p
 - `backend/src/lib/supabaseAdmin.js`: export server-only del cliente administrativo de Supabase.
 - `backend/prisma/`: schema, migraciones Prisma y seed demo.
 - `supabase/migrations/`: migraciones SQL/RLS/Storage de Supabase.
+- `supabase/email-templates/`: plantillas de Supabase Auth y checklist SMTP/DNS.
 - `scripts/`: arranque, validacion de entorno y utilidades Prisma.
 
 ## Requisitos
@@ -116,6 +117,16 @@ Frontend: `http://localhost:5173`. Backend: `http://localhost:5000` o el siguien
 | `VITE_SUPABASE_URL` | Todos | Si | Frontend | URL publica Supabase. | `https://<project-ref>.supabase.co` |
 | `VITE_SUPABASE_ANON_KEY` | Todos | Si | Frontend | Clave publica. Nunca service role. | `replace-with-supabase-anon-key` |
 | `VITE_SUPABASE_OAUTH_REDIRECT_URL` | Todos | Si | Frontend | Callback local de la app tras OAuth. | `http://localhost:5173/auth/callback` |
+| `VITE_NIDO_PUBLIC_LOGO_URL` | Staging/Prod | No | Docs/Auth email | URL HTTPS publica del logo para correos Supabase. | `https://dominio-nido.com/brand/nido-logo.png` |
+
+## Correos De Supabase Auth
+
+- Plantillas: `supabase/email-templates/`.
+- Guia de aplicacion: `supabase/email-templates/README.md`.
+- SMTP, SPF, DKIM y DMARC: `supabase/email-templates/DELIVERABILITY.md`.
+- Documento operativo: `docs/SUPABASE_AUTH_EMAIL_TEMPLATES.md`.
+
+En produccion, el logo de email debe abrir por HTTPS en `/brand/nido-logo.png` desde el dominio real configurado como Supabase Auth `Site URL`.
 
 ## Scripts
 

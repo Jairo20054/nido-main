@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { InlineMessage } from '../../components/ui/InlineMessage';
+import { BrandLogo } from '../../components/ui/BrandLogo';
 import { useAuth } from '../../app/providers/useAuth';
 
 /**
@@ -33,6 +34,7 @@ export function ForgotPasswordPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
+        <BrandLogo className="auth-card__logo" size="auth" />
         <span className="section__eyebrow">Recuperación</span>
         <h1>Recupera tu acceso</h1>
         <p>Te enviaremos un enlace seguro para restablecer tu contraseña.</p>

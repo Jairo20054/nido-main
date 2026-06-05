@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "NIDO",
+  "name": "NIDO - Arriendo residencial",
   "icons": [
     {
       "src": "favicon.ico",
@@ -21,6 +21,6 @@
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#174c3a",
+  "background_color": "#f6f7f4"
 }

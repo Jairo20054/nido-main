@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { InlineMessage } from '../../components/ui/InlineMessage';
+import { BrandLogo } from '../../components/ui/BrandLogo';
 import { useAuth } from '../../app/providers/useAuth';
 
 /**
@@ -43,6 +44,7 @@ export function ResetPasswordPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
+        <BrandLogo className="auth-card__logo" size="auth" />
         <span className="section__eyebrow">Seguridad</span>
         <h1>Define tu nueva contraseña</h1>
         <p>

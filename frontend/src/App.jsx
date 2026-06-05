@@ -56,6 +56,10 @@ const ManagementPage = lazyPage(
   () => import('./features/dashboard/ManagementPage'),
   'ManagementPage'
 );
+const PublishPropertyPage = lazyPage(
+  () => import('./features/dashboard/PublishPropertyPage'),
+  'PublishPropertyPage'
+);
 const OperationalPage = lazyPage(
   () => import('./features/dashboard/OperationalPage'),
   'OperationalPage'
@@ -201,7 +205,7 @@ function App() {
               path="/publish"
               element={
                 <ProtectedAppPage roles={['LANDLORD', 'ADMIN']}>
-                  <ManagementPage />
+                  <PublishPropertyPage />
                 </ProtectedAppPage>
               }
             />

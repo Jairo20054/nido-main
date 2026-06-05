@@ -7,7 +7,6 @@ import {
   FileText,
   Heart,
   Home,
-  House,
   LifeBuoy,
   LogOut,
   PlusCircle,
@@ -18,6 +17,7 @@ import {
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../app/providers/useAuth';
 import { getRoleLabel } from '../../lib/formatters';
+import { BrandLogo } from '../ui/BrandLogo';
 
 const roleNavItems = {
   TENANT: [
@@ -67,14 +67,8 @@ const getPageTitle = (pathname, userRole) => {
 function BrandBlock() {
   return (
     <Link to="/dashboard" className="auth-brand" aria-label="Ir al inicio de Nido">
-      <span className="brand__mark" aria-hidden="true">
-        <span className="brand__mark-home">
-          <House size={13} strokeWidth={2.4} />
-        </span>
-        <span className="brand__mark-leaf"></span>
-      </span>
+      <BrandLogo size="sidebar" />
       <span>
-        <strong>Nido</strong>
         <small>Espacio privado</small>
       </span>
     </Link>
@@ -154,7 +148,7 @@ export function AuthenticatedLayout({ children }) {
         <main className="auth-main">{children}</main>
       </div>
 
-      {role === 'TENANT' ? <NavigationList items={mobileItems} compact /> : null}
+      <NavigationList items={mobileItems} compact />
     </div>
   );
 }

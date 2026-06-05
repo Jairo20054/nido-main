@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { InlineMessage } from '../../components/ui/InlineMessage';
+import { BrandLogo } from '../../components/ui/BrandLogo';
 import { useAuth } from '../../app/providers/useAuth';
 import { GoogleAuthButton } from './GoogleAuthButton';
 import { resolvePostAuthDestination } from './authRedirects';
@@ -140,6 +141,7 @@ export function RegisterPage() {
   return (
     <div className="auth-page">
       <div className="auth-card auth-card--wide">
+        <BrandLogo className="auth-card__logo" size="auth" />
         <span className="section__eyebrow">Registro</span>
         <h1>Crea tu cuenta</h1>
         <p>Empieza a guardar propiedades, enviar solicitudes o publicar tu inventario de arriendos.</p>

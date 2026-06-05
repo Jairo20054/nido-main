@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { House, LogOut, Menu, User, X } from 'lucide-react';
+import { LogOut, Menu, User, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../app/providers/useAuth';
+import { BrandLogo } from '../ui/BrandLogo';
 
 export function SiteHeader() {
   const navigate = useNavigate();
@@ -72,13 +73,7 @@ export function SiteHeader() {
     <header className={`site-header ${isScrolled ? 'site-header--scrolled' : ''}`}>
       <div className="site-header__container">
         <Link to="/" className="brand" onClick={closeMobileMenu}>
-          <span className="brand__mark" aria-hidden="true">
-            <span className="brand__mark-home">
-              <House size={13} strokeWidth={2.4} />
-            </span>
-            <span className="brand__mark-leaf"></span>
-          </span>
-          <span className="brand__text">Nido</span>
+          <BrandLogo />
         </Link>
 
         <nav className="site-header__nav" aria-label="Principal">
