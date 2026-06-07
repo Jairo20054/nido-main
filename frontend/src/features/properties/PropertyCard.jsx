@@ -27,6 +27,8 @@ export function PropertyCard({
   variant = 'default',
   proximityLabel,
   distanceLabel,
+  selectedForCompare = false,
+  onToggleCompare,
 }) {
   const safeText = (value, fallback = '') => {
     if (value === null || value === undefined) return fallback;
@@ -85,10 +87,21 @@ export function PropertyCard({
     }
   };
 
+  const handleToggleCompare = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (onToggleCompare) {
+      onToggleCompare(property);
+    }
+  };
+
   return (
     <Link
       to={cardTarget}
-      className={`property-card property-card--${variant}`}
+      className={`property-card property-card--${variant} ${
+        selectedForCompare ? 'property-card--compare-selected' : ''
+      }`}
       aria-label={`Ver detalle de ${title}`}
     >
       <div className="property-card__media">
@@ -203,6 +216,16 @@ export function PropertyCard({
             <span className="property-card__footer-badge">
               {property.availableImmediately ? 'Disponible ahora' : 'Agenda visita'}
             </span>
+            {onToggleCompare ? (
+              <button
+                type="button"
+                className="property-card__compare"
+                onClick={handleToggleCompare}
+                aria-pressed={selectedForCompare}
+              >
+                {selectedForCompare ? 'Quitar' : 'Comparar'}
+              </button>
+            ) : null}
             <span className="property-card__cta">Ver detalles</span>
           </div>
         ) : null}

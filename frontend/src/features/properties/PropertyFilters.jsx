@@ -214,7 +214,7 @@ export function PropertyFilters({
         />
       </FilterSection>
 
-      <FilterSection title="Amenidades">
+      <FilterSection title="Servicios y reglas">
         <div className="amenity-checklist">
           {AMENITY_OPTIONS.slice(0, 7).map(({ value, label, icon: Icon }) => (
             <label key={value} className="amenity-check">
@@ -255,11 +255,9 @@ export function PropertyFilters({
           <SlidersHorizontal size={15} aria-hidden="true" />
           {resultCount} propiedades visibles
         </div>
-        {onDismiss ? (
-          <button className="property-filters__apply" type="button" onClick={onDismiss}>
-            Ver resultados
-          </button>
-        ) : null}
+        <button className="property-filters__apply" type="button" onClick={onDismiss}>
+          {onDismiss ? 'Ver resultados' : 'Aplicar filtros'}
+        </button>
       </div>
     </form>
   );

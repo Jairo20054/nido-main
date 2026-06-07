@@ -9,6 +9,8 @@ import { ActiveFilterChips } from './ActiveFilterChips';
 import { EmptyPropertiesState } from './EmptyPropertiesState';
 import { EXAMPLE_PROPERTIES } from './exampleProperties';
 import { MobileFiltersDrawer } from './MobileFiltersDrawer';
+import { PropertyComparisonBar } from './PropertyComparisonBar';
+import { PropertyComparisonModal } from './PropertyComparisonModal';
 import { PropertiesGrid } from './PropertiesGrid';
 import { PropertiesResultsHeader } from './PropertiesResultsHeader';
 import { PropertiesSearchBar } from './PropertiesSearchBar';
@@ -77,6 +79,9 @@ export function SearchPage() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [showMapPanel, setShowMapPanel] = useState(false);
   const [viewMode, setViewMode] = useState('grid');
+  const [selectedProperties, setSelectedProperties] = useState([]);
+  const [comparisonOpen, setComparisonOpen] = useState(false);
+  const [compareNotice, setCompareNotice] = useState('');
 
   const fetchProperties = async (activeFilters) => {
     setLoading(true);
@@ -193,6 +198,19 @@ export function SearchPage() {
     fetchProperties(debouncedFilters);
   }, [debouncedFilters, isAuthenticated]);
 
+  useEffect(() => {
+    setSelectedProperties((current) =>
+      current.filter((selected) => properties.some((property) => property.id === selected.id))
+    );
+  }, [properties]);
+
+  useEffect(() => {
+    if (!compareNotice) return undefined;
+
+    const timeoutId = window.setTimeout(() => setCompareNotice(''), 3600);
+    return () => window.clearTimeout(timeoutId);
+  }, [compareNotice]);
+
   const toggleFavorite = async (property) => {
     if (!isAuthenticated) {
       setError('Puedes explorar sin cuenta. Inicia sesion solo si quieres guardar propiedades.');
@@ -256,6 +274,32 @@ export function SearchPage() {
     return chips;
   }, [filters, defaultFilters]);
 
+  const selectedPropertyIds = useMemo(
+    () => selectedProperties.map((property) => property.id),
+    [selectedProperties]
+  );
+
+  const resultSummary = useMemo(() => {
+    const parts = [];
+    parts.push(filters.city || 'Colombia');
+
+    if (filters.maxRent !== defaultFilters.maxRent) {
+      parts.push(`Presupuesto hasta ${formatCurrency(filters.maxRent)}`);
+    }
+
+    if (filters.propertyTypes.length === 1) {
+      parts.push(getPropertyTypeLabel(filters.propertyTypes[0]));
+    } else if (filters.propertyTypes.length > 1) {
+      parts.push(`${filters.propertyTypes.length} tipos de vivienda`);
+    } else {
+      parts.push('Cualquier tipo');
+    }
+
+    if (activeCount) parts.push(`${activeCount} filtros activos`);
+
+    return parts.join(' · ');
+  }, [activeCount, defaultFilters.maxRent, filters]);
+
   const dismissChip = (chip) => {
     if (chip.type === 'propertyType') return togglePropertyType(chip.value);
     if (chip.type === 'city') return setFilter('city', '');
@@ -276,6 +320,33 @@ export function SearchPage() {
     setFilter('city', 'Medellin');
   };
 
+  const toggleCompare = (property) => {
+    setCompareNotice('');
+    setSelectedProperties((current) => {
+      const isSelected = current.some((item) => item.id === property.id);
+
+      if (isSelected) {
+        return current.filter((item) => item.id !== property.id);
+      }
+
+      if (current.length >= 4) {
+        setCompareNotice('Puedes comparar hasta 4 propiedades al mismo tiempo.');
+        return current;
+      }
+
+      return [...current, property];
+    });
+  };
+
+  const openComparison = () => {
+    if (selectedProperties.length < 2) {
+      setCompareNotice('Selecciona al menos 2 propiedades para comparar.');
+      return;
+    }
+
+    setComparisonOpen(true);
+  };
+
   return (
     <div className="page page--search properties-page">
       <section className="properties-page__search">
@@ -288,7 +359,7 @@ export function SearchPage() {
         />
       </section>
 
-      <section className="properties-layout">
+      <section className={`properties-layout ${showMapPanel ? 'properties-layout--map-open' : ''}`}>
         <aside className="properties-layout__filters">
           <PropertyFilters
             filters={filters}
@@ -308,6 +379,8 @@ export function SearchPage() {
             filters={filters}
             viewMode={viewMode}
             activeCount={activeCount}
+            resultSummary={resultSummary}
+            mapOpen={showMapPanel}
             onSortChange={(value) => setFilter('sort', value)}
             onClear={clearFilters}
             onToggleMap={() => setShowMapPanel((current) => !current)}
@@ -315,6 +388,7 @@ export function SearchPage() {
           />
           <ActiveFilterChips chips={activeFilterChips} onDismiss={dismissChip} onClear={clearFilters} />
           <InlineMessage tone="danger">{error}</InlineMessage>
+          <InlineMessage tone="neutral">{compareNotice}</InlineMessage>
 
           {!loading && !properties.length ? (
             <EmptyPropertiesState
@@ -329,6 +403,8 @@ export function SearchPage() {
               viewMode={viewMode}
               onToggleFavorite={toggleFavorite}
               savingFavorite={savingFavorite}
+              selectedPropertyIds={selectedPropertyIds}
+              onToggleCompare={toggleCompare}
             />
           )}
         </main>
@@ -362,6 +438,21 @@ export function SearchPage() {
         onTogglePropertyType={togglePropertyType}
         onClear={clearFilters}
         onDismiss={() => setMobileFiltersOpen(false)}
+      />
+
+      <PropertyComparisonBar
+        count={selectedProperties.length}
+        onClear={() => {
+          setSelectedProperties([]);
+          setCompareNotice('');
+        }}
+        onCompare={openComparison}
+      />
+
+      <PropertyComparisonModal
+        open={comparisonOpen}
+        properties={selectedProperties}
+        onClose={() => setComparisonOpen(false)}
       />
     </div>
   );

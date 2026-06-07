@@ -8,6 +8,8 @@ export function PropertiesGrid({
   viewMode,
   onToggleFavorite,
   savingFavorite,
+  selectedPropertyIds = [],
+  onToggleCompare,
 }) {
   if (loading) {
     return (
@@ -26,6 +28,8 @@ export function PropertiesGrid({
           variant="compact"
           onToggleFavorite={onToggleFavorite}
           disabledFavorite={savingFavorite === property.id}
+          selectedForCompare={selectedPropertyIds.includes(property.id)}
+          onToggleCompare={onToggleCompare}
         />
       ))}
     </div>

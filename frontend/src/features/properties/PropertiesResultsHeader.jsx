@@ -8,6 +8,8 @@ export function PropertiesResultsHeader({
   filters,
   viewMode,
   activeCount = 0,
+  resultSummary,
+  mapOpen = false,
   onSortChange,
   onClear,
   onToggleMap,
@@ -22,7 +24,10 @@ export function PropertiesResultsHeader({
     <div className="properties-results-header">
       <div>
         <h1>{counter} propiedades encontradas</h1>
-        <p>{locationCopy}</p>
+        <p>Opciones disponibles segun tus filtros</p>
+        <div className="properties-results-header__meta">
+          {resultSummary || locationCopy}
+        </div>
       </div>
       <div className="properties-results-header__actions">
         <label className="properties-sort" htmlFor="properties-sort">
@@ -43,7 +48,7 @@ export function PropertiesResultsHeader({
         ) : null}
         <button type="button" className="properties-map-button" onClick={onToggleMap}>
           <Map size={17} aria-hidden="true" />
-          Ver en mapa
+          {mapOpen ? 'Ocultar mapa' : 'Ver mapa'}
         </button>
         <div className="properties-view-toggle" role="group" aria-label="Vista de resultados">
           <button

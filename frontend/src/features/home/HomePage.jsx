@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import {
   Bath,
   BedDouble,
@@ -33,6 +33,16 @@ const BUDGET_OPTIONS = [
   { value: '2500000-4000000', label: '$2.5M - $4M', minRent: 2500000, maxRent: 4000000 },
   { value: '4000000-9000000', label: 'Mas de $4M', minRent: 4000000, maxRent: 9000000 },
 ];
+
+const HERO_IMAGES = [
+  '/images/hero/hero-colombia-1.png',
+  '/images/hero/hero-colombia-2.png',
+  '/images/hero/hero-colombia-3.png',
+  '/images/hero/hero-colombia-4.png',
+];
+
+const HERO_FALLBACK_IMAGE = '/images/sofa.jpg';
+const HERO_ROTATION_INTERVAL = 6000;
 
 const PROPERTY_TYPES = [
   { value: '', label: 'Cualquier tipo', icon: Home },
@@ -121,10 +131,30 @@ const scrollToResults = (resultsRef) => {
   }, 80);
 };
 
+function usePrefersReducedMotion() {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    if (!mediaQuery) return undefined;
+
+    const updatePreference = () => setPrefersReducedMotion(mediaQuery.matches);
+    updatePreference();
+    mediaQuery.addEventListener('change', updatePreference);
+
+    return () => mediaQuery.removeEventListener('change', updatePreference);
+  }, []);
+
+  return prefersReducedMotion;
+}
+
 export function HomePage() {
   const resultsRef = useRef(null);
   const location = useLocation();
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [currentHeroImage, setCurrentHeroImage] = useState(0);
+  const [failedHeroImages, setFailedHeroImages] = useState([]);
+  const prefersReducedMotion = usePrefersReducedMotion();
   const {
     filters,
     appliedFilters,
@@ -143,6 +173,9 @@ export function HomePage() {
     runSearch,
     toggleFavorite,
   } = useHomePropertySearch();
+  const availableHeroImages = HERO_IMAGES.filter((image) => !failedHeroImages.includes(image));
+  const heroImages = availableHeroImages.length ? availableHeroImages : [HERO_FALLBACK_IMAGE];
+  const activeHeroImage = Math.min(currentHeroImage, heroImages.length - 1);
 
   useEffect(() => {
     if (location.hash === '#buscar') {
@@ -151,6 +184,26 @@ export function HomePage() {
       }, 120);
     }
   }, [location.hash]);
+
+  useEffect(() => {
+    if (currentHeroImage <= heroImages.length - 1) return;
+    setCurrentHeroImage(0);
+  }, [currentHeroImage, heroImages.length]);
+
+  useEffect(() => {
+    if (prefersReducedMotion || heroImages.length < 2) return undefined;
+
+    const interval = window.setInterval(() => {
+      setCurrentHeroImage((current) => (current + 1) % heroImages.length);
+    }, HERO_ROTATION_INTERVAL);
+
+    return () => window.clearInterval(interval);
+  }, [heroImages.length, prefersReducedMotion]);
+
+  const handleHeroImageError = (image) => {
+    if (image === HERO_FALLBACK_IMAGE) return;
+    setFailedHeroImages((current) => (current.includes(image) ? current : [...current, image]));
+  };
 
   const submitSearch = (event) => {
     event.preventDefault();
@@ -187,14 +240,27 @@ export function HomePage() {
     <div className="home-page home-page--nido">
       <section className="home-hero home-hero--image" id="buscar">
         <div className="home-hero__content">
+          <div className="home-hero__media" aria-hidden="true">
+            {heroImages.map((image, index) => (
+              <img
+                key={image}
+                src={image}
+                alt=""
+                className={`home-hero__image ${index === activeHeroImage ? 'is-active' : ''}`}
+                loading={index === 0 ? 'eager' : 'lazy'}
+                onError={() => handleHeroImageError(image)}
+              />
+            ))}
+            <div className="home-hero__overlay" />
+          </div>
           <div className="home-hero__intro">
             <span className="hero-kicker">
               <Sparkles size={14} aria-hidden="true" />
               Arriendos claros en Colombia
             </span>
-            <h1 className="home-hero__title">Tu proximo hogar, sin complicaciones</h1>
+            <h1 className="home-hero__title">Tu próximo hogar, sin complicaciones</h1>
             <p className="home-hero__subtitle">
-              Encuentra arriendos confiables con informacion clara, propiedades verificadas y
+              Encuentra arriendos confiables con información clara, propiedades verificadas y
               procesos simples.
             </p>
           </div>
@@ -308,61 +374,37 @@ function HomeSearchForm({ filters, activeCount, onChange, onSearch, onOpenMoreFi
         />
       </label>
 
-      <label className="home-search__field" htmlFor="home-budget">
-        <span className="home-search__icon">
-          <WalletCards size={20} aria-hidden="true" />
-        </span>
-        <span className="home-search__label">Presupuesto</span>
-        <select
-          id="home-budget"
-          value={budgetValue}
-          onChange={(event) => {
-            const option = BUDGET_OPTIONS.find((item) => item.value === event.target.value);
-            if (!option) return;
-            onChange('minRent', option.minRent);
-            onChange('maxRent', option.maxRent);
-          }}
-        >
-          {budgetValue === 'custom' ? <option value="custom">Rango personalizado</option> : null}
-          {BUDGET_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </label>
+      <FilterDropdown
+        id="home-budget"
+        label="Presupuesto"
+        icon={WalletCards}
+        value={budgetValue}
+        options={budgetValue === 'custom' ? [{ value: 'custom', label: 'Rango personalizado' }, ...BUDGET_OPTIONS] : BUDGET_OPTIONS}
+        onChange={(value) => {
+          const option = BUDGET_OPTIONS.find((item) => item.value === value);
+          if (!option) return;
+          onChange('minRent', option.minRent);
+          onChange('maxRent', option.maxRent);
+        }}
+      />
 
-      <label className="home-search__field" htmlFor="home-property-type">
-        <span className="home-search__icon">
-          <Home size={20} aria-hidden="true" />
-        </span>
-        <span className="home-search__label">Tipo de vivienda</span>
-        <select
-          id="home-property-type"
-          value={filters.propertyType}
-          onChange={(event) => onChange('propertyType', event.target.value)}
-        >
-          {PROPERTY_TYPES.map((option) => (
-            <option key={option.value || 'all'} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </label>
+      <FilterDropdown
+        id="home-property-type"
+        label="Tipo de vivienda"
+        icon={Home}
+        value={filters.propertyType}
+        options={PROPERTY_TYPES}
+        onChange={(value) => onChange('propertyType', value)}
+      />
 
-      <label className="home-search__field" htmlFor="home-rooms">
-        <span className="home-search__icon">
-          <BedDouble size={20} aria-hidden="true" />
-        </span>
-        <span className="home-search__label">Habitaciones</span>
-        <select id="home-rooms" value={filters.rooms} onChange={(event) => onChange('rooms', event.target.value)}>
-          {ROOM_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </label>
+      <FilterDropdown
+        id="home-rooms"
+        label="Habitaciones"
+        icon={BedDouble}
+        value={filters.rooms}
+        options={ROOM_OPTIONS}
+        onChange={(value) => onChange('rooms', value)}
+      />
 
       <button
         type="button"
@@ -388,6 +430,92 @@ function HomeSearchForm({ filters, activeCount, onChange, onSearch, onOpenMoreFi
         <option value="Envigado" />
       </datalist>
     </form>
+  );
+}
+
+function FilterDropdown({ id, label, value, options, onChange, icon: Icon }) {
+  const generatedId = useId();
+  const buttonId = id || generatedId;
+  const menuId = `${buttonId}-menu`;
+  const dropdownRef = useRef(null);
+  const selectedOption = options.find((option) => String(option.value) === String(value)) || options[0];
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const handleClickOutside = (event) => {
+      if (!dropdownRef.current?.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open]);
+
+  const selectOption = (nextValue) => {
+    onChange(nextValue);
+    setOpen(false);
+  };
+
+  return (
+    <div className="home-search__field home-filter-dropdown" ref={dropdownRef}>
+      <span className="home-search__icon">
+        <Icon size={20} aria-hidden="true" />
+      </span>
+      <span className="home-search__label" id={`${buttonId}-label`}>
+        {label}
+      </span>
+      <button
+        id={buttonId}
+        type="button"
+        className="home-filter-dropdown__trigger"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-labelledby={`${buttonId}-label ${buttonId}`}
+        aria-controls={menuId}
+        onClick={() => setOpen((current) => !current)}
+      >
+        <span>{selectedOption?.label}</span>
+        <ChevronDown size={16} aria-hidden="true" />
+      </button>
+
+      {open ? (
+        <div className="home-filter-dropdown__menu" id={menuId} role="listbox" aria-labelledby={`${buttonId}-label`}>
+          {options.map((option) => {
+            const OptionIcon = option.icon;
+            const active = String(option.value) === String(value);
+
+            return (
+              <button
+                key={`${option.value || 'all'}-${option.label}`}
+                type="button"
+                className={`home-filter-dropdown__option ${active ? 'is-active' : ''}`}
+                role="option"
+                aria-selected={active}
+                onClick={() => selectOption(option.value)}
+              >
+                {OptionIcon ? <OptionIcon size={16} aria-hidden="true" /> : null}
+                <span>{option.label}</span>
+                {active ? <CheckCircle2 size={16} aria-hidden="true" /> : null}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -499,26 +627,28 @@ function MoreFiltersModal({
           <section className="home-filter-group">
             <h3>Espacios</h3>
             <div className="home-filter-grid home-filter-grid--two">
-              <label className="home-filter-input" htmlFor="home-filter-rooms">
+              <div className="home-filter-input">
                 <span>Habitaciones</span>
-                <select id="home-filter-rooms" value={filters.rooms} onChange={(event) => onChange('rooms', event.target.value)}>
-                  {ROOM_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="home-filter-input" htmlFor="home-filter-bathrooms">
+                <FilterDropdown
+                  id="home-filter-rooms"
+                  label="Habitaciones"
+                  icon={BedDouble}
+                  value={filters.rooms}
+                  options={ROOM_OPTIONS}
+                  onChange={(value) => onChange('rooms', value)}
+                />
+              </div>
+              <div className="home-filter-input">
                 <span>Banos</span>
-                <select id="home-filter-bathrooms" value={filters.bathrooms} onChange={(event) => onChange('bathrooms', event.target.value)}>
-                  {BATHROOM_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                <FilterDropdown
+                  id="home-filter-bathrooms"
+                  label="Banos"
+                  icon={Bath}
+                  value={filters.bathrooms}
+                  options={BATHROOM_OPTIONS}
+                  onChange={(value) => onChange('bathrooms', value)}
+                />
+              </div>
               <label className="home-filter-input" htmlFor="home-filter-area">
                 <span>Area aproximada desde</span>
                 <input
