@@ -297,7 +297,7 @@ export function SearchPage() {
 
     if (activeCount) parts.push(`${activeCount} filtros activos`);
 
-    return parts.join(' · ');
+    return parts.join(' / ');
   }, [activeCount, defaultFilters.maxRent, filters]);
 
   const dismissChip = (chip) => {

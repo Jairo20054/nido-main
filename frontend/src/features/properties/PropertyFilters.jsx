@@ -169,7 +169,7 @@ export function PropertyFilters({
         <PriceRange filters={filters} onChange={onChange} />
       </FilterSection>
 
-      <FilterSection title="Tipo de propiedad">
+      <FilterSection title="Tipo de propiedad" defaultOpen={false}>
         <div className="property-filter-card-grid">
           {PROPERTY_TYPE_OPTIONS.map(({ value, label, icon: Icon }) => {
             const active = filters.propertyTypes.includes(value);
@@ -190,7 +190,7 @@ export function PropertyFilters({
         </div>
       </FilterSection>
 
-      <FilterSection title="Habitaciones">
+      <FilterSection title="Habitaciones" defaultOpen={false}>
         <NumberStepper
           id="filterBedrooms"
           label="Habitaciones minimas"
@@ -202,7 +202,7 @@ export function PropertyFilters({
         />
       </FilterSection>
 
-      <FilterSection title="Banos">
+      <FilterSection title="Banos" defaultOpen={false}>
         <NumberStepper
           id="filterBathrooms"
           label="Banos minimos"
@@ -214,7 +214,7 @@ export function PropertyFilters({
         />
       </FilterSection>
 
-      <FilterSection title="Servicios y reglas">
+      <FilterSection title="Servicios y reglas" defaultOpen={false}>
         <div className="amenity-checklist">
           {AMENITY_OPTIONS.slice(0, 7).map(({ value, label, icon: Icon }) => (
             <label key={value} className="amenity-check">

@@ -5,6 +5,7 @@ import {
   PROPERTY_TYPE_OPTIONS,
   QUICK_FILTERS,
 } from './propertySearchConfig';
+import { FilterDropdown } from './FilterDropdown';
 
 const getBudgetValue = (filters) => {
   const match = BUDGET_OPTIONS.find(
@@ -23,6 +24,17 @@ export function PropertiesSearchBar({
 }) {
   const budgetValue = useMemo(() => getBudgetValue(filters), [filters]);
   const primaryType = filters.propertyTypes.length === 1 ? filters.propertyTypes[0] : '';
+  const budgetOptions = useMemo(
+    () =>
+      budgetValue === 'custom'
+        ? [{ value: 'custom', label: 'Rango personalizado' }, ...BUDGET_OPTIONS]
+        : BUDGET_OPTIONS,
+    [budgetValue]
+  );
+  const propertyTypeOptions = useMemo(
+    () => [{ value: '', label: 'Cualquier tipo' }, ...PROPERTY_TYPE_OPTIONS],
+    []
+  );
 
   const applyQuickFilter = (filter) => {
     if (filter.type === 'extra') {
@@ -54,45 +66,28 @@ export function PropertiesSearchBar({
         </div>
       </label>
 
-      <label className="properties-search-bar__field">
-        <span>Presupuesto</span>
-        <select
-          value={budgetValue}
-          aria-label="Rango de presupuesto"
-          onChange={(event) => {
-            const option = BUDGET_OPTIONS.find((item) => item.value === event.target.value);
-            if (!option) return;
-            onChange('minRent', option.minRent);
-            onChange('maxRent', option.maxRent);
-          }}
-        >
-          {budgetValue === 'custom' ? <option value="custom">Rango personalizado</option> : null}
-          {BUDGET_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </label>
+      <FilterDropdown
+        label="Presupuesto"
+        ariaLabel="Rango de presupuesto"
+        value={budgetValue}
+        options={budgetOptions}
+        onChange={(nextValue) => {
+          const option = BUDGET_OPTIONS.find((item) => item.value === nextValue);
+          if (!option) return;
+          onChange('minRent', option.minRent);
+          onChange('maxRent', option.maxRent);
+        }}
+      />
 
-      <label className="properties-search-bar__field">
-        <span>Tipo de vivienda</span>
-        <select
-          value={primaryType}
-          aria-label="Tipo de vivienda"
-          onChange={(event) => {
-            const nextValue = event.target.value;
-            onChange('propertyTypes', nextValue ? [nextValue] : []);
-          }}
-        >
-          <option value="">Cualquier tipo</option>
-          {PROPERTY_TYPE_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </label>
+      <FilterDropdown
+        label="Tipo de vivienda"
+        ariaLabel="Tipo de vivienda"
+        value={primaryType}
+        options={propertyTypeOptions}
+        onChange={(nextValue) => {
+          onChange('propertyTypes', nextValue ? [nextValue] : []);
+        }}
+      />
 
       <div className="properties-search-bar__active" aria-live="polite">
         <SlidersHorizontal size={17} aria-hidden="true" />
@@ -102,7 +97,7 @@ export function PropertiesSearchBar({
 
       <button className="properties-search-bar__submit" type="submit">
         <Search size={18} aria-hidden="true" />
-        Buscar propiedades
+        Buscar
       </button>
 
       <div className="properties-search-bar__quick" aria-label="Busquedas rapidas">
