@@ -1,5 +1,17 @@
 import React from 'react';
-import { BarChart3, ClipboardList, FileText, Settings, UploadCloud } from 'lucide-react';
+import {
+  BarChart3,
+  Bell,
+  ClipboardList,
+  CreditCard,
+  FileText,
+  KeyRound,
+  Settings,
+  ShieldCheck,
+  SlidersHorizontal,
+  UploadCloud,
+  UserRound,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RequestStatusBadge } from '../../components/ui/RequestStatusBadge';
 import { useAuth } from '../../app/providers/useAuth';
@@ -42,6 +54,54 @@ const pageConfig = {
     description: 'Ajustes operativos preparados para conectar reglas, notificaciones y privacidad.',
   },
 };
+
+const SETTINGS_SECTIONS = [
+  {
+    icon: UserRound,
+    title: 'Perfil',
+    description: 'Nombre, telefono, avatar y datos visibles en tus conversaciones.',
+    action: 'Editar en Mi cuenta',
+    href: '/account',
+  },
+  {
+    icon: KeyRound,
+    title: 'Seguridad',
+    description: 'Acceso protegido, recuperacion de cuenta y sesiones autenticadas.',
+    action: 'Revisar acceso',
+    href: '/account',
+  },
+  {
+    icon: Bell,
+    title: 'Notificaciones',
+    description: 'Alertas sobre solicitudes, cambios de estado y mensajes relevantes.',
+    action: 'Configurar despues',
+    href: '/settings',
+    muted: true,
+  },
+  {
+    icon: SlidersHorizontal,
+    title: 'Preferencias',
+    description: 'Filtros, ciudad principal y opciones para una experiencia mas precisa.',
+    action: 'Ajustar despues',
+    href: '/settings',
+    muted: true,
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Privacidad',
+    description: 'Control de datos visibles para arrendadores, arrendatarios y administradores.',
+    action: 'Ver perfil',
+    href: '/account',
+  },
+  {
+    icon: CreditCard,
+    title: 'Metodos de pago',
+    description: 'Espacio preparado para pagos y validaciones cuando el modulo este activo.',
+    action: 'No disponible aun',
+    href: '/settings',
+    muted: true,
+  },
+];
 
 function RequestRows({ role }) {
   const rows = role === 'TENANT' ? mockTenantRequests : mockReceivedRequests;
@@ -134,24 +194,30 @@ export function OperationalPage({ type = 'applications' }) {
       ) : type === 'stats' ? (
         <StatsContent />
       ) : type === 'settings' ? (
-        <section className="dashboard-panel">
-          <div className="settings-preview-grid">
-            <article>
-              <strong>Notificaciones</strong>
-              <p>Alertas por nuevas solicitudes, cambios de estado y mensajes relevantes.</p>
-            </article>
-            <article>
-              <strong>Privacidad</strong>
-              <p>Control de datos visibles para arrendadores, arrendatarios y administradores.</p>
-            </article>
-            <article>
-              <strong>Cuenta</strong>
-              <p>Actualiza tu perfil desde Mi cuenta mientras se conectan ajustes avanzados.</p>
-            </article>
+        <section className="dashboard-panel settings-panel">
+          <div className="dashboard-panel__heading">
+            <div>
+              <h2>Configuracion de cuenta</h2>
+              <p>Organiza tus datos, privacidad y preferencias desde un solo lugar.</p>
+            </div>
+            <Link className="button button--secondary" to="/account">
+              Ir a Mi cuenta
+            </Link>
           </div>
-          <Link className="button button--secondary" to="/account">
-            Ir a Mi cuenta
-          </Link>
+          <div className="settings-preview-grid settings-preview-grid--detailed">
+            {SETTINGS_SECTIONS.map(({ icon: SectionIcon, title, description, action, href, muted }) => (
+              <article key={title} className={muted ? 'settings-preview-item settings-preview-item--muted' : 'settings-preview-item'}>
+                <span className="settings-preview-item__icon">
+                  <SectionIcon size={18} aria-hidden="true" />
+                </span>
+                <div>
+                  <strong>{title}</strong>
+                  <p>{description}</p>
+                  <Link to={href}>{action}</Link>
+                </div>
+              </article>
+            ))}
+          </div>
         </section>
       ) : (
         <section className="dashboard-panel">

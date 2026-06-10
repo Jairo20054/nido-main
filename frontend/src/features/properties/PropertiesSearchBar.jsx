@@ -53,15 +53,15 @@ export function PropertiesSearchBar({
       }}
     >
       <label className="properties-search-bar__field properties-search-bar__field--location">
-        <span>Donde quieres vivir?</span>
+        <span>Ciudad, departamento o barrio</span>
         <div>
           <MapPin size={18} aria-hidden="true" />
           <input
             type="text"
             value={filters.city}
             onChange={(event) => onChange('city', event.target.value)}
-            placeholder="Ciudad, barrio o zona"
-            aria-label="Ciudad, barrio o zona"
+            placeholder="Ej: Bogota, Cundinamarca, Chapinero"
+            aria-label="Ciudad, departamento, barrio o zona"
           />
         </div>
       </label>

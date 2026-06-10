@@ -363,12 +363,12 @@ function HomeSearchForm({ filters, activeCount, onChange, onSearch, onOpenMoreFi
         <span className="home-search__icon">
           <MapPin size={20} aria-hidden="true" />
         </span>
-        <span className="home-search__label">Ciudad o zona</span>
+        <span className="home-search__label">Ciudad, departamento o barrio</span>
         <input
           id="home-location"
           type="text"
           list="home-popular-cities"
-          placeholder="Ciudad, barrio o zona"
+          placeholder="Ej: Medellin, Antioquia, El Poblado"
           value={filters.location}
           onChange={(event) => onChange('location', event.target.value)}
         />

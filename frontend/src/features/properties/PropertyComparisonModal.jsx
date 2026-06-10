@@ -15,6 +15,46 @@ const getRating = (property) => {
   return Number.isFinite(rating) ? rating.toFixed(1) : 'Sin rating';
 };
 
+const getTotalMonthly = (property) => Number(property.monthlyRent || 0) + Number(property.maintenanceFee || 0);
+
+function ComparisonSummaryCard({ property }) {
+  const area = property.areaM2 || property.area;
+  const highlights = [
+    property.furnished ? 'Amoblado' : null,
+    property.petsAllowed ? 'Mascotas' : null,
+    Number(property.parkingSpots || 0) > 0 ? `${property.parkingSpots} parqueadero` : null,
+  ].filter(Boolean);
+
+  return (
+    <article className="property-comparison-summary-card">
+      <PropertyImage property={property} alt={property.title} className="property-comparison-summary-card__image" />
+      <div className="property-comparison-summary-card__body">
+        <strong>{property.title}</strong>
+        <span>
+          <MapPin size={14} aria-hidden="true" />
+          {getPropertyLocationLabel(property)}
+        </span>
+        <p>{formatCurrency(getTotalMonthly(property))} total aprox.</p>
+        <div className="property-comparison-summary-card__facts">
+          <span>{getValue(property.bedrooms, '--')} hab.</span>
+          <span>{getValue(property.bathrooms, '--')} banos</span>
+          <span>{getValue(area, '--')} m2</span>
+        </div>
+        {highlights.length ? (
+          <div className="property-comparison-summary-card__tags">
+            {highlights.map((highlight) => (
+              <span key={highlight}>{highlight}</span>
+            ))}
+          </div>
+        ) : null}
+        <Link className="property-comparison-summary-card__link" to={`/properties/${property.id}`}>
+          Ver propiedad
+        </Link>
+      </div>
+    </article>
+  );
+}
+
 function BooleanValue({ active }) {
   return active ? (
     <span className="property-comparison-modal__yes">
@@ -95,6 +135,12 @@ export function PropertyComparisonModal({ open, properties, onClose }) {
             <X size={18} aria-hidden="true" />
           </button>
         </header>
+
+        <div className="property-comparison-modal__summary-grid">
+          {properties.map((property) => (
+            <ComparisonSummaryCard key={property.id} property={property} />
+          ))}
+        </div>
 
         <div className="property-comparison-modal__table-wrap">
           <table className="property-comparison-modal__table">

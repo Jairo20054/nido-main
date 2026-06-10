@@ -11040,3 +11040,424 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* NIDO professional UX pass */
+.home-page--nido .home-hero__content {
+  justify-items: center;
+  min-height: clamp(540px, 66vh, 680px);
+}
+
+.home-hero--image .home-hero__intro {
+  justify-self: start;
+  width: min(680px, 100%);
+}
+
+.home-page--nido .home-search {
+  justify-self: center;
+  margin-inline: auto;
+  grid-template-columns:
+    minmax(260px, 1.5fr)
+    minmax(166px, 0.78fr)
+    minmax(178px, 0.82fr)
+    minmax(148px, 0.66fr)
+    minmax(130px, 0.58fr)
+    minmax(138px, 0.62fr);
+}
+
+.home-page--nido .home-search__field--location {
+  border-radius: 8px 0 0 8px;
+}
+
+.home-page--nido .home-search input::placeholder,
+.properties-search-bar__field input::placeholder {
+  color: rgba(101, 115, 109, 0.78);
+  font-weight: 600;
+}
+
+.home-page--nido .home-quick-row {
+  width: min(1180px, 100%);
+  justify-content: center;
+  margin-inline: auto;
+}
+
+.home-results {
+  min-width: 0;
+}
+
+.home-results__heading {
+  align-items: flex-end;
+}
+
+.home-results__heading h2 {
+  letter-spacing: 0;
+}
+
+.properties-search-bar {
+  max-width: 1280px;
+  margin-inline: auto;
+}
+
+.properties-layout__results {
+  min-height: 520px;
+}
+
+.property-card--compact .property-card__headline {
+  align-items: flex-start;
+}
+
+.property-card--compact .property-card__footer {
+  border-top: 1px solid rgba(17, 24, 39, 0.06);
+  padding-top: 10px;
+}
+
+.property-card--compare-selected {
+  border-color: rgba(37, 99, 235, 0.36) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08), 0 12px 28px rgba(17, 24, 39, 0.08);
+}
+
+.property-comparison-modal__panel {
+  gap: 18px;
+}
+
+.property-comparison-modal__summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.property-comparison-summary-card {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 8px;
+  background: #f9fbfa;
+}
+
+.property-comparison-summary-card__image {
+  width: 96px;
+  height: 128px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.property-comparison-summary-card__body {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  min-width: 0;
+}
+
+.property-comparison-summary-card__body strong {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 1.22;
+}
+
+.property-comparison-summary-card__body > span,
+.property-comparison-summary-card__facts {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.property-comparison-summary-card__body > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.property-comparison-summary-card__body p {
+  margin: 0;
+  color: var(--color-primary);
+  font-weight: 900;
+}
+
+.property-comparison-summary-card__facts,
+.property-comparison-summary-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.property-comparison-summary-card__facts span,
+.property-comparison-summary-card__tags span {
+  min-height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.property-comparison-summary-card__tags span {
+  background: rgba(23, 76, 58, 0.08);
+  color: var(--color-primary);
+}
+
+.property-comparison-summary-card__link {
+  width: fit-content;
+  color: var(--color-primary);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.account-page {
+  width: min(1280px, 100%);
+}
+
+.account-layout {
+  grid-template-columns: minmax(340px, 0.95fr) minmax(0, 1.05fr);
+  align-items: start;
+}
+
+.account-profile-card,
+.account-side-panel {
+  min-width: 0;
+}
+
+.account-side-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.account-profile-summary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 8px;
+  background: #f9fbfa;
+}
+
+.account-profile-summary__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgba(23, 76, 58, 0.1);
+  color: var(--color-primary);
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+.account-profile-summary__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.account-profile-summary strong,
+.account-profile-summary span {
+  min-width: 0;
+}
+
+.account-profile-summary div > span,
+.account-profile-summary__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-muted);
+  font-size: 0.84rem;
+}
+
+.account-profile-summary__status {
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(23, 76, 58, 0.08);
+  color: var(--color-primary);
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.account-status-list {
+  display: grid;
+  gap: 10px;
+}
+
+.account-status-list article {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 12px;
+  border: 1px solid rgba(17, 24, 39, 0.07);
+  border-radius: 8px;
+  background: #f9fbfa;
+}
+
+.account-status-list svg {
+  color: var(--color-primary);
+}
+
+.account-status-list strong,
+.account-status-list span {
+  display: block;
+}
+
+.account-status-list span {
+  color: var(--color-text-muted);
+  font-size: 0.86rem;
+}
+
+.account-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.account-quick-actions a,
+.settings-preview-item a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(23, 76, 58, 0.12);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--color-primary);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.account-requests-card .request-list {
+  display: grid;
+  gap: 10px;
+}
+
+.account-requests-card .request-item {
+  align-items: center;
+  border-radius: 8px;
+}
+
+.settings-panel .dashboard-panel__heading {
+  align-items: flex-start;
+}
+
+.settings-panel .dashboard-panel__heading p {
+  margin: 6px 0 0;
+  color: var(--color-text-muted);
+}
+
+.settings-preview-grid--detailed {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.settings-preview-item {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.settings-preview-item__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: rgba(23, 76, 58, 0.08);
+  color: var(--color-primary);
+}
+
+.settings-preview-item p {
+  margin: 0 0 10px;
+}
+
+.settings-preview-item--muted {
+  background: #f9fbfa;
+}
+
+.settings-preview-item--muted a {
+  color: var(--color-text-muted);
+}
+
+.landlord-stat-tile,
+.landlord-property-card,
+.landlord-filters {
+  box-shadow: 0 8px 22px rgba(17, 24, 39, 0.045);
+}
+
+.landlord-property-card {
+  align-items: stretch;
+}
+
+.landlord-property-card__top h2 {
+  max-width: 58ch;
+}
+
+.landlord-property-card__actions {
+  padding-top: 2px;
+}
+
+@media (max-width: 1120px) {
+  .home-page--nido .home-search {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .home-page--nido .home-search__field--location {
+    grid-column: 1 / -1;
+    border-radius: 8px 8px 0 0;
+  }
+
+  .home-page--nido .home-search__more,
+  .home-page--nido .home-search__button {
+    min-height: 60px;
+  }
+
+  .account-layout,
+  .settings-preview-grid--detailed {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 820px) {
+  .home-page--nido .home-search {
+    grid-template-columns: 1fr;
+  }
+
+  .home-page--nido .home-quick-row {
+    justify-content: flex-start;
+  }
+
+  .home-page--nido .home-search__field--location,
+  .home-page--nido .home-search__field {
+    border-radius: 0;
+  }
+
+  .account-profile-summary {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .account-profile-summary__status {
+    grid-column: 1 / -1;
+    width: fit-content;
+  }
+}
+
+@media (max-width: 620px) {
+  .property-comparison-modal__summary-grid {
+    display: none;
+  }
+
+  .account-profile-summary {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+}
