@@ -8,6 +8,9 @@ import {
   RADIUS_OPTIONS,
 } from './propertySearchConfig';
 
+const PRICE_FILTER_MAX = 1000000000;
+const PRICE_FILTER_STEP = 1000000;
+
 function FilterSection({ title, children, defaultOpen = true }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -46,20 +49,20 @@ function PriceInput({ id, label, value, onChange }) {
 }
 
 function PriceRange({ filters, onChange }) {
-  const rawMax = filters.maxRent > 0 ? filters.maxRent : 9000000;
-  const maxValue = Math.min(9000000, Math.max(rawMax, 100000));
-  const minValue = Math.min(Math.max(filters.minRent, 0), maxValue - 100000);
-  const left = (minValue / 9000000) * 100;
-  const right = (maxValue / 9000000) * 100;
+  const rawMax = filters.maxRent > 0 ? filters.maxRent : PRICE_FILTER_MAX;
+  const maxValue = Math.min(PRICE_FILTER_MAX, Math.max(rawMax, PRICE_FILTER_STEP));
+  const minValue = Math.min(Math.max(filters.minRent, 0), maxValue - PRICE_FILTER_STEP);
+  const left = (minValue / PRICE_FILTER_MAX) * 100;
+  const right = (maxValue / PRICE_FILTER_MAX) * 100;
 
-  const setMin = (value) => onChange('minRent', Math.max(0, Math.min(value, maxValue - 100000)));
-  const setMax = (value) => onChange('maxRent', Math.min(9000000, Math.max(value, minValue + 100000)));
+  const setMin = (value) => onChange('minRent', Math.max(0, Math.min(value, maxValue - PRICE_FILTER_STEP)));
+  const setMax = (value) => onChange('maxRent', Math.min(PRICE_FILTER_MAX, Math.max(value, minValue + PRICE_FILTER_STEP)));
 
   return (
     <div className="price-filter">
       <div className="price-filter__summary">
         <span>{formatCurrency(filters.minRent)}</span>
-        <span>{filters.maxRent >= 9000000 ? '$9.000.000+' : formatCurrency(filters.maxRent)}</span>
+        <span>{filters.maxRent >= PRICE_FILTER_MAX ? '$1.000.000.000+' : formatCurrency(filters.maxRent)}</span>
       </div>
       <div className="price-filter__inputs">
         <PriceInput id="minRent" label="Minimo" value={filters.minRent} onChange={setMin} />
@@ -71,8 +74,8 @@ function PriceRange({ filters, onChange }) {
         <input
           type="range"
           min="0"
-          max="9000000"
-          step="100000"
+          max={PRICE_FILTER_MAX}
+          step={PRICE_FILTER_STEP}
           value={minValue}
           aria-label="Presupuesto minimo"
           onChange={(event) => setMin(Number(event.target.value))}
@@ -80,8 +83,8 @@ function PriceRange({ filters, onChange }) {
         <input
           type="range"
           min="0"
-          max="9000000"
-          step="100000"
+          max={PRICE_FILTER_MAX}
+          step={PRICE_FILTER_STEP}
           value={maxValue}
           aria-label="Presupuesto maximo"
           onChange={(event) => setMax(Number(event.target.value))}

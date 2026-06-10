@@ -1,7 +1,6 @@
 const { badRequest, forbidden, serviceUnavailable, unauthorized } = require('./errors');
 const { supabaseAnon } = require('./supabase');
 const { supabaseAdmin } = require('./supabaseAdmin');
-const { ensureDatabaseUserProfile } = require('../modules/users/user.service');
 
 // Capa transversal de autenticacion/autorizacion. Supabase Auth valida la identidad
 // y Supabase Postgres conserva el perfil operativo que usa el resto del dominio.
@@ -450,13 +449,7 @@ const attachUser = async (req, strict) => {
       throw serviceUnavailable('No fue posible cargar tu perfil. Intenta nuevamente en unos minutos.');
     }
 
-    const decoratedProfile = await decorateProfile(userData.user, profile);
-    const databaseProfile = await ensureDatabaseUserProfile(decoratedProfile);
-
-    req.user = {
-      ...decoratedProfile,
-      role: databaseProfile.role,
-    };
+    req.user = await decorateProfile(userData.user, profile);
   } catch (profileError) {
     if (strict) {
       throw profileError?.statusCode

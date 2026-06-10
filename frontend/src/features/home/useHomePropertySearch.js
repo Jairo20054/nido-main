@@ -2,13 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../app/providers/useAuth';
 import { api } from '../../lib/apiClient';
-import { sortPropertiesByLocationRelevance } from '../../utils/locationUtils';
-import { HOME_EXAMPLE_PROPERTIES } from './homeExampleProperties';
 
 const DEFAULT_FILTERS = {
   location: '',
   minRent: 0,
-  maxRent: 9000000,
+  maxRent: 1000000000,
   propertyType: '',
   rooms: 0,
   bathrooms: 0,
@@ -63,83 +61,24 @@ const serializeFilters = (filters) => {
 
 const isSameFilters = (left, right) => JSON.stringify(left) === JSON.stringify(right);
 
-const hasMeaningfulFilters = (filters) =>
-  Boolean(
-    filters.location ||
-      filters.propertyType ||
-      filters.minRent !== DEFAULT_FILTERS.minRent ||
-      filters.maxRent !== DEFAULT_FILTERS.maxRent ||
-      filters.rooms !== DEFAULT_FILTERS.rooms ||
-      filters.bathrooms !== DEFAULT_FILTERS.bathrooms ||
-      filters.area !== DEFAULT_FILTERS.area ||
-      filters.availableFrom ||
-      filters.extras.length
-  );
-
-const getAmenityText = (property) => (property.amenities || []).join(' ').toLowerCase();
-
-const includesAny = (text, words) => words.some((word) => text.includes(word));
-
-const matchesExtra = (property, extra) => {
-  const amenityText = getAmenityText(property);
-
-  if (extra === 'furnished') return Boolean(property.furnished);
-  if (extra === 'petsAllowed') return Boolean(property.petsAllowed);
-  if (extra === 'parking') return Number(property.parkingSpots || 0) > 0;
-  if (extra === 'elevator') return Boolean(property.elevator) || includesAny(amenityText, ['ascensor']);
-  if (extra === 'balcony') return Boolean(property.balcony) || includesAny(amenityText, ['balcon']);
-  if (extra === 'security') return Boolean(property.security) || includesAny(amenityText, ['vigil', 'seguridad']);
-
-  return true;
-};
-
-const sortProperties = (properties, sort) => {
-  const sorted = [...properties];
-
-  if (sort === 'rent-asc') return sorted.sort((a, b) => (a.monthlyRent || 0) - (b.monthlyRent || 0));
-  if (sort === 'rent-desc') return sorted.sort((a, b) => (b.monthlyRent || 0) - (a.monthlyRent || 0));
-  if (sort === 'area-desc') return sorted.sort((a, b) => (b.areaM2 || b.area || 0) - (a.areaM2 || a.area || 0));
-  if (sort === 'latest') {
-    return sorted.sort((a, b) => new Date(b.publishedAt || b.createdAt || 0) - new Date(a.publishedAt || a.createdAt || 0));
-  }
-
-  return sorted;
-};
-
 const buildPropertyQuery = (filters) => ({
   q: filters.location || undefined,
-  propertyType: filters.propertyType ? filters.propertyType.toUpperCase() : undefined,
+  propertyTypes: filters.propertyType || undefined,
   minRent: filters.minRent || undefined,
   maxRent: filters.maxRent !== DEFAULT_FILTERS.maxRent ? filters.maxRent : undefined,
   bedrooms: filters.rooms || undefined,
   bathrooms: filters.bathrooms || undefined,
-  furnished: filters.extras.includes('furnished') || undefined,
-  petsAllowed: filters.extras.includes('petsAllowed') || undefined,
-  sort: BACKEND_SORTS.includes(filters.sort) ? filters.sort : 'recommended',
+  areaMin: filters.area || undefined,
+  availableFrom: filters.availableFrom || undefined,
+  furnished: filters.extras.includes('furnished') ? true : undefined,
+  petsAllowed: filters.extras.includes('petsAllowed') ? true : undefined,
+  parking: filters.extras.includes('parking') ? true : undefined,
+  elevator: filters.extras.includes('elevator') ? true : undefined,
+  balcony: filters.extras.includes('balcony') ? true : undefined,
+  security: filters.extras.includes('security') ? true : undefined,
+  sort: filters.sort === 'area-desc' || BACKEND_SORTS.includes(filters.sort) ? filters.sort : 'recommended',
   limit: 24,
 });
-
-const refineProperties = (properties, filters) =>
-  properties.filter((property) => {
-    if (filters.propertyType && String(property.propertyType || '').toLowerCase() !== filters.propertyType) {
-      return false;
-    }
-
-    if (filters.area && Number(property.areaM2 || property.area || 0) < filters.area) {
-      return false;
-    }
-
-    if (filters.availableFrom && !property.availableImmediately) {
-      const requestedDate = new Date(filters.availableFrom);
-      const propertyDate = new Date(property.availableFrom || '');
-
-      if (!Number.isFinite(propertyDate.getTime()) || propertyDate > requestedDate) {
-        return false;
-      }
-    }
-
-    return filters.extras.every((extra) => matchesExtra(property, extra));
-  });
 
 export function useHomePropertySearch() {
   const { isAuthenticated } = useAuth();
@@ -173,29 +112,13 @@ export function useHomePropertySearch() {
           query: buildPropertyQuery(nextFilters),
         });
         const backendProperties = response.data || [];
-        const sourceProperties = backendProperties.length ? backendProperties : HOME_EXAMPLE_PROPERTIES;
-        const refined = refineProperties(sourceProperties, nextFilters);
-        const sorted =
-          nextFilters.sort === 'recommended'
-            ? sortPropertiesByLocationRelevance(refined, {}, nextFilters)
-            : sortProperties(refined, nextFilters.sort);
-        const visibleResults =
-          sorted.length || hasMeaningfulFilters(nextFilters) ? sorted : HOME_EXAMPLE_PROPERTIES;
 
-        setResults(visibleResults);
-        setTotalCount(backendProperties.length ? response.meta?.total || visibleResults.length : visibleResults.length);
+        setResults(backendProperties);
+        setTotalCount(response.meta?.total || backendProperties.length);
       } catch (requestError) {
-        const refinedExamples = refineProperties(HOME_EXAMPLE_PROPERTIES, nextFilters);
-        const sortedExamples =
-          nextFilters.sort === 'recommended'
-            ? sortPropertiesByLocationRelevance(refinedExamples, {}, nextFilters)
-            : sortProperties(refinedExamples, nextFilters.sort);
-        const visibleExamples =
-          sortedExamples.length || hasMeaningfulFilters(nextFilters) ? sortedExamples : HOME_EXAMPLE_PROPERTIES;
-
-        setResults(visibleExamples);
-        setTotalCount(visibleExamples.length);
-        setError(visibleExamples.length ? '' : requestError.message || 'No pudimos cargar propiedades en este momento.');
+        setResults([]);
+        setTotalCount(0);
+        setError(requestError.message || 'No pudimos cargar propiedades en este momento.');
       } finally {
         setLoading(false);
       }

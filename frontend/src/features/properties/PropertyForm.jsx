@@ -445,8 +445,8 @@ const validateForm = (form, { action = 'publish', scope = null } = {}) => {
     add('monthlyRent', 'Ingresa el precio mensual.');
   } else if (toNumber(form.monthlyRent) < 100000) {
     add('monthlyRent', 'El valor mensual debe ser de al menos $100.000.');
-  } else if (toNumber(form.monthlyRent) > 50000000) {
-    add('monthlyRent', 'El valor mensual no debe superar $50.000.000.');
+  } else if (toNumber(form.monthlyRent) > 1000000000) {
+    add('monthlyRent', 'El valor mensual no debe superar $1.000.000.000.');
   }
 
   if (form.administrationIncluded && form.maintenanceFee !== '' && toNumber(form.maintenanceFee) < 0) {

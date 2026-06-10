@@ -5,7 +5,7 @@ const DEFAULT_FILTERS = {
   city: '',
   propertyTypes: [],
   minRent: 0,
-  maxRent: 9000000,
+  maxRent: 1000000000,
   bedrooms: 0,
   bathrooms: 0,
   extras: [],

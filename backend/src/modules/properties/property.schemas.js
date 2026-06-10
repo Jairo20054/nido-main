@@ -247,13 +247,22 @@ const propertyQuerySchema = Joi.object({
     PropertyType.PENTHOUSE,
     PropertyType.ROOM
   ),
+  propertyTypes: Joi.string().trim().allow('', null),
   minRent: Joi.number().integer().min(0),
   maxRent: Joi.number().integer().min(0),
   bedrooms: Joi.number().integer().min(0).max(12),
   bathrooms: Joi.number().integer().min(1).max(12),
+  areaMin: Joi.number().integer().min(0),
   furnished: Joi.boolean(),
   petsAllowed: Joi.boolean(),
   utilitiesIncluded: Joi.boolean(),
+  parking: Joi.boolean(),
+  elevator: Joi.boolean(),
+  balcony: Joi.boolean(),
+  security: Joi.boolean(),
+  gym: Joi.boolean(),
+  gatedCommunity: Joi.boolean(),
+  availableFrom: Joi.date().iso(),
   status: Joi.string().valid(
     PropertyStatus.DRAFT,
     PropertyStatus.PENDING,
@@ -263,7 +272,7 @@ const propertyQuerySchema = Joi.object({
     PropertyStatus.RENTED,
     PropertyStatus.ARCHIVED
   ),
-  sort: Joi.string().valid('recommended', 'latest', 'rent-asc', 'rent-desc').default('recommended'),
+  sort: Joi.string().valid('recommended', 'latest', 'rent-asc', 'rent-desc', 'area-desc').default('recommended'),
   page: Joi.number().integer().min(1).default(1),
   limit: Joi.number().integer().min(1).max(50).default(9),
 });

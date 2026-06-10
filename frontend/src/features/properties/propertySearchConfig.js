@@ -23,7 +23,7 @@ export const PROPERTY_TYPE_OPTIONS = [
 ];
 
 export const BUDGET_OPTIONS = [
-  { value: 'all', label: 'Cualquier presupuesto', minRent: 0, maxRent: 9000000 },
+  { value: 'all', label: 'Cualquier presupuesto', minRent: 0, maxRent: 1000000000 },
   { value: '800000-3000000', label: '$800.000 - $3.000.000+', minRent: 800000, maxRent: 3000000 },
   { value: '0-1500000', label: 'Hasta $1.500.000', minRent: 0, maxRent: 1500000 },
   { value: '1500000-2500000', label: '$1.500.000 - $2.500.000', minRent: 1500000, maxRent: 2500000 },

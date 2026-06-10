@@ -27,11 +27,11 @@ import { PropertyCardSkeleton } from '../properties/PropertyCardSkeleton';
 import { useHomePropertySearch } from './useHomePropertySearch';
 
 const BUDGET_OPTIONS = [
-  { value: 'all', label: 'Sin limite', minRent: 0, maxRent: 9000000 },
+  { value: 'all', label: 'Sin limite', minRent: 0, maxRent: 1000000000 },
   { value: '0-1500000', label: 'Hasta $1.5M', minRent: 0, maxRent: 1500000 },
   { value: '1500000-2500000', label: '$1.5M - $2.5M', minRent: 1500000, maxRent: 2500000 },
   { value: '2500000-4000000', label: '$2.5M - $4M', minRent: 2500000, maxRent: 4000000 },
-  { value: '4000000-9000000', label: 'Mas de $4M', minRent: 4000000, maxRent: 9000000 },
+  { value: '4000000-1000000000', label: 'Mas de $4M', minRent: 4000000, maxRent: 1000000000 },
 ];
 
 const HERO_IMAGES = [
@@ -595,14 +595,14 @@ function MoreFiltersModal({
                   min="0"
                   step="100000"
                   value={filters.maxRent === defaultFilters.maxRent ? '' : filters.maxRent}
-                  placeholder="$9.000.000+"
+                  placeholder="$1.000.000.000+"
                   onChange={(event) => onChange('maxRent', event.target.value || defaultFilters.maxRent)}
                 />
               </label>
             </div>
             <p className="home-filter-summary">
               {formatCurrency(filters.minRent)} -{' '}
-              {filters.maxRent >= defaultFilters.maxRent ? '$9.000.000+' : formatCurrency(filters.maxRent)}
+              {filters.maxRent >= defaultFilters.maxRent ? '$1.000.000.000+' : formatCurrency(filters.maxRent)}
             </p>
           </section>
 

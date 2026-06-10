@@ -5587,7 +5587,7 @@ h3 {
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
   padding: 0;
   border: 0;
@@ -5596,8 +5596,15 @@ h3 {
   text-align: left;
 }
 
+.home-filter-dropdown__trigger span {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
 .home-filter-dropdown__trigger svg {
-  flex: 0 0 auto;
+  display: block;
+  flex: 0 0 16px;
+  align-self: center;
   color: rgba(23, 76, 58, 0.68);
   transition: transform 0.18s ease;
 }

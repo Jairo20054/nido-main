@@ -4,10 +4,8 @@ import { InlineMessage } from '../../components/ui/InlineMessage';
 import { useAuth } from '../../app/providers/useAuth';
 import { api } from '../../lib/apiClient';
 import { formatCurrency, getPropertyTypeLabel } from '../../lib/formatters';
-import { sortPropertiesByLocationRelevance } from '../../utils/locationUtils';
 import { ActiveFilterChips } from './ActiveFilterChips';
 import { EmptyPropertiesState } from './EmptyPropertiesState';
-import { EXAMPLE_PROPERTIES } from './exampleProperties';
 import { MobileFiltersDrawer } from './MobileFiltersDrawer';
 import { PropertyComparisonBar } from './PropertyComparisonBar';
 import { PropertyComparisonModal } from './PropertyComparisonModal';
@@ -20,44 +18,16 @@ import { EXTRA_LABELS } from './propertySearchConfig';
 import { useSearchFilters } from './useSearchFilters';
 
 const BACKEND_SORTS = ['recommended', 'latest', 'rent-asc', 'rent-desc'];
+const EXTRA_QUERY_KEYS = ['furnished', 'petsAllowed', 'parking', 'elevator', 'balcony', 'gym', 'security', 'gatedCommunity'];
 
-const getAmenityText = (property) => (property.amenities || []).join(' ').toLowerCase();
+const extrasToQuery = (extras) =>
+  EXTRA_QUERY_KEYS.reduce((query, key) => {
+    if (extras.includes(key)) {
+      query[key] = true;
+    }
 
-const includesAny = (text, words) => words.some((word) => text.includes(word));
-
-const getSearchText = (property) =>
-  [property.city, property.department, property.neighborhood, property.title, property.summary]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase();
-
-const matchesExtra = (property, extra) => {
-  const amenityText = getAmenityText(property);
-
-  if (extra === 'furnished') return Boolean(property.furnished);
-  if (extra === 'petsAllowed') return Boolean(property.petsAllowed);
-  if (extra === 'parking') return Number(property.parkingSpots || 0) > 0;
-  if (extra === 'elevator') return Boolean(property.elevator) || includesAny(amenityText, ['ascensor']);
-  if (extra === 'balcony') return Boolean(property.balcony) || includesAny(amenityText, ['balcon']);
-  if (extra === 'gym') return includesAny(amenityText, ['gimnasio', 'gym']);
-  if (extra === 'security') return Boolean(property.security) || includesAny(amenityText, ['vigil', 'seguridad']);
-  if (extra === 'gatedCommunity') return includesAny(amenityText, ['conjunto cerrado', 'unidad cerrada']);
-
-  return true;
-};
-
-const sortProperties = (properties, sort) => {
-  const sorted = [...properties];
-
-  if (sort === 'rent-asc') return sorted.sort((a, b) => (a.monthlyRent || 0) - (b.monthlyRent || 0));
-  if (sort === 'rent-desc') return sorted.sort((a, b) => (b.monthlyRent || 0) - (a.monthlyRent || 0));
-  if (sort === 'area-desc') return sorted.sort((a, b) => (b.areaM2 || b.area || 0) - (a.areaM2 || a.area || 0));
-  if (sort === 'latest') {
-    return sorted.sort((a, b) => new Date(b.publishedAt || b.createdAt || 0) - new Date(a.publishedAt || a.createdAt || 0));
-  }
-
-  return sorted;
-};
+    return query;
+  }, {});
 
 export function SearchPage() {
   const { isAuthenticated } = useAuth();
@@ -89,106 +59,28 @@ export function SearchPage() {
 
     try {
       const backendSort = BACKEND_SORTS.includes(activeFilters.sort) ? activeFilters.sort : 'recommended';
-      const singlePropertyType =
-        activeFilters.propertyTypes.length === 1 ? activeFilters.propertyTypes[0].toUpperCase() : undefined;
       const response = await api.get('/properties', {
         auth: isAuthenticated,
         query: {
           q: activeFilters.city || undefined,
-          propertyType: singlePropertyType,
+          propertyTypes: activeFilters.propertyTypes.length ? activeFilters.propertyTypes.join(',') : undefined,
           minRent: activeFilters.minRent || undefined,
           maxRent: activeFilters.maxRent !== defaultFilters.maxRent ? activeFilters.maxRent : undefined,
           bedrooms: activeFilters.bedrooms || undefined,
           bathrooms: activeFilters.bathrooms || undefined,
-          furnished: activeFilters.extras.includes('furnished') || undefined,
-          petsAllowed: activeFilters.extras.includes('petsAllowed') || undefined,
-          sort: backendSort,
+          sort: activeFilters.sort === 'area-desc' ? 'area-desc' : backendSort,
+          ...extrasToQuery(activeFilters.extras),
           limit: 50,
         },
       });
 
       const backendProperties = response.data || [];
-      const sourceProperties = backendProperties.length ? backendProperties : EXAMPLE_PROPERTIES;
-      const refinedProperties = sourceProperties.filter((property) => {
-        const rent = Number(property.monthlyRent || 0);
-        const area = Number(property.areaM2 || property.area || 0);
-
-        if (
-          activeFilters.city &&
-          !getSearchText(property).includes(activeFilters.city.trim().toLowerCase())
-        ) {
-          return false;
-        }
-
-        if (rent < activeFilters.minRent) {
-          return false;
-        }
-
-        if (activeFilters.maxRent !== defaultFilters.maxRent && rent > activeFilters.maxRent) {
-          return false;
-        }
-
-        if (activeFilters.bedrooms && Number(property.bedrooms || 0) < activeFilters.bedrooms) {
-          return false;
-        }
-
-        if (activeFilters.bathrooms && Number(property.bathrooms || 0) < activeFilters.bathrooms) {
-          return false;
-        }
-
-        if (activeFilters.sort === 'area-desc' && !area) {
-          return false;
-        }
-
-        if (
-          activeFilters.propertyTypes.length > 0 &&
-          !activeFilters.propertyTypes.includes(String(property.propertyType || '').toLowerCase())
-        ) {
-          return false;
-        }
-
-        return activeFilters.extras.every((extra) => matchesExtra(property, extra));
-      });
-
-      const sortedProperties =
-        activeFilters.sort === 'recommended'
-          ? sortPropertiesByLocationRelevance(refinedProperties, {}, activeFilters)
-          : sortProperties(refinedProperties, activeFilters.sort);
-
-      setProperties(sortedProperties);
-      setTotalCount(backendProperties.length ? response.meta?.total || refinedProperties.length : refinedProperties.length);
+      setProperties(backendProperties);
+      setTotalCount(response.meta?.total || backendProperties.length);
     } catch (requestError) {
-      const exampleResults = EXAMPLE_PROPERTIES.filter((property) => {
-        const rent = Number(property.monthlyRent || 0);
-
-        if (
-          activeFilters.city &&
-          !getSearchText(property).includes(activeFilters.city.trim().toLowerCase())
-        ) {
-          return false;
-        }
-
-        if (rent < activeFilters.minRent) return false;
-        if (activeFilters.maxRent !== defaultFilters.maxRent && rent > activeFilters.maxRent) return false;
-        if (activeFilters.bedrooms && Number(property.bedrooms || 0) < activeFilters.bedrooms) return false;
-        if (activeFilters.bathrooms && Number(property.bathrooms || 0) < activeFilters.bathrooms) return false;
-        if (
-          activeFilters.propertyTypes.length > 0 &&
-          !activeFilters.propertyTypes.includes(String(property.propertyType || '').toLowerCase())
-        ) {
-          return false;
-        }
-
-        return activeFilters.extras.every((extra) => matchesExtra(property, extra));
-      });
-      const sortedExamples =
-        activeFilters.sort === 'recommended'
-          ? sortPropertiesByLocationRelevance(exampleResults, {}, activeFilters)
-          : sortProperties(exampleResults, activeFilters.sort);
-
-      setProperties(sortedExamples);
-      setTotalCount(sortedExamples.length);
-      setError(sortedExamples.length ? '' : requestError.message);
+      setProperties([]);
+      setTotalCount(0);
+      setError(requestError.message || 'No pudimos cargar propiedades en este momento.');
     } finally {
       setLoading(false);
     }
@@ -256,7 +148,7 @@ export function SearchPage() {
         key: 'rent',
         type: 'rent',
         label: `${formatCurrency(filters.minRent)} - ${
-          filters.maxRent >= defaultFilters.maxRent ? '$9.000.000+' : formatCurrency(filters.maxRent)
+          filters.maxRent >= defaultFilters.maxRent ? '$1.000.000.000+' : formatCurrency(filters.maxRent)
         }`,
       });
     }
