@@ -20,7 +20,6 @@ import {
   X,
 } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
-import { InlineMessage } from '../../components/ui/InlineMessage';
 import { formatCurrency } from '../../lib/formatters';
 import { PropertyCard } from '../properties/PropertyCard';
 import { PropertyCardSkeleton } from '../properties/PropertyCardSkeleton';
@@ -171,6 +170,7 @@ export function HomePage() {
     toggleExtra,
     clearFilters,
     runSearch,
+    retrySearch,
     toggleFavorite,
   } = useHomePropertySearch();
   const availableHeroImages = HERO_IMAGES.filter((image) => !failedHeroImages.includes(image));
@@ -313,12 +313,12 @@ export function HomePage() {
           </div>
         </div>
 
-        <InlineMessage tone="danger">{error}</InlineMessage>
-
         {loading ? (
           <div className="property-grid property-grid--home">
             <PropertyCardSkeleton count={8} variant="home" />
           </div>
+        ) : error ? (
+          <HomeErrorState message={error} onRetry={retrySearch} />
         ) : results.length > 0 ? (
           <div className="property-grid property-grid--home">
             {results.map((property) => (
@@ -351,6 +351,21 @@ export function HomePage() {
         onApply={applyFilters}
       />
     </div>
+  );
+}
+
+function HomeErrorState({ message, onRetry }) {
+  return (
+    <section className="home-empty-state" aria-live="polite">
+      <span className="home-empty-state__icon">
+        <X size={30} aria-hidden="true" />
+      </span>
+      <h2>No pudimos cargar las propiedades</h2>
+      <p>{message || 'Intenta de nuevo en unos minutos.'}</p>
+      <button type="button" className="home-filter-modal__apply" onClick={() => onRetry()}>
+        Reintentar
+      </button>
+    </section>
   );
 }
 

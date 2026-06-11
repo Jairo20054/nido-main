@@ -1,10 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../app/providers/useAuth';
 import { api } from '../../lib/apiClient';
 
 const DEFAULT_FILTERS = {
   location: '',
+  city: '',
+  department: '',
+  neighborhood: '',
   minRent: 0,
   maxRent: 1000000000,
   propertyType: '',
@@ -29,18 +33,33 @@ const parseNumber = (value, fallback) => {
 const normalizeExtras = (extras) =>
   [...new Set((extras || []).filter((extra) => EXTRA_KEYS.includes(extra)))];
 
-const readFiltersFromParams = (searchParams) => ({
-  location: searchParams.get('ciudad') || '',
-  minRent: parseNumber(searchParams.get('min'), DEFAULT_FILTERS.minRent),
-  maxRent: parseNumber(searchParams.get('max'), DEFAULT_FILTERS.maxRent),
-  propertyType: searchParams.get('tipo') || '',
-  rooms: parseNumber(searchParams.get('hab'), DEFAULT_FILTERS.rooms),
-  bathrooms: parseNumber(searchParams.get('banos'), DEFAULT_FILTERS.bathrooms),
-  extras: normalizeExtras(searchParams.get('extras')?.split(',').filter(Boolean)),
-  sort: searchParams.get('orden') || DEFAULT_FILTERS.sort,
-  area: parseNumber(searchParams.get('area'), DEFAULT_FILTERS.area),
-  availableFrom: searchParams.get('disponible') || '',
-});
+const firstParam = (searchParams, keys) => {
+  const key = keys.find((item) => searchParams.get(item));
+  return key ? searchParams.get(key) : '';
+};
+
+const readFiltersFromParams = (searchParams) => {
+  const city = firstParam(searchParams, ['ciudad', 'city']);
+  const department = firstParam(searchParams, ['departamento', 'department']);
+  const neighborhood = firstParam(searchParams, ['barrio', 'neighborhood']);
+  const location = firstParam(searchParams, ['q', 'location']) || city || department || neighborhood;
+
+  return {
+    location,
+    city,
+    department,
+    neighborhood,
+    minRent: parseNumber(firstParam(searchParams, ['min', 'minPrice', 'minRent']), DEFAULT_FILTERS.minRent),
+    maxRent: parseNumber(firstParam(searchParams, ['max', 'maxPrice', 'maxRent']), DEFAULT_FILTERS.maxRent),
+    propertyType: firstParam(searchParams, ['tipo', 'propertyType']),
+    rooms: parseNumber(firstParam(searchParams, ['hab', 'habitaciones', 'rooms', 'bedrooms']), DEFAULT_FILTERS.rooms),
+    bathrooms: parseNumber(firstParam(searchParams, ['banos', 'bathrooms']), DEFAULT_FILTERS.bathrooms),
+    extras: normalizeExtras(searchParams.get('extras')?.split(',').filter(Boolean)),
+    sort: firstParam(searchParams, ['orden', 'sort']) || DEFAULT_FILTERS.sort,
+    area: parseNumber(firstParam(searchParams, ['area', 'areaMin']), DEFAULT_FILTERS.area),
+    availableFrom: firstParam(searchParams, ['disponible', 'availableFrom']),
+  };
+};
 
 const serializeFilters = (filters) => {
   const params = new URLSearchParams();
@@ -63,6 +82,9 @@ const isSameFilters = (left, right) => JSON.stringify(left) === JSON.stringify(r
 
 const buildPropertyQuery = (filters) => ({
   q: filters.location || undefined,
+  city: filters.city || undefined,
+  department: filters.department || undefined,
+  neighborhood: filters.neighborhood || undefined,
   propertyTypes: filters.propertyType || undefined,
   minRent: filters.minRent || undefined,
   maxRent: filters.maxRent !== DEFAULT_FILTERS.maxRent ? filters.maxRent : undefined,
@@ -82,16 +104,35 @@ const buildPropertyQuery = (filters) => ({
 
 export function useHomePropertySearch() {
   const { isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState(() => readFiltersFromParams(searchParams));
   const [appliedFilters, setAppliedFilters] = useState(() => readFiltersFromParams(searchParams));
-  const [results, setResults] = useState([]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [savingFavorite, setSavingFavorite] = useState('');
+  const queryFilters = useMemo(() => buildPropertyQuery(appliedFilters), [appliedFilters]);
+  const queryKey = useMemo(
+    () => ['properties', 'home', queryFilters, isAuthenticated],
+    [isAuthenticated, queryFilters]
+  );
+
+  const propertiesQuery = useQuery({
+    queryKey,
+    queryFn: () =>
+      api.get('/properties', {
+        auth: isAuthenticated,
+        query: queryFilters,
+      }),
+    staleTime: 15000,
+  });
+
+  const results = propertiesQuery.data?.data || [];
+  const totalCount = propertiesQuery.data?.meta?.total || results.length;
+  const loading = propertiesQuery.isLoading || propertiesQuery.isFetching;
+  const error = propertiesQuery.isError
+    ? propertiesQuery.error?.message || 'No pudimos cargar las propiedades.'
+    : '';
 
   useEffect(() => {
     const nextFilters = readFiltersFromParams(searchParams);
@@ -100,35 +141,12 @@ export function useHomePropertySearch() {
   }, [searchParams]);
 
   const runSearch = useCallback(
-    async (nextFilters = filters) => {
+    (nextFilters = filters) => {
       setAppliedFilters(nextFilters);
       setSearchParams(serializeFilters(nextFilters), { replace: true });
-      setLoading(true);
-      setError('');
-
-      try {
-        const response = await api.get('/properties', {
-          auth: isAuthenticated,
-          query: buildPropertyQuery(nextFilters),
-        });
-        const backendProperties = response.data || [];
-
-        setResults(backendProperties);
-        setTotalCount(response.meta?.total || backendProperties.length);
-      } catch (requestError) {
-        setResults([]);
-        setTotalCount(0);
-        setError(requestError.message || 'No pudimos cargar propiedades en este momento.');
-      } finally {
-        setLoading(false);
-      }
     },
-    [filters, isAuthenticated, setSearchParams]
+    [filters, setSearchParams]
   );
-
-  useEffect(() => {
-    runSearch(appliedFilters);
-  }, [isAuthenticated]);
 
   const setFilter = (field, value) => {
     setFilters((current) => {
@@ -136,12 +154,21 @@ export function useHomePropertySearch() {
         return { ...current, [field]: parseNumber(value, current[field]) };
       }
 
+      if (field === 'location') {
+        return { ...current, location: value, city: '', department: '', neighborhood: '' };
+      }
+
       return { ...current, [field]: value };
     });
   };
 
   const patchFilters = (patch, shouldRunSearch = false) => {
-    const nextFilters = { ...filters, ...patch };
+    const explicitLocationReset =
+      Object.prototype.hasOwnProperty.call(patch, 'location') &&
+      patch.location !== filters.location
+        ? { city: '', department: '', neighborhood: '' }
+        : {};
+    const nextFilters = { ...filters, ...patch, ...explicitLocationReset };
     setFilters(nextFilters);
 
     if (shouldRunSearch) {
@@ -180,13 +207,16 @@ export function useHomePropertySearch() {
         await api.post(`/favorites/${property.id}`, {});
       }
 
-      setResults((current) =>
-        current.map((item) =>
-          item.id === property.id ? { ...item, isFavorite: !item.isFavorite } : item
-        )
-      );
-    } catch (requestError) {
-      setError(requestError.message || 'No pudimos actualizar tus guardados.');
+      queryClient.setQueryData(queryKey, (current) => {
+        if (!current?.data) return current;
+
+        return {
+          ...current,
+          data: current.data.map((item) =>
+            item.id === property.id ? { ...item, isFavorite: !item.isFavorite } : item
+          ),
+        };
+      });
     } finally {
       setSavingFavorite('');
     }
@@ -230,6 +260,7 @@ export function useHomePropertySearch() {
     toggleExtra,
     clearFilters,
     runSearch,
+    retrySearch: propertiesQuery.refetch,
     toggleFavorite,
   };
 }

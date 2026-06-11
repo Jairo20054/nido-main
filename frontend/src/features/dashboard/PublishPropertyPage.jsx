@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { CheckCircle2, FileText, ImagePlus, ShieldCheck } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { InlineMessage } from '../../components/ui/InlineMessage';
@@ -22,6 +23,7 @@ function PublishGuidanceCard({ icon: Icon, title, description }) {
 
 export function PublishPropertyPage() {
   const { isAdmin } = useAuth();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const location = useLocation();
   const editingProperty = location.state?.property || null;
@@ -74,6 +76,8 @@ export function PublishPropertyPage() {
       const successMessage = editingProperty
         ? 'Propiedad actualizada correctamente.'
         : response.message || 'Publicacion guardada correctamente.';
+
+      queryClient.invalidateQueries({ queryKey: ['properties'] });
 
       setMessageTone('success');
       setMessage(successMessage);

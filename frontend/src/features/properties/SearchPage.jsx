@@ -279,10 +279,11 @@ export function SearchPage() {
             onViewModeChange={setViewMode}
           />
           <ActiveFilterChips chips={activeFilterChips} onDismiss={dismissChip} onClear={clearFilters} />
-          <InlineMessage tone="danger">{error}</InlineMessage>
           <InlineMessage tone="neutral">{compareNotice}</InlineMessage>
 
-          {!loading && !properties.length ? (
+          {!loading && error ? (
+            <InlineMessage tone="danger">{error}</InlineMessage>
+          ) : !loading && !properties.length ? (
             <EmptyPropertiesState
               hasFilters={activeCount > 0}
               onClear={clearFilters}

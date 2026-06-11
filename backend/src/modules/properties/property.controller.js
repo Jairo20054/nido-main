@@ -40,6 +40,9 @@ const BOOLEAN_EXTRAS = {
   gatedCommunity: 'gated_community',
 };
 
+const TEXT_FILTER_KEYS = ['q', 'city', 'department', 'neighborhood'];
+const SEARCH_BATCH_SIZE = 1000;
+
 const requireSupabase = () => {
   if (!supabaseService) {
     throw serviceUnavailable('Supabase no esta configurado en el servidor');
@@ -78,12 +81,83 @@ const toDbPublishedStatus = (status) => {
   return normalized === 'DRAFT' ? 'draft' : PUBLIC_STATUS;
 };
 
-const safeOrTerm = (value) =>
+const normalizeSearchText = (value) =>
   normalizeText(value)
-    .replace(/[%_]/g, '\\$&')
-    .replace(/[(),]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+
+const includesSearchText = (source, term) => {
+  const normalizedTerm = normalizeSearchText(term);
+  if (!normalizedTerm) return true;
+
+  return normalizeSearchText(source).includes(normalizedTerm);
+};
+
+const firstPresent = (source, keys) => {
+  const key = keys.find((item) => source[item] !== undefined && source[item] !== null && source[item] !== '');
+  return key ? source[key] : undefined;
+};
+
+const normalizePropertyFilters = (filters = {}) => {
+  const propertyType = firstPresent(filters, ['propertyType', 'tipo']);
+  const propertyTypes = firstPresent(filters, ['propertyTypes', 'tipos']);
+
+  return {
+    ...filters,
+    q: firstPresent(filters, ['q', 'search', 'location', 'ubicacion']),
+    city: firstPresent(filters, ['city', 'ciudad']),
+    department: firstPresent(filters, ['department', 'departamento']),
+    neighborhood: firstPresent(filters, ['neighborhood', 'barrio']),
+    propertyType,
+    propertyTypes,
+    minRent: firstPresent(filters, ['minRent', 'minPrice', 'min']),
+    maxRent: firstPresent(filters, ['maxRent', 'maxPrice', 'priceMax', 'max']),
+    bedrooms: firstPresent(filters, ['bedrooms', 'rooms', 'habitaciones', 'hab']),
+    bathrooms: firstPresent(filters, ['bathrooms', 'banos']),
+    areaMin: firstPresent(filters, ['areaMin', 'area']),
+  };
+};
+
+const hasTextFilters = (filters) => TEXT_FILTER_KEYS.some((key) => Boolean(normalizeText(filters[key])));
+
+const rowMatchesTextFilters = (row, filters) => {
+  const q = normalizeText(filters.q);
+  if (q) {
+    const searchableFields = [
+      row.title,
+      row.description,
+      row.summary,
+      row.city,
+      row.state_region,
+      row.department,
+      row.neighborhood,
+      row.address,
+      row.zone_reference,
+    ];
+
+    if (!searchableFields.some((field) => includesSearchText(field, q))) {
+      return false;
+    }
+  }
+
+  if (filters.city && !includesSearchText(row.city, filters.city)) {
+    return false;
+  }
+
+  if (
+    filters.department &&
+    ![row.state_region, row.department].some((field) => includesSearchText(field, filters.department))
+  ) {
+    return false;
+  }
+
+  if (filters.neighborhood && !includesSearchText(row.neighborhood, filters.neighborhood)) {
+    return false;
+  }
+
+  return true;
+};
 
 const buildMediaRows = (propertyId, media = []) =>
   media
@@ -336,25 +410,6 @@ const favoriteIdsFor = async (client, userId, propertyIds) => {
 
 const applySearchFilters = (query, filters, user) => {
   const canSeeAllStatuses = isAdmin(user);
-  const q = safeOrTerm(filters.q || filters.city);
-
-  if (q) {
-    const pattern = `%${q}%`;
-    query = query.or(
-      [
-        `title.ilike.${pattern}`,
-        `description.ilike.${pattern}`,
-        `summary.ilike.${pattern}`,
-        `city.ilike.${pattern}`,
-        `state_region.ilike.${pattern}`,
-        `neighborhood.ilike.${pattern}`,
-      ].join(',')
-    );
-  }
-
-  if (filters.neighborhood) {
-    query = query.ilike('neighborhood', `%${safeOrTerm(filters.neighborhood)}%`);
-  }
 
   const propertyTypes = compactList(String(filters.propertyTypes || '').split(',')).map(normalizePropertyType);
   if (filters.propertyType) propertyTypes.push(normalizePropertyType(filters.propertyType));
@@ -390,6 +445,15 @@ const applySearchFilters = (query, filters, user) => {
   }
 
   return query;
+};
+
+const buildPropertiesListQuery = (client, filters, user, { count = false } = {}) => {
+  let query = count
+    ? client.from('properties').select(PROPERTY_SELECT, { count: 'exact' })
+    : client.from('properties').select(PROPERTY_SELECT);
+
+  query = applySearchFilters(query, filters, user);
+  return applyOrdering(query, filters.sort);
 };
 
 const applyOrdering = (query, sort) => {
@@ -431,14 +495,43 @@ const syncPropertyImages = async (client, propertyId, media = []) => {
 
 const listProperties = async (req, res) => {
   const client = requireSupabase();
+  const filters = normalizePropertyFilters(req.query);
   const { page, limit, skip } = getPagination(req.query);
-  let query = client.from('properties').select(PROPERTY_SELECT, { count: 'exact' });
 
-  query = applySearchFilters(query, req.query, req.user);
-  query = applyOrdering(query, req.query.sort);
-  query = query.range(skip, skip + limit - 1);
+  if (hasTextFilters(filters)) {
+    const rows = [];
+    let batchOffset = 0;
 
-  const { data, error, count } = await query;
+    while (true) {
+      const { data, error } = await buildPropertiesListQuery(client, filters, req.user)
+        .range(batchOffset, batchOffset + SEARCH_BATCH_SIZE - 1);
+
+      if (error) {
+        throw serviceUnavailable('No fue posible consultar propiedades en Supabase');
+      }
+
+      rows.push(...(data || []));
+
+      if (!data || data.length < SEARCH_BATCH_SIZE) {
+        break;
+      }
+
+      batchOffset += SEARCH_BATCH_SIZE;
+    }
+
+    const filteredRows = rows.filter((property) => rowMatchesTextFilters(property, filters));
+    const pageRows = filteredRows.slice(skip, skip + limit);
+    const favoriteIds = await favoriteIdsFor(client, req.user?.id, pageRows.map((item) => item.id));
+
+    return res.json({
+      success: true,
+      data: pageRows.map((property) => rowToProperty(property, favoriteIds)),
+      meta: buildPaginationMeta({ page, limit, total: filteredRows.length }),
+    });
+  }
+
+  const { data, error, count } = await buildPropertiesListQuery(client, filters, req.user, { count: true })
+    .range(skip, skip + limit - 1);
 
   if (error) {
     throw serviceUnavailable('No fue posible consultar propiedades en Supabase');
