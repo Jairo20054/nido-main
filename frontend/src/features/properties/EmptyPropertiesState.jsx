@@ -1,12 +1,13 @@
 import React from 'react';
 import { Home, RotateCcw, Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export function EmptyPropertiesState({ hasFilters, onClear, onPopular }) {
   const title = hasFilters
     ? 'No encontramos propiedades con estos filtros'
     : 'No hay propiedades disponibles';
   const description = hasFilters
-    ? 'Intenta ampliar el presupuesto, cambiar la zona o eliminar algunos filtros.'
+    ? 'Prueba quitando algunos filtros o buscando otra ubicacion.'
     : 'Cuando haya nuevas publicaciones disponibles las veras aqui.';
 
   return (
@@ -25,6 +26,10 @@ export function EmptyPropertiesState({ hasFilters, onClear, onPopular }) {
           <Sparkles size={16} aria-hidden="true" />
           Ver propiedades populares
         </button>
+        <Link to="/" className="button button--secondary">
+          <Home size={16} aria-hidden="true" />
+          Volver al inicio
+        </Link>
       </div>
     </section>
   );

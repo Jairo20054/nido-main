@@ -12,22 +12,43 @@ import { PropertyComparisonModal } from './PropertyComparisonModal';
 import { PropertiesGrid } from './PropertiesGrid';
 import { PropertiesResultsHeader } from './PropertiesResultsHeader';
 import { PropertiesSearchBar } from './PropertiesSearchBar';
-import { PropertyFilters } from './PropertyFilters';
+import { PropertiesTopFilters } from './PropertiesTopFilters';
 import { RecommendedPropertiesPanel } from './RecommendedPropertiesPanel';
 import { EXTRA_LABELS } from './propertySearchConfig';
+import {
+  buildPropertySearchQuery,
+  DEFAULT_SEARCH_FILTERS,
+} from './searchFilterParams';
 import { useSearchFilters } from './useSearchFilters';
 
-const BACKEND_SORTS = ['recommended', 'latest', 'rent-asc', 'rent-desc'];
-const EXTRA_QUERY_KEYS = ['furnished', 'petsAllowed', 'parking', 'elevator', 'balcony', 'gym', 'security', 'gatedCommunity'];
+const buildResultSummary = (filters, activeCount) => {
+  const parts = [];
+  const locationLabel =
+    filters.location ||
+    [filters.neighborhood, filters.city, filters.department].filter(Boolean).join(', ');
 
-const extrasToQuery = (extras) =>
-  EXTRA_QUERY_KEYS.reduce((query, key) => {
-    if (extras.includes(key)) {
-      query[key] = true;
-    }
+  if (locationLabel) {
+    parts.push(locationLabel);
+  }
 
-    return query;
-  }, {});
+  if (filters.propertyTypes.length === 1) {
+    parts.push(getPropertyTypeLabel(filters.propertyTypes[0]));
+  } else if (filters.propertyTypes.length > 1) {
+    parts.push(`${filters.propertyTypes.length} tipos de inmueble`);
+  } else {
+    parts.push('Casas y apartamentos');
+  }
+
+  if (filters.maxRent !== DEFAULT_SEARCH_FILTERS.maxRent) {
+    parts.push(`Hasta ${formatCurrency(filters.maxRent)}`);
+  }
+
+  if (activeCount) {
+    parts.push(`${activeCount} filtros activos`);
+  }
+
+  return parts.join(' / ');
+};
 
 export function SearchPage() {
   const { isAuthenticated } = useAuth();
@@ -35,6 +56,8 @@ export function SearchPage() {
     filters,
     debouncedFilters,
     setFilter,
+    patchFilters,
+    replaceFilters,
     togglePropertyType,
     toggleExtra,
     clearFilters,
@@ -47,6 +70,7 @@ export function SearchPage() {
   const [error, setError] = useState('');
   const [savingFavorite, setSavingFavorite] = useState('');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [desktopFiltersOpen, setDesktopFiltersOpen] = useState(false);
   const [showMapPanel, setShowMapPanel] = useState(false);
   const [viewMode, setViewMode] = useState('grid');
   const [selectedProperties, setSelectedProperties] = useState([]);
@@ -58,20 +82,9 @@ export function SearchPage() {
     setError('');
 
     try {
-      const backendSort = BACKEND_SORTS.includes(activeFilters.sort) ? activeFilters.sort : 'recommended';
       const response = await api.get('/properties', {
         auth: isAuthenticated,
-        query: {
-          q: activeFilters.city || undefined,
-          propertyTypes: activeFilters.propertyTypes.length ? activeFilters.propertyTypes.join(',') : undefined,
-          minRent: activeFilters.minRent || undefined,
-          maxRent: activeFilters.maxRent !== defaultFilters.maxRent ? activeFilters.maxRent : undefined,
-          bedrooms: activeFilters.bedrooms || undefined,
-          bathrooms: activeFilters.bathrooms || undefined,
-          sort: activeFilters.sort === 'area-desc' ? 'area-desc' : backendSort,
-          ...extrasToQuery(activeFilters.extras),
-          limit: 50,
-        },
+        query: buildPropertySearchQuery(activeFilters, { limit: 36 }),
       });
 
       const backendProperties = response.data || [];
@@ -132,84 +145,156 @@ export function SearchPage() {
 
   const activeFilterChips = useMemo(() => {
     const chips = [];
+    const locationLabel =
+      filters.location ||
+      [filters.neighborhood, filters.city, filters.department].filter(Boolean).join(', ');
+
+    if (locationLabel) {
+      chips.push({ key: 'location', type: 'location', label: locationLabel });
+    }
 
     filters.propertyTypes.forEach((type) => {
       chips.push({
         key: `propertyType:${type}`,
         type: 'propertyType',
         value: type,
-        label: getPropertyTypeLabel(type.toUpperCase()),
+        label: getPropertyTypeLabel(type),
       });
     });
 
-    if (filters.city) chips.push({ key: 'city', type: 'city', label: filters.city });
     if (filters.minRent !== defaultFilters.minRent || filters.maxRent !== defaultFilters.maxRent) {
       chips.push({
         key: 'rent',
         type: 'rent',
         label: `${formatCurrency(filters.minRent)} - ${
-          filters.maxRent >= defaultFilters.maxRent ? '$1.000.000.000+' : formatCurrency(filters.maxRent)
+          filters.maxRent >= defaultFilters.maxRent
+            ? '$ 1.000.000.000+ COP'
+            : formatCurrency(filters.maxRent)
         }`,
       });
     }
-    if (filters.bedrooms) chips.push({ key: 'bedrooms', type: 'bedrooms', label: `${filters.bedrooms}+ hab.` });
-    if (filters.bathrooms) chips.push({ key: 'bathrooms', type: 'bathrooms', label: `${filters.bathrooms}+ banos` });
-    if (filters.radius !== defaultFilters.radius) {
+
+    if (filters.bedrooms) {
       chips.push({
-        key: 'radius',
-        type: 'radius',
-        label: filters.radius === 0.5 ? '500 m' : `${filters.radius} km`,
+        key: 'bedrooms',
+        type: 'bedrooms',
+        label: filters.bedroomsExact ? `${filters.bedrooms} hab. exactas` : `${filters.bedrooms}+ hab.`,
       });
     }
-    filters.extras.forEach((extra) => chips.push({ key: extra, type: 'extra', value: extra, label: EXTRA_LABELS[extra] }));
+
+    if (filters.bathrooms) {
+      chips.push({
+        key: 'bathrooms',
+        type: 'bathrooms',
+        label: filters.bathroomsExact ? `${filters.bathrooms} banos exactos` : `${filters.bathrooms}+ banos`,
+      });
+    }
+
+    if (filters.parking !== defaultFilters.parking) {
+      chips.push({
+        key: 'parking',
+        type: 'parking',
+        label: String(filters.parking) === '0' ? 'Sin parqueadero' : `${filters.parking}+ parqueaderos`,
+      });
+    }
+
+    if (filters.minArea || filters.maxArea) {
+      chips.push({
+        key: 'area',
+        type: 'area',
+        label: `${filters.minArea || 0} - ${filters.maxArea || '2000+'} m2`,
+      });
+    }
+
+    if (filters.strata) {
+      chips.push({ key: 'strata', type: 'strata', label: `Estrato ${filters.strata}` });
+    }
+
+    if (filters.administrationIncluded) {
+      chips.push({
+        key: 'administrationIncluded',
+        type: 'administrationIncluded',
+        label: 'Administracion incluida',
+      });
+    }
+
+    if (filters.availableFrom) {
+      chips.push({
+        key: 'availableFrom',
+        type: 'availableFrom',
+        label: `Disponible desde ${filters.availableFrom}`,
+      });
+    }
+
+    filters.extras.forEach((extra) =>
+      chips.push({
+        key: extra,
+        type: 'extra',
+        value: extra,
+        label: EXTRA_LABELS[extra],
+      })
+    );
 
     return chips;
-  }, [filters, defaultFilters]);
+  }, [defaultFilters, filters]);
 
   const selectedPropertyIds = useMemo(
     () => selectedProperties.map((property) => property.id),
     [selectedProperties]
   );
 
-  const resultSummary = useMemo(() => {
-    const parts = [];
-    parts.push(filters.city || 'Colombia');
-
-    if (filters.maxRent !== defaultFilters.maxRent) {
-      parts.push(`Presupuesto hasta ${formatCurrency(filters.maxRent)}`);
-    }
-
-    if (filters.propertyTypes.length === 1) {
-      parts.push(getPropertyTypeLabel(filters.propertyTypes[0]));
-    } else if (filters.propertyTypes.length > 1) {
-      parts.push(`${filters.propertyTypes.length} tipos de vivienda`);
-    } else {
-      parts.push('Cualquier tipo');
-    }
-
-    if (activeCount) parts.push(`${activeCount} filtros activos`);
-
-    return parts.join(' / ');
-  }, [activeCount, defaultFilters.maxRent, filters]);
+  const resultSummary = useMemo(
+    () => buildResultSummary(filters, activeCount),
+    [activeCount, filters]
+  );
 
   const dismissChip = (chip) => {
-    if (chip.type === 'propertyType') return togglePropertyType(chip.value);
-    if (chip.type === 'city') return setFilter('city', '');
-    if (chip.type === 'rent') {
-      setFilter('minRent', defaultFilters.minRent);
-      setFilter('maxRent', defaultFilters.maxRent);
-      return undefined;
+    if (chip.type === 'location') {
+      patchFilters({
+        location: '',
+        city: '',
+        department: '',
+        neighborhood: '',
+      });
+      return;
     }
-    if (chip.type === 'bedrooms') return setFilter('bedrooms', defaultFilters.bedrooms);
-    if (chip.type === 'bathrooms') return setFilter('bathrooms', defaultFilters.bathrooms);
-    if (chip.type === 'radius') return setFilter('radius', defaultFilters.radius);
+    if (chip.type === 'propertyType') return togglePropertyType(chip.value);
+    if (chip.type === 'rent') {
+      patchFilters({
+        minRent: defaultFilters.minRent,
+        maxRent: defaultFilters.maxRent,
+      });
+      return;
+    }
+    if (chip.type === 'bedrooms') {
+      patchFilters({
+        bedrooms: defaultFilters.bedrooms,
+        bedroomsExact: defaultFilters.bedroomsExact,
+      });
+      return;
+    }
+    if (chip.type === 'bathrooms') {
+      patchFilters({
+        bathrooms: defaultFilters.bathrooms,
+        bathroomsExact: defaultFilters.bathroomsExact,
+      });
+      return;
+    }
+    if (chip.type === 'parking') return setFilter('parking', defaultFilters.parking);
+    if (chip.type === 'area') {
+      patchFilters({ minArea: defaultFilters.minArea, maxArea: defaultFilters.maxArea });
+      return;
+    }
+    if (chip.type === 'strata') return setFilter('strata', defaultFilters.strata);
+    if (chip.type === 'administrationIncluded') {
+      return setFilter('administrationIncluded', defaultFilters.administrationIncluded);
+    }
+    if (chip.type === 'availableFrom') return setFilter('availableFrom', defaultFilters.availableFrom);
     if (chip.type === 'extra') return toggleExtra(chip.value);
-    return undefined;
   };
 
   const showPopularResults = () => {
-    clearFilters();
-    setFilter('city', 'Medellin');
+    replaceFilters({ ...DEFAULT_SEARCH_FILTERS, location: 'Medellin' });
   };
 
   const toggleCompare = (property) => {
@@ -240,30 +325,28 @@ export function SearchPage() {
   };
 
   return (
-    <div className="page page--search properties-page">
+    <div className="page page--search properties-page properties-page--marketplace">
       <section className="properties-page__search">
         <PropertiesSearchBar
           filters={filters}
           activeCount={activeCount}
           onChange={setFilter}
+        />
+      </section>
+
+      <section className="properties-page__toolbar">
+        <PropertiesTopFilters
+          filters={filters}
+          activeCount={activeCount}
+          onChange={setFilter}
           onToggleExtra={toggleExtra}
           onTogglePropertyType={togglePropertyType}
+          onClear={clearFilters}
+          onOpenMoreFilters={() => setDesktopFiltersOpen(true)}
         />
       </section>
 
       <section className={`properties-layout ${showMapPanel ? 'properties-layout--map-open' : ''}`}>
-        <aside className="properties-layout__filters">
-          <PropertyFilters
-            filters={filters}
-            activeCount={activeCount}
-            onChange={setFilter}
-            onToggleExtra={toggleExtra}
-            onTogglePropertyType={togglePropertyType}
-            onClear={clearFilters}
-            resultCount={properties.length}
-          />
-        </aside>
-
         <main className="properties-layout__results">
           <PropertiesResultsHeader
             count={properties.length}
@@ -278,8 +361,12 @@ export function SearchPage() {
             onToggleMap={() => setShowMapPanel((current) => !current)}
             onViewModeChange={setViewMode}
           />
-          <ActiveFilterChips chips={activeFilterChips} onDismiss={dismissChip} onClear={clearFilters} />
-          <InlineMessage tone="neutral">{compareNotice}</InlineMessage>
+          <ActiveFilterChips
+            chips={activeFilterChips}
+            onDismiss={dismissChip}
+            onClear={clearFilters}
+          />
+          {compareNotice ? <InlineMessage tone="neutral">{compareNotice}</InlineMessage> : null}
 
           {!loading && error ? (
             <InlineMessage tone="danger">{error}</InlineMessage>
@@ -304,7 +391,7 @@ export function SearchPage() {
 
         <div className={`properties-layout__panel ${showMapPanel ? 'is-open' : ''}`}>
           <RecommendedPropertiesPanel
-            location={filters.city}
+            location={filters.location || filters.city}
             properties={properties}
             onViewMap={() => setShowMapPanel(true)}
           />
@@ -326,11 +413,26 @@ export function SearchPage() {
         filters={filters}
         activeCount={activeCount}
         resultCount={properties.length}
-        onChange={setFilter}
-        onToggleExtra={toggleExtra}
-        onTogglePropertyType={togglePropertyType}
-        onClear={clearFilters}
+        onApply={(nextFilters) => {
+          replaceFilters(nextFilters);
+          setMobileFiltersOpen(false);
+        }}
+        onClear={() => replaceFilters(DEFAULT_SEARCH_FILTERS)}
         onDismiss={() => setMobileFiltersOpen(false)}
+      />
+
+      <MobileFiltersDrawer
+        open={desktopFiltersOpen}
+        filters={filters}
+        activeCount={activeCount}
+        resultCount={properties.length}
+        onApply={(nextFilters) => {
+          replaceFilters(nextFilters);
+          setDesktopFiltersOpen(false);
+        }}
+        onClear={() => replaceFilters(DEFAULT_SEARCH_FILTERS)}
+        onDismiss={() => setDesktopFiltersOpen(false)}
+        desktop
       />
 
       <PropertyComparisonBar

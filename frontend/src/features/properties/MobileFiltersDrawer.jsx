@@ -6,16 +6,20 @@ export function MobileFiltersDrawer({
   filters,
   activeCount,
   resultCount,
-  onChange,
-  onToggleExtra,
-  onTogglePropertyType,
   onClear,
+  onApply,
   onDismiss,
+  desktop = false,
 }) {
   if (!open) return null;
 
   return (
-    <div className="mobile-filter-sheet" role="dialog" aria-modal="true" aria-label="Filtros de propiedades">
+    <div
+      className={`mobile-filter-sheet ${desktop ? 'mobile-filter-sheet--desktop' : ''}`}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Filtros de propiedades"
+    >
       <button
         type="button"
         className="mobile-filter-sheet__backdrop"
@@ -26,9 +30,7 @@ export function MobileFiltersDrawer({
         <PropertyFilters
           filters={filters}
           activeCount={activeCount}
-          onChange={onChange}
-          onToggleExtra={onToggleExtra}
-          onTogglePropertyType={onTogglePropertyType}
+          onApply={onApply}
           onClear={onClear}
           onDismiss={onDismiss}
           resultCount={resultCount}

@@ -3,7 +3,6 @@ import {
   Bath,
   BedDouble,
   Building2,
-  Car,
   CheckCircle2,
   ChevronDown,
   HeartHandshake,
@@ -78,8 +77,8 @@ const QUICK_FILTERS = [
   { label: 'Bogota', patch: { location: 'Bogota' }, isActive: (filters) => filters.location === 'Bogota' },
   { label: 'Medellin', patch: { location: 'Medellin' }, isActive: (filters) => filters.location === 'Medellin' },
   { label: 'Cali', patch: { location: 'Cali' }, isActive: (filters) => filters.location === 'Cali' },
-  { label: 'Apartamentos', patch: { propertyType: 'apartment' }, isActive: (filters) => filters.propertyType === 'apartment' },
-  { label: 'Casas', patch: { propertyType: 'house' }, isActive: (filters) => filters.propertyType === 'house' },
+  { label: 'Apartamentos', patch: { propertyTypes: ['apartment'] }, isActive: (filters) => filters.propertyTypes.includes('apartment') },
+  { label: 'Casas', patch: { propertyTypes: ['house'] }, isActive: (filters) => filters.propertyTypes.includes('house') },
   { label: 'Amoblados', extra: 'furnished' },
   { label: 'Mascotas', extra: 'petsAllowed' },
 ];
@@ -87,7 +86,6 @@ const QUICK_FILTERS = [
 const EXTRA_FILTERS = [
   { value: 'furnished', label: 'Amoblado', icon: Sofa },
   { value: 'petsAllowed', label: 'Mascotas', icon: PawPrint },
-  { value: 'parking', label: 'Parqueadero', icon: Car },
   { value: 'elevator', label: 'Ascensor', icon: ChevronDown },
   { value: 'balcony', label: 'Balcon', icon: Home },
   { value: 'security', label: 'Vigilancia', icon: ShieldCheck },
@@ -156,14 +154,12 @@ export function HomePage() {
   const prefersReducedMotion = usePrefersReducedMotion();
   const {
     filters,
-    appliedFilters,
     results,
     totalCount,
     loading,
     error,
     savingFavorite,
     activeCount,
-    hasActiveSearch,
     defaultFilters,
     setFilter,
     patchFilters,
@@ -208,7 +204,6 @@ export function HomePage() {
   const submitSearch = (event) => {
     event.preventDefault();
     runSearch(filters);
-    scrollToResults(resultsRef);
   };
 
   const applyQuickFilter = (quickFilter) => {
@@ -232,8 +227,7 @@ export function HomePage() {
   };
 
   const resetFilters = () => {
-    clearFilters(true);
-    scrollToResults(resultsRef);
+    clearFilters();
   };
 
   return (
@@ -282,21 +276,17 @@ export function HomePage() {
           <div>
             <span className="section__eyebrow home-results__eyebrow">
               <MapPin size={14} aria-hidden="true" />
-              {hasActiveSearch ? 'Busqueda activa' : 'Recomendadas'}
+              Destacadas en NIDO
             </span>
-            <h2 id="home-results-title">
-              {hasActiveSearch ? 'Propiedades encontradas' : 'Propiedades recomendadas cerca de ti'}
-            </h2>
+            <h2 id="home-results-title">Propiedades recomendadas para comenzar</h2>
             <p>
-              {hasActiveSearch
-                ? `${totalCount || results.length} opciones segun tus filtros${appliedFilters.location ? ` en ${appliedFilters.location}` : ''}.`
-                : 'Explora viviendas publicadas recientemente y ajusta filtros sin cambiar de pantalla.'}
+              {`${totalCount || results.length} publicaciones recientes para explorar antes de ir a resultados.`}
             </p>
           </div>
           <div className="home-results__actions">
             <label className="home-sort-control" htmlFor="home-sort">
               <span>Ordenar</span>
-              <select id="home-sort" value={filters.sort} onChange={(event) => patchFilters({ sort: event.target.value }, true)}>
+              <select id="home-sort" value={filters.sort} onChange={(event) => setFilter('sort', event.target.value)}>
                 {SORT_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -304,7 +294,7 @@ export function HomePage() {
                 ))}
               </select>
             </label>
-            {hasActiveSearch ? (
+            {activeCount ? (
               <button type="button" className="home-clear-button" onClick={resetFilters}>
                 <RotateCcw size={16} aria-hidden="true" />
                 Limpiar filtros
@@ -333,7 +323,7 @@ export function HomePage() {
             ))}
           </div>
         ) : (
-          <HomeEmptyState hasFilters={hasActiveSearch} onClear={resetFilters} />
+          <HomeEmptyState hasFilters={activeCount > 0} onClear={resetFilters} />
         )}
       </section>
 
@@ -346,7 +336,7 @@ export function HomePage() {
         activeCount={activeCount}
         onChange={setFilter}
         onToggleExtra={toggleExtra}
-        onClear={() => clearFilters(false)}
+        onClear={() => clearFilters()}
         onDismiss={() => setFiltersOpen(false)}
         onApply={applyFilters}
       />
@@ -407,18 +397,18 @@ function HomeSearchForm({ filters, activeCount, onChange, onSearch, onOpenMoreFi
         id="home-property-type"
         label="Tipo de vivienda"
         icon={Home}
-        value={filters.propertyType}
+        value={filters.propertyTypes[0] || ''}
         options={PROPERTY_TYPES}
-        onChange={(value) => onChange('propertyType', value)}
+        onChange={(value) => onChange('propertyTypes', value ? [value] : [])}
       />
 
       <FilterDropdown
         id="home-rooms"
         label="Habitaciones"
         icon={BedDouble}
-        value={filters.rooms}
+        value={filters.bedrooms}
         options={ROOM_OPTIONS}
-        onChange={(value) => onChange('rooms', value)}
+        onChange={(value) => onChange('bedrooms', value)}
       />
 
       <button
@@ -628,9 +618,14 @@ function MoreFiltersModal({
                 <button
                   key={value}
                   type="button"
-                  className={filters.propertyType === value ? 'is-active' : ''}
-                  onClick={() => onChange('propertyType', filters.propertyType === value ? '' : value)}
-                  aria-pressed={filters.propertyType === value}
+                  className={filters.propertyTypes.includes(value) ? 'is-active' : ''}
+                  onClick={() =>
+                    onChange(
+                      'propertyTypes',
+                      filters.propertyTypes.includes(value) ? [] : [value]
+                    )
+                  }
+                  aria-pressed={filters.propertyTypes.includes(value)}
                 >
                   <Icon size={18} aria-hidden="true" />
                   {label}
@@ -648,9 +643,9 @@ function MoreFiltersModal({
                   id="home-filter-rooms"
                   label="Habitaciones"
                   icon={BedDouble}
-                  value={filters.rooms}
+                  value={filters.bedrooms}
                   options={ROOM_OPTIONS}
-                  onChange={(value) => onChange('rooms', value)}
+                  onChange={(value) => onChange('bedrooms', value)}
                 />
               </div>
               <div className="home-filter-input">
@@ -671,9 +666,11 @@ function MoreFiltersModal({
                   type="number"
                   min="0"
                   step="5"
-                  value={filters.area || ''}
+                  value={filters.minArea || ''}
                   placeholder="Ej: 60 m2"
-                  onChange={(event) => onChange('area', event.target.value || defaultFilters.area)}
+                  onChange={(event) =>
+                    onChange('minArea', event.target.value || defaultFilters.minArea)
+                  }
                 />
               </label>
               <label className="home-filter-input" htmlFor="home-filter-date">

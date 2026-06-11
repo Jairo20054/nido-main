@@ -114,8 +114,14 @@ const normalizePropertyFilters = (filters = {}) => {
     minRent: firstPresent(filters, ['minRent', 'minPrice', 'min']),
     maxRent: firstPresent(filters, ['maxRent', 'maxPrice', 'priceMax', 'max']),
     bedrooms: firstPresent(filters, ['bedrooms', 'rooms', 'habitaciones', 'hab']),
+    bedroomsExact: firstPresent(filters, ['bedroomsExact', 'habitacionesExactas']),
     bathrooms: firstPresent(filters, ['bathrooms', 'banos']),
+    bathroomsExact: firstPresent(filters, ['bathroomsExact', 'banosExactos']),
     areaMin: firstPresent(filters, ['areaMin', 'area']),
+    areaMax: firstPresent(filters, ['areaMax', 'maxArea']),
+    strata: firstPresent(filters, ['strata', 'estrato']),
+    parking: firstPresent(filters, ['parking', 'parkingSpots']),
+    administrationIncluded: firstPresent(filters, ['administrationIncluded', 'administracionIncluida']),
   };
 };
 
@@ -423,10 +429,33 @@ const applySearchFilters = (query, filters, user) => {
 
   if (filters.minRent !== undefined) query = query.gte('monthly_rent', filters.minRent);
   if (filters.maxRent !== undefined) query = query.lte('monthly_rent', filters.maxRent);
-  if (filters.bedrooms !== undefined) query = query.gte('bedrooms', filters.bedrooms);
-  if (filters.bathrooms !== undefined) query = query.gte('bathrooms', filters.bathrooms);
+  if (filters.bedrooms !== undefined) {
+    query = filters.bedroomsExact ? query.eq('bedrooms', filters.bedrooms) : query.gte('bedrooms', filters.bedrooms);
+  }
+
+  if (filters.bathrooms !== undefined) {
+    query = filters.bathroomsExact ? query.eq('bathrooms', filters.bathrooms) : query.gte('bathrooms', filters.bathrooms);
+  }
+
   if (filters.areaMin !== undefined) query = query.gte('area_m2', filters.areaMin);
-  if (filters.parking === true) query = query.gt('parking_spots', 0);
+  if (filters.areaMax !== undefined) query = query.lte('area_m2', filters.areaMax);
+  if (filters.strata !== undefined) query = query.eq('strata', filters.strata);
+  if (filters.administrationIncluded !== undefined) {
+    query = query.eq('administration_included', filters.administrationIncluded);
+  }
+
+  if (filters.parking !== undefined) {
+    if (filters.parking === true) {
+      query = query.gt('parking_spots', 0);
+    } else if (filters.parking === false) {
+      query = query.eq('parking_spots', 0);
+    } else {
+      const parkingCount = Number(filters.parking);
+      if (Number.isFinite(parkingCount)) {
+        query = parkingCount === 0 ? query.eq('parking_spots', 0) : query.gte('parking_spots', parkingCount);
+      }
+    }
+  }
 
   Object.entries(BOOLEAN_EXTRAS).forEach(([filterKey, column]) => {
     if (filters[filterKey] !== undefined) {
@@ -461,6 +490,7 @@ const applyOrdering = (query, sort) => {
   if (sort === 'rent-desc') return query.order('monthly_rent', { ascending: false }).order('created_at', { ascending: false });
   if (sort === 'latest') return query.order('created_at', { ascending: false });
   if (sort === 'area-desc') return query.order('area_m2', { ascending: false }).order('created_at', { ascending: false });
+  if (sort === 'bedrooms-desc') return query.order('bedrooms', { ascending: false }).order('created_at', { ascending: false });
 
   return query.order('published_at', { ascending: false, nullsFirst: false }).order('created_at', { ascending: false });
 };

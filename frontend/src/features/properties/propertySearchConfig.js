@@ -2,7 +2,6 @@ import {
   Bath,
   BedDouble,
   Building2,
-  Car,
   Dumbbell,
   Home,
   Landmark,
@@ -20,6 +19,7 @@ export const PROPERTY_TYPE_OPTIONS = [
   { value: 'studio', label: 'Apartaestudio', icon: Sofa },
   { value: 'room', label: 'Habitacion', icon: BedDouble },
   { value: 'loft', label: 'Loft', icon: Warehouse },
+  { value: 'penthouse', label: 'Penthouse', icon: Landmark },
 ];
 
 export const BUDGET_OPTIONS = [
@@ -61,7 +61,6 @@ export const BATHROOM_OPTIONS = [
 ];
 
 export const AMENITY_OPTIONS = [
-  { value: 'parking', label: 'Parqueadero', icon: Car },
   { value: 'elevator', label: 'Ascensor', icon: Landmark },
   { value: 'balcony', label: 'Balcon', icon: MapPin },
   { value: 'gym', label: 'Gimnasio', icon: Dumbbell },
@@ -71,12 +70,21 @@ export const AMENITY_OPTIONS = [
   { value: 'security', label: 'Vigilancia', icon: ShieldCheck },
 ];
 
+export const PARKING_OPTIONS = [
+  { value: '', label: 'Todos' },
+  { value: '0', label: 'Sin parqueadero' },
+  { value: '1', label: '1+' },
+  { value: '2', label: '2+' },
+  { value: '3', label: '3+' },
+];
+
 export const SORT_OPTIONS = [
-  { value: 'recommended', label: 'Recomendados' },
+  { value: 'recommended', label: 'Popularidad' },
   { value: 'rent-asc', label: 'Menor precio' },
   { value: 'rent-desc', label: 'Mayor precio' },
   { value: 'latest', label: 'Mas recientes' },
   { value: 'area-desc', label: 'Mayor area' },
+  { value: 'bedrooms-desc', label: 'Mas habitaciones' },
 ];
 
 export const EXTRA_LABELS = Object.fromEntries(

@@ -2,6 +2,7 @@ import React from 'react';
 import { Grid2X2, List, Map, RotateCcw } from 'lucide-react';
 import { FilterDropdown } from './FilterDropdown';
 import { SORT_OPTIONS } from './propertySearchConfig';
+import { getPropertyTypeLabel } from '../../lib/formatters';
 
 export function PropertiesResultsHeader({
   count,
@@ -16,16 +17,27 @@ export function PropertiesResultsHeader({
   onToggleMap,
   onViewModeChange,
 }) {
-  const locationCopy = filters.city
-    ? `Mostrando en ${filters.city}`
-    : 'Mostrando propiedades segun tus filtros';
+  const locationCopy =
+    filters.location ||
+    [filters.neighborhood, filters.city, filters.department].filter(Boolean).join(', ');
   const counter = totalCount > count ? totalCount : count;
   const summaryParts = (resultSummary || locationCopy).split(' / ').filter(Boolean);
+  const typeCopy =
+    filters.propertyTypes.length === 1
+      ? getPropertyTypeLabel(filters.propertyTypes[0])
+      : 'Casas y apartamentos';
+  const heading = `${typeCopy} en arriendo${locationCopy ? ` en ${locationCopy}` : ''}`;
 
   return (
     <div className="properties-results-header">
       <div className="properties-results-header__copy">
-        <h1>{counter} propiedades encontradas</h1>
+        <span className="properties-results-header__breadcrumb">
+          Estas en: NIDO &gt; Arriendo &gt; {locationCopy || 'Colombia'}
+        </span>
+        <h1>{heading}</h1>
+        <p>
+          Mostrando {count ? 1 : 0} - {count} de {counter} resultados
+        </p>
         <div className="properties-results-header__meta" aria-label="Resumen de resultados">
           {summaryParts.map((part) => (
             <span key={part}>{part}</span>
