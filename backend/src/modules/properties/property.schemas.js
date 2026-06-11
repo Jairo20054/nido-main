@@ -103,6 +103,7 @@ const propertyPayloadSchema = Joi.object({
     )
     .default(PropertyStatus.DRAFT),
   city: requiredText(2, 60),
+  country: optionalText(60),
   department: optionalText(60),
   neighborhood: optionalText(80),
   addressLine: requiredText(4, 160),
@@ -292,8 +293,18 @@ const propertyStatusSchema = Joi.object({
   reviewNote: Joi.string().trim().max(1000).allow('', null),
 });
 
+const propertyLocationSchema = Joi.object({
+  latitude: Joi.number().min(-90).max(90).required(),
+  longitude: Joi.number().min(-180).max(180).required(),
+  address: optionalText(160),
+  addressLine: optionalText(160),
+  city: optionalText(60),
+  country: optionalText(60),
+});
+
 module.exports = {
   createPropertySchema,
+  propertyLocationSchema,
   propertyQuerySchema,
   propertyStatusSchema,
   updatePropertySchema,

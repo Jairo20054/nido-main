@@ -57,6 +57,20 @@ export function PublishPropertyPage() {
         ? await api.patch(`/properties/${editingProperty.id}`, payload)
         : await api.post('/properties', payload);
 
+      if (
+        editingProperty &&
+        Number.isFinite(Number(payload.latitude)) &&
+        Number.isFinite(Number(payload.longitude))
+      ) {
+        await api.patch(`/properties/${editingProperty.id}/location`, {
+          latitude: Number(payload.latitude),
+          longitude: Number(payload.longitude),
+          address: payload.addressLine,
+          city: payload.city,
+          country: payload.country,
+        });
+      }
+
       const successMessage = editingProperty
         ? 'Propiedad actualizada correctamente.'
         : response.message || 'Publicacion guardada correctamente.';

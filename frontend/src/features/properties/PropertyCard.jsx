@@ -14,6 +14,7 @@ import {
 import { Link } from 'react-router-dom';
 import { PropertyImage } from '../../components/ui/PropertyImage';
 import { formatCurrency, getPropertyTypeLabel } from '../../lib/formatters';
+import { getStaticMapUrl } from '../../lib/map';
 import {
   getPropertyLocationLabel,
   getPropertyReputationLabel,
@@ -29,6 +30,7 @@ export function PropertyCard({
   distanceLabel,
   selectedForCompare = false,
   onToggleCompare,
+  isListView = false,
 }) {
   const safeText = (value, fallback = '') => {
     if (value === null || value === undefined) return fallback;
@@ -77,6 +79,13 @@ export function PropertyCard({
     return 'Nuevo';
   })();
   const cardTarget = `/properties/${property.id}`;
+  const staticMapUrl = getStaticMapUrl({
+    latitude: property.latitude,
+    longitude: property.longitude,
+    width: 280,
+    height: 140,
+    zoom: 14,
+  });
 
   const handleToggleFavorite = (event) => {
     event.preventDefault();
@@ -168,6 +177,14 @@ export function PropertyCard({
           {getPropertyLocationLabel(property)}
         </p>
         {!isHome && summary ? <p className="property-card__summary">{summary}</p> : null}
+        {isListView && staticMapUrl ? (
+          <img
+            src={staticMapUrl}
+            alt={`Mapa de ${property.addressLine || property.address || title}`}
+            className="property-card__static-map"
+            loading="lazy"
+          />
+        ) : null}
 
         <div className="property-card__stats">
           <span>

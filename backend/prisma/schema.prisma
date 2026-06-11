@@ -91,6 +91,7 @@ model Property {
   rentalType              RentalType                @default(FULL_HOME)
   status                  PropertyStatus            @default(DRAFT)
   city                    String
+  country                 String                    @default("CO")
   department              String?
   neighborhood            String?
   addressLine             String

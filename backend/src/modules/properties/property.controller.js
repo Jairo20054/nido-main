@@ -551,6 +551,7 @@ const createProperty = async (req, res) => {
 const updateProperty = async (req, res) => {
   const client = requireSupabase();
   const existing = await fetchPropertyRow(client, req.params.id);
+  const landlordId = await getLandlordIdForUser(client, req.user);
 
   if (!existing) {
     throw notFound('La propiedad no existe');
@@ -581,6 +582,49 @@ const updateProperty = async (req, res) => {
   res.json({
     success: true,
     message: 'Propiedad actualizada correctamente',
+    data: rowToProperty(updated),
+  });
+};
+
+const updatePropertyLocation = async (req, res) => {
+  const client = requireSupabase();
+  const existing = await fetchPropertyRow(client, req.params.id);
+  const landlordId = await getLandlordIdForUser(client, req.user);
+
+  if (!existing) {
+    throw notFound('La propiedad no existe');
+  }
+
+  if (!canManageProperty(req.user, existing, landlordId)) {
+    throw forbidden();
+  }
+
+  const now = new Date().toISOString();
+  const patch = {
+    latitude: req.body.latitude,
+    longitude: req.body.longitude,
+    updated_at: now,
+  };
+
+  const address = blankToNull(req.body.addressLine ?? req.body.address);
+  const city = blankToNull(req.body.city);
+  const country = blankToNull(req.body.country);
+
+  if (address !== null) patch.address = address;
+  if (city !== null) patch.city = city;
+  if (country !== null) patch.country = country;
+
+  const { error } = await client.from('properties').update(patch).eq('id', req.params.id);
+
+  if (error) {
+    throw serviceUnavailable('No fue posible actualizar la ubicacion de la propiedad');
+  }
+
+  const updated = await fetchPropertyRow(client, req.params.id);
+
+  res.json({
+    success: true,
+    message: 'Ubicacion actualizada correctamente',
     data: rowToProperty(updated),
   });
 };
@@ -627,6 +671,7 @@ const changePropertyStatus = async (req, res) => {
 const deleteProperty = async (req, res) => {
   const client = requireSupabase();
   const existing = await fetchPropertyRow(client, req.params.id);
+  const landlordId = await getLandlordIdForUser(client, req.user);
 
   if (!existing) {
     throw notFound('La propiedad no existe');
@@ -685,5 +730,6 @@ module.exports = {
   getMyProperties,
   getPropertyById,
   listProperties,
+  updatePropertyLocation,
   updateProperty,
 };

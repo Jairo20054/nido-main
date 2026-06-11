@@ -5,6 +5,7 @@ const { paginationQuerySchema } = require('../../shared/pagination');
 const { validate } = require('../../shared/validate');
 const {
   createPropertySchema,
+  propertyLocationSchema,
   propertyQuerySchema,
   propertyStatusSchema,
   updatePropertySchema,
@@ -28,6 +29,12 @@ router.patch(
   requireRoles('ADMIN'),
   validate(propertyStatusSchema),
   asyncHandler(controller.changePropertyStatus)
+);
+router.patch(
+  '/:id/location',
+  requireAuth,
+  validate(propertyLocationSchema),
+  asyncHandler(controller.updatePropertyLocation)
 );
 router.get('/:id', optionalAuth, asyncHandler(controller.getPropertyById));
 router.patch('/:id', requireAuth, validate(updatePropertySchema), asyncHandler(controller.updateProperty));

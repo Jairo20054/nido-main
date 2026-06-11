@@ -92,6 +92,7 @@ const validateFrontendEnv = () => {
     VITE_SUPABASE_EMAIL_CONFIRMATION_URL: import.meta.env.VITE_SUPABASE_EMAIL_CONFIRMATION_URL || '',
     VITE_SUPABASE_PROPERTY_MEDIA_BUCKET:
       import.meta.env.VITE_SUPABASE_PROPERTY_MEDIA_BUCKET || 'property-media-public',
+    VITE_MAPTILER_KEY: import.meta.env.VITE_MAPTILER_KEY || '',
     VITE_SUPABASE_URL: supabaseUrl,
     VITE_VERCEL_URL: import.meta.env.VITE_VERCEL_URL || '',
   };

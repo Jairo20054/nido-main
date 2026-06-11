@@ -30,6 +30,7 @@ export function PropertiesGrid({
           disabledFavorite={savingFavorite === property.id}
           selectedForCompare={selectedPropertyIds.includes(property.id)}
           onToggleCompare={onToggleCompare}
+          isListView={viewMode === 'list'}
         />
       ))}
     </div>

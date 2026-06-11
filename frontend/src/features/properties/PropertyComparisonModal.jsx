@@ -2,8 +2,10 @@ import React, { useEffect } from 'react';
 import { Bath, BedDouble, Car, Check, MapPin, Ruler, Star, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PropertyImage } from '../../components/ui/PropertyImage';
+import { PropertyMap } from '../../components/map/PropertyMap';
 import { formatCurrency } from '../../lib/formatters';
 import { getPropertyLocationLabel } from '../../lib/propertyPresentation';
+import { hasValidCoordinates } from '../../utils/geo';
 
 const getValue = (value, fallback = 'No indicado') => {
   if (value === null || value === undefined || value === '') return fallback;
@@ -141,6 +143,26 @@ export function PropertyComparisonModal({ open, properties, onClose }) {
             <ComparisonSummaryCard key={property.id} property={property} />
           ))}
         </div>
+
+        <section className="nido-comparison-map-grid" aria-label="Ubicacion en mapa">
+          {properties.map((property) => (
+            <article key={property.id} className="nido-comparison-map-card">
+              <strong>{property.title}</strong>
+              <PropertyMap
+                latitude={property.latitude}
+                longitude={property.longitude}
+                address={getPropertyLocationLabel(property)}
+                title={property.title}
+                zoom={14}
+                heightClassName="nido-map--compare"
+                compact
+              />
+              {!hasValidCoordinates(property.latitude, property.longitude) ? (
+                <span>Sin ubicacion disponible</span>
+              ) : null}
+            </article>
+          ))}
+        </section>
 
         <div className="property-comparison-modal__table-wrap">
           <table className="property-comparison-modal__table">

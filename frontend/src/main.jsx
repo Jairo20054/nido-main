@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+import 'maplibre-gl/dist/maplibre-gl.css';
 import App from './App';
 import './styles/theme.css';
 import './styles/app.css';

@@ -1,4 +1,5 @@
 import React, { Suspense, lazy } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './app/providers/AuthProvider';
 import { ProtectedRoute } from './app/routes/ProtectedRoute';
@@ -75,6 +76,8 @@ const PropertyDetailPage = lazyPage(
 );
 const SearchPage = lazyPage(() => import('./features/properties/SearchPage'), 'SearchPage');
 
+const queryClient = new QueryClient();
+
 function ProtectedAppPage({ children, roles }) {
   return (
     <ProtectedRoute roles={roles}>
@@ -92,14 +95,16 @@ function ProtectedAppPage({ children, roles }) {
 function App() {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <Suspense fallback={<LoadingState label="Cargando vista..." />}>
-          <Routes>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <Suspense fallback={<LoadingState label="Cargando vista..." />}>
+            <Routes>
             <Route element={<SiteLayout />}>
               {/* Rutas publicas del portal */}
               <Route path="/" element={<HomePage />} />
               <Route path="/properties" element={<SearchPage />} />
               <Route path="/properties/:id" element={<PropertyDetailPage />} />
+              <Route path="/propiedades/:id" element={<PropertyDetailPage />} />
               <Route path="/properties/:id/apply/start" element={<ApplyStartPage />} />
               <Route path="/properties/:id/apply/prequal" element={<ApplyPrequalificationPage />} />
               <Route path="/properties/:id/apply/documents" element={<ApplicationDocumentsPage />} />
@@ -192,6 +197,14 @@ function App() {
                 </ProtectedAppPage>
               }
             />
+            <Route
+              path="/configuracion"
+              element={
+                <ProtectedAppPage>
+                  <OperationalPage type="settings" />
+                </ProtectedAppPage>
+              }
+            />
             {/* Rutas con permisos especiales por rol */}
             <Route
               path="/manage"
@@ -217,10 +230,27 @@ function App() {
                 </ProtectedAppPage>
               }
             />
+            <Route
+              path="/moderacion"
+              element={
+                <ProtectedAppPage roles={['ADMIN']}>
+                  <AdminPage />
+                </ProtectedAppPage>
+              }
+            />
+            <Route
+              path="/arrendadores/:id/metricas"
+              element={
+                <ProtectedAppPage roles={['ADMIN']}>
+                  <OperationalPage type="stats" />
+                </ProtectedAppPage>
+              }
+            />
             <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Suspense>
-      </AuthProvider>
+            </Routes>
+          </Suspense>
+        </AuthProvider>
+      </QueryClientProvider>
     </ErrorBoundary>
   );
 }

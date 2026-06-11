@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../app/providers/useAuth';
 import { InlineMessage } from '../../components/ui/InlineMessage';
+import { LocationPicker } from '../../components/map/LocationPicker';
 import { NumberStepper } from '../../components/ui/NumberStepper';
 import { PROPERTY_DRAFT_STORAGE_KEY } from '../../lib/constants';
 import {
@@ -496,7 +497,7 @@ const validateForm = (form, { action = 'publish', scope = null } = {}) => {
 };
 
 const normalizePayload = (form, targetStatus) => {
-  const { country: _country, operationType: _operationType, ...payload } = form;
+  const { operationType: _operationType, ...payload } = form;
   const normalizedBedrooms = normalizeNumber(form.bedrooms, 0);
   const description = buildGeneratedDescription(form);
 
@@ -761,6 +762,19 @@ function SummaryCard({ icon: Icon, label, value }) {
 }
 
 function TypeLocationStep({ cities, departments, errors, form, onDepartmentChange, setField }) {
+  const handleLocationChange = (location) => {
+    const updates = {
+      latitude: location.latitude,
+      longitude: location.longitude,
+    };
+
+    if (location.address) updates.addressLine = location.address;
+    if (location.city) updates.city = location.city;
+    if (location.country) updates.country = location.country;
+
+    Object.entries(updates).forEach(([field, value]) => setField(field, value));
+  };
+
   return (
     <FormSection
       eyebrow="Paso 1"
@@ -846,6 +860,13 @@ function TypeLocationStep({ cities, departments, errors, form, onDepartmentChang
         placeholder="Ej. Carrera 15 con Calle 93, zona Parque de la 93"
         help="Puedes mantener privada la direccion exacta. La zona debe ser suficiente para validar la publicacion."
         maxLength={160}
+      />
+      <LocationPicker
+        initialLat={form.latitude}
+        initialLng={form.longitude}
+        initialAddress={form.addressLine}
+        initialCity={form.city}
+        onLocationChange={handleLocationChange}
       />
       </div>
 

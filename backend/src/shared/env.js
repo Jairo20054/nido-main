@@ -122,7 +122,7 @@ const env = {
 
 const validateBackendEnv = () => {
   const missing = [];
-  const allowedPublicKeys = new Set(['VITE_SUPABASE_ANON_KEY', 'VITE_SUPABASE_PUBLISHABLE_KEY']);
+  const allowedPublicKeys = new Set(['VITE_SUPABASE_ANON_KEY', 'VITE_SUPABASE_PUBLISHABLE_KEY', 'VITE_MAPTILER_KEY']);
   const publicSecretEnvNames = Object.keys(process.env).filter(
     (key) =>
       key.startsWith('VITE_') &&
