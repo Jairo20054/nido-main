@@ -380,6 +380,7 @@ function HomeSearchForm({ filters, activeCount, onChange, onSearch, onOpenMoreFi
       </label>
 
       <FilterDropdown
+        className="home-search__field--budget"
         id="home-budget"
         label="Presupuesto"
         icon={WalletCards}
@@ -394,6 +395,7 @@ function HomeSearchForm({ filters, activeCount, onChange, onSearch, onOpenMoreFi
       />
 
       <FilterDropdown
+        className="home-search__field--property-type"
         id="home-property-type"
         label="Tipo de vivienda"
         icon={Home}
@@ -403,6 +405,7 @@ function HomeSearchForm({ filters, activeCount, onChange, onSearch, onOpenMoreFi
       />
 
       <FilterDropdown
+        className="home-search__field--rooms"
         id="home-rooms"
         label="Habitaciones"
         icon={BedDouble}
@@ -417,14 +420,19 @@ function HomeSearchForm({ filters, activeCount, onChange, onSearch, onOpenMoreFi
         onClick={onOpenMoreFilters}
         aria-label="Abrir mas filtros"
       >
-        <SlidersHorizontal size={18} aria-hidden="true" />
-        <span>Mas filtros</span>
+        <span className="home-search__more-icon">
+          <SlidersHorizontal size={18} aria-hidden="true" />
+        </span>
+        <span className="home-search__more-copy">
+          <span className="home-search__more-label">Filtros</span>
+          <span className="home-search__more-value">Mas filtros</span>
+        </span>
         {activeCount ? <strong>{activeCount}</strong> : null}
       </button>
 
       <button type="submit" className="home-search__button">
         <Search size={20} aria-hidden="true" />
-        Buscar
+        <span className="home-search__button-text">Buscar</span>
       </button>
 
       <datalist id="home-popular-cities">
@@ -438,7 +446,7 @@ function HomeSearchForm({ filters, activeCount, onChange, onSearch, onOpenMoreFi
   );
 }
 
-function FilterDropdown({ id, label, value, options, onChange, icon: Icon }) {
+function FilterDropdown({ className = '', id, label, value, options, onChange, icon: Icon }) {
   const generatedId = useId();
   const buttonId = id || generatedId;
   const menuId = `${buttonId}-menu`;
@@ -476,7 +484,7 @@ function FilterDropdown({ id, label, value, options, onChange, icon: Icon }) {
   };
 
   return (
-    <div className="home-search__field home-filter-dropdown" ref={dropdownRef}>
+    <div className={`home-search__field home-filter-dropdown ${className}`.trim()} ref={dropdownRef}>
       <span className="home-search__icon">
         <Icon size={20} aria-hidden="true" />
       </span>

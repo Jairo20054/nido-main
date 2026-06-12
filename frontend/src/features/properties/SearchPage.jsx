@@ -6,6 +6,7 @@ import { api } from '../../lib/apiClient';
 import { formatCurrency, getPropertyTypeLabel } from '../../lib/formatters';
 import { ActiveFilterChips } from './ActiveFilterChips';
 import { EmptyPropertiesState } from './EmptyPropertiesState';
+import { FilterDropdown } from './FilterDropdown';
 import { MobileFiltersDrawer } from './MobileFiltersDrawer';
 import { PropertyComparisonBar } from './PropertyComparisonBar';
 import { PropertyComparisonModal } from './PropertyComparisonModal';
@@ -14,7 +15,7 @@ import { PropertiesResultsHeader } from './PropertiesResultsHeader';
 import { PropertiesSearchBar } from './PropertiesSearchBar';
 import { PropertiesTopFilters } from './PropertiesTopFilters';
 import { RecommendedPropertiesPanel } from './RecommendedPropertiesPanel';
-import { EXTRA_LABELS } from './propertySearchConfig';
+import { EXTRA_LABELS, SORT_OPTIONS } from './propertySearchConfig';
 import {
   buildPropertySearchQuery,
   DEFAULT_SEARCH_FILTERS,
@@ -339,11 +340,37 @@ export function SearchPage() {
           filters={filters}
           activeCount={activeCount}
           onChange={setFilter}
-          onToggleExtra={toggleExtra}
-          onTogglePropertyType={togglePropertyType}
           onClear={clearFilters}
           onOpenMoreFilters={() => setDesktopFiltersOpen(true)}
         />
+      </section>
+
+      <section className="properties-mobile-toolbar" aria-label="Filtros y orden movil">
+        <button
+          type="button"
+          className="properties-mobile-toolbar__filter"
+          onClick={() => setMobileFiltersOpen(true)}
+        >
+          <SlidersHorizontal size={18} aria-hidden="true" />
+          Filtros
+          {activeCount ? <span>{activeCount}</span> : null}
+        </button>
+        <FilterDropdown
+          className="properties-mobile-toolbar__sort"
+          label="Ordenar"
+          ariaLabel="Ordenar propiedades"
+          value={filters.sort}
+          options={SORT_OPTIONS}
+          onChange={(value) => setFilter('sort', value)}
+        />
+        {activeCount ? (
+          <div className="properties-mobile-toolbar__summary" aria-live="polite">
+            <span>{activeCount} activos</span>
+            <button type="button" onClick={clearFilters}>
+              Limpiar
+            </button>
+          </div>
+        ) : null}
       </section>
 
       <section className={`properties-layout ${showMapPanel ? 'properties-layout--map-open' : ''}`}>
@@ -358,6 +385,7 @@ export function SearchPage() {
             mapOpen={showMapPanel}
             onSortChange={(value) => setFilter('sort', value)}
             onClear={clearFilters}
+            onClearPropertyTypes={() => patchFilters({ propertyTypes: [] })}
             onToggleMap={() => setShowMapPanel((current) => !current)}
             onViewModeChange={setViewMode}
           />
@@ -397,16 +425,6 @@ export function SearchPage() {
           />
         </div>
       </section>
-
-      <button
-        type="button"
-        className="mobile-filter-trigger"
-        onClick={() => setMobileFiltersOpen(true)}
-      >
-        <SlidersHorizontal size={18} aria-hidden="true" />
-        Filtros
-        {activeCount ? <span>{activeCount}</span> : null}
-      </button>
 
       <MobileFiltersDrawer
         open={mobileFiltersOpen}

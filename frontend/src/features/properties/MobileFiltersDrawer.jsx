@@ -1,5 +1,5 @@
-import React from 'react';
-import { PropertyFilters } from './PropertyFilters';
+import React, { useEffect } from 'react';
+import { MoreFiltersModal } from './MoreFiltersModal';
 
 export function MobileFiltersDrawer({
   open,
@@ -11,6 +11,25 @@ export function MobileFiltersDrawer({
   onDismiss,
   desktop = false,
 }) {
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        onDismiss();
+      }
+    };
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onDismiss, open]);
+
   if (!open) return null;
 
   return (
@@ -27,13 +46,14 @@ export function MobileFiltersDrawer({
         onClick={onDismiss}
       />
       <div className="mobile-filter-sheet__panel">
-        <PropertyFilters
+        <MoreFiltersModal
           filters={filters}
           activeCount={activeCount}
           onApply={onApply}
           onClear={onClear}
           onDismiss={onDismiss}
           resultCount={resultCount}
+          advancedOnly={desktop}
         />
       </div>
     </div>

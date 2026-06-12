@@ -197,13 +197,31 @@ export function ManagementPage() {
     setLoading(true);
 
     try {
-      const [propertyResponse, requestResponse] = await Promise.all([
+      const [propertyResult, requestResult] = await Promise.allSettled([
         api.get('/properties/mine', { query: { limit: 50 } }),
         api.get('/requests/received', { query: { limit: 50 } }),
       ]);
-      setProperties(propertyResponse.data);
-      setRequests(requestResponse.data);
-      if (!location.state?.message) setMessage('');
+
+      if (propertyResult.status === 'rejected') {
+        throw propertyResult.reason;
+      }
+
+      setProperties(propertyResult.value.data);
+
+      if (requestResult.status === 'fulfilled') {
+        setRequests(requestResult.value.data);
+      } else {
+        console.warn('[MANAGEMENT_REQUESTS] No fue posible cargar solicitudes recibidas', {
+          message: requestResult.reason?.message,
+          status: requestResult.reason?.status,
+        });
+        setRequests([]);
+      }
+
+      if (!location.state?.message) {
+        setMessage(requestResult.status === 'rejected' ? 'Tus propiedades cargaron; las solicitudes se intentaran de nuevo mas tarde.' : '');
+        setMessageTone(requestResult.status === 'rejected' ? 'neutral' : 'success');
+      }
     } catch (requestError) {
       setMessageTone('danger');
       setMessage(requestError.message);

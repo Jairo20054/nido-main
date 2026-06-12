@@ -51,6 +51,17 @@ const requireSupabase = () => {
   return supabaseService;
 };
 
+const logSupabaseError = (context, error) => {
+  if (!error) return;
+
+  console.error(`[${context}] Supabase error`, {
+    code: error.code,
+    message: error.message,
+    details: error.details,
+    hint: error.hint,
+  });
+};
+
 const isAdmin = (user) => user?.role === 'ADMIN';
 
 const assertLandlordOrAdmin = (user) => {
@@ -99,11 +110,48 @@ const firstPresent = (source, keys) => {
   return key ? source[key] : undefined;
 };
 
+const normalizeFilterText = (value) => {
+  const text = normalizeText(value);
+  return text || undefined;
+};
+
+const normalizeFilterNumber = (value) => {
+  if (value === undefined || value === null || value === '') return undefined;
+
+  const number = Number(value);
+  return Number.isFinite(number) ? number : undefined;
+};
+
+const normalizeFilterBoolean = (value) => {
+  if (value === undefined || value === null || value === '') return undefined;
+  if (typeof value === 'boolean') return value;
+
+  const normalized = normalizeText(value).toLowerCase();
+  if (['true', '1', 'yes', 'si'].includes(normalized)) return true;
+  if (['false', '0', 'no'].includes(normalized)) return false;
+
+  return undefined;
+};
+
+const normalizeFilterList = (value) => {
+  if (Array.isArray(value)) {
+    return compactList(value).join(',');
+  }
+
+  return normalizeFilterText(value);
+};
+
+const normalizeParkingFilter = (value) => {
+  const booleanValue = normalizeFilterBoolean(value);
+  if (booleanValue !== undefined) return booleanValue;
+
+  return normalizeFilterNumber(value);
+};
+
 const normalizePropertyFilters = (filters = {}) => {
   const propertyType = firstPresent(filters, ['propertyType', 'tipo']);
   const propertyTypes = firstPresent(filters, ['propertyTypes', 'tipos']);
-
-  return {
+  const normalized = {
     ...filters,
     q: firstPresent(filters, ['q', 'search', 'location', 'ubicacion']),
     city: firstPresent(filters, ['city', 'ciudad']),
@@ -122,6 +170,37 @@ const normalizePropertyFilters = (filters = {}) => {
     strata: firstPresent(filters, ['strata', 'estrato']),
     parking: firstPresent(filters, ['parking', 'parkingSpots']),
     administrationIncluded: firstPresent(filters, ['administrationIncluded', 'administracionIncluida']),
+  };
+
+  return {
+    ...normalized,
+    q: normalizeFilterText(normalized.q),
+    city: normalizeFilterText(normalized.city),
+    department: normalizeFilterText(normalized.department),
+    neighborhood: normalizeFilterText(normalized.neighborhood),
+    propertyType: normalizeFilterText(normalized.propertyType),
+    propertyTypes: normalizeFilterList(normalized.propertyTypes),
+    minRent: normalizeFilterNumber(normalized.minRent),
+    maxRent: normalizeFilterNumber(normalized.maxRent),
+    bedrooms: normalizeFilterNumber(normalized.bedrooms),
+    bedroomsExact: normalizeFilterBoolean(normalized.bedroomsExact),
+    bathrooms: normalizeFilterNumber(normalized.bathrooms),
+    bathroomsExact: normalizeFilterBoolean(normalized.bathroomsExact),
+    areaMin: normalizeFilterNumber(normalized.areaMin),
+    areaMax: normalizeFilterNumber(normalized.areaMax),
+    strata: normalizeFilterNumber(normalized.strata),
+    parking: normalizeParkingFilter(normalized.parking),
+    administrationIncluded: normalizeFilterBoolean(normalized.administrationIncluded),
+    furnished: normalizeFilterBoolean(normalized.furnished),
+    petsAllowed: normalizeFilterBoolean(normalized.petsAllowed),
+    elevator: normalizeFilterBoolean(normalized.elevator),
+    balcony: normalizeFilterBoolean(normalized.balcony),
+    security: normalizeFilterBoolean(normalized.security),
+    gym: normalizeFilterBoolean(normalized.gym),
+    gatedCommunity: normalizeFilterBoolean(normalized.gatedCommunity),
+    availableFrom: normalizeFilterText(normalized.availableFrom),
+    status: normalizeFilterText(normalized.status),
+    sort: normalizeFilterText(normalized.sort) || 'recommended',
   };
 };
 
@@ -376,6 +455,7 @@ const getLandlordIdForUser = async (client, user, { ensure = false } = {}) => {
     .maybeSingle();
 
   if (selectError) {
+    logSupabaseError('PROPERTIES_LANDLORD_LOOKUP', selectError);
     throw serviceUnavailable('No fue posible sincronizar el perfil de arrendador en Supabase');
   }
 
@@ -394,6 +474,7 @@ const getLandlordIdForUser = async (client, user, { ensure = false } = {}) => {
       return getLandlordIdForUser(client, user, { ensure: false });
     }
 
+    logSupabaseError('PROPERTIES_LANDLORD_CREATE', insertError);
     throw serviceUnavailable('No fue posible sincronizar el perfil de arrendador en Supabase');
   }
 
@@ -503,6 +584,7 @@ const fetchPropertyRow = async (client, propertyId) => {
     .maybeSingle();
 
   if (error) {
+    logSupabaseError('PROPERTIES_FETCH_ONE', error);
     throw serviceUnavailable('No fue posible cargar la propiedad desde Supabase');
   }
 
@@ -537,6 +619,7 @@ const listProperties = async (req, res) => {
         .range(batchOffset, batchOffset + SEARCH_BATCH_SIZE - 1);
 
       if (error) {
+        logSupabaseError('PROPERTIES_SEARCH', error);
         throw serviceUnavailable('No fue posible consultar propiedades en Supabase');
       }
 
@@ -564,6 +647,7 @@ const listProperties = async (req, res) => {
     .range(skip, skip + limit - 1);
 
   if (error) {
+    logSupabaseError('PROPERTIES_SEARCH', error);
     throw serviceUnavailable('No fue posible consultar propiedades en Supabase');
   }
 
@@ -587,6 +671,7 @@ const getFeaturedProperties = async (req, res) => {
     .limit(6);
 
   if (error) {
+    logSupabaseError('PROPERTIES_FEATURED', error);
     throw serviceUnavailable('No fue posible consultar propiedades destacadas');
   }
 
@@ -615,6 +700,7 @@ const getMyProperties = async (req, res) => {
     .range(skip, skip + limit - 1);
 
   if (error) {
+    logSupabaseError('PROPERTIES_MINE', error);
     throw serviceUnavailable('No fue posible cargar tus propiedades');
   }
 
@@ -652,6 +738,7 @@ const createProperty = async (req, res) => {
   const { data, error } = await client.from('properties').insert(row).select(PROPERTY_SELECT).single();
 
   if (error) {
+    logSupabaseError('PROPERTIES_CREATE', error);
     throw serviceUnavailable('No fue posible guardar la propiedad en Supabase');
   }
 
@@ -693,6 +780,7 @@ const updateProperty = async (req, res) => {
   const { error } = await client.from('properties').update(row).eq('id', req.params.id);
 
   if (error) {
+    logSupabaseError('PROPERTIES_UPDATE', error);
     throw serviceUnavailable('No fue posible actualizar la propiedad en Supabase');
   }
 
@@ -740,6 +828,7 @@ const updatePropertyLocation = async (req, res) => {
   const { error } = await client.from('properties').update(patch).eq('id', req.params.id);
 
   if (error) {
+    logSupabaseError('PROPERTIES_LOCATION_UPDATE', error);
     throw serviceUnavailable('No fue posible actualizar la ubicacion de la propiedad');
   }
 
@@ -779,6 +868,7 @@ const changePropertyStatus = async (req, res) => {
     .eq('id', req.params.id);
 
   if (error) {
+    logSupabaseError('PROPERTIES_STATUS_UPDATE', error);
     throw serviceUnavailable('No fue posible actualizar el estado de la propiedad');
   }
 
@@ -807,6 +897,7 @@ const deleteProperty = async (req, res) => {
   const { error } = await client.from('properties').delete().eq('id', req.params.id);
 
   if (error) {
+    logSupabaseError('PROPERTIES_DELETE', error);
     throw serviceUnavailable('No fue posible eliminar la propiedad');
   }
 
@@ -821,6 +912,7 @@ const getAdminPropertyStats = async (_req, res) => {
   const { data, error } = await client.from('properties').select('status');
 
   if (error) {
+    logSupabaseError('PROPERTIES_ADMIN_STATS', error);
     throw serviceUnavailable('No fue posible cargar estadisticas de propiedades');
   }
 
@@ -853,6 +945,8 @@ module.exports = {
   getMyProperties,
   getPropertyById,
   listProperties,
+  PROPERTY_SELECT,
+  rowToProperty,
   updatePropertyLocation,
   updateProperty,
 };

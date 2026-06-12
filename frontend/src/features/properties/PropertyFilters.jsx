@@ -65,6 +65,7 @@ export function PropertyFilters({
   onClear,
   onDismiss,
   resultCount = 0,
+  advancedOnly = false,
 }) {
   const [draft, setDraft] = useState(filters);
 
@@ -72,7 +73,7 @@ export function PropertyFilters({
     setDraft(filters);
   }, [filters]);
 
-  const hasInvalidPrice = draft.minRent > draft.maxRent;
+  const hasInvalidPrice = !advancedOnly && draft.minRent > draft.maxRent;
 
   const updateField = (field, value) => {
     setDraft((current) => ({
@@ -139,108 +140,149 @@ export function PropertyFilters({
         </div>
       </div>
 
-      <FilterSection title="Ubicacion">
-        <div className="property-filter-field-grid">
-          <label className="property-filter-field" htmlFor="filter-location">
-            <span>Busqueda libre</span>
-            <input
-              id="filter-location"
-              value={draft.location}
-              onChange={(event) => updateField('location', event.target.value)}
-              placeholder="Cali, Laureles, Chapinero..."
-            />
-          </label>
-          <label className="property-filter-field" htmlFor="filter-city">
-            <span>Ciudad</span>
-            <input
-              id="filter-city"
-              value={draft.city}
-              onChange={(event) => updateField('city', event.target.value)}
-              placeholder="Cali"
-            />
-          </label>
-          <label className="property-filter-field" htmlFor="filter-neighborhood">
-            <span>Barrio</span>
-            <input
-              id="filter-neighborhood"
-              value={draft.neighborhood}
-              onChange={(event) => updateField('neighborhood', event.target.value)}
-              placeholder="Granada"
-            />
-          </label>
-          <label className="property-filter-field" htmlFor="filter-department">
-            <span>Departamento</span>
-            <input
-              id="filter-department"
-              value={draft.department}
-              onChange={(event) => updateField('department', event.target.value)}
-              placeholder="Valle del Cauca"
-            />
-          </label>
-        </div>
-      </FilterSection>
+      {!advancedOnly ? (
+        <>
+          <FilterSection title="Ubicacion">
+            <div className="property-filter-field-grid">
+              <label className="property-filter-field" htmlFor="filter-location">
+                <span>Busqueda libre</span>
+                <input
+                  id="filter-location"
+                  value={draft.location}
+                  onChange={(event) => updateField('location', event.target.value)}
+                  placeholder="Cali, Laureles, Chapinero..."
+                />
+              </label>
+              <label className="property-filter-field" htmlFor="filter-city">
+                <span>Ciudad</span>
+                <input
+                  id="filter-city"
+                  value={draft.city}
+                  onChange={(event) => updateField('city', event.target.value)}
+                  placeholder="Cali"
+                />
+              </label>
+              <label className="property-filter-field" htmlFor="filter-neighborhood">
+                <span>Barrio</span>
+                <input
+                  id="filter-neighborhood"
+                  value={draft.neighborhood}
+                  onChange={(event) => updateField('neighborhood', event.target.value)}
+                  placeholder="Granada"
+                />
+              </label>
+              <label className="property-filter-field" htmlFor="filter-department">
+                <span>Departamento</span>
+                <input
+                  id="filter-department"
+                  value={draft.department}
+                  onChange={(event) => updateField('department', event.target.value)}
+                  placeholder="Valle del Cauca"
+                />
+              </label>
+            </div>
+          </FilterSection>
 
-      <FilterSection title="Tipo de inmueble">
-        <div className="property-filter-card-grid">
-          {PROPERTY_TYPE_OPTIONS.map(({ value, label, icon: Icon }) => {
-            const active = draft.propertyTypes.includes(value);
+          <FilterSection title="Tipo de inmueble">
+            <div className="property-filter-card-grid">
+              {PROPERTY_TYPE_OPTIONS.map(({ value, label, icon: Icon }) => {
+                const active = draft.propertyTypes.includes(value);
 
-            return (
-              <button
-                key={value}
-                type="button"
-                className={active ? 'is-active' : ''}
-                onClick={() => togglePropertyType(value)}
-                aria-pressed={active}
-              >
-                <Icon size={17} aria-hidden="true" />
-                {label}
-              </button>
-            );
-          })}
-        </div>
-      </FilterSection>
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    className={active ? 'is-active' : ''}
+                    onClick={() => togglePropertyType(value)}
+                    aria-pressed={active}
+                  >
+                    <Icon size={17} aria-hidden="true" />
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          </FilterSection>
 
-      <FilterSection title="Precio y parqueadero">
-        <div className="property-filter-field-grid">
-          <label className="property-filter-field" htmlFor="filter-min-rent">
-            <span>Precio minimo</span>
-            <input
-              id="filter-min-rent"
-              type="number"
-              min="0"
-              step="100000"
-              value={draft.minRent || ''}
-              onChange={(event) => updateField('minRent', event.target.value)}
-              placeholder="800000"
-            />
-          </label>
-          <label className="property-filter-field" htmlFor="filter-max-rent">
-            <span>Precio maximo</span>
-            <input
-              id="filter-max-rent"
-              type="number"
-              min="0"
-              step="100000"
-              value={draft.maxRent === PRICE_FILTER_LIMIT ? '' : draft.maxRent}
-              onChange={(event) => updateField('maxRent', event.target.value || PRICE_FILTER_LIMIT)}
-              placeholder="2500000"
-            />
-          </label>
-          <label className="property-filter-field" htmlFor="filter-parking">
-            <span>Parqueadero</span>
-            <select
-              id="filter-parking"
-              value={draft.parking}
-              onChange={(event) => updateField('parking', event.target.value)}
-            >
-              {PARKING_OPTIONS.map((option) => (
-                <option key={option.value || 'all'} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          <FilterSection title="Precio y parqueadero">
+            <div className="property-filter-field-grid">
+              <label className="property-filter-field" htmlFor="filter-min-rent">
+                <span>Precio minimo</span>
+                <input
+                  id="filter-min-rent"
+                  type="number"
+                  min="0"
+                  step="100000"
+                  value={draft.minRent || ''}
+                  onChange={(event) => updateField('minRent', event.target.value)}
+                  placeholder="800000"
+                />
+              </label>
+              <label className="property-filter-field" htmlFor="filter-max-rent">
+                <span>Precio maximo</span>
+                <input
+                  id="filter-max-rent"
+                  type="number"
+                  min="0"
+                  step="100000"
+                  value={draft.maxRent === PRICE_FILTER_LIMIT ? '' : draft.maxRent}
+                  onChange={(event) => updateField('maxRent', event.target.value || PRICE_FILTER_LIMIT)}
+                  placeholder="2500000"
+                />
+              </label>
+              <label className="property-filter-field" htmlFor="filter-parking">
+                <span>Parqueadero</span>
+                <select
+                  id="filter-parking"
+                  value={draft.parking}
+                  onChange={(event) => updateField('parking', event.target.value)}
+                >
+                  {PARKING_OPTIONS.map((option) => (
+                    <option key={option.value || 'all'} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="property-filter-check property-filter-check--single">
+                <input
+                  type="checkbox"
+                  checked={draft.administrationIncluded}
+                  onChange={(event) => updateField('administrationIncluded', event.target.checked)}
+                />
+                <span>Administracion incluida</span>
+              </label>
+            </div>
+            {hasInvalidPrice ? (
+              <p className="property-filter-warning">
+                El precio minimo no puede ser mayor al precio maximo.
+              </p>
+            ) : null}
+          </FilterSection>
+
+          <FilterSection title="Habitaciones y banos">
+            <div className="property-filter-double-grid">
+              <CountSegment
+                label="Habitaciones"
+                exact={draft.bedroomsExact}
+                value={draft.bedrooms}
+                options={BEDROOM_OPTIONS}
+                onExactChange={(value) => updateField('bedroomsExact', value)}
+                onValueChange={(value) => updateField('bedrooms', value)}
+              />
+              <CountSegment
+                label="Banos"
+                exact={draft.bathroomsExact}
+                value={draft.bathrooms}
+                options={BATHROOM_OPTIONS}
+                onExactChange={(value) => updateField('bathroomsExact', value)}
+                onValueChange={(value) => updateField('bathrooms', value)}
+              />
+            </div>
+          </FilterSection>
+        </>
+      ) : (
+        <FilterSection title="Condiciones">
           <label className="property-filter-check property-filter-check--single">
             <input
               type="checkbox"
@@ -249,34 +291,8 @@ export function PropertyFilters({
             />
             <span>Administracion incluida</span>
           </label>
-        </div>
-        {hasInvalidPrice ? (
-          <p className="property-filter-warning">
-            El precio minimo no puede ser mayor al precio maximo.
-          </p>
-        ) : null}
-      </FilterSection>
-
-      <FilterSection title="Habitaciones y banos">
-        <div className="property-filter-double-grid">
-          <CountSegment
-            label="Habitaciones"
-            exact={draft.bedroomsExact}
-            value={draft.bedrooms}
-            options={BEDROOM_OPTIONS}
-            onExactChange={(value) => updateField('bedroomsExact', value)}
-            onValueChange={(value) => updateField('bedrooms', value)}
-          />
-          <CountSegment
-            label="Banos"
-            exact={draft.bathroomsExact}
-            value={draft.bathrooms}
-            options={BATHROOM_OPTIONS}
-            onExactChange={(value) => updateField('bathroomsExact', value)}
-            onValueChange={(value) => updateField('bathrooms', value)}
-          />
-        </div>
-      </FilterSection>
+        </FilterSection>
+      )}
 
       <FilterSection title="Area, estrato y disponibilidad">
         <div className="property-filter-field-grid">

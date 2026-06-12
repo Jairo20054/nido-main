@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid2X2, List, Map, RotateCcw } from 'lucide-react';
+import { Grid2X2, List, Map, RotateCcw, X } from 'lucide-react';
 import { FilterDropdown } from './FilterDropdown';
 import { SORT_OPTIONS } from './propertySearchConfig';
 import { getPropertyTypeLabel } from '../../lib/formatters';
@@ -14,6 +14,7 @@ export function PropertiesResultsHeader({
   mapOpen = false,
   onSortChange,
   onClear,
+  onClearPropertyTypes,
   onToggleMap,
   onViewModeChange,
 }) {
@@ -25,8 +26,12 @@ export function PropertiesResultsHeader({
   const typeCopy =
     filters.propertyTypes.length === 1
       ? getPropertyTypeLabel(filters.propertyTypes[0])
-      : 'Casas y apartamentos';
+      : filters.propertyTypes.length > 1
+        ? `${filters.propertyTypes.length} tipos de inmueble`
+        : 'Casas y apartamentos';
   const heading = `${typeCopy} en arriendo${locationCopy ? ` en ${locationCopy}` : ''}`;
+  const hasTypeFilter = filters.propertyTypes.length > 0;
+  const visibleSummaryParts = summaryParts.filter((part) => part !== typeCopy);
 
   return (
     <div className="properties-results-header">
@@ -39,7 +44,19 @@ export function PropertiesResultsHeader({
           Mostrando {count ? 1 : 0} - {count} de {counter} resultados
         </p>
         <div className="properties-results-header__meta" aria-label="Resumen de resultados">
-          {summaryParts.map((part) => (
+          {hasTypeFilter ? (
+            <button
+              type="button"
+              className="properties-results-header__category"
+              onClick={onClearPropertyTypes}
+            >
+              {typeCopy}
+              <X size={14} aria-hidden="true" />
+            </button>
+          ) : (
+            <span className="properties-results-header__category">{typeCopy}</span>
+          )}
+          {visibleSummaryParts.map((part) => (
             <span key={part}>{part}</span>
           ))}
         </div>

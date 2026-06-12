@@ -1,12 +1,10 @@
 const Joi = require('joi');
-const { RequestStatus } = require('@prisma/client');
 
-const cuidPattern = /^[a-z0-9]{20,32}$/i;
 const colombianPhonePattern = /^(\+?57\s?)?3\d{2}[\s-]?\d{3}[\s-]?\d{4}$/;
 
 // Validaciones de entrada para crear, editar y revisar solicitudes de arriendo.
 const createRequestSchema = Joi.object({
-  propertyId: Joi.string().trim().pattern(cuidPattern).required(),
+  propertyId: Joi.string().trim().uuid({ version: ['uuidv4'] }).required(),
   desiredMoveIn: Joi.date().iso().greater('now').required(),
   leaseMonths: Joi.number().integer().min(1).max(60).required(),
   occupants: Joi.number().integer().min(1).max(12).required(),
@@ -32,7 +30,7 @@ const updateRequestSchema = Joi.object({
 
 const reviewRequestSchema = Joi.object({
   status: Joi.string()
-    .valid(RequestStatus.APPROVED, RequestStatus.REJECTED)
+    .valid('APPROVED', 'REJECTED')
     .required(),
 });
 

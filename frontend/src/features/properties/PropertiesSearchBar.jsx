@@ -3,6 +3,8 @@ import { MapPin, Search } from 'lucide-react';
 
 const QUICK_LOCATIONS = ['Bogota', 'Medellin', 'Cali', 'Laureles', 'Chapinero', 'Granada'];
 
+const getActiveFilterLabel = (count) => (count === 1 ? 'filtro activo' : 'filtros activos');
+
 export function PropertiesSearchBar({ filters, activeCount, onChange }) {
   const [draftLocation, setDraftLocation] = useState(filters.location);
 
@@ -21,7 +23,7 @@ export function PropertiesSearchBar({ filters, activeCount, onChange }) {
   return (
     <form className="properties-search-bar properties-search-bar--marketplace" onSubmit={submitSearch}>
       <label className="properties-search-bar__field properties-search-bar__field--location">
-        <span>Buscar por ciudad, barrio o zona</span>
+        <span className="properties-search-bar__label">Buscar por ciudad, barrio o zona</span>
         <div>
           <MapPin size={18} aria-hidden="true" />
           <input
@@ -34,10 +36,12 @@ export function PropertiesSearchBar({ filters, activeCount, onChange }) {
         </div>
       </label>
 
-      <div className="properties-search-bar__active" aria-live="polite">
-        <strong>{activeCount}</strong>
-        filtros activos
-      </div>
+      {activeCount ? (
+        <div className="properties-search-bar__active" aria-live="polite">
+          <strong>{activeCount}</strong>
+          {getActiveFilterLabel(activeCount)}
+        </div>
+      ) : null}
 
       <button className="properties-search-bar__submit" type="submit">
         <Search size={18} aria-hidden="true" />
